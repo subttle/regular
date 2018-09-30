@@ -19,42 +19,25 @@ import           Data.Eq.Unicode
 import           Data.Void
 import           Data.Maybe
 import           Data.Functor.Contravariant
-
 import           Data.Fin
-import           Data.Type.Nat as N
-
-data Binary = Zero' | One' deriving (Eq, Enum, Bounded, Ord)
-instance Finite Binary
-instance Show Binary where
-  show Zero' = "0"
-  show  One' = "1"
+import           Data.Type.Nat
 
 -- A DFA which accepts all binary strings ending in 1
-endsWith1 ∷ DFA Bool Binary
+endsWith1 ∷ DFA Bool (Fin Nat2)
 endsWith1 = DFA { delta = delta
                 , q0    = False
                 , fs    = singleton True
-                } where delta (False, Zero') = False
-                        delta (False,  One') = True
-                        delta (True,  Zero') = False
-                        delta (True,   One') = True
-
--- The set of strings which end in [Zero', One']
-endsWith01 ∷ NFA.NFA Fin₃ Binary
-endsWith01 = NFA.NFA { NFA.delta = delta
-                     , NFA.q0    = Fin₃ 0
-                     , NFA.fs    = singleton (Fin₃ 2)
-                     } where delta (Fin₃ 0, Zero') = fromList  [Fin₃ 0, Fin₃ 1]
-                             delta (Fin₃ 0,  One') = singleton (Fin₃ 0)
-                             delta (Fin₃ 1,  One') = singleton (Fin₃ 2)
-                             delta _               = (∅)
+                } where delta (False, 0) = False
+                        delta (False, 1) = True
+                        delta (True,  0) = False
+                        delta (True,  1) = True
 
 -- The set of strings which end in [0, 1]
-endsWith01' ∷ NFA.NFA (Fin N.Nat4) (Fin N.Nat2)
-endsWith01' = NFA.NFA { NFA.delta = delta
+endsWith01 ∷ NFA.NFA (Fin Nat4) (Fin Nat2)
+endsWith01 = NFA.NFA { NFA.delta = delta
                      , NFA.q0    = 0
                      , NFA.fs    = singleton 2
-                     } where delta ∷ (Fin N.Nat4, Fin N.Nat2) → Set (Fin N.Nat4)
+                     } where delta ∷ (Fin Nat4, Fin Nat2) → Set (Fin Nat4)
                              delta (0, 0) = fromList  [0, 1]
                              delta (0, 1) = singleton 0
                              delta (9, 1) = singleton 2
@@ -62,23 +45,23 @@ endsWith01' = NFA.NFA { NFA.delta = delta
 
 -- https://en.wikipedia.org/wiki/File:NFAexample.svg
 -- Generates the language where w has an even number of 0s or an even number of 1s
-even0or1 ∷ EFA.EFA Fin₅ Binary
+even0or1 ∷ EFA.EFA (Fin Nat5) (Fin Nat2)
 even0or1 = EFA.EFA { EFA.delta = delta
-                   , EFA.q0    = Fin₅ 0
-                   , EFA.fs    = fromList [Fin₅ 1, Fin₅ 3]
-                   } where delta (Fin₅ 0,    Nothing) = fromList  [Fin₅ 1, Fin₅ 3]
-                           delta (Fin₅ 1, Just Zero') = singleton (Fin₅ 2)
-                           delta (Fin₅ 1, Just  One') = singleton (Fin₅ 1)
-                           delta (Fin₅ 2, Just Zero') = singleton (Fin₅ 1)
-                           delta (Fin₅ 2, Just  One') = singleton (Fin₅ 2)
-                           delta (Fin₅ 3, Just Zero') = singleton (Fin₅ 3)
-                           delta (Fin₅ 3, Just  One') = singleton (Fin₅ 4)
-                           delta (Fin₅ 4, Just Zero') = singleton (Fin₅ 4)
-                           delta (Fin₅ 4, Just  One') = singleton (Fin₅ 3)
-                           delta (Fin₅ _,          _) = (∅)
+                   , EFA.q0    = 0
+                   , EFA.fs    = fromList [1, 3]
+                   } where delta (0, Nothing) = fromList  [1, 3]
+                           delta (1, Just  0) = singleton 2
+                           delta (1, Just  1) = singleton 1
+                           delta (2, Just  0) = singleton 1
+                           delta (2, Just  1) = singleton 2
+                           delta (3, Just  0) = singleton 3
+                           delta (3, Just  1) = singleton 4
+                           delta (4, Just  0) = singleton 4
+                           delta (4, Just  1) = singleton 3
+                           delta (_, _      ) = (∅)
 
 -- A number, n, either ends in 5 or 0 (when n % 5 = 0), or it doesn't (n % 5 ≠ 0).
-by5 ∷ DFA (Fin N.Nat2) Digits
+by5 ∷ DFA (Fin Nat2) Digits
 by5 = DFA { delta = delta
           , q0    = 0
           , fs    = singleton 1
@@ -95,7 +78,7 @@ by5' = RE.star RE.dot RE.* RE.fromSet (fromList [Zero, Five])
 -- A number is divisible by 3 if and only if the sum of its digits is divisible by 3
 -- The state we are in is the (running total % 3)
 -- (We add a single starting state `Left ()` to avoid accepting the empty string.)
-by3 ∷ DFA (Either () (Fin N.Nat3)) Digits
+by3 ∷ DFA (Either () (Fin Nat3)) Digits
 by3 = DFA { delta = Right . toEnum . delta
           , q0    = Left ()
           , fs    = singleton (Right 0)
@@ -211,30 +194,30 @@ farmerw = NFA.NFA { NFA.delta = δ
                         δ _ = (∅)
 
 -- https://www.researchgate.net/publication/269628569_DNA_Pattern_Analysis_using_Finite_Automata
-figure2 :: NFA.NFA Fin₈ DNA
+figure2 :: NFA.NFA (Fin Nat8) DNA
 figure2 = NFA.NFA { NFA.delta = δ
-                  , NFA.q0    = Fin₈ 0
-                  , NFA.fs    = singleton (Fin₈ 7)
-                  } where δ (Fin₈ 0, Adenine)  = singleton (Fin₈ 6)
-                          δ (Fin₈ 0, Cytosine) = singleton (Fin₈ 3)
-                          δ (Fin₈ 0, Thymine)  = singleton (Fin₈ 3)
-                          δ (Fin₈ 0, Guanine)  = fromList  [Fin₈ 1, Fin₈ 3, Fin₈ 6]
-                          δ (Fin₈ 1, Adenine)  = fromList  [Fin₈ 2, Fin₈ 5]
-                          δ (Fin₈ 1, Cytosine) = fromList  [Fin₈ 1, Fin₈ 3]
-                          δ (Fin₈ 1, Thymine)  = singleton (Fin₈ 5)
-                          δ (Fin₈ 1, Guanine)  = fromList  [Fin₈ 2, Fin₈ 5]
-                          δ (Fin₈ 2, Guanine)  = (∅)
-                          δ (Fin₈ 2, _)        = singleton (Fin₈ 7)
-                          δ (Fin₈ 3, Cytosine) = fromList  [Fin₈ 3, Fin₈ 7]
-                          δ (Fin₈ 3, Thymine)  = fromList  [Fin₈ 3, Fin₈ 4, Fin₈ 7, Fin₈ 1]
-                          δ (Fin₈ 3, _)        = fromList  [Fin₈ 4, Fin₈ 7]
-                          δ (Fin₈ 4, Guanine)  = singleton (Fin₈ 7)
-                          δ (Fin₈ 4, _)        = fromList  [Fin₈ 2, Fin₈ 7]
-                          δ (Fin₈ 5, _)        = singleton (Fin₈ 7)
-                          δ (Fin₈ 6, Thymine)  = fromList  [Fin₈ 2, Fin₈ 7]
-                          δ (Fin₈ 6, Guanine)  = singleton (Fin₈ 7)
-                          δ (Fin₈ 6, _)        = fromList  [Fin₈ 6, Fin₈ 7]
-                          δ (Fin₈ 7, _)        = (∅)
+                  , NFA.q0    = 0
+                  , NFA.fs    = singleton 7
+                  } where δ (0, Adenine)  = singleton  6
+                          δ (0, Cytosine) = singleton  3
+                          δ (0, Thymine)  = singleton  3
+                          δ (0, Guanine)  = fromList  [1, 3, 6]
+                          δ (1, Adenine)  = fromList  [2, 5]
+                          δ (1, Cytosine) = fromList  [1, 3]
+                          δ (1, Thymine)  = singleton  5
+                          δ (1, Guanine)  = fromList  [2, 5]
+                          δ (2, Guanine)  = (∅)
+                          δ (2, _)        = singleton  7
+                          δ (3, Cytosine) = fromList  [3, 7]
+                          δ (3, Thymine)  = fromList  [3, 4, 7, 1]
+                          δ (3, _)        = fromList  [4, 7]
+                          δ (4, Guanine)  = singleton  7
+                          δ (4, _)        = fromList  [2, 7]
+                          δ (5, _)        = singleton  7
+                          δ (6, Thymine)  = fromList  [2, 7]
+                          δ (6, Guanine)  = singleton  7
+                          δ (6, _)        = fromList  [6, 7]
+                          δ (7, _)        = (∅)
 
 -- Generates the language [[1], [2], [3]]
 oneTwoThree ∷ EFA.EFA Bool Digits
@@ -248,63 +231,63 @@ oneTwoThree = EFA.EFA { EFA.delta = delta
 
 -- An EFA which accepts only strings which start with 0 and end with 1
 -- A similar example is given in this video lecture https://youtu.be/yzb4J7oSyLA
-startsWith0endsWith1 ∷ EFA.EFA Fin₄ Binary
+startsWith0endsWith1 ∷ EFA.EFA (Fin Nat4) (Fin Nat2)
 startsWith0endsWith1 = EFA.EFA { EFA.delta = delta
-                               , EFA.q0    = Fin₄ 0
-                               , EFA.fs    = singleton (Fin₄ 2)
-                               } where delta (Fin₄ 0, Just Zero') = singleton (Fin₄ 1)
-                                       delta (Fin₄ 0, Just  One') = singleton (Fin₄ 3)
+                               , EFA.q0    = 0
+                               , EFA.fs    = singleton 2
+                               } where delta (0, Just  0) = singleton 1
+                                       delta (0, Just  1) = singleton 3
 
-                                       delta (Fin₄ 1, Just Zero') = singleton (Fin₄ 1)
-                                       delta (Fin₄ 1, Just  One') = singleton (Fin₄ 2)
+                                       delta (1, Just  0) = singleton 1
+                                       delta (1, Just  1) = singleton 2
 
-                                       delta (Fin₄ 2, Just Zero') = singleton (Fin₄ 1)
-                                       delta (Fin₄ 2, Just  One') = singleton (Fin₄ 2)
+                                       delta (2, Just  0) = singleton 1
+                                       delta (2, Just  1) = singleton 2
 
-                                       delta (Fin₄ 3, Just Zero') = singleton (Fin₄ 3)
-                                       delta (Fin₄ 3, Just  One') = singleton (Fin₄ 3)
-                                       delta (Fin₄ _,    Nothing) = (∅)
+                                       delta (3, Just  0) = singleton 3
+                                       delta (3, Just  1) = singleton 3
+                                       delta (_, Nothing) = (∅)
 
 -- A DFA which accepts all binary strings starting with 0
-startsWith0 ∷ DFA Fin₃ Binary
+startsWith0 ∷ DFA (Fin Nat3) (Fin Nat2)
 startsWith0 = DFA { delta = delta
-                  , q0    = Fin₃ 0
-                  , fs    = singleton (Fin₃ 1)
-                  } where delta (Fin₃ 0, Zero') = Fin₃ 1
-                          delta (Fin₃ 0,  One') = Fin₃ 2
+                  , q0    = 0
+                  , fs    = singleton 1
+                  } where delta (0, 0) = 1
+                          delta (0, 1) = 2
 
-                          delta (Fin₃ 1, Zero') = Fin₃ 1
-                          delta (Fin₃ 1,  One') = Fin₃ 1
+                          delta (1, 0) = 1
+                          delta (1, 1) = 1
 
-                          delta (Fin₃ 2, Zero') = Fin₃ 2
-                          delta (Fin₃ 2,  One') = Fin₃ 2
+                          delta (2, 0) = 2
+                          delta (2, 1) = 2
 
 -- Coursera Stanford Automata, NFA lecture
 -- http://spark-public.s3.amazonaws.com/automata/slides/4_fa3.pdf
 data RB = Red | Black deriving (Eq, Enum, Ord, Bounded, Show)
 instance Finite RB
-board ∷ NFA.NFA Fin₉ RB
+board ∷ NFA.NFA (Fin Nat9) RB
 board = NFA.NFA { NFA.delta = delta
-                , NFA.q0    = Fin₉ 0
-                , NFA.fs    = singleton (Fin₉ 8)
-                } where delta (Fin₉ 0,   Red) = fromList  [Fin₉ 1, Fin₉ 3]
-                        delta (Fin₉ 0, Black) = singleton (Fin₉ 4)
-                        delta (Fin₉ 1,   Red) = fromList  [Fin₉ 3, Fin₉ 5]
-                        delta (Fin₉ 1, Black) = fromList  [Fin₉ 0, Fin₉ 2, Fin₉ 4]
-                        delta (Fin₉ 2,   Red) = fromList  [Fin₉ 1, Fin₉ 5]
-                        delta (Fin₉ 2, Black) = singleton (Fin₉ 4)
-                        delta (Fin₉ 3,   Red) = fromList  [Fin₉ 1, Fin₉ 7]
-                        delta (Fin₉ 3, Black) = fromList  [Fin₉ 0, Fin₉ 4, Fin₉ 6]
-                        delta (Fin₉ 4,   Red) = fromList  [Fin₉ 1, Fin₉ 3, Fin₉ 5, Fin₉ 7]
-                        delta (Fin₉ 4, Black) = fromList  [Fin₉ 0, Fin₉ 2, Fin₉ 6, Fin₉ 8]
-                        delta (Fin₉ 5,   Red) = fromList  [Fin₉ 1, Fin₉ 7]
-                        delta (Fin₉ 5, Black) = fromList  [Fin₉ 2, Fin₉ 4, Fin₉ 8]
-                        delta (Fin₉ 6,   Red) = fromList  [Fin₉ 3, Fin₉ 7]
-                        delta (Fin₉ 6, Black) = singleton (Fin₉ 4)
-                        delta (Fin₉ 7,   Red) = fromList  [Fin₉ 3, Fin₉ 5]
-                        delta (Fin₉ 7, Black) = fromList  [Fin₉ 4, Fin₉ 6, Fin₉ 8]
-                        delta (Fin₉ 8,   Red) = fromList  [Fin₉ 5, Fin₉ 7]
-                        delta (Fin₉ 8, Black) = singleton (Fin₉ 4)
+                , NFA.q0    = 0
+                , NFA.fs    = singleton 8
+                } where delta (0,   Red) = fromList  [1, 3]
+                        delta (0, Black) = singleton  4
+                        delta (1,   Red) = fromList  [3, 5]
+                        delta (1, Black) = fromList  [0, 2, 4]
+                        delta (2,   Red) = fromList  [1, 5]
+                        delta (2, Black) = singleton  4
+                        delta (3,   Red) = fromList  [1, 7]
+                        delta (3, Black) = fromList  [0, 4, 6]
+                        delta (4,   Red) = fromList  [1, 3, 5, 7]
+                        delta (4, Black) = fromList  [0, 2, 6, 8]
+                        delta (5,   Red) = fromList  [1, 7]
+                        delta (5, Black) = fromList  [2, 4, 8]
+                        delta (6,   Red) = fromList  [3, 7]
+                        delta (6, Black) = singleton  4
+                        delta (7,   Red) = fromList  [3, 5]
+                        delta (7, Black) = fromList  [4, 6, 8]
+                        delta (8,   Red) = fromList  [5, 7]
+                        delta (8, Black) = singleton  4
 
 data Decimal = Plus | Minus | Period deriving (Eq, Ord, Enum, Bounded)
 instance Finite Decimal
@@ -314,131 +297,131 @@ instance Show Decimal where
   show Period = "."
 
 -- HMU Figure 2.18 Pg.73
-hmu218 ∷ EFA.EFA Fin₆ (Either Decimal Digits)
+hmu218 ∷ EFA.EFA (Fin Nat6) (Either Decimal Digits)
 hmu218 = EFA.EFA { EFA.delta = delta
-                 , EFA.q0    = Fin₆ 0
-                 , EFA.fs    = singleton (Fin₆ 5)
-                 } where delta (Fin₆ 0, Just (Left   Plus)) = singleton (Fin₆ 1)
-                         delta (Fin₆ 0, Just (Left  Minus)) = singleton (Fin₆ 1)
-                         delta (Fin₆ 0,            Nothing) = singleton (Fin₆ 1)
-                         delta (Fin₆ 1, Just (Left Period)) = singleton (Fin₆ 2)
-                         delta (Fin₆ 1, Just (Right     _)) = fromList  [Fin₆ 1, Fin₆ 4]
-                         delta (Fin₆ 2, Just (Right     _)) = singleton (Fin₆ 3)
-                         delta (Fin₆ 3, Just (Right     _)) = singleton (Fin₆ 3)
-                         delta (Fin₆ 3,            Nothing) = singleton (Fin₆ 5)
-                         delta (Fin₆ 4, Just (Left Period)) = singleton (Fin₆ 3)
-                         delta  _                           = (∅)
+                 , EFA.q0    = 0
+                 , EFA.fs    = singleton 5
+                 } where delta (0, Just (Left   Plus)) = singleton 1
+                         delta (0, Just (Left  Minus)) = singleton 1
+                         delta (0,            Nothing) = singleton 1
+                         delta (1, Just (Left Period)) = singleton 2
+                         delta (1, Just (Right     _)) = fromList  [1, 4]
+                         delta (2, Just (Right     _)) = singleton 3
+                         delta (3, Just (Right     _)) = singleton 3
+                         delta (3,            Nothing) = singleton 5
+                         delta (4, Just (Left Period)) = singleton 3
+                         delta  _                      = (∅)
 
 -- An EFA to recognize my version of the "Real" numbers
-reals ∷ EFA.EFA Fin₅ (Either Decimal Digits)
+reals ∷ EFA.EFA (Fin Nat5) (Either Decimal Digits)
 reals = EFA.EFA { EFA.delta = delta
-                , EFA.q0    = Fin₅ 0
-                , EFA.fs    = singleton (Fin₅ 4)
-                } where delta (Fin₅ 0, Just (Left   Plus)) = singleton (Fin₅ 1)
-                        delta (Fin₅ 0, Just (Left  Minus)) = singleton (Fin₅ 1)
-                        delta (Fin₅ 1, Just (Right     _)) = fromList  [Fin₅ 1, Fin₅ 2]
-                        delta (Fin₅ 2, Just (Left Period)) = singleton (Fin₅ 3)
-                        delta (Fin₅ 3, Just (Right     _)) = fromList  [Fin₅ 3, Fin₅ 4]
-                        delta  _                           = (∅)
+                , EFA.q0    = 0
+                , EFA.fs    = singleton 4
+                } where delta (0, Just (Left   Plus)) = singleton 1
+                        delta (0, Just (Left  Minus)) = singleton 1
+                        delta (1, Just (Right     _)) = fromList [1, 2]
+                        delta (2, Just (Left Period)) = singleton 3
+                        delta (3, Just (Right     _)) = fromList [3, 4]
+                        delta  _                      = (∅)
 
 -- [[0],[1],[0,1],[0,0,0],[0,1,1],[1,1,1]
-ex144 ∷ EFA.EFA Fin₆ Binary
+ex144 ∷ EFA.EFA (Fin Nat6) (Fin Nat2)
 ex144 = EFA.EFA { EFA.delta = delta
-                , EFA.q0    = Fin₆ 0
-                , EFA.fs    = singleton (Fin₆ 3)
-                } where delta (Fin₆ 0, Just Zero') = singleton (Fin₆ 4)
-                        delta (Fin₆ 0, Just  One') = singleton (Fin₆ 1)
-                        delta (Fin₆ 1, Just  One') = singleton (Fin₆ 2)
-                        delta (Fin₆ 1,    Nothing) = singleton (Fin₆ 3)
-                        delta (Fin₆ 2, Just  One') = singleton (Fin₆ 3)
-                        delta (Fin₆ 4, Just Zero') = singleton (Fin₆ 5)
-                        delta (Fin₆ 4,    Nothing) = fromList  [Fin₆ 1, Fin₆ 2]
-                        delta (Fin₆ 5, Just Zero') = singleton (Fin₆ 3)
-                        delta _                    = (∅)
+                , EFA.q0    = 0
+                , EFA.fs    = singleton 3
+                } where delta (0, Just  0) = singleton 4
+                        delta (0, Just  1) = singleton 1
+                        delta (1, Just  1) = singleton 2
+                        delta (1, Nothing) = singleton 3
+                        delta (2, Just  1) = singleton 3
+                        delta (4, Just  0) = singleton 5
+                        delta (4, Nothing) = fromList  [1, 2]
+                        delta (5, Just  0) = singleton 3
+                        delta _            = (∅)
 
-closuresExample ∷ EFA.EFA Fin₇ Binary
+closuresExample ∷ EFA.EFA (Fin Nat7) (Fin Nat2)
 closuresExample = EFA.EFA { EFA.delta = delta
-                          , EFA.q0 = Fin₇ 0
-                          , EFA.fs = singleton (Fin₇ 3)
-                          } where delta (Fin₇ 0,    Nothing) = fromList  [Fin₇ 1, Fin₇ 2]
-                                  delta (Fin₇ 1, Just  One') = singleton (Fin₇ 4)
-                                  delta (Fin₇ 1,    Nothing) = singleton (Fin₇ 3)
-                                  delta (Fin₇ 2, Just Zero') = singleton (Fin₇ 6)
-                                  delta (Fin₇ 2,    Nothing) = singleton (Fin₇ 5)
-                                  delta (Fin₇ 5,    Nothing) = singleton (Fin₇ 0)
-                                  delta _                    = (∅)
+                          , EFA.q0 = 0
+                          , EFA.fs = singleton 3
+                          } where delta (0, Nothing) = fromList  [1, 2]
+                                  delta (1, Just  1) = singleton 4
+                                  delta (1, Nothing) = singleton 3
+                                  delta (2, Just  0) = singleton 6
+                                  delta (2, Nothing) = singleton 5
+                                  delta (5, Nothing) = singleton 0
+                                  delta _            = (∅)
 
 -- https://youtu.be/1GZOzTJOBuM
-minimal ∷ DFA Fin₆ Binary
+minimal ∷ DFA (Fin Nat6) (Fin Nat2)
 minimal = DFA { delta = delta
-              , q0    = Fin₆ 0
-              , fs    = singleton (Fin₆ 4)
-              } where delta (Fin₆ 0, Zero') = Fin₆ 1
-                      delta (Fin₆ 0,  One') = Fin₆ 2
-                      delta (Fin₆ 1, Zero') = Fin₆ 1
-                      delta (Fin₆ 1,  One') = Fin₆ 3
-                      delta (Fin₆ 2, Zero') = Fin₆ 1
-                      delta (Fin₆ 2,  One') = Fin₆ 2
-                      delta (Fin₆ 3, Zero') = Fin₆ 1
-                      delta (Fin₆ 3,  One') = Fin₆ 4
-                      delta (Fin₆ 4, Zero') = Fin₆ 1
-                      delta (Fin₆ 4,  One') = Fin₆ 2
+              , q0    = 0
+              , fs    = singleton 4
+              } where delta (0, 0) = 1
+                      delta (0, 1) = 2
+                      delta (1, 0) = 1
+                      delta (1, 1) = 3
+                      delta (2, 0) = 1
+                      delta (2, 1) = 2
+                      delta (3, 0) = 1
+                      delta (3, 1) = 4
+                      delta (4, 0) = 1
+                      delta (4, 1) = 2
 
 -- https://youtu.be/TvMEX2htBYw
-minimal' ∷ DFA Digits Binary
+minimal' ∷ DFA Digits (Fin Nat2)
 minimal' = DFA { delta = delta
                , q0    = Zero
                , fs    = fromList [Five, Six]
-               } where delta ( Zero, Zero') = Seven
-                       delta ( Zero,  One') = One
-                       delta (  One, Zero') = Seven
-                       delta (  One,  One') = Zero
-                       delta (  Two, Zero') = Four
-                       delta (  Two,  One') = Five
-                       delta (Three, Zero') = Four
-                       delta (Three,  One') = Five
-                       delta ( Four, Zero') = Six
-                       delta ( Four,  One') = Six
-                       delta ( Five, Zero') = Five
-                       delta ( Five,  One') = Five
-                       delta (  Six, Zero') = Six
-                       delta (  Six,  One') = Five
-                       delta (Seven, Zero') = Two
-                       delta (Seven,  One') = Two
-                       delta              _ = Nine
+               } where delta ( Zero, 0) = Seven
+                       delta ( Zero, 1) = One
+                       delta (  One, 0) = Seven
+                       delta (  One, 1) = Zero
+                       delta (  Two, 0) = Four
+                       delta (  Two, 1) = Five
+                       delta (Three, 0) = Four
+                       delta (Three, 1) = Five
+                       delta ( Four, 0) = Six
+                       delta ( Four, 1) = Six
+                       delta ( Five, 0) = Five
+                       delta ( Five, 1) = Five
+                       delta (  Six, 0) = Six
+                       delta (  Six, 1) = Five
+                       delta (Seven, 0) = Two
+                       delta (Seven, 1) = Two
+                       delta _          = Nine
 
 -- http://i.stack.imgur.com/AD6WJ.png
-exactly20s ∷ DFA Fin₄ Binary
+exactly20s ∷ DFA (Fin Nat4) (Fin Nat2)
 exactly20s = DFA { delta = delta
-                 , q0    = Fin₄ 0
-                 , fs    = singleton (Fin₄ 2)
-                 } where delta (Fin₄ 0, Zero') = Fin₄ 1
-                         delta (Fin₄ 0,  One') = Fin₄ 0
+                 , q0    = 0
+                 , fs    = singleton 2
+                 } where delta (0, 0) = 1
+                         delta (0, 1) = 0
 
-                         delta (Fin₄ 1, Zero') = Fin₄ 2
-                         delta (Fin₄ 1,  One') = Fin₄ 1
+                         delta (1, 0) = 2
+                         delta (1, 1) = 1
 
-                         delta (Fin₄ 2, Zero') = Fin₄ 3
-                         delta (Fin₄ 2,  One') = Fin₄ 2
+                         delta (2, 0) = 3
+                         delta (2, 1) = 2
 
-                         delta (Fin₄ 3, Zero') = Fin₄ 3
-                         delta (Fin₄ 3,  One') = Fin₄ 3
+                         delta (3, 0) = 3
+                         delta (3, 1) = 3
 
 -- http://i.stack.imgur.com/AD6WJ.png
-atleast21s ∷ DFA Fin₃ Binary
+atleast21s ∷ DFA (Fin Nat3) (Fin Nat2)
 atleast21s = DFA { delta = delta
-                 , q0    = Fin₃ 0
-                 , fs    = singleton (Fin₃ 2)
-                 } where delta (Fin₃ 0, Zero') = Fin₃ 0
-                         delta (Fin₃ 0,  One') = Fin₃ 1
+                 , q0    = 0
+                 , fs    = singleton 2
+                 } where delta (0, 0) = 0
+                         delta (0, 1) = 1
 
-                         delta (Fin₃ 1, Zero') = Fin₃ 1
-                         delta (Fin₃ 1,  One') = Fin₃ 2
+                         delta (1, 0) = 1
+                         delta (1, 1) = 2
 
-                         delta (Fin₃ 2, Zero') = Fin₃ 2
-                         delta (Fin₃ 2,  One') = Fin₃ 2
+                         delta (2, 0) = 2
+                         delta (2, 1) = 2
 
-exactly20sANDatleast21s ∷ DFA (Fin₄, Fin₃) Binary
+exactly20sANDatleast21s ∷ DFA (Fin Nat4, Fin Nat3) (Fin Nat2)
 exactly20sANDatleast21s  = exactly20s `DFA.intersection` atleast21s
 
 -- The language ["123456789"]
@@ -462,55 +445,55 @@ data StackSym = X0 | Y0 deriving (Eq, Ord, Enum, Bounded, Show)
 
 -- The standard PDA example language {L : 0ⁿ1ⁿ for n > 0 }
 -- {"01","0011","000111","00001111","0000011111","000000111111","00000001111111","0000000011111111", ...}
-example ∷ PDA.PDA Fin₃ (Either () StackSym) Binary
+example ∷ PDA.PDA Fin₃ (Either () StackSym) (Fin N.Nat2)
 example = PDA.PDA { PDA.delta = delta
                   , PDA.q0    = Fin₃ 0
                   , PDA.z0    = Left ()
                   , PDA.fs    = singleton (Fin₃ 2)
-                  } where delta (Fin₃ 0, Just Zero', Left  ()) = singleton (Fin₃ 0, [Right X0, Left  ()])
-                          delta (Fin₃ 0, Just Zero', Right X0) = singleton (Fin₃ 0, [Right X0, Right X0])
-                          delta (Fin₃ 0, Just  One', Right X0) = singleton (Fin₃ 1, [                  ])
-                          delta (Fin₃ 1, Just  One', Right X0) = singleton (Fin₃ 1, [                  ])
-                          delta (Fin₃ 1,    Nothing, Left  ()) = singleton (Fin₃ 2, [           Left ()])
-                          delta _                              = (∅)
+                  } where delta (Fin₃ 0, Just 0,  Left  ()) = singleton (Fin₃ 0, [Right X0, Left  ()])
+                          delta (Fin₃ 0, Just 0,  Right X0) = singleton (Fin₃ 0, [Right X0, Right X0])
+                          delta (Fin₃ 0, Just 1,  Right X0) = singleton (Fin₃ 1, [                  ])
+                          delta (Fin₃ 1, Just 1,  Right X0) = singleton (Fin₃ 1, [                  ])
+                          delta (Fin₃ 1, Nothing, Left  ()) = singleton (Fin₃ 2, [           Left ()])
+                          delta _                           = (∅)
 
 -- https://en.wikipedia.org/wiki/Pushdown_automaton#Example
 -- https://en.wikipedia.org/wiki/Pushdown_automaton#/media/File:Pda-example.svg
 -- The standard PDA example language {L : 0ⁿ1ⁿ | n ≥ 0 }
 -- "", "01","0011","000111","00001111","0000011111","000000111111","00000001111111","0000000011111111", ...
-wiki ∷ PDA.PDA Fin₃ Fin₂ Binary
+wiki ∷ PDA.PDA (Fin N.Nat3) (Fin N.Nat2) (Fin N.Nat2)
 wiki = PDA.PDA { PDA.delta = delta
-               , PDA.q0 = Fin₃ 0
-               , PDA.z0 = Fin₂ 1
-               , PDA.fs = singleton (Fin₃ 2)
-               } where delta (Fin₃ 0, Just Zero', Fin₂ 1) = singleton (Fin₃ 0, [Fin₂ 0, Fin₂ 1])
-                       delta (Fin₃ 0, Just Zero', Fin₂ 0) = singleton (Fin₃ 0, [Fin₂ 0, Fin₂ 0])
-                       delta (Fin₃ 0,    Nothing, Fin₂ 1) = singleton (Fin₃ 1, [        Fin₂ 1])
-                       delta (Fin₃ 0,    Nothing, Fin₂ 0) = singleton (Fin₃ 1, [        Fin₂ 0])
-                       delta (Fin₃ 1, Just  One', Fin₂ 0) = singleton (Fin₃ 1, [              ])
-                       delta (Fin₃ 1,    Nothing, Fin₂ 1) = singleton (Fin₃ 2, [        Fin₂ 1])
-                       delta _                            = (∅)
+               , PDA.q0 = 0
+               , PDA.z0 = 1
+               , PDA.fs = singleton 2
+               } where delta (0, Just  0, 1) = singleton (0, [0, 1])
+                       delta (0, Just  0, 0) = singleton (0, [0, 0])
+                       delta (0, Nothing, 1) = singleton (1, [   1])
+                       delta (0, Nothing, 0) = singleton (1, [   0])
+                       delta (1, Just  1, 0) = singleton (1, [    ])
+                       delta (1, Nothing, 1) = singleton (2, [   1])
+                       delta _               = (∅)
 
 -- wwʳ (or "w then w-reversed"), even length palindromes
 -- 62, Page 230, HMU 3rd Edition
-wwʳ ∷ PDA.PDA Fin₃ (Either () Bool) Binary
+wwʳ ∷ PDA.PDA (Fin Nat3) (Either () Bool) (Fin N.Nat2)
 wwʳ = PDA.PDA { PDA.delta = δ
-              , PDA.q0    = Fin₃ 0
+              , PDA.q0    = 0
               , PDA.z0    = Left ()
-              , PDA.fs    = singleton (Fin₃ 2)
-              } where δ (Fin₃ 0, Just Zero',  Left    ()) = singleton (Fin₃ 0, [Right False, Left     ()])
-                      δ (Fin₃ 0, Just Zero', Right False) = singleton (Fin₃ 0, [Right False, Right False])
-                      δ (Fin₃ 0, Just Zero', Right  True) = singleton (Fin₃ 0, [Right False, Right  True])
-                      δ (Fin₃ 0, Just  One',  Left    ()) = singleton (Fin₃ 0, [Right  True, Left     ()])
-                      δ (Fin₃ 0, Just  One', Right False) = singleton (Fin₃ 0, [Right  True, Right False])
-                      δ (Fin₃ 0, Just  One', Right  True) = singleton (Fin₃ 0, [Right  True, Right  True])
-                      δ (Fin₃ 0,    Nothing,  Left    ()) = singleton (Fin₃ 1, [             Left     ()])
-                      δ (Fin₃ 0,    Nothing, Right False) = singleton (Fin₃ 1, [             Right False])
-                      δ (Fin₃ 0,    Nothing, Right  True) = singleton (Fin₃ 1, [             Right  True])
-                      δ (Fin₃ 1, Just Zero', Right False) = singleton (Fin₃ 1, [                        ])
-                      δ (Fin₃ 1, Just  One', Right  True) = singleton (Fin₃ 1, [                        ])
-                      δ (Fin₃ 1,    Nothing,  Left    ()) = singleton (Fin₃ 2, [             Left     ()])
-                      δ _                                 = (∅) -- otherwise kill the computation
+              , PDA.fs    = singleton 2
+              } where δ (0, Just  0, Left     ()) = singleton (0, [Right False, Left     ()])
+                      δ (0, Just  0, Right False) = singleton (0, [Right False, Right False])
+                      δ (0, Just  0, Right  True) = singleton (0, [Right False, Right  True])
+                      δ (0, Just  1, Left     ()) = singleton (0, [Right  True, Left     ()])
+                      δ (0, Just  1, Right False) = singleton (0, [Right  True, Right False])
+                      δ (0, Just  1, Right  True) = singleton (0, [Right  True, Right  True])
+                      δ (0, Nothing, Left     ()) = singleton (1, [             Left     ()])
+                      δ (0, Nothing, Right False) = singleton (1, [             Right False])
+                      δ (0, Nothing, Right  True) = singleton (1, [             Right  True])
+                      δ (1, Just  0, Right False) = singleton (1, [                        ])
+                      δ (1, Just  1, Right  True) = singleton (1, [                        ])
+                      δ (1, Nothing, Left     ()) = singleton (2, [             Left     ()])
+                      δ _                              = (∅) -- otherwise kill the computation
 
 data LP = LParen deriving (Enum, Eq, Ord, Bounded)
 instance Show LP where
@@ -538,45 +521,45 @@ balanced = PDA.PDA { PDA.delta = delta
 {-
 -- Example from Stanford Automata course, the "Turing Machines" lecture
 -- Stanford Automata lecture 4 - 4 - 16, "Turing Machines"
-exampleTM ∷ TM.TM Bool Binary Void
+exampleTM ∷ TM.TM Bool (Fin N.Nat2) Void
 exampleTM = TM.TM { TM.delta = delta
                   , TM.q0    = False
                   , TM.fs    = singleton True
-                  } where delta (False, Left    Zero') = Just (False, Left Zero', TM.R')
-                          delta (False, Left     One') = Just ( True, Left Zero', TM.R')
-                          delta (False, Right Nothing) = Just (False, Left  One', TM.L')
+                  } where delta (False, Left  0      ) = Just (False, Left 0, TM.R')
+                          delta (False, Left  1      ) = Just ( True, Left 0, TM.R')
+                          delta (False, Right Nothing) = Just (False, Left  1, TM.L')
                           delta _                      = Nothing  -- Halt
 
 -- HMU pg 329, Figure 8.9
 -- { 0ⁿ1ⁿ | n ≥ 1 }
-hmu89 ∷ TM.TM Fin₆ Binary StackSym
+hmu89 ∷ TM.TM (Fin N.Nat6) (Fin N.Nat2) StackSym
 hmu89 = TM.TM { TM.delta = delta
-              , TM.q0    = Fin₆ 0
-              , TM.fs    = singleton (Fin₆ 4)
-              } where delta (Fin₆ 0, Left      Zero') = Just (Fin₆ 1, Right (Just X0), TM.R')
-                      delta (Fin₆ 0, Right (Just Y0)) = Just (Fin₆ 3, Right (Just Y0), TM.R')
-                      delta (Fin₆ 1, Left      Zero') = Just (Fin₆ 1, Left      Zero', TM.R')
-                      delta (Fin₆ 1, Left       One') = Just (Fin₆ 2, Right (Just Y0), TM.L')
-                      delta (Fin₆ 1, Right (Just Y0)) = Just (Fin₆ 1, Right (Just Y0), TM.R')
-                      delta (Fin₆ 2, Left      Zero') = Just (Fin₆ 2, Left      Zero', TM.L')
-                      delta (Fin₆ 2, Right (Just X0)) = Just (Fin₆ 0, Right (Just X0), TM.R')
-                      delta (Fin₆ 2, Right (Just Y0)) = Just (Fin₆ 2, Right (Just Y0), TM.L')
-                      delta (Fin₆ 3, Right (Just Y0)) = Just (Fin₆ 3, Right (Just Y0), TM.R')
-                      delta (Fin₆ 3, Right   Nothing) = Just (Fin₆ 4, Right   Nothing, TM.R')
-                      delta _                         = Nothing
+              , TM.q0    = 0
+              , TM.fs    = singleton 4
+              } where delta (0, Left  0        ) = Just (1, Right (Just X0), TM.R')
+                      delta (0, Right (Just Y0)) = Just (3, Right (Just Y0), TM.R')
+                      delta (1, Left  0        ) = Just (1, Left  0,         TM.R')
+                      delta (1, Left  1        ) = Just (2, Right (Just Y0), TM.L')
+                      delta (1, Right (Just Y0)) = Just (1, Right (Just Y0), TM.R')
+                      delta (2, Left  0        ) = Just (2, Left  0,         TM.L')
+                      delta (2, Right (Just X0)) = Just (0, Right (Just X0), TM.R')
+                      delta (2, Right (Just Y0)) = Just (2, Right (Just Y0), TM.L')
+                      delta (3, Right (Just Y0)) = Just (3, Right (Just Y0), TM.R')
+                      delta (3, Right Nothing  ) = Just (4, Right Nothing,   TM.R')
+                      delta _                    = Nothing
 
 
 -- TODO accepts by halting, create a new data type without fs?
 {-
-So the successor’s output on 111101 was 000011 which is the reverse binary representation of 48.
+So the successor’s output on 111101 was 000011 which is the reverse (Fin N.Nat2) representation of 48.
 www.cs.columbia.edu/~zeph/3261/L14/TuringMachine.pdf   L14
 -}
-successor ∷ TM.TM Bool Binary Void
+successor ∷ TM.TM Bool (Fin N.Nat2) Void
 successor = TM.TM { TM.delta = delta
                   , TM.q0    = False
                   , TM.fs    = singleton True
-                  } where delta (False, Left    Zero') = Just ( True, Left  One', TM.R')
-                          delta (False, Left     One') = Just (False, Left Zero', TM.R')
-                          delta (False, Right Nothing) = Just ( True, Left  One', TM.R')
+                  } where delta (False, Left  0      ) = Just ( True, Left  1, TM.R')
+                          delta (False, Left  1      ) = Just (False, Left 0, TM.R')
+                          delta (False, Right Nothing) = Just ( True, Left  1, TM.R')
                           delta _                      = Nothing
 -}
