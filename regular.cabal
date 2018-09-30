@@ -3,7 +3,7 @@ version:             0.1.0.0
 synopsis:            Simple project template from stack
 description:         Please see README.md
 homepage:            http://github.com/subttle/regular
-license:             AllRightsReserved
+license:             BSD3
 license-file:        LICENSE
 author:              Ian Treyball
 maintainer:          ian.treyball@columbia.edu

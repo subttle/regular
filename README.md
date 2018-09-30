@@ -15,8 +15,6 @@ I'm patiently (and gratefully!) waiting on a few things from some of the best pr
 
 I haven't proven all class instances to be lawful yet.
 
-I plan on choosing a better license.
-
 ## Example
 
 Here is a small example of what FizzBuzz looks like with DFA:
