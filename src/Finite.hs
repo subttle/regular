@@ -17,6 +17,19 @@ import           Common
 import           GHC.Enum
 import           Data.Char
 
+import qualified Data.Fin as F
+import qualified Data.Type.Nat as N
+
+instance Finite (F.Fin N.Nat1)
+instance Finite (F.Fin N.Nat2)
+instance Finite (F.Fin N.Nat3)
+instance Finite (F.Fin N.Nat4)
+instance Finite (F.Fin N.Nat5)
+instance Finite (F.Fin N.Nat6)
+instance Finite (F.Fin N.Nat7)
+instance Finite (F.Fin N.Nat8)
+instance Finite (F.Fin N.Nat9)
+
 -- An imperfect, somewhat practical, representation of a Finite type constraint
 -- The poor Haskeller's version of a Finite type constraint without reaching for dependent types
 -- Will probably delete most of this once Haskell has better dependent type support :)

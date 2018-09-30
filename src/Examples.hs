@@ -20,6 +20,9 @@ import           Data.Void
 import           Data.Maybe
 import           Data.Functor.Contravariant
 
+import           Data.Fin
+import           Data.Type.Nat as N
+
 data Binary = Zero' | One' deriving (Eq, Enum, Bounded, Ord)
 instance Finite Binary
 instance Show Binary where
@@ -46,6 +49,17 @@ endsWith01 = NFA.NFA { NFA.delta = delta
                              delta (Fin₃ 1,  One') = singleton (Fin₃ 2)
                              delta _               = (∅)
 
+-- The set of strings which end in [0, 1]
+endsWith01' ∷ NFA.NFA (Fin N.Nat4) (Fin N.Nat2)
+endsWith01' = NFA.NFA { NFA.delta = delta
+                     , NFA.q0    = 0
+                     , NFA.fs    = singleton 2
+                     } where delta ∷ (Fin N.Nat4, Fin N.Nat2) → Set (Fin N.Nat4)
+                             delta (0, 0) = fromList  [0, 1]
+                             delta (0, 1) = singleton 0
+                             delta (9, 1) = singleton 2
+                             delta _      = (∅)
+
 -- https://en.wikipedia.org/wiki/File:NFAexample.svg
 -- Generates the language where w has an even number of 0s or an even number of 1s
 even0or1 ∷ EFA.EFA Fin₅ Binary
@@ -64,15 +78,13 @@ even0or1 = EFA.EFA { EFA.delta = delta
                            delta (Fin₅ _,          _) = (∅)
 
 -- A number, n, either ends in 5 or 0 (when n % 5 = 0), or it doesn't (n % 5 ≠ 0).
-newtype Mod5IsZero = Mod5IsZero Bool deriving (Eq, Ord, Enum, Bounded, Show)
-instance Finite Mod5IsZero
-by5 ∷ DFA Mod5IsZero Digits
+by5 ∷ DFA (Fin N.Nat2) Digits
 by5 = DFA { delta = delta
-          , q0    = Mod5IsZero False
-          , fs    = singleton (Mod5IsZero True)
-          } where delta (_, Zero) = Mod5IsZero True
-                  delta (_, Five) = Mod5IsZero True
-                  delta _         = Mod5IsZero False
+          , q0    = 0
+          , fs    = singleton 1
+          } where delta (_, Zero) = 1
+                  delta (_, Five) = 1
+                  delta _         = 0
 
 -- A regular expression to match the language of the divisibleBy5 DFA
 -- [0-9]★[0+5]
@@ -80,16 +92,13 @@ by5 = DFA { delta = delta
 by5' ∷ RE.RegExp Digits
 by5' = RE.star RE.dot RE.* RE.fromSet (fromList [Zero, Five])
 
--- The range of (`mod` 3) is {0, 1, 2}
-data Mod3 =  IsZero | IsOne | IsTwo deriving (Eq, Ord, Enum, Bounded, Show)
-instance Finite Mod3
 -- A number is divisible by 3 if and only if the sum of its digits is divisible by 3
 -- The state we are in is the (running total % 3)
 -- (We add a single starting state `Left ()` to avoid accepting the empty string.)
-by3 ∷ DFA (Either () Mod3) Digits
+by3 ∷ DFA (Either () (Fin N.Nat3)) Digits
 by3 = DFA { delta = Right . toEnum . delta
           , q0    = Left ()
-          , fs    = singleton (Right IsZero)
+          , fs    = singleton (Right 0)
           } where delta (Left  (), digit) = (0          + fromEnum digit) `mod` 3
                   delta (Right  q, digit) = (fromEnum q + fromEnum digit) `mod` 3
 
@@ -181,7 +190,7 @@ farmerw ∷ NFA.NFA (Bool, Bool, Bool) Objects
 farmerw = NFA.NFA { NFA.delta = δ
                 , NFA.q0    =           (False, False, False)  -- Everything starts not across the river
                 , NFA.fs    = singleton (True,  True,  True )  -- We are finished when everything is safely across the river
-                } where 
+                } where
                         -- fgb
                         δ ((False, False, False), Hen) = singleton (False, True,  False)
                         -- fGb
