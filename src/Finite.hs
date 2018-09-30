@@ -16,19 +16,8 @@ import           Data.Functor.Contravariant
 import           Common
 import           GHC.Enum
 import           Data.Char
-
-import qualified Data.Fin as F
-import qualified Data.Type.Nat as N
-
-instance Finite (F.Fin N.Nat1)
-instance Finite (F.Fin N.Nat2)
-instance Finite (F.Fin N.Nat3)
-instance Finite (F.Fin N.Nat4)
-instance Finite (F.Fin N.Nat5)
-instance Finite (F.Fin N.Nat6)
-instance Finite (F.Fin N.Nat7)
-instance Finite (F.Fin N.Nat8)
-instance Finite (F.Fin N.Nat9)
+import           Data.Fin (Fin)
+import           Data.Type.Nat (Nat1, Nat2, Nat3, Nat4, Nat5, Nat6, Nat7, Nat8, Nat9)
 
 -- An imperfect, somewhat practical, representation of a Finite type constraint
 -- The poor Haskeller's version of a Finite type constraint without reaching for dependent types
@@ -171,6 +160,16 @@ instance                                                      Bounded Void where
 instance                                                      Finite  Void where
   asList = []
   asSet  = (∅)
+
+instance Finite (Fin Nat1)
+instance Finite (Fin Nat2)
+instance Finite (Fin Nat3)
+instance Finite (Fin Nat4)
+instance Finite (Fin Nat5)
+instance Finite (Fin Nat6)
+instance Finite (Fin Nat7)
+instance Finite (Fin Nat8)
+instance Finite (Fin Nat9)
 
 -- N.B. That it is possible to construct invalid Finₙ types, e.g. (`Fin₂ 9`) is perfectly legal Haskell and will compile
 -- look away, I'm hideous
