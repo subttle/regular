@@ -22,26 +22,21 @@ Here is a small example of what FizzBuzz looks like with DFA:
 ```Haskell
 
 -- A number, n, either ends in 5 or 0 (when n % 5 = 0), or it doesn't (n % 5 ≠ 0).
-newtype Mod5IsZero = Mod5IsZero Bool deriving (Eq, Ord, Enum, Bounded, Show)
-instance Finite Mod5IsZero
-by5 ∷ DFA Mod5IsZero Digits
+by5 ∷ DFA (Fin Nat2) Digits
 by5 = DFA { delta = delta
-          , q0    = Mod5IsZero False
-          , fs    = singleton (Mod5IsZero True)
-          } where delta (_, Zero) = Mod5IsZero True
-                  delta (_, Five) = Mod5IsZero True
-                  delta _         = Mod5IsZero False
+          , q0    = 0
+          , fs    = singleton 1
+          } where delta (_, Zero) = 1
+                  delta (_, Five) = 1
+                  delta _         = 0
 
--- The range of (`mod` 3) is {0, 1, 2}
-data Mod3 =  IsZero | IsOne | IsTwo deriving (Eq, Ord, Enum, Bounded, Show)
-instance Finite Mod3
 -- A number is divisible by 3 if and only if the sum of its digits is divisible by 3
 -- The state we are in is the (running total % 3)
 -- (We add a single starting state `Left ()` to avoid accepting the empty string.)
-by3 ∷ DFA (Either () Mod3) Digits
+by3 ∷ DFA (Either () (Fin Nat3)) Digits
 by3 = DFA { delta = Right . toEnum . delta
           , q0    = Left ()
-          , fs    = singleton (Right IsZero)
+          , fs    = singleton (Right 0)
           } where delta (Left  (), digit) = (0          + fromEnum digit) `mod` 3
                   delta (Right  q, digit) = (fromEnum q + fromEnum digit) `mod` 3
 
