@@ -2,13 +2,12 @@
 
 For this particular project my priority has been learning Haskell and exploring some formal language theory. It is currently useful for building small automata and regexp, e.g. as a companion for reading papers, doing homework problems, etc.. For now it should be clear that I value correctness and simplicity over speed.
 
-
-
 Note well:
 
 The code is not yet structured properly, so expect major refactoring and restructuring. Once I have everything correct I can start to worry about speed. For now this code is SLOW.
 
 I'm patiently (and gratefully!) waiting on a few things from some of the best projects out there right now:
+
 - Labelled graphs in alga
 - Easytest from Unison
 - Linear types in Haskell
@@ -18,9 +17,12 @@ I haven't proven all class instances to be lawful yet.
 
 I plan on choosing a better license.
 
-### Example
+## Example
+
 Here is a small example of what FizzBuzz looks like with DFA:
+
 ```Haskell
+
 -- A number, n, either ends in 5 or 0 (when n % 5 = 0), or it doesn't (n % 5 ≠ 0).
 newtype Mod5IsZero = Mod5IsZero Bool deriving (Eq, Ord, Enum, Bounded, Show)
 instance Finite Mod5IsZero
