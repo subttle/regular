@@ -119,7 +119,6 @@ instance (Ord s) ⇒ Additive (RegExp s) where
 instance (Ord s) ⇒ Idempotent (RegExp s) where
 
 instance (Ord s) ⇒ Order (RegExp s) where
-  -- order = orderOrd
   -- http://www.inf.ed.ac.uk/teaching/courses/inf2a/slides/2014_inf2a_L05_slides.pdf
   -- "
   -- α ≤ β means L(α) ⊆ L(β) (or equivalently α + β = β).
@@ -127,7 +126,7 @@ instance (Ord s) ⇒ Order (RegExp s) where
   -- αγ + β ≤ γ ⇒ α∗β ≤ γ
   -- β + γα ≤ γ ⇒ βα∗ ≤ γ
   -- "
-  -- TODO so does this mean I have language equality instead of structural equality to use now?
+  -- TODO language equality? Might need to factor distributivity first
   (<~) ∷ RegExp s → RegExp s → Bool
   (<~) α β = α + β == β
 
