@@ -133,4 +133,8 @@ nullable = nullable' . normalize
 constant ∷ (Ord s) ⇒ ExRE s → ExRE s
 constant α | nullable α = One
            | otherwise  = Zero
+
+difference ∷ ExRE s → ExRE s → ExRE s
+difference α β =  α & comp β
+
 -}
