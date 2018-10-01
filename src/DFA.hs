@@ -363,9 +363,6 @@ fromNFA m@(NFA.NFA δ q₀ f) = DFA { delta = \(states, σ) → foldMap (\q → 
 fromEFA ∷ (Finite q) ⇒ EFA.EFA q s → DFA (Set q) s
 fromEFA = fromNFA . NFA.fromEFA
 
-toFAReverse ∷ (Finite s, Finite q) ⇒ DFA q s → FA.FA q s
-toFAReverse = FA.reversal . toFA
-
 -- Take a DFA, d, and convert it to an NFA, n, such that ℒ(d) = ℒ(n)
 toNFA ∷ DFA q s → NFA.NFA q s
 toNFA (DFA δ q₀ f) = NFA.NFA { NFA.delta = singleton . δ
