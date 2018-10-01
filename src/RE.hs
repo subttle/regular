@@ -1,11 +1,11 @@
 {-# LANGUAGE InstanceSigs, GADTs, PostfixOperators #-}
-{-# LANGUAGE MultiParamTypeClasses #-} -- For LeftModule and RightModule, and Sigma class instance
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE DeriveFunctor, DeriveFoldable, DeriveTraversable #-}
 {-# OPTIONS_GHC -Wall #-}
 
 {-# LANGUAGE FlexibleContexts, DataKinds,
     RankNTypes, ScopedTypeVariables,
-    -- StandaloneDeriving,
     UnicodeSyntax,
     UndecidableInstances #-}
 
@@ -54,7 +54,7 @@ data RegExp s where
   (:|) ∷ RegExp s → RegExp s → RegExp s  -- Union, plus, or            -- ℒ(α ∣ β) = ℒ(α) ∪ ℒ(β)
   (:.) ∷ RegExp s → RegExp s → RegExp s  -- Concatenation              -- ℒ(α · β) = ℒ(α) · ℒ(β)
   Star ∷            RegExp s → RegExp s  -- Kleene star, repetition    -- ℒ(α★)    = ℒ(α)★
-  deriving (Eq, Read, Ord)
+  deriving (Eq, Ord, Functor, Foldable, Traversable)
 
 -- TODO coinductive Kleene Algebra http://www.math.ucla.edu/~znorwood/290d.2.14s/papers/Rutten-v1.pdf
 -- also A coalgebraic approach to Kleene algebra with tests
@@ -65,8 +65,7 @@ data RegExpF s a where
   UnionF  ∷ a → a → RegExpF s a
   ConcatF ∷ a → a → RegExpF s a
   StarF   ∷     a → RegExpF s a
-  deriving Eq -- (Eq, Functor)
-
+  deriving (Eq, Functor)
 
 instance (Finite s) ⇒ Σ (RegExp s) s
 instance (Finite s) ⇒ Σ (RegExpF s a) s
@@ -171,26 +170,29 @@ instance (Ord s) ⇒ ZeroProductSemiring (RegExp s) where
 infixr 8 `star`  -- Numeric.Exp?
 
 -- A Kleene algebra is a dioid (idempotent semiring) with star and an annihilator for multiplication
---       ℒ + ℒ ≡ ℒ            -- (+) Idempotent
---       ℒ + ε ≡ ℒ            -- (+) Right identity
---       ε + ℒ ≡ ℒ            -- (+) Left  identity
---       ℒ₀+ℒ₁ ≡ ℒ₁+ℒ₀        -- (+) Commutivity
---  (ℒ₀+ℒ₁)+ℒ₂ ≡ ℒ₀+(ℒ₁+ℒ₂)   -- (+) Associativity
---    (ℒ₀ℒ₁)ℒ₂ ≡ ℒ₀(ℒ₁ℒ₂)     -- (*) Associativity
---          ℒ∅ ≡ ∅            -- (*) Right annihilator
---          ∅ℒ ≡ ∅            -- (*) Left  annihilator
---   ℒ₀(ℒ₁+ℒ₂) ≡ ℒ₀ℒ₁ + ℒ₀ℒ₂  -- Left distributivity
---   (ℒ₁+ℒ₂)ℒ₀ ≡ ℒ₁ℒ₀ + ℒ₂ℒ₀  -- Right distributivity
+--        α + α ≡ α            -- (+) Idempotent
+--        α + 1 ≡ α            -- (+) Right identity
+--        1 + α ≡ α            -- (+) Left  identity
+--        α + β ≡ β + α        -- (+) Commutivity
+--  (α + β) + γ ≡ α + (β + γ)  -- (+) Associativity
+--        (αβ)γ ≡ α(βγ)        -- (*) Associativity
+--           α0 ≡ 0            -- (*) Right annihilator
+--           0α ≡ 0            -- (*) Left  annihilator
+--     α(β + γ) ≡ αβ + αγ      -- Left distributivity
+--     (β + γ)α ≡ βα + γα      -- Right distributivity
 -- TODO replace these with axioms below
---          ∅★ ≡ ε
---          ε★ ≡ ε
---         ℒ★★ ≡ ℒ★           -- (★) IdempotentFun
+--           0★ ≡ 1
+--           1★ ≡ 1
+--          α★★ ≡ α★           -- (★) IdempotentFun
+
 -- TODO Arden’s rule: Given an equation of the form X = αX + β, its smallest solution is X = α∗β. What’s more, if  6∈ L(α), this is the only solution. http://www.inf.ed.ac.uk/teaching/courses/inf2a/slides/2014_inf2a_L05_slides.pdf
 -- http://events.cs.bham.ac.uk/mgs2012/lectures/StruthSlides.pdf
 -- http://hoefner-online.de/home/pdfs_tr/trCS-07-04-Shef.pdf
--- ε + ℒℒ★ ≤ ℒ★             -- star unfold axiom 1 + xx★ ≤ x★
--- ℒ₀+ℒ₁ℒ₂ ≤ ℒ₂ ⇒ ℒ₁ℒ₀ ≤ ℒ₂ -- star induction axiom y + xz ≤ z ⇒ x★y ≤ z
--- and their opposites 1 + x ★x ≤ x ★ y + zx ≤ z ⇒ yx★ ≤ z
+-- 1 + αα★ ≤ α★          -- star unfold axiom
+-- 1 + α★α ≤ α★
+-- β + αγ  ≤ γ ⇒ α★β ≤ γ -- star induction axiom
+-- β + γα  ≤ γ ⇒ βα★ ≤ γ
+
 -- FIXME: So I need to add the Order, right? Can I move the Definition down here then?
 -- N.B. These functions (`star`, `(+)`, and `(*)`) assume they were passed a normalized regular expression.
 class (Dioid a, ZeroProductSemiring a) ⇒ KleeneAlgebra a where
@@ -216,24 +218,6 @@ instance Pointed RegExp where
   point ∷ s → RegExp s
   point = Lit
 
-instance Functor RegExp where
-  fmap ∷ (s → g) → RegExp s → RegExp g
-  fmap _ Zero     = Zero
-  fmap _ One      = One
-  fmap f (Lit  σ) = Lit (f σ)
-  fmap f (α :| β) = fmap f α :| fmap f β
-  fmap f (α :. β) = fmap f α :. fmap f β
-  fmap f (Star α) = Star (fmap f α)
-
-instance Functor (RegExpF s) where
-  fmap ∷ (a → b) → RegExpF s a → RegExpF s b
-  fmap _ ZeroF         = ZeroF
-  fmap _ OneF          = OneF
-  fmap _ (LitF σ)      = LitF σ
-  fmap f (UnionF  a b) = UnionF  (f a) (f b)
-  fmap f (ConcatF a b) = ConcatF (f a) (f b)
-  fmap f (StarF   a)   = StarF   (f a)
-
 instance Applicative RegExp where
   pure ∷ s → RegExp s
   pure = point
@@ -254,24 +238,6 @@ instance Monad RegExp where
   (>>=) (α :| β) f = (α >>= f) :| (β >>= f)
   (>>=) (α :. β) f = (α >>= f) :. (β >>= f)
   (>>=) (Star α) f = Star (α >>= f)
-
-instance Foldable RegExp where
-  foldMap ∷ (Monoid m) ⇒ (s → m) → RegExp s → m
-  foldMap _ Zero     = mempty
-  foldMap _ One      = mempty
-  foldMap f (Lit  σ) = f σ
-  foldMap f (α :| β) = foldMap f α `mappend` foldMap f β
-  foldMap f (α :. β) = foldMap f α `mappend` foldMap f β
-  foldMap f (Star α) = foldMap f α
-
-instance Traversable RegExp where
-  traverse ∷ (Applicative f) ⇒ (s → f g) → RegExp s → f (RegExp g)
-  traverse _ Zero     = pure Zero
-  traverse _ One      = pure One
-  traverse f (Lit  σ) = Lit  <$> f σ
-  traverse f (α :| β) = (:|) <$> traverse f α <*> traverse f β
-  traverse f (α :. β) = (:.) <$> traverse f α <*> traverse f β
-  traverse f (Star α) = Star <$> traverse f α
 
 -- "character class"
 fromSet ∷ (Ord s) ⇒ Set s → RegExp s
