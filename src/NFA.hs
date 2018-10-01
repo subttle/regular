@@ -55,6 +55,9 @@ instance (Show s, Finite s) ⇒ Show (SomeNFA s) where
 instance (Finite q, Finite s) ⇒ Configuration NFA q s (Set q) where
   deterministic ∷ NFA q s → Bool
   deterministic m = all ((≤ 1) . size') (range m)
+  
+  codeterministic ∷ NFA q s → Bool
+  codeterministic = deterministic . FA.reversal . toFA
 
   complete ∷ NFA q s → Bool
   complete m = all ((≥ 1) . size') (range m)

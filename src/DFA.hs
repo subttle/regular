@@ -65,6 +65,9 @@ instance (Finite q, Finite s) ⇒ Configuration DFA q s q where
   deterministic ∷ DFA q s → Bool
   deterministic _ = True
 
+  codeterministic ∷ DFA q s → Bool
+  codeterministic = deterministic . FA.reversal . toFA
+
   -- By construction of a DFA type this will be `True`
   complete      ∷ DFA q s → Bool
   complete      _ = True
@@ -169,15 +172,6 @@ table m = Map.toAscList (deltaToMap m)
 -- ℒ(m) is cofinite in Σ★ iff the complement of ℒ(m) (in Σ★) is finite.
 cofinite ∷ (Finite q, Finite s) ⇒                       DFA q s → Bool
 cofinite = finite . complement
-
-codeterministic ∷ (Finite q, Finite s) ⇒                DFA q s → Bool
-codeterministic = deterministic . FA.reversal . toFA
-
--- Bideterministic automata are deterministic automata with
--- the property of their reversal automata also being deterministic.
--- An automaton M is called bideterministic if both M and its reversal automaton, Mʳ, are deterministic
-bideterministic ∷ (Finite q, Finite s) ⇒                DFA q s → Bool
-bideterministic m = deterministic m  ∧  codeterministic m
 
 -- Theorem (Cerny, 1964): A DFA M is (directable) synchronizing iff ∀q ∈ Q, ∃p ∈ Q, ∃w ∈ Σ★: δ(q,w) = δ(p, w)
 -- That is, there exists a word w, such that evaluation of w from from any state, q, always ends up in the same state, p.

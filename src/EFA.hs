@@ -65,6 +65,9 @@ instance (Finite q, Finite s) ⇒ Configuration EFA q s (Set q) where
   deterministic ∷ EFA q s → Bool -- FIXME implemnt when I restructure to allow conversions
   deterministic = undefined -- FIXME should I use the noEpsilonClosures ?
 
+  codeterministic ∷ EFA q s → Bool
+  codeterministic = undefined  -- FIXME
+
   occupied ∷ EFA q s → Set q → Set q
   occupied _ = id
 

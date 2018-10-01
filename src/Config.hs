@@ -7,6 +7,7 @@ import           Finite
 import           Data.Set as Set
 import           Data.Set.Unicode
 import           Data.Eq.Unicode
+import           Data.Bool.Unicode
 
 -- When `occupy` is `q` the automaton is deterministic, and when `occupy` is `Set q` it enables nondeterminism
 class (Q (automaton q s) q, Σ (automaton q s) s, Eq occupy) ⇒ Configuration automaton q s occupy | automaton q s → occupy where
@@ -25,12 +26,18 @@ class (Q (automaton q s) q, Σ (automaton q s) s, Eq occupy) ⇒ Configuration a
     -- The set of states which can be reached from the inital state(s)
     accessible ∷ automaton q s → Set q
 
+    complete      ∷ automaton q s → Bool
+
     -- "A traditional finite-state automaton is deterministic if, for each state, the
     -- next state is uniquely determined by the current state and the current input character" --  Y.-S. Han and D. Wood
     -- Given an automaton, decide if it is deterministic, regardless of its type
     deterministic ∷ automaton q s → Bool
 
-    complete      ∷ automaton q s → Bool
+    codeterministic ∷ automaton q s → Bool
+
+    -- An automaton M is called bideterministic if both M and its reversal automaton, Mʳ, are deterministic
+    bideterministic ∷ automaton q s → Bool
+    bideterministic m = deterministic m ∧ codeterministic m
 
     -- δ★ : Q × Σ★ → Q
     -- "Extended delta" - The delta function extended from single symbols to strings (lists of symbols).

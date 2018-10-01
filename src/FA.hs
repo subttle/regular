@@ -23,8 +23,6 @@ import           Finite
 import qualified TG
 import           Algebra.Graph.Relation as Relation
 
--- Brzozowski frequently uses this variant of Finite Automata and it frequently proves to be useful :)
--- https://riunet.upv.es/bitstream/handle/10251/27623/partial%20rev%20determ.pdf?sequence=1
 -- This is essentially an NFA with multiple start states
 -- Having this type simplifies some algorithms (such as Brzozowski minimization)
 data FA q s where
@@ -45,6 +43,9 @@ instance (Finite q, Finite s) ⇒ Configuration FA q s (Set q) where
   deterministic ∷ FA q s → Bool
   deterministic m@(FA _ i _) = size' i == 1 ∧ all ((≤ 1) . size') (range m)
 
+  codeterministic ∷ FA q s → Bool
+  codeterministic = deterministic . reversal
+
   complete ∷ FA q s → Bool
   complete      m            =                all ((≥ 1) . size') (range m)
 
@@ -57,7 +58,6 @@ instance (Finite q, Finite s) ⇒ Configuration FA q s (Set q) where
   final   ∷ FA q s → Set q
   final   (FA _ _ f) = f
 
-  -- Given an FA, m, and a configuration, return what it yields in one step
   (⊢) ∷ FA q s → (Set q, [s]) → (Set q, [s])
   (⊢) _          (states,    []) = (states,                           [])
   (⊢) (FA δ _ _) (states, σ : w) = (foldMap δ (states × singleton σ), w )
@@ -65,8 +65,6 @@ instance (Finite q, Finite s) ⇒ Configuration FA q s (Set q) where
   accessible ∷ FA q s → Set q
   accessible m = foldMap (reachable m) (initial m)
   
-  -- untested vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-  -- δ′′ : P(Q) × Σ★ → P(Q)
   delta'' ∷ FA q s → (Set q, [s]) → Set q
   delta'' (FA δ _ _) = uncurry (Prelude.foldl (\states σ → foldMap (\q → δ (q,  σ)) states))
 
