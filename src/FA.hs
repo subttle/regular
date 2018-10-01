@@ -120,6 +120,13 @@ concatenate (FA δ₁ i₁ f₁) (FA δ₂ i₂ f₂) = FA { delta   = δ
                                                      δ (Left  q, σ)          = Set.map Left (δ₁ (q, σ))
                                                      δ (Right p, σ)          =                           Set.map Right (δ₂ (p,  σ))
 
+-- The product construction
+synchronous ∷ (Ord q, Ord p) ⇒ FA q s → FA p s → FA (q, p) s
+synchronous (FA δ₁ i₁ f₁) (FA δ₂ i₂ f₂) = FA { delta   = δ
+                                             , initial = i₁ × i₂
+                                             , final   = f₁ × f₂
+                                             } where δ ((q, p), σ) = δ₁ (q, σ) × δ₂ (p, σ)
+
 asynchronous ∷ (Ord q, Ord p) ⇒ FA q s → FA p g → FA (q, p) (Either s g)
 asynchronous (FA δ₁ i₁ f₁) (FA δ₂ i₂ f₂) = FA { delta   = δ
                                               , initial = i₁ × i₂
