@@ -364,7 +364,7 @@ fromEFA ∷ (Finite q) ⇒ EFA.EFA q s → DFA (Set q) s
 fromEFA = fromNFA . NFA.fromEFA
 
 toFAReverse ∷ (Finite s, Finite q) ⇒ DFA q s → FA.FA q s
-toFAReverse m@(DFA _ q₀ f) = FA.fromGraph (TG.reverse (toGraph m)) f (singleton q₀)
+toFAReverse = FA.reversal . toFA
 
 -- Take a DFA, d, and convert it to an NFA, n, such that ℒ(d) = ℒ(n)
 toNFA ∷ DFA q s → NFA.NFA q s
