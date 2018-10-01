@@ -70,7 +70,8 @@ instance (Finite q, Finite s) ⇒ Configuration FA q s (Set q) where
   delta'' ∷ FA q s → (Set q, [s]) → Set q
   delta'' (FA δ _ _) = uncurry (Prelude.foldl (\states σ → foldMap (\q → δ (q,  σ)) states))
 
-  delta' = undefined -- TODO don't define delta' in Config?
+  delta' ∷ FA q s → (q, [s]) → Set q
+  delta' m (q, w) = delta'' m (singleton q, w)
 
   eval ∷ (Finite q, Finite s) ⇒ FA q s → [s] → Set q
   eval m@(FA _ i _) w = delta'' m (i, w)
