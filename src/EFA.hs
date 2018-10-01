@@ -86,7 +86,7 @@ instance (Finite q, Finite s) ⇒ Configuration EFA q s (Set q) where
   -- "Extended delta"
   -- Extend the δ function to accept strings of symbols
   -- TODO random untested/unclear design thought: might be able to define a morphism on Q which involves eclosure?
-  delta' ∷ (Finite q, Finite s) ⇒ EFA q s → (q, [s]) → Set q
+  delta' ∷ EFA q s → (q, [s]) → Set q
   delta' m (q, w) = delta'' m (singleton q, w)
 
   -- δ′′ : P(Q) × (Σ ∪ {ε})★ → P(Q)
@@ -97,7 +97,7 @@ instance (Finite q, Finite s) ⇒ Configuration EFA q s (Set q) where
                                             w
 
   -- Take an EFA, m, and a string, and then compute the resulting states, which may be an empty set
-  eval ∷ (Finite q, Finite s) ⇒ EFA q s → [s] → Set q
+  eval ∷ EFA q s → [s] → Set q
   eval m@(EFA _ q₀ _) w = delta' m (q₀, w)
 
 -- Convert the transition function to a Map

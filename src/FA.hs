@@ -42,10 +42,10 @@ instance Contravariant (FA q) where
     contramap h m@(FA δ _ _) = m { delta = \(q, γ) → δ (q, h γ) }
 
 instance (Finite q, Finite s) ⇒ Configuration FA q s (Set q) where
-  deterministic ∷ (Finite q, Finite s) ⇒ FA q s → Bool
+  deterministic ∷ FA q s → Bool
   deterministic m@(FA _ i _) = size' i == 1 ∧ all ((≤ 1) . size') (range m)
 
-  complete ∷ (Finite q, Finite s) ⇒ FA q s → Bool
+  complete ∷ FA q s → Bool
   complete      m            =                all ((≥ 1) . size') (range m)
 
   occupied ∷ FA q s → Set q → Set q
@@ -73,7 +73,7 @@ instance (Finite q, Finite s) ⇒ Configuration FA q s (Set q) where
   delta' ∷ FA q s → (q, [s]) → Set q
   delta' m (q, w) = delta'' m (singleton q, w)
 
-  eval ∷ (Finite q, Finite s) ⇒ FA q s → [s] → Set q
+  eval ∷ FA q s → [s] → Set q
   eval m@(FA _ i _) w = delta'' m (i, w)
 
 -- The FA, empty, such that

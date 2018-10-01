@@ -53,10 +53,10 @@ instance (Show s, Finite s) ⇒ Show (SomeNFA s) where
   show (SomeNFA m) = show m
 
 instance (Finite q, Finite s) ⇒ Configuration NFA q s (Set q) where
-  deterministic ∷ (Finite q, Finite s) ⇒ NFA q s → Bool
+  deterministic ∷ NFA q s → Bool
   deterministic m = all ((≤ 1) . size') (range m)
 
-  complete ∷ (Finite q, Finite s) ⇒ NFA q s → Bool
+  complete ∷ NFA q s → Bool
   complete m = all ((≥ 1) . size') (range m)
 
   occupied ∷ NFA q s → Set q → Set q
@@ -80,7 +80,7 @@ instance (Finite q, Finite s) ⇒ Configuration NFA q s (Set q) where
   -- "Extended delta"
   -- Take an NFA and a starting state, q, for that NFA,
   -- then compute the set of states P such that δ★(q, w) = P
-  delta' ∷ (Finite q, Finite s) ⇒ NFA q s → (q, [s]) → Set q  -- TODO untested
+  delta' ∷ NFA q s → (q, [s]) → Set q  -- TODO untested
   delta' m (q, w) = delta'' m (singleton q, w)
 
   -- δ★ : P(Q) × Σ★ → P(Q)  -- TODO untested

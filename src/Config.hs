@@ -44,7 +44,7 @@ class (Q (automaton q s) q, Σ (automaton q s) s, Eq occupy) ⇒ Configuration a
     -- Given an automaton and a configuration, return what it yields in one step
     (⊢)     ∷ automaton q s → (occupy, [s]) → (occupy, [s])
 
-    (⊢⋆)    ∷ (Eq occupy) ⇒ automaton q s → (occupy, [s]) → (occupy, [s])
+    (⊢⋆)    ∷ automaton q s → (occupy, [s]) → (occupy, [s])
     (⊢⋆) = fixedPoint . (⊢)
 
     eval ∷ automaton q s → [s] → occupy
