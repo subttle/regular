@@ -159,8 +159,8 @@ fromSet s = EFA { delta = δ
 
 -- Avoid using `foldl` because the base case may introduce extra states
 fromList ∷ (Eq s) ⇒ [s] → SomeEFA s
-fromList [] = SomeEFA epsilon
-fromList  w = foldl1 (\(SomeEFA acc) (SomeEFA σ) → SomeEFA (concatenate acc σ)) (fmap (SomeEFA . literal) w)
+fromList []      = SomeEFA epsilon
+fromList (σ : w) = fromNE (σ NE.:| w)
 
 fromNE ∷ (Eq s) ⇒ NE.NonEmpty s → SomeEFA s
 fromNE  w = foldl1 (\(SomeEFA acc) (SomeEFA σ) → SomeEFA (concatenate acc σ)) (fmap (SomeEFA . literal) w)

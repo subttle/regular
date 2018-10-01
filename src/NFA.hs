@@ -6,6 +6,7 @@ import           Common
 import           Data.Map            as Map (Map, fromList)
 import qualified Data.Map            as Map (fromSet, toAscList)
 import           Data.Set            as Set hiding (foldl)
+import qualified Data.List.NonEmpty  as NE
 import           Data.Set.Unicode
 import           Data.Ord.Unicode
 import qualified EFA
@@ -139,8 +140,11 @@ fromSet s = NFA { delta = δ
 -- will concatenate the last symbol in the string with epsilon.
 -- Could also just use `fromRE` instead... Confirm this way is better?
 fromList ∷ (Eq s) ⇒ [s] → SomeNFA s
-fromList [] = SomeNFA epsilon
-fromList  w = foldl1 (\(SomeNFA acc) (SomeNFA b) → SomeNFA (concatenate acc b)) (fmap (SomeNFA . literal) w)
+fromList []      = SomeNFA epsilon
+fromList (σ : w) = fromNE (σ NE.:| w)
+
+fromNE ∷ (Eq s) ⇒ NE.NonEmpty s → SomeNFA s
+fromNE  w = foldl1 (\(SomeNFA acc) (SomeNFA σ) → SomeNFA (concatenate acc σ)) (fmap (SomeNFA . literal) w)
 
 -- Given two NFAs m₁ and m₂, return an NFA which recognizes any string from
 -- m₁ immediately followed by any string from m₂
