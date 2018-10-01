@@ -14,7 +14,7 @@ cabal-version:       >=1.20
 
 library
   hs-source-dirs:      src
-  exposed-modules:     DFA, NFA, EFA, GFA, RE, FA, Common, TG, Finite, Examples, Config
+  exposed-modules:     DFA, NFA, EFA, GFA, RE, ERE, FA, Common, TG, Finite, Examples, Config
   build-depends:       base >= 4.8 && < 5
                      , base-unicode-symbols
                      , containers >= 0.5.11.0
