@@ -85,3 +85,52 @@ height (α :. β) = max (height α) (height β)
 height (α :& β) = max (height α) (height β)
 height (Star α) = 1 + height α
 height (Comp α) = height α
+
+-- TODO once the algebraic `(+)`, `(*)`, `(&)`, `star`, `comp` operators are properly defined
+-- these functions can then be used:
+{-
+normalize ∷ (Ord s) ⇒ ExRE s → ExRE s
+normalize Zero        = zero
+normalize One         = one
+normalize (Lit  σ)    = literal σ
+normalize (α :| β)    = normalize α + normalize β
+normalize (α :. β)    = normalize α * normalize β
+normalize (α :& β)    = normalize α & normalize β
+normalize (Star α)    = star (normalize α)
+normalize (Comp α)    = comp (normalize α)
+
+-- Brzozowski ∂ with respect to σ ∈ Σ
+derivative ∷ (Ord s) ⇒ ExRE s → s → ExRE s
+derivative Zero     _ = zero
+derivative One      _ = zero
+derivative (Lit σ') σ = if σ' == σ then one else zero
+derivative (α :| β) σ = derivative α σ + derivative β σ
+derivative (α :. β) σ = (derivative α σ * β) + (constant α * derivative β σ)
+derivative (α :& β) σ = derivative α σ & derivative β σ
+derivative (Star α) σ = derivative α σ * star α
+derivative (Comp α) σ = comp (derivative α σ)
+
+-- Brzozowski ∂ extended to strings
+derivative' ∷ (Ord s) ⇒ ExRE s → [s] → ExRE s
+derivative' = List.foldl derivative
+
+matches ∷ (Ord s) ⇒ ExRE s → [s] → Bool
+matches Zero       _ = False
+matches α         [] = constant α == One
+matches α    (a : w) = matches (derivative α a) w
+
+nullable ∷ (Ord s) ⇒ ExRE s → Bool
+nullable = nullable' . normalize
+  where nullable' Zero     = False
+        nullable' One      = True
+        nullable' (Lit  _) = False
+        nullable' (α :| β) = nullable' α ∨ nullable' β
+        nullable' (α :. β) = nullable' α ∧ nullable' β
+        nullable' (α :& β) = nullable' α ∧ nullable' β
+        nullable' (Star _) = True
+        nullable' (Comp α) = not (nullable' α)
+
+constant ∷ (Ord s) ⇒ ExRE s → ExRE s
+constant α | nullable α = One
+           | otherwise  = Zero
+-}
