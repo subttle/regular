@@ -171,7 +171,7 @@ cofinite ∷ (Finite q, Finite s) ⇒                       DFA q s → Bool
 cofinite = finite . complement
 
 codeterministic ∷ (Finite q, Finite s) ⇒                DFA q s → Bool
-codeterministic = undefined -- m = deterministic (toFAReverse m)
+codeterministic = deterministic . FA.reversal . toFA
 
 -- Bideterministic automata are deterministic automata with
 -- the property of their reversal automata also being deterministic.
