@@ -15,10 +15,7 @@ import           Data.Bool.Unicode
 import           Data.Ord.Unicode
 import           Data.Map (Map)
 import qualified Data.Map as Map
--- import           Data.Bifunctor
--- import           Data.Void
 import           Data.Functor.Contravariant
--- import           Data.Functor.Contravariant.Divisible
 import           Common
 import           Config hiding (initial, final)
 import qualified Config
@@ -48,7 +45,6 @@ instance (Finite q, Finite s) ⇒ Configuration FA q s (Set q) where
   deterministic ∷ (Finite q, Finite s) ⇒ FA q s → Bool
   deterministic m@(FA _ i _) = size' i == 1 ∧ all ((≤ 1) . size') (range m)
 
-  -- TODO make CFA it's own type?
   complete ∷ (Finite q, Finite s) ⇒ FA q s → Bool
   complete      m            =                all ((≥ 1) . size') (range m)
 
@@ -103,6 +99,7 @@ literal σ' = FA { delta   = δ
                 , final   = singleton True
                 } where δ (False, σ) | σ == σ' = singleton True
                         δ _                    = (∅)
+
 -- Given a set of symbols, construct an FA which recognizes exactly those set of literals and nothing else
 -- Much like a character class of a regular expression.
 fromSet ∷ (Ord s) ⇒ Set s → FA Bool s
@@ -128,7 +125,6 @@ asynchronous (FA δ₁ i₁ f₁) (FA δ₂ i₂ f₂) = FA { delta   = δ
                                               , initial = i₁ × i₂
                                               , final   = f₁ × f₂
                                               } where δ ((q, p), Left  σ) = δ₁ (q, σ)   × singleton p
-                                                      -- TODO wrote this when tired, double check and test :D
                                                       δ ((q, p), Right γ) = singleton q × δ₂ (p, γ)
 
 reversal ∷ (Finite q, Finite s) ⇒ FA q s → FA q s
