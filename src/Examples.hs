@@ -312,18 +312,6 @@ hmu218 = EFA.EFA { EFA.delta = delta
                          delta (4, Just (Left Period)) = singleton 3
                          delta  _                      = (∅)
 
--- An EFA to recognize my version of the "Real" numbers
-reals ∷ EFA.EFA (Fin Nat5) (Either Decimal Digits)
-reals = EFA.EFA { EFA.delta = delta
-                , EFA.q0    = 0
-                , EFA.fs    = singleton 4
-                } where delta (0, Just (Left   Plus)) = singleton 1
-                        delta (0, Just (Left  Minus)) = singleton 1
-                        delta (1, Just (Right     _)) = fromList [1, 2]
-                        delta (2, Just (Left Period)) = singleton 3
-                        delta (3, Just (Right     _)) = fromList [3, 4]
-                        delta  _                      = (∅)
-
 -- [[0],[1],[0,1],[0,0,0],[0,1,1],[1,1,1]
 ex144 ∷ EFA.EFA (Fin Nat6) (Fin Nat2)
 ex144 = EFA.EFA { EFA.delta = delta
