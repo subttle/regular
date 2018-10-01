@@ -153,11 +153,6 @@ instance (Show q, Finite q, Show s, Finite s) ⇒ Show (FA q s) where
          "\n, I = " ++ (show . Set' . initial)          m ++
          "\n, F = " ++ (show . Set' .   final)          m ++ " )"
 
--- TODO https://arxiv.org/pdf/1405.5594.pdf Lemma 22
--- Can make it's own type, BFA? and do not do `fs` as a set but rather as an element to force it to be single
-bideterministic ∷ FA q s → Bool
-bideterministic _ = undefined
-
 -- Determinize the FA without transforming it to a DFA type
 determinization ∷ (Finite q) ⇒ FA q s → FA (Set q) s
 determinization m@(FA δ i f) = FA { delta   = \(states, σ) → Set.map (\q → δ (q, σ)) states
