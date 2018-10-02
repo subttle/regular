@@ -25,6 +25,7 @@ library
                      , profunctors
                      , pointed
                      , fin
+                     , universe
   default-language:    Haskell2010
 
 executable regular-exe
@@ -41,6 +42,7 @@ executable regular-exe
                      , profunctors
                      , pointed
                      , fin
+                     , universe
 
 test-suite regular-test
   type:                exitcode-stdio-1.0

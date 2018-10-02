@@ -19,6 +19,7 @@ import           GHC.Enum
 import           Data.Char
 import           Data.Fin (Fin)
 import qualified Data.Type.Nat as Nat
+import qualified Data.Universe as U
 
 -- An imperfect, somewhat practical, representation of a Finite type constraint
 -- The poor Haskeller's version of a Finite type constraint without reaching for dependent types
