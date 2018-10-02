@@ -37,7 +37,6 @@ import           Data.Bool.Unicode
 import           Data.Foldable (toList)
 import           Data.Pointed
 import           Numeric.Additive.Class (Additive, (+), Idempotent, Abelian)
--- import           Numeric.Order.Additive (AdditiveOrder)
 import           Numeric.Order.Class
 import           Numeric.Algebra.Class (Monoidal, Multiplicative, (*), zero, LeftModule, (.*), RightModule, (*.), Semiring, sumWith)
 import           Numeric.Algebra.Unital (Unital, one, pow, productWith)
@@ -128,9 +127,6 @@ instance (Ord s) ⇒ Order (RegExp s) where
   -- TODO language equality? Might need to factor distributivity first
   (<~) ∷ RegExp s → RegExp s → Bool
   (<~) α β = α + β == β
-
--- z + x <= z + y   =   x <= y   =   x + z <= y + z
--- instance (Ord s) ⇒ AdditiveOrder (RegExp s)
 
 -- An additive Abelian semigroup
 -- a + b = b + a
@@ -451,7 +447,7 @@ derivative' = List.foldl derivative
 -- version of the Brzozowski derivative. Instead of a deterministic finite automaton, the
 -- partial derivative leads to a construction of a nondeterministic finite automaton"
 -- -- http://www.dcc.fc.up.pt/~nam/web/resources/rafaelamsc.pdf 3.3 (pg. 20)
-partial ∷ (Eq s, Ord s) ⇒ RegExp s → s → Set (RegExp s)
+partial ∷ (Ord s) ⇒ RegExp s → s → Set (RegExp s)
 partial Zero     _              = (∅)
 partial One      _              = (∅)
 partial (Lit σ') σ | σ' == σ    = singleton One
