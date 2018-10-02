@@ -1,4 +1,5 @@
 {-# LANGUAGE InstanceSigs, TypeSynonymInstances, FlexibleInstances, GeneralizedNewtypeDeriving, UnicodeSyntax, ExplicitForAll, ScopedTypeVariables #-}
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FunctionalDependencies #-}
 
 module Finite where
@@ -17,7 +18,7 @@ import           Common
 import           GHC.Enum
 import           Data.Char
 import           Data.Fin (Fin)
-import           Data.Type.Nat (Nat1, Nat2, Nat3, Nat4, Nat5, Nat6, Nat7, Nat8, Nat9)
+import qualified Data.Type.Nat as Nat
 
 -- An imperfect, somewhat practical, representation of a Finite type constraint
 -- The poor Haskeller's version of a Finite type constraint without reaching for dependent types
@@ -98,7 +99,6 @@ instance (Finite a) ⇒                                         Finite  (Maybe a
   asList = Nothing : fmap Just asList
   asSet  = Set.insert Nothing (Set.mapMonotonic Just asSet)
 
-
 instance (Bounded a, Bounded b) ⇒                             Bounded (Either a b) where
   minBound = Left  minBound
   maxBound = Right maxBound
@@ -155,245 +155,34 @@ instance                                                      Enum    Void where
   fromEnum = absurd
 -- Easier to do this than write "BoundedOrEmpty" class because Enum and Bounded are everywhere :)
 instance                                                      Bounded Void where
-  minBound = undefined
+  minBound = undefined           
   maxBound = undefined
 instance                                                      Finite  Void where
   asList = []
   asSet  = (∅)
 
-instance Finite (Fin Nat1)
-instance Finite (Fin Nat2)
-instance Finite (Fin Nat3)
-instance Finite (Fin Nat4)
-instance Finite (Fin Nat5)
-instance Finite (Fin Nat6)
-instance Finite (Fin Nat7)
-instance Finite (Fin Nat8)
-instance Finite (Fin Nat9)
+type Nat10  = Nat.S Nat.Nat9
+type Nat11  = Nat.S Nat10
+type Nat12  = Nat.S Nat11
+type Nat13  = Nat.S Nat12
+type Nat14  = Nat.S Nat13
+type Nat15  = Nat.S Nat14
 
--- N.B. That it is possible to construct invalid Finₙ types, e.g. (`Fin₂ 9`) is perfectly legal Haskell and will compile
--- look away, I'm hideous
-newtype Fin₁₀ = Fin₁₀ ℕ deriving (Eq, Ord, Num, Show)
-instance Bounded Fin₁₀ where
-  minBound = Fin₁₀ 0
-  maxBound = Fin₁₀ 9
-instance Enum Fin₁₀ where
-  toEnum          0  = Fin₁₀ 0
-  toEnum          1  = Fin₁₀ 1
-  toEnum          2  = Fin₁₀ 2
-  toEnum          3  = Fin₁₀ 3
-  toEnum          4  = Fin₁₀ 4
-  toEnum          5  = Fin₁₀ 5
-  toEnum          6  = Fin₁₀ 6
-  toEnum          7  = Fin₁₀ 7
-  toEnum          8  = Fin₁₀ 8
-  toEnum          9  = Fin₁₀ 9
-  toEnum          n  = toEnumError "invalid Fin₁₀" n (minBound :: Fin₁₀, maxBound :: Fin₁₀)
-  fromEnum (Fin₁₀ 0) =       0
-  fromEnum (Fin₁₀ 1) =       1
-  fromEnum (Fin₁₀ 2) =       2
-  fromEnum (Fin₁₀ 3) =       3
-  fromEnum (Fin₁₀ 4) =       4
-  fromEnum (Fin₁₀ 5) =       5
-  fromEnum (Fin₁₀ 6) =       6
-  fromEnum (Fin₁₀ 7) =       7
-  fromEnum (Fin₁₀ 8) =       8
-  fromEnum (Fin₁₀ 9) =       9
-  fromEnum (Fin₁₀ n) = error ("invalid (Fin₁₀ " ++ show n ++ ") in fromEnum")
-  enumFrom     = boundedEnumFrom
-  enumFromThen = boundedEnumFromThen
-instance Finite Fin₁₀ where
-  asList = [Fin₁₀ 0, Fin₁₀ 1, Fin₁₀ 2, Fin₁₀ 3, Fin₁₀ 4, Fin₁₀ 5, Fin₁₀ 6, Fin₁₀ 7, Fin₁₀ 8, Fin₁₀ 9]
-
-newtype Fin₁₁ = Fin₁₁ ℕ deriving (Eq, Ord, Num, Show)
-instance Bounded Fin₁₁ where
-  minBound = Fin₁₁ 0
-  maxBound = Fin₁₁ 10
-instance Enum Fin₁₁ where
-  toEnum          0   = Fin₁₁ 0
-  toEnum          1   = Fin₁₁ 1
-  toEnum          2   = Fin₁₁ 2
-  toEnum          3   = Fin₁₁ 3
-  toEnum          4   = Fin₁₁ 4
-  toEnum          5   = Fin₁₁ 5
-  toEnum          6   = Fin₁₁ 6
-  toEnum          7   = Fin₁₁ 7
-  toEnum          8   = Fin₁₁ 8
-  toEnum          9   = Fin₁₁ 9
-  toEnum          10  = Fin₁₁ 10
-  toEnum          n   = toEnumError "invalid Fin₁₁" n (minBound :: Fin₁₁, maxBound :: Fin₁₁)
-  fromEnum (Fin₁₁ 0)  =       0
-  fromEnum (Fin₁₁ 1)  =       1
-  fromEnum (Fin₁₁ 2)  =       2
-  fromEnum (Fin₁₁ 3)  =       3
-  fromEnum (Fin₁₁ 4)  =       4
-  fromEnum (Fin₁₁ 5)  =       5
-  fromEnum (Fin₁₁ 6)  =       6
-  fromEnum (Fin₁₁ 7)  =       7
-  fromEnum (Fin₁₁ 8)  =       8
-  fromEnum (Fin₁₁ 9)  =       9
-  fromEnum (Fin₁₁ 10) =       10
-  fromEnum (Fin₁₁ n)  = error ("invalid (Fin₁₁ " ++ show n ++ ") in fromEnum")
-  enumFrom     = boundedEnumFrom
-  enumFromThen = boundedEnumFromThen
-instance Finite Fin₁₁ where
-  asList = [Fin₁₁ 0, Fin₁₁ 1, Fin₁₁ 2, Fin₁₁ 3, Fin₁₁ 4, Fin₁₁ 5, Fin₁₁ 6, Fin₁₁ 7, Fin₁₁ 8, Fin₁₁ 9, Fin₁₁ 10]
-
-newtype Fin₁₂ = Fin₁₂ ℕ deriving (Eq, Ord, Num, Show)
-instance Bounded Fin₁₂ where
-  minBound = Fin₁₂ 0
-  maxBound = Fin₁₂ 11
-instance Enum Fin₁₂ where
-  toEnum          0   = Fin₁₂ 0
-  toEnum          1   = Fin₁₂ 1
-  toEnum          2   = Fin₁₂ 2
-  toEnum          3   = Fin₁₂ 3
-  toEnum          4   = Fin₁₂ 4
-  toEnum          5   = Fin₁₂ 5
-  toEnum          6   = Fin₁₂ 6
-  toEnum          7   = Fin₁₂ 7
-  toEnum          8   = Fin₁₂ 8
-  toEnum          9   = Fin₁₂ 9
-  toEnum          10  = Fin₁₂ 10
-  toEnum          11  = Fin₁₂ 11
-  toEnum          n   = toEnumError "invalid Fin₁₂" n (minBound :: Fin₁₂, maxBound :: Fin₁₂)
-  fromEnum (Fin₁₂ 0)  =       0
-  fromEnum (Fin₁₂ 1)  =       1
-  fromEnum (Fin₁₂ 2)  =       2
-  fromEnum (Fin₁₂ 3)  =       3
-  fromEnum (Fin₁₂ 4)  =       4
-  fromEnum (Fin₁₂ 5)  =       5
-  fromEnum (Fin₁₂ 6)  =       6
-  fromEnum (Fin₁₂ 7)  =       7
-  fromEnum (Fin₁₂ 8)  =       8
-  fromEnum (Fin₁₂ 9)  =       9
-  fromEnum (Fin₁₂ 10) =       10
-  fromEnum (Fin₁₂ 11) =       11
-  fromEnum (Fin₁₂ n)  = error ("invalid (Fin₁₂ " ++ show n ++ ") in fromEnum")
-  enumFrom     = boundedEnumFrom
-  enumFromThen = boundedEnumFromThen
-instance Finite Fin₁₂ where
-  asList = [Fin₁₂ 0, Fin₁₂ 1, Fin₁₂ 2, Fin₁₂ 3, Fin₁₂ 4, Fin₁₂ 5, Fin₁₂ 6, Fin₁₂ 7, Fin₁₂ 8, Fin₁₂ 9, Fin₁₂ 10, Fin₁₂ 11]
-
-newtype Fin₁₃ = Fin₁₃ ℕ deriving (Eq, Ord, Num, Show)
-instance Bounded Fin₁₃ where
-  minBound = Fin₁₃ 0
-  maxBound = Fin₁₃ 12
-instance Enum Fin₁₃ where
-  toEnum          0   = Fin₁₃ 0
-  toEnum          1   = Fin₁₃ 1
-  toEnum          2   = Fin₁₃ 2
-  toEnum          3   = Fin₁₃ 3
-  toEnum          4   = Fin₁₃ 4
-  toEnum          5   = Fin₁₃ 5
-  toEnum          6   = Fin₁₃ 6
-  toEnum          7   = Fin₁₃ 7
-  toEnum          8   = Fin₁₃ 8
-  toEnum          9   = Fin₁₃ 9
-  toEnum          10  = Fin₁₃ 10
-  toEnum          11  = Fin₁₃ 11
-  toEnum          12  = Fin₁₃ 12
-  toEnum          n   = toEnumError "invalid Fin₁₃" n (minBound :: Fin₁₃, maxBound :: Fin₁₃)
-  fromEnum (Fin₁₃ 0)  =       0
-  fromEnum (Fin₁₃ 1)  =       1
-  fromEnum (Fin₁₃ 2)  =       2
-  fromEnum (Fin₁₃ 3)  =       3
-  fromEnum (Fin₁₃ 4)  =       4
-  fromEnum (Fin₁₃ 5)  =       5
-  fromEnum (Fin₁₃ 6)  =       6
-  fromEnum (Fin₁₃ 7)  =       7
-  fromEnum (Fin₁₃ 8)  =       8
-  fromEnum (Fin₁₃ 9)  =       9
-  fromEnum (Fin₁₃ 10) =       10
-  fromEnum (Fin₁₃ 11) =       11
-  fromEnum (Fin₁₃ 12) =       12
-  fromEnum (Fin₁₃ n) = error ("invalid (Fin₁₃ " ++ show n ++ ") in fromEnum")
-  enumFrom     = boundedEnumFrom
-  enumFromThen = boundedEnumFromThen
-instance Finite Fin₁₃ where
-  asList = [Fin₁₃ 0, Fin₁₃ 1, Fin₁₃ 2, Fin₁₃ 3, Fin₁₃ 4, Fin₁₃ 5, Fin₁₃ 6, Fin₁₃ 7, Fin₁₃ 8, Fin₁₃ 9, Fin₁₃ 10, Fin₁₃ 11, Fin₁₃ 12]
-
-newtype Fin₁₄ = Fin₁₄ ℕ deriving (Eq, Ord, Num, Show)
-instance Bounded Fin₁₄ where
-  minBound = Fin₁₄ 0
-  maxBound = Fin₁₄ 13
-instance Enum Fin₁₄ where
-  toEnum          0   = Fin₁₄ 0
-  toEnum          1   = Fin₁₄ 1
-  toEnum          2   = Fin₁₄ 2
-  toEnum          3   = Fin₁₄ 3
-  toEnum          4   = Fin₁₄ 4
-  toEnum          5   = Fin₁₄ 5
-  toEnum          6   = Fin₁₄ 6
-  toEnum          7   = Fin₁₄ 7
-  toEnum          8   = Fin₁₄ 8
-  toEnum          9   = Fin₁₄ 9
-  toEnum          10  = Fin₁₄ 10
-  toEnum          11  = Fin₁₄ 11
-  toEnum          12  = Fin₁₄ 12
-  toEnum          13  = Fin₁₄ 13
-  toEnum          n   = toEnumError "invalid Fin₁₄" n (minBound :: Fin₁₄, maxBound :: Fin₁₄)
-  fromEnum (Fin₁₄ 0)  =       0
-  fromEnum (Fin₁₄ 1)  =       1
-  fromEnum (Fin₁₄ 2)  =       2
-  fromEnum (Fin₁₄ 3)  =       3
-  fromEnum (Fin₁₄ 4)  =       4
-  fromEnum (Fin₁₄ 5)  =       5
-  fromEnum (Fin₁₄ 6)  =       6
-  fromEnum (Fin₁₄ 7)  =       7
-  fromEnum (Fin₁₄ 8)  =       8
-  fromEnum (Fin₁₄ 9)  =       9
-  fromEnum (Fin₁₄ 10) =       10
-  fromEnum (Fin₁₄ 11) =       11
-  fromEnum (Fin₁₄ 12) =       12
-  fromEnum (Fin₁₄ 13) =       13
-  fromEnum (Fin₁₄ n)  = error ("invalid (Fin₁₄ " ++ show n ++ ") in fromEnum")
-  enumFrom     = boundedEnumFrom
-  enumFromThen = boundedEnumFromThen
-instance Finite Fin₁₄ where
-  asList = [Fin₁₄ 0, Fin₁₄ 1, Fin₁₄ 2, Fin₁₄ 3, Fin₁₄ 4, Fin₁₄ 5, Fin₁₄ 6, Fin₁₄ 7, Fin₁₄ 8, Fin₁₄ 9, Fin₁₄ 10, Fin₁₄ 11, Fin₁₄ 12, Fin₁₄ 13]
-
-newtype Fin₁₅ = Fin₁₅ ℕ deriving (Eq, Ord, Num, Show)
-instance Bounded Fin₁₅ where
-  minBound = Fin₁₅ 0
-  maxBound = Fin₁₅ 14
-instance Enum Fin₁₅ where
-  toEnum          0   = Fin₁₅ 0
-  toEnum          1   = Fin₁₅ 1
-  toEnum          2   = Fin₁₅ 2
-  toEnum          3   = Fin₁₅ 3
-  toEnum          4   = Fin₁₅ 4
-  toEnum          5   = Fin₁₅ 5
-  toEnum          6   = Fin₁₅ 6
-  toEnum          7   = Fin₁₅ 7
-  toEnum          8   = Fin₁₅ 8
-  toEnum          9   = Fin₁₅ 9
-  toEnum          10  = Fin₁₅ 10
-  toEnum          11  = Fin₁₅ 11
-  toEnum          12  = Fin₁₅ 12
-  toEnum          13  = Fin₁₅ 13
-  toEnum          14  = Fin₁₅ 14
-  toEnum          n   = toEnumError "invalid Fin₁₅" n (minBound :: Fin₁₅, maxBound :: Fin₁₅)
-  fromEnum (Fin₁₅ 0)  =       0
-  fromEnum (Fin₁₅ 1)  =       1
-  fromEnum (Fin₁₅ 2)  =       2
-  fromEnum (Fin₁₅ 3)  =       3
-  fromEnum (Fin₁₅ 4)  =       4
-  fromEnum (Fin₁₅ 5)  =       5
-  fromEnum (Fin₁₅ 6)  =       6
-  fromEnum (Fin₁₅ 7)  =       7
-  fromEnum (Fin₁₅ 8)  =       8
-  fromEnum (Fin₁₅ 9)  =       9
-  fromEnum (Fin₁₅ 10) =       10
-  fromEnum (Fin₁₅ 11) =       11
-  fromEnum (Fin₁₅ 12) =       12
-  fromEnum (Fin₁₅ 13) =       13
-  fromEnum (Fin₁₅ 14) =       14
-  fromEnum (Fin₁₅ n)  = error ("invalid (Fin₁₅ " ++ show n ++ ") in fromEnum")
-  enumFrom     = boundedEnumFrom
-  enumFromThen = boundedEnumFromThen
-instance Finite Fin₁₅ where
-  asList = [Fin₁₅ 0, Fin₁₅ 1, Fin₁₅ 2, Fin₁₅ 3, Fin₁₅ 4, Fin₁₅ 5, Fin₁₅ 6, Fin₁₅ 7, Fin₁₅ 8, Fin₁₅ 9, Fin₁₅ 10, Fin₁₅ 11, Fin₁₅ 12, Fin₁₅ 13, Fin₁₅ 14]
+instance Finite (Fin Nat.Nat1)
+instance Finite (Fin Nat.Nat2)
+instance Finite (Fin Nat.Nat3)
+instance Finite (Fin Nat.Nat4)
+instance Finite (Fin Nat.Nat5)
+instance Finite (Fin Nat.Nat6)
+instance Finite (Fin Nat.Nat7)
+instance Finite (Fin Nat.Nat8)
+instance Finite (Fin Nat.Nat9)
+instance Finite (Fin Nat10)
+instance Finite (Fin Nat11)
+instance Finite (Fin Nat12)
+instance Finite (Fin Nat13)
+instance Finite (Fin Nat14)
+instance Finite (Fin Nat15)
 
 -- TODO deleteme
 instance (Show a, Finite a) ⇒ Show (Predicate a) where
