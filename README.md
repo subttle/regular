@@ -22,13 +22,13 @@ Here is a small example of what FizzBuzz looks like with DFA:
 ```Haskell
 
 -- A number, n, either ends in 5 or 0 (when n % 5 = 0), or it doesn't (n % 5 ≠ 0).
-by5 ∷ DFA (Fin Nat2) (Fin Nat10)
+by5 ∷ DFA Bool (Fin Nat10)
 by5 = DFA { delta = delta
-          , q0    = 0
-          , fs    = singleton 1
-          } where delta (_, 0) = 1
-                  delta (_, 5) = 1
-                  delta _      = 0
+          , q0    = False
+          , fs    = singleton True
+          } where delta (_, 0) = True
+                  delta (_, 5) = True
+                  delta _      = False
 
 -- A number is divisible by 3 if and only if the sum of its digits is divisible by 3
 -- The state we are in is the (running total % 3)

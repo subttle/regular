@@ -61,13 +61,13 @@ even0or1 = EFA.EFA { EFA.delta = delta
                            delta (_, _      ) = (∅)
 
 -- A number, n, either ends in 5 or 0 (when n % 5 = 0), or it doesn't (n % 5 ≠ 0).
-by5 ∷ DFA (Fin Nat2) (Fin Nat10)
+by5 ∷ DFA Bool (Fin Nat10)
 by5 = DFA { delta = delta
-          , q0    = 0
-          , fs    = singleton 1
-          } where delta (_, 0) = 1
-                  delta (_, 5) = 1
-                  delta _      = 0
+          , q0    = False
+          , fs    = singleton True
+          } where delta (_, 0) = True
+                  delta (_, 5) = True
+                  delta _      = False
 
 -- A regular expression to match the language of the divisibleBy5 DFA
 -- [0-9]★[0+5]
