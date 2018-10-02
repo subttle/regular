@@ -224,17 +224,8 @@ data Alpha = A | B | C | D | E | F | G | H | I | J | K | L | M | N | O | P | Q |
 instance                                                       Finite Alpha where
   asList = [A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z]
 
-
-
-data Digits = Zero | One | Two   | Three | Four
-            | Five | Six | Seven | Eight | Nine deriving (Eq, Ord, Enum, Bounded)
-instance Show Digits where
-  show = show . fromEnum
-instance                                                       Finite Digits where
-  asList = [Zero, One, Two, Three, Four, Five, Six, Seven, Eight, Nine]
-
 -- TODO move this helper function back to Common once `ℕ` is added to unicode lib; putting it in Common would cause an import cycle for now though..
-toDigits :: ℕ -> [Digits]
+toDigits :: ℕ -> [Fin Nat10]
 toDigits = fmap (toEnum . digitToInt) . show
 
 data DNA = Adenine | Cytosine | Guanine | Thymine deriving (Eq, Ord, Bounded, Enum)

@@ -28,7 +28,7 @@ RE.optional, atLeastOnce, dot,
 isZero, KleeneAlgebra) where
 
 import           Common
-import           Finite hiding (Zero, One)
+import           Finite
 import           Prelude hiding ((+), (*), last, map)
 import           Data.List as List hiding (last, map)
 import           Data.Set as Set

@@ -61,24 +61,24 @@ even0or1 = EFA.EFA { EFA.delta = delta
                            delta (_, _      ) = (∅)
 
 -- A number, n, either ends in 5 or 0 (when n % 5 = 0), or it doesn't (n % 5 ≠ 0).
-by5 ∷ DFA (Fin Nat2) Digits
+by5 ∷ DFA (Fin Nat2) (Fin Nat10)
 by5 = DFA { delta = delta
           , q0    = 0
           , fs    = singleton 1
-          } where delta (_, Zero) = 1
-                  delta (_, Five) = 1
-                  delta _         = 0
+          } where delta (_, 0) = 1
+                  delta (_, 5) = 1
+                  delta _      = 0
 
 -- A regular expression to match the language of the divisibleBy5 DFA
 -- [0-9]★[0+5]
 -- ((0+(1+(2+(3+(4+(5+(6+(7+(8+9))))))))))★·(0+5)
-by5' ∷ RE.RegExp Digits
-by5' = RE.star RE.dot RE.* RE.fromSet (fromList [Zero, Five])
+by5' ∷ RE.RegExp (Fin Nat10)
+by5' = RE.star RE.dot RE.* RE.fromSet (fromList [0, 5])
 
 -- A number is divisible by 3 if and only if the sum of its digits is divisible by 3
 -- The state we are in is the (running total % 3)
 -- (We add a single starting state `Left ()` to avoid accepting the empty string.)
-by3 ∷ DFA (Either () (Fin Nat3)) Digits
+by3 ∷ DFA (Either () (Fin Nat3)) (Fin Nat10)
 by3 = DFA { delta = Right . toEnum . delta
           , q0    = Left ()
           , fs    = singleton (Right 0)
@@ -220,14 +220,14 @@ figure2 = NFA.NFA { NFA.delta = δ
                           δ (7, _)        = (∅)
 
 -- Generates the language [[1], [2], [3]]
-oneTwoThree ∷ EFA.EFA Bool Digits
+oneTwoThree ∷ EFA.EFA Bool (Fin Nat4)
 oneTwoThree = EFA.EFA { EFA.delta = delta
                       , EFA.q0    = False
                       , EFA.fs    = singleton True
-                      } where delta (False, Just   One) = singleton True
-                              delta (False, Just   Two) = singleton True
-                              delta (False, Just Three) = singleton True
-                              delta _                   = (∅)
+                      } where delta (False, Just 1) = singleton True
+                              delta (False, Just 2) = singleton True
+                              delta (False, Just 3) = singleton True
+                              delta _               = (∅)
 
 -- An EFA which accepts only strings which start with 0 and end with 1
 -- A similar example is given in this video lecture https://youtu.be/yzb4J7oSyLA
@@ -297,7 +297,7 @@ instance Show Decimal where
   show Period = "."
 
 -- HMU Figure 2.18 Pg.73
-hmu218 ∷ EFA.EFA (Fin Nat6) (Either Decimal Digits)
+hmu218 ∷ EFA.EFA (Fin Nat6) (Either Decimal (Fin Nat10))
 hmu218 = EFA.EFA { EFA.delta = delta
                  , EFA.q0    = 0
                  , EFA.fs    = singleton 5
@@ -356,27 +356,27 @@ minimal = DFA { delta = delta
                       delta (4, 1) = 2
 
 -- https://youtu.be/TvMEX2htBYw
-minimal' ∷ DFA Digits (Fin Nat2)
+minimal' ∷ DFA (Fin Nat10) (Fin Nat2)
 minimal' = DFA { delta = delta
-               , q0    = Zero
-               , fs    = fromList [Five, Six]
-               } where delta ( Zero, 0) = Seven
-                       delta ( Zero, 1) = One
-                       delta (  One, 0) = Seven
-                       delta (  One, 1) = Zero
-                       delta (  Two, 0) = Four
-                       delta (  Two, 1) = Five
-                       delta (Three, 0) = Four
-                       delta (Three, 1) = Five
-                       delta ( Four, 0) = Six
-                       delta ( Four, 1) = Six
-                       delta ( Five, 0) = Five
-                       delta ( Five, 1) = Five
-                       delta (  Six, 0) = Six
-                       delta (  Six, 1) = Five
-                       delta (Seven, 0) = Two
-                       delta (Seven, 1) = Two
-                       delta _          = Nine
+               , q0    = 0
+               , fs    = fromList [5, 6]
+               } where delta (0, 0) = 7
+                       delta (0, 1) = 1
+                       delta (1, 0) = 7
+                       delta (1, 1) = 0
+                       delta (2, 0) = 4
+                       delta (2, 1) = 5
+                       delta (3, 0) = 4
+                       delta (3, 1) = 5
+                       delta (4, 0) = 6
+                       delta (4, 1) = 6
+                       delta (5, 0) = 5
+                       delta (5, 1) = 5
+                       delta (6, 0) = 6
+                       delta (6, 1) = 5
+                       delta (7, 0) = 2
+                       delta (7, 1) = 2
+                       delta _      = 9
 
 -- http://i.stack.imgur.com/AD6WJ.png
 exactly20s ∷ DFA (Fin Nat4) (Fin Nat2)
@@ -413,20 +413,20 @@ exactly20sANDatleast21s ∷ DFA (Fin Nat4, Fin Nat3) (Fin Nat2)
 exactly20sANDatleast21s  = exactly20s `DFA.intersection` atleast21s
 
 -- The language ["123456789"]
-digitsNFA ∷ NFA.NFA Digits Digits
+digitsNFA ∷ NFA.NFA (Fin Nat10) (Fin Nat10)
 digitsNFA = NFA.NFA { NFA.delta = delta
-                    , NFA.q0 = Zero
-                    , NFA.fs = singleton Nine
-                    } where delta (Zero,  One)   = singleton One
-                            delta (One,   Two)   = singleton Two
-                            delta (Two,   Three) = singleton Three
-                            delta (Three, Four)  = singleton Four
-                            delta (Four,  Five)  = singleton Five
-                            delta (Five,  Six)   = singleton Six
-                            delta (Six,   Seven) = singleton Seven
-                            delta (Seven, Eight) = singleton Eight
-                            delta (Eight, Nine)  = singleton Nine
-                            delta _              = (∅)
+                    , NFA.q0 = 0
+                    , NFA.fs = singleton 9
+                    } where delta (0, 1) = singleton 1
+                            delta (1, 2) = singleton 2
+                            delta (2, 3) = singleton 3
+                            delta (3, 4) = singleton 4
+                            delta (4, 5) = singleton 5
+                            delta (5, 6) = singleton 6
+                            delta (6, 7) = singleton 7
+                            delta (7, 8) = singleton 8
+                            delta (8, 9) = singleton 9
+                            delta _      = (∅)
 
 {-
 data StackSym = X0 | Y0 deriving (Eq, Ord, Enum, Bounded, Show)
