@@ -257,4 +257,4 @@ fromFA (FA.FA δ i f) = EFA { delta = Set.map Right . δ₁
                                    δ₁ _                  = (∅)
 
 toGraph ∷ ∀ q s . (Finite q) ⇒ EFA q s → TG.ETG q s
-toGraph (EFA δ _ _) = TG.ETG (\s → fromAdjacencyList (fmap (\q → (q, Set.toList (δ (q, s)))) asList))
+toGraph (EFA δ _ _) = TG.ETG (\s → stars (fmap (\q → (q, Set.toList (δ (q, s)))) asList))

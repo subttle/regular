@@ -231,7 +231,7 @@ fromFA' m | size' (FA.initial m) == 1 = Just NFA { delta = FA.delta m
           | otherwise                 = Nothing
 
 toGraph ∷ ∀ q s . (Finite q) ⇒ NFA q s → TG.TG q s
-toGraph (NFA δ _ _) = TG.TG (\s -> fromAdjacencyList (fmap (\q → (q, Set.toList (δ (q, s)))) asList))
+toGraph (NFA δ _ _) = TG.TG (\s -> stars (fmap (\q → (q, Set.toList (δ (q, s)))) asList))
 
 fromGraph ∷ (Finite s, Finite q) ⇒ TG.TG q s → q → Set q → NFA q s
 fromGraph (TG.TG a) q₀ f = NFA { delta = δ

@@ -374,7 +374,7 @@ toNFAMin m@(DFA δ _ f) = (toNFA m) { NFA.delta = δ₁ }
 -- Convert the DFA to its Transition Graph.
 -- N.B. information is lost in this conversion, i.e. q₀ and F will be dropped
 toGraph ∷ ∀ q s . (Finite q) ⇒ DFA q s → TG.TG q s
-toGraph (DFA δ _ _) = TG.TG (\s → fromAdjacencyList (fmap (\q → (q, [δ (q, s)])) asList))
+toGraph (DFA δ _ _) = TG.TG (\s → stars (fmap (\q → (q, [δ (q, s)])) asList))
 
 -- Take a DFA, d, and convert it to an EFA, e, such that ℒ(d) = ℒ(e)
 toEFA ∷ DFA q s → EFA.EFA q s
