@@ -69,7 +69,7 @@ by5 = DFA { delta = delta
                   delta (_, 5) = True
                   delta _      = False
 
--- A regular expression to match the language of the divisibleBy5 DFA
+-- A regular expression to match the language of the `by5` DFA
 -- [0-9]★[0+5]
 -- ((0+(1+(2+(3+(4+(5+(6+(7+(8+9))))))))))★·(0+5)
 by5' ∷ RE.RegExp (Fin Nat10)
@@ -191,7 +191,7 @@ farmerw = NFA.NFA { NFA.delta = δ
                         δ ((False, True,  True),  Hen) = singleton (False, False, True)
                         -- fgB
                         δ ((False, False, True),  Fox) = singleton (True,  False, True)
-                        δ _ = (∅)
+                        δ _                            = (∅)
 
 -- https://www.researchgate.net/publication/269628569_DNA_Pattern_Analysis_using_Finite_Automata
 figure2 :: NFA.NFA (Fin Nat8) DNA
