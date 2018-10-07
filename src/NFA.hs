@@ -139,6 +139,7 @@ fromSet s = NFA { delta = δ
                         δ _                  = (∅)
 
 -- Return an NFA whose language is all permutations of the given set
+-- e.g. ℒ(permutations {0, 1, 2}) = {[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]}
 permutations ∷ (Ord s) ⇒ Set s → NFA (Set s) s
 permutations s = NFA { delta = δ
                      , q0    = (∅)
