@@ -246,7 +246,7 @@ asynchronous (DFA δ₁ q₀ f₁) (DFA δ₂ p₀ f₂) = DFA { delta = δ
 
 -- The symmetric difference ("exclusive or", or "xor") of two DFAs
 -- ℒ(m₁) ⊕ ℒ(m₂) = (ℒ(m₁) - ℒ(m₂)) ∪ (ℒ(m₂) - ℒ(m₁))
-xor ∷ (Finite q, Finite p, Finite (q, p), Finite (p, q)) ⇒ DFA q s → DFA p s → DFA ((q, p), (p, q)) s
+xor ∷ (Finite q, Finite p) ⇒ DFA q s → DFA p s → DFA ((q, p), (p, q)) s
 xor m₁ m₂ = DFA.difference m₁ m₂ `DFA.union` DFA.difference m₂ m₁
 
 -- ℒʳ
