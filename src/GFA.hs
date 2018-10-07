@@ -90,8 +90,7 @@ extract ∷ GFA Void s → RE.RegExp s
 extract (GFA δ) = δ (Left (Init ()), Left (Final ()))
 
 toRE ∷ (Ord s, Finite q) ⇒ GFA q s → RE.RegExp s
-toRE m = extract m'
-   where m' = reduce m
+toRE = extract . reduce
 
 fromRE ∷         RegExp s → GFA Void s
 fromRE α = GFA { delta = const α }
