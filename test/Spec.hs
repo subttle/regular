@@ -5,10 +5,10 @@ import           DFA
 import qualified NFA
 import qualified EFA
 import qualified GFA
-import qualified PDA
+-- import qualified PDA
 import           Common
 import           Finite
-import qualified RE
+import qualified RegExp as RE
 import           Examples
 import           Data.Set
 import           Data.List as List

@@ -166,7 +166,7 @@ fromList []      = SomeEFA epsilon
 fromList (σ : w) = fromNE (σ NE.:| w)
 
 fromNE ∷ (Eq s) ⇒ NE.NonEmpty s → SomeEFA s
-fromNE  w = foldl1 (\(SomeEFA acc) (SomeEFA σ) → SomeEFA (concatenate acc σ)) (fmap (SomeEFA . literal) w)
+fromNE w = foldl1 (\(SomeEFA acc) (SomeEFA σ) → SomeEFA (concatenate acc σ)) (fmap (SomeEFA . literal) w)
 
 -- TODO not really tested
 fromLang ∷ (Eq s) ⇒ [[s]] → SomeEFA s
@@ -189,7 +189,7 @@ fromRE (α RE.:. β) = concatenate' (fromRE α) (fromRE β)
                where concatenate' ∷ SomeEFA s → SomeEFA s → SomeEFA s
                      concatenate' (SomeEFA m₁) (SomeEFA m₂) = SomeEFA (EFA.concatenate m₁ m₂)
 fromRE (RE.Star α) = star'        (fromRE α)
-               where star'        ∷              SomeEFA s → SomeEFA s
+               where star'        ∷             SomeEFA s → SomeEFA s
                      star'                     (SomeEFA m)  = SomeEFA (EFA.star m)
 
 -- Union for Thompson's construction
