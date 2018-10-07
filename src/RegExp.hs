@@ -471,9 +471,9 @@ matches α    (a : w) = matches (derivative α a) w
 
 -- automorphism -- http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.50.7458&rep=rep1&type=pdf
 reversal ∷ (Ord s) ⇒ RegExp s → RegExp s
-reversal Zero     = zero
-reversal One      = one
-reversal (Lit  σ) = literal σ
-reversal (α :| β) = reversal α + reversal β
-reversal (α :. β) = reversal β * reversal α
-reversal (Star α) = star (reversal α)
+reversal Zero     = Zero
+reversal One      = One
+reversal (Lit  σ) = Lit σ
+reversal (α :| β) = reversal α :| reversal β
+reversal (α :. β) = reversal β :. reversal α
+reversal (Star α) = Star (reversal α)

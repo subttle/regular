@@ -1,6 +1,6 @@
 {-# LANGUAGE FlexibleInstances, InstanceSigs, MultiParamTypeClasses, UnicodeSyntax #-}
 
-module TG where
+module TransitionGraph where
 
 import           Common
 import           Finite

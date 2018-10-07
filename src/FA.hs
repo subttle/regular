@@ -20,7 +20,7 @@ import           Common
 import           Config hiding (initial, final)
 import qualified Config
 import           Finite
-import qualified TG
+import qualified TransitionGraph as TG
 import           Algebra.Graph.Relation as Relation
 
 -- This is essentially an NFA with multiple start states

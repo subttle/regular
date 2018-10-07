@@ -18,7 +18,7 @@ import           Common
 import           Finite
 import           Config
 import           Algebra.Graph.Relation as Relation hiding (domain)
-import qualified TG
+import qualified TransitionGraph as TG
 import qualified NFA
 import qualified EFA
 import qualified GFA

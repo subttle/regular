@@ -11,7 +11,7 @@ import           Data.Set.Unicode
 import           Data.Ord.Unicode
 import qualified EFA
 import qualified FA
-import qualified TG
+import qualified TransitionGraph as TG
 import           Finite
 import           Data.Functor.Contravariant
 -- import           Data.Functor.Invariant

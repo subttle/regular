@@ -17,7 +17,7 @@ import qualified Data.List.NonEmpty  as NE
 import           Data.Maybe          (catMaybes)
 import           Finite
 import           Common
-import qualified TG
+import qualified TransitionGraph as TG
 import qualified FA
 import qualified RegExp as RE
 import           Algebra.Graph.Relation as Relation
