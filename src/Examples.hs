@@ -7,7 +7,7 @@ import           DFA
 import qualified NFA
 import qualified EFA
 import qualified GFA
-import qualified RE
+import qualified RegExp as RE
 -- import qualified PDA
 -- import qualified TM
 import           Common

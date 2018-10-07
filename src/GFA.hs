@@ -7,7 +7,7 @@ module GFA where
 import           Prelude hiding ((*), (+))
 import           Common
 import           Finite
-import           RE
+import           RegExp as RE
 import qualified EFA
 import           Data.Set as Set
 import           Data.Set.Unicode

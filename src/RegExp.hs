@@ -10,21 +10,21 @@
     UndecidableInstances #-}
 
 -- {-# LANGUAGE DeriveFunctor, DeriveFoldable, DeriveTraversable #-}
-module RE (RegExp (..), one, zero, literal, (*), (+), star, (*.), (.*),
+module RegExp (RegExp (..), one, zero, literal, (*), (+), star, (*.), (.*),
 language, finite, infinite, nullable,
 derivative, derivative',
 matches, constant, reversal,
 normalize,
 similar, dissimilar,
-fromSet, RE.fromList, RE.toSet, RE.toList,
+fromSet, RegExp.fromList, RegExp.toSet, RegExp.toList,
 fromLang,
 partial, partial',
 linear,
 first, last,
-awidth, height, RE.size,
+awidth, height, RegExp.size,
 heightAlgebra, sizeAlgebra,
 convert,
-RE.optional, atLeastOnce, dot,
+RegExp.optional, atLeastOnce, dot,
 isZero, KleeneAlgebra) where
 
 import           Common
@@ -245,7 +245,7 @@ fromList ∷ [s] → RegExp s
 fromList = productWith point
 
 fromLang ∷ (Ord s) ⇒ [[s]] → RegExp s
-fromLang = sumWith RE.fromList
+fromLang = sumWith RegExp.fromList
 
 -- "occurences"
 -- http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.56.3425&rep=rep1&type=pdf pg 46. def 4.57
@@ -272,7 +272,7 @@ dot = fromSet asSet
 
 -- alphabetic width is the total number (with multiplicitiy) of alphabetic symbols from Σ
 awidth ∷ RegExp s → ℕ
-awidth = genericLength . RE.toList
+awidth = genericLength . RegExp.toList
 
 -- "star height"
 height ∷ RegExp s → ℕ
@@ -302,9 +302,9 @@ size ∷ RegExp s → ℕ
 size Zero     = 1
 size One      = 1
 size (Lit  _) = 1
-size (α :| β) = 1 + RE.size α + RE.size β
-size (α :. β) = 1 + RE.size α + RE.size β
-size (Star α) = 1 + RE.size α
+size (α :| β) = 1 + RegExp.size α + RegExp.size β
+size (α :. β) = 1 + RegExp.size α + RegExp.size β
+size (Star α) = 1 + RegExp.size α
 
 -- TODO if this is unambiguous it can be written `φ` instead of `sizef`? https://wiki.haskell.org/Catamorphisms
 sizeAlgebra ∷ Algebra (RegExpF s) ℕ
@@ -374,8 +374,8 @@ last (Star α)              = last α
 -- Mathematically, this is defined as a Set,
 -- however, Data.Set does not support lazy infinite sets.
 language ∷ (Finite s) ⇒ RegExp s → [[s]]
-language γ | RE.finite γ' = Set.toList (language' γ')
-           | otherwise    = Prelude.filter (matches γ') (sigmaStar γ')
+language γ | RegExp.finite γ' = Set.toList (language' γ')
+           | otherwise        = Prelude.filter (matches γ') (sigmaStar γ')
      where γ' = normalize γ
            language'  ∷ (Finite s) ⇒ RegExp s → Set [s]
            -- The empty language

@@ -22,7 +22,7 @@ import qualified TG
 import qualified NFA
 import qualified EFA
 import qualified GFA
-import qualified RE
+import qualified RegExp as RE
 import qualified FA
 -- import qualified PDA
 

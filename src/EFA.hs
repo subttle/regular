@@ -19,7 +19,7 @@ import           Finite
 import           Common
 import qualified TG
 import qualified FA
-import qualified RE
+import qualified RegExp as RE
 import           Algebra.Graph.Relation as Relation
 import           Config
 
