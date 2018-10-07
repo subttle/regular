@@ -138,6 +138,14 @@ fromSet s = NFA { delta = δ
                 } where δ (False, σ) | σ ∈ s = singleton True
                         δ _                  = (∅)
 
+-- Return an NFA whose language is all permutations of the given set
+permutations ∷ (Ord s) ⇒ Set s → NFA (Set s) s
+permutations s = NFA { delta = δ
+                     , q0    = (∅)
+                     , fs    = singleton s
+                     } where δ (q, σ) | σ ∈ s && σ ∉ q = singleton (σ `Set.insert` q)
+                             δ _                       = (∅)
+
 -- Avoid using `foldl` because the base case introduces more states than necessary, i.e.
 -- `foldl (\(SomeNFA acc) σ → SomeNFA (concatenate acc (literal σ))) (SomeNFA epsilon)`
 -- will concatenate the last symbol in the string with epsilon.
