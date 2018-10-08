@@ -1,19 +1,6 @@
 # regular (WIP)
 
-For this particular project my priority has been learning Haskell and exploring some formal language theory. It is currently useful for building small automata and regexp, e.g. as a companion for reading papers, doing homework problems, etc.. For now it should be clear that I value correctness and simplicity over speed.
-
-Note well:
-
-The code is not yet structured properly, so expect major refactoring and restructuring. Once I have everything correct I can start to worry about speed. For now this code is SLOW.
-
-I'm patiently (and gratefully!) waiting on a few things from some of the best projects out there right now:
-
-- Labelled graphs in alga
-- Easytest from Unison
-- Linear types in Haskell
-- Better dependent type support in Haskell
-
-I haven't proven all class instances to be lawful yet.
+Formalisms for expressing Regular Languages (Deterministic Finite Automata, Nondeterministic Finite Automata, Regular Expressions, etc.) in Haskell.
 
 ## Example
 
@@ -51,3 +38,18 @@ main = mapM_ (putStrLn . fizzbuzz . toDigits) [1 .. 100]
                | buzz n    = "Buzz"
                | otherwise = n >>= show
 ```
+
+TODO A quick explanation of what is going on in the example.
+
+For now it should be clear that I value correctness and simplicity over speed. This is my first ever project in Haskell and it is not yet complete.
+
+The code is not yet structured properly, so expect major refactoring and restructuring. Once I have everything correct I can start to worry about speed. For now this code is SLOW.
+
+I'm patiently (and gratefully!) waiting on a few things from some of the best projects out there right now:
+
+- Labelled graphs in alga
+- Easytest from Unison
+- Linear types in Haskell
+- Better dependent type support in Haskell
+
+I haven't proven all class instances to be lawful yet.
