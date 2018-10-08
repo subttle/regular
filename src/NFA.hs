@@ -9,6 +9,7 @@ import           Data.Set            as Set hiding (foldl)
 import qualified Data.List.NonEmpty  as NE
 import           Data.Set.Unicode
 import           Data.Ord.Unicode
+import           Data.Bool.Unicode
 import qualified EFA
 import qualified FA
 import qualified TransitionGraph as TG
@@ -144,8 +145,8 @@ permutations ∷ (Ord s) ⇒ Set s → NFA (Set s) s
 permutations s = NFA { delta = δ
                      , q0    = (∅)
                      , fs    = singleton s
-                     } where δ (q, σ) | σ ∈ s && σ ∉ q = singleton (σ `Set.insert` q)
-                             δ _                       = (∅)
+                     } where δ (q, σ) | σ ∈ s ∧ σ ∉ q = singleton (σ `insert` q)
+                             δ _                      = (∅)
 
 -- Avoid using `foldl` because the base case introduces more states than necessary, i.e.
 -- `foldl (\(SomeNFA acc) σ → SomeNFA (concatenate acc (literal σ))) (SomeNFA epsilon)`
