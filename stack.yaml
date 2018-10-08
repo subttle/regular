@@ -4,4 +4,4 @@ packages:
 - .
 extra-deps:
 - algebraic-graphs-0.2
-resolver: lts-12.11
+resolver: lts-12.12
