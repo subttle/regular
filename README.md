@@ -1,6 +1,6 @@
 # regular (WIP)
 
-Formalisms for expressing Regular Languages (Deterministic Finite Automata, Nondeterministic Finite Automata, Regular Expressions, etc.) in Haskell.
+Formalisms for representing Regular Languages (Deterministic Finite Automata, Nondeterministic Finite Automata, Regular Expressions, etc.) in Haskell.
 
 ## Example
 
