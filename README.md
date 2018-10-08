@@ -21,7 +21,7 @@ Here is a small example of what FizzBuzz looks like with DFA:
 
 ```Haskell
 
--- A number, n, either ends in 5 or 0 (when n % 5 = 0), or it doesn't (n % 5 ≠ 0).
+-- A number is divisible by 5 iff its last digit is 0 or 5
 by5 ∷ DFA Bool (Fin Nat10)
 by5 = DFA { delta = delta
           , q0    = False
@@ -30,7 +30,7 @@ by5 = DFA { delta = delta
                   delta (_, 5) = True
                   delta _      = False
 
--- A number is divisible by 3 if and only if the sum of its digits is divisible by 3
+-- A number is divisible by 3 iff the sum of its digits is divisible by 3
 -- The state we are in is the (running total % 3)
 -- (We add a single starting state `Left ()` to avoid accepting the empty string.)
 by3 ∷ DFA (Either () (Fin Nat3)) (Fin Nat10)
