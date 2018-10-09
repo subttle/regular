@@ -18,6 +18,7 @@ import           Data.Bool.Unicode
 import           Data.Eq.Unicode
 import           Data.Void
 import           Data.Maybe
+import           Data.Either
 import           Data.Functor.Contravariant
 import           Data.Fin
 import           Data.Type.Nat
@@ -79,11 +80,10 @@ by5' = RE.star RE.dot RE.* RE.fromSet (fromList [0, 5])
 -- The state we are in is the (running total % 3)
 -- (We add a single starting state `Left ()` to avoid accepting the empty string.)
 by3 ∷ DFA (Either () (Fin Nat3)) (Fin Nat10)
-by3 = DFA { delta = Right . toEnum . delta
+by3 = DFA { delta = Right . toEnum . (`mod` 3) . \(q, digit) → fromEnum (fromRight 0 q) + fromEnum digit
           , q0    = Left ()
           , fs    = singleton (Right 0)
-          } where delta (Left  (), digit) = (0          + fromEnum digit) `mod` 3
-                  delta (Right  q, digit) = (fromEnum q + fromEnum digit) `mod` 3
+          }
 
 {-          Ross Ashby's "ghost taming" automaton [1]
  (example from "Synchronizing automata and the Černý conjecture" [2])
