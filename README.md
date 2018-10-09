@@ -21,11 +21,10 @@ by5 = DFA { delta = delta
 -- The state we are in is the (running total % 3)
 -- (We add a single starting state `Left ()` to avoid accepting the empty string.)
 by3 ∷ DFA (Either () (Fin Nat3)) (Fin Nat10)
-by3 = DFA { delta = Right . toEnum . delta
+by3 = DFA { delta = Right . toEnum . (`mod` 3) . \(q, digit) → fromEnum (fromRight 0 q) + fromEnum digit
           , q0    = Left ()
           , fs    = singleton (Right 0)
-          } where delta (Left  (), digit) = (0          + fromEnum digit) `mod` 3
-                  delta (Right  q, digit) = (fromEnum q + fromEnum digit) `mod` 3
+          }
 
 main ∷ IO ()
 main = mapM_ (putStrLn . fizzbuzz . toDigits) [1 .. 100]
