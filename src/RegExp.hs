@@ -2,7 +2,7 @@
 {-# LANGUAGE FlexibleInstances         #-}
 {-# LANGUAGE GADTs                     #-}
 {-# LANGUAGE MultiParamTypeClasses     #-}
-{-# LANGUAGE ExistentialQuantification #-}
+-- {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE ScopedTypeVariables       #-}
 {-# LANGUAGE InstanceSigs              #-}
 {-# LANGUAGE UnicodeSyntax             #-}
@@ -10,9 +10,7 @@
 {-# LANGUAGE DeriveFoldable            #-}
 {-# LANGUAGE DeriveTraversable         #-}
 -- {-# LANGUAGE DataKinds                 #-}
--- {-# LANGUAGE RankNTypes                #-}
 -- {-# LANGUAGE PostfixOperators          #-}
--- {-# LANGUAGE UndecidableInstances      #-}
 {-# OPTIONS_GHC -Wall                  #-}
 
 module RegExp (RegExp (..), one, zero, literal, (*), (+), star, (*.), (.*),

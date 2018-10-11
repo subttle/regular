@@ -5,8 +5,6 @@
 {-# LANGUAGE ScopedTypeVariables       #-}
 {-# LANGUAGE InstanceSigs              #-}
 {-# LANGUAGE UnicodeSyntax             #-}
-{-# LANGUAGE TypeInType                #-}
-{-# LANGUAGE TypeOperators             #-}
 {-# OPTIONS_GHC -Wall                  #-}
 
 module FA where
