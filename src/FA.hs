@@ -1,12 +1,14 @@
-{-# LANGUAGE InstanceSigs, MultiParamTypeClasses,
-    ExistentialQuantification, FlexibleInstances,
-    TypeInType,
-    TypeOperators,
-    GADTs,
-    UnicodeSyntax,
-    ScopedTypeVariables #-}
+{-# LANGUAGE FlexibleInstances         #-}
+{-# LANGUAGE GADTs                     #-}
+{-# LANGUAGE MultiParamTypeClasses     #-}
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE ScopedTypeVariables       #-}
+{-# LANGUAGE InstanceSigs              #-}
+{-# LANGUAGE UnicodeSyntax             #-}
+{-# LANGUAGE TypeInType                #-}
+{-# LANGUAGE TypeOperators             #-}
+{-# OPTIONS_GHC -Wall                  #-}
 
-{-# OPTIONS_GHC -Wall #-}
 module FA where
 
 import           Data.Set as Set

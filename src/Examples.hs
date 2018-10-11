@@ -1,5 +1,10 @@
-{-# LANGUAGE FlexibleInstances, GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE GADTs, ExplicitForAll, UnicodeSyntax, InstanceSigs, MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleInstances          #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE GADTs                      #-}
+{-# LANGUAGE ExplicitForAll             #-}
+{-# LANGUAGE UnicodeSyntax              #-}
+{-# LANGUAGE InstanceSigs               #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
 
 module Examples where
 

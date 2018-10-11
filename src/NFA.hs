@@ -1,5 +1,12 @@
-{-# LANGUAGE GADTs, InstanceSigs, FlexibleInstances, MultiParamTypeClasses, IncoherentInstances, RankNTypes, UnicodeSyntax #-}
-{-# OPTIONS -Wall #-}
+{-# LANGUAGE FlexibleInstances         #-}
+{-# LANGUAGE GADTs                     #-}
+{-# LANGUAGE MultiParamTypeClasses     #-}
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE ScopedTypeVariables       #-}
+{-# LANGUAGE InstanceSigs              #-}
+{-# LANGUAGE UnicodeSyntax             #-}
+{-# OPTIONS_GHC -Wall                  #-}
+
 module NFA where
 
 import           Common

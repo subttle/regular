@@ -1,15 +1,20 @@
-{-# LANGUAGE InstanceSigs, GADTs, PostfixOperators #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE DeriveFunctor, DeriveFoldable, DeriveTraversable #-}
-{-# OPTIONS_GHC -Wall #-}
+{-# LANGUAGE FlexibleContexts          #-}
+{-# LANGUAGE FlexibleInstances         #-}
+{-# LANGUAGE GADTs                     #-}
+{-# LANGUAGE MultiParamTypeClasses     #-}
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE ScopedTypeVariables       #-}
+{-# LANGUAGE InstanceSigs              #-}
+{-# LANGUAGE UnicodeSyntax             #-}
+{-# LANGUAGE DeriveFunctor             #-}
+{-# LANGUAGE DeriveFoldable            #-}
+{-# LANGUAGE DeriveTraversable         #-}
+-- {-# LANGUAGE DataKinds                 #-}
+-- {-# LANGUAGE RankNTypes                #-}
+-- {-# LANGUAGE PostfixOperators          #-}
+-- {-# LANGUAGE UndecidableInstances      #-}
+{-# OPTIONS_GHC -Wall                  #-}
 
-{-# LANGUAGE FlexibleContexts, DataKinds,
-    RankNTypes, ScopedTypeVariables,
-    UnicodeSyntax,
-    UndecidableInstances #-}
-
--- {-# LANGUAGE DeriveFunctor, DeriveFoldable, DeriveTraversable #-}
 module RegExp (RegExp (..), one, zero, literal, (*), (+), star, (*.), (.*),
 language, finite, infinite, nullable,
 derivative, derivative',

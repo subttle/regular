@@ -1,6 +1,12 @@
-{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses #-}
-{-# LANGUAGE GADTs #-}
-{-# LANGUAGE ScopedTypeVariables, InstanceSigs, UnicodeSyntax #-}
+{-# LANGUAGE FlexibleContexts          #-}
+{-# LANGUAGE FlexibleInstances         #-}
+{-# LANGUAGE GADTs                     #-}
+{-# LANGUAGE MultiParamTypeClasses     #-}
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE ScopedTypeVariables       #-}
+{-# LANGUAGE InstanceSigs              #-}
+{-# LANGUAGE UnicodeSyntax             #-}
+-- {-# OPTIONS_GHC -Wall                  #-}
 
 module GFA where
 
@@ -8,16 +14,15 @@ import           Prelude hiding ((*), (+))
 import           Common
 import           Finite
 import           RegExp as RE
-import qualified EFA
 import           Data.Set as Set
-import           Data.Set.Unicode
+-- import           Data.Set.Unicode
 import           Data.Bool.Unicode
 import qualified Data.Map as Map (fromList)
-import           Data.Either
+-- import           Data.Either
 import           Data.Void
 import           Data.Pointed
-import           Data.Functor.Contravariant
-import           Data.Functor.Contravariant.Divisible
+-- import           Data.Functor.Contravariant
+-- import           Data.Functor.Contravariant.Divisible
 import qualified Data.Profunctor as Profunctor
 
 -- Generalized Nondeterministic Finite Automaton with ε-transitions

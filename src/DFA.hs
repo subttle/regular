@@ -1,10 +1,12 @@
-{-# LANGUAGE InstanceSigs, MultiParamTypeClasses,
-    ExistentialQuantification, FlexibleInstances,
-    GADTs,
-    FlexibleContexts,
-    ScopedTypeVariables,
-    UnicodeSyntax #-}
-{-# OPTIONS_GHC -Wall #-}
+{-# LANGUAGE FlexibleContexts          #-}
+{-# LANGUAGE FlexibleInstances         #-}
+{-# LANGUAGE GADTs                     #-}
+{-# LANGUAGE MultiParamTypeClasses     #-}
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE ScopedTypeVariables       #-}
+{-# LANGUAGE InstanceSigs              #-}
+{-# LANGUAGE UnicodeSyntax             #-}
+{-# OPTIONS_GHC -Wall                  #-}
 
 module DFA where
 

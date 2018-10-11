@@ -1,4 +1,7 @@
-{-# LANGUAGE FlexibleInstances, InstanceSigs, MultiParamTypeClasses, UnicodeSyntax #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE InstanceSigs          #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE UnicodeSyntax         #-}
 
 module TransitionGraph where
 

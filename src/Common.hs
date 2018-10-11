@@ -1,5 +1,8 @@
-{-# LANGUAGE UnicodeSyntax #-}
-{-# LANGUAGE FlexibleInstances, InstanceSigs, MultiParamTypeClasses, ExistentialQuantification, IncoherentInstances #-}
+{-# LANGUAGE UnicodeSyntax             #-}
+{-# LANGUAGE FlexibleInstances         #-}
+{-# LANGUAGE InstanceSigs              #-}
+{-# LANGUAGE MultiParamTypeClasses     #-}
+{-# LANGUAGE ExistentialQuantification #-}
 
 module Common where
 

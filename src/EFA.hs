@@ -1,20 +1,26 @@
-{-# LANGUAGE GADTs, InstanceSigs, ExistentialQuantification, ScopedTypeVariables, UnicodeSyntax #-}
-{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleContexts          #-}
+{-# LANGUAGE FlexibleInstances         #-}
+{-# LANGUAGE GADTs                     #-}
+{-# LANGUAGE MultiParamTypeClasses     #-}
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE ScopedTypeVariables       #-}
+{-# LANGUAGE InstanceSigs              #-}
+{-# LANGUAGE UnicodeSyntax             #-}
+{-# OPTIONS_GHC -Wall                  #-}
 
 module EFA where
 
-import           Control.Applicative
 import           Control.Monad
 import           Data.Functor.Contravariant
 import           Data.Map            as Map (Map, fromList)
 import qualified Data.Map            as Map (fromSet, toAscList)
 import           Prelude             hiding (map)
 import           Data.Set            as Set hiding (foldl)
-import qualified Data.Set            as Set (filter)
+-- import qualified Data.Set            as Set (filter)
 import           Data.Set.Unicode
-import           Data.List           hiding (map)
+-- import           Data.List           hiding (map)
 import qualified Data.List.NonEmpty  as NE
-import           Data.Maybe          (catMaybes)
+-- import           Data.Maybe          (catMaybes)
 import           Finite
 import           Common
 import qualified TransitionGraph as TG
@@ -60,7 +66,7 @@ instance (Show s, Finite s) ⇒ Show (SomeEFA s) where
 
 instance (Finite q, Finite s) ⇒ Configuration EFA q s (Set q) where
   complete ∷ EFA q s → Bool
-  complete m = undefined -- FIXME implemnt when I restructure to allow conversions
+  complete = undefined -- FIXME implemnt when I restructure to allow conversions
 
   deterministic ∷ EFA q s → Bool -- FIXME implemnt when I restructure to allow conversions
   deterministic = undefined -- FIXME should I use the noEpsilonClosures ?
@@ -95,7 +101,7 @@ instance (Finite q, Finite s) ⇒ Configuration EFA q s (Set q) where
   -- δ′′ : P(Q) × (Σ ∪ {ε})★ → P(Q)
   -- TODO untested, but if keeping then rewrite (⊢★) to use `= (delta'' ..., [])`?
   delta'' ∷ EFA q s → (Set q, [s]) → Set q
-  delta'' m@(EFA δ _ _) (states, w) = foldl (\occupied σ → eclosure m (foldMap δ (occupied × singleton (Just σ))))
+  delta'' m@(EFA δ _ _) (states, w) = foldl (\occupied' σ → eclosure m (foldMap δ (occupied' × singleton (Just σ))))
                                             (eclosure m states)
                                             w
 

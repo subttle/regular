@@ -1,7 +1,12 @@
-{-# LANGUAGE InstanceSigs, GADTs, PostfixOperators, UnicodeSyntax #-}
+{-# LANGUAGE InstanceSigs          #-}
+{-# LANGUAGE GADTs                 #-}
+{-# LANGUAGE PostfixOperators      #-}
+{-# LANGUAGE UnicodeSyntax         #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE DeriveFunctor, DeriveFoldable, DeriveTraversable #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE DeriveFunctor         #-}
+{-# LANGUAGE DeriveFoldable        #-}
+{-# LANGUAGE DeriveTraversable     #-}
 
 module ERE where
 
