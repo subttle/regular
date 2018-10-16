@@ -10,6 +10,7 @@ import           Data.Set as Set
 import           Data.Set.Unicode
 import           Data.Eq.Unicode
 import           Data.Bool.Unicode
+import qualified TransitionGraph as TG
 
 -- When `occupy` is `q` the automaton is deterministic, and when `occupy` is `Set q` it enables nondeterminism
 class (Q (automaton q s) q, Σ (automaton q s) s, Eq occupy) ⇒ Configuration automaton q s occupy | automaton q s → occupy where
@@ -17,6 +18,10 @@ class (Q (automaton q s) q, Σ (automaton q s) s, Eq occupy) ⇒ Configuration a
     -- N.B. `ID` here is "instantaneous description" and not "identity"
     initialID ∷ automaton q s → [s] → (occupy, [s])
     initialID m w = (initial m, w)
+
+    -- The automaton's Transition Graph.
+    -- N.B. information is lost in this conversion
+    toGraph ∷ automaton q s → TG.TG q s
 
     occupied ∷ automaton q s → occupy → Set q
 

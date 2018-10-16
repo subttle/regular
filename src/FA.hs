@@ -74,6 +74,9 @@ instance (Finite q, Finite s) ⇒ Configuration FA q s (Set q) where
   eval ∷ FA q s → [s] → Set q
   eval m@(FA _ i _) w = delta'' m (i, w)
 
+  toGraph ∷ FA q s → TG.TG q s
+  toGraph (FA δ _ _) = TG.TG (\s → stars (fmap (\q → (q, Set.toList (δ (q, s)))) (asList ∷ [q])))
+
 -- The FA, empty, such that
 -- ℒ(empty) = ∅
 empty ∷ FA q s
@@ -135,9 +138,6 @@ asynchronous (FA δ₁ i₁ f₁) (FA δ₂ i₂ f₂) = FA { delta   = δ
 
 reversal ∷ (Finite q, Finite s) ⇒ FA q s → FA q s
 reversal m@(FA.FA _ i f) = fromGraph (TG.reverse (toGraph m)) f i
-
-toGraph ∷ ∀ q s . (Finite s, Finite q) ⇒ FA q s → TG.TG q s
-toGraph (FA δ _ _) = TG.TG (\s → stars (fmap (\q → (q, Set.toList (δ (q, s)))) (asList ∷ [q])))
 
 fromGraph ∷ (Finite s, Finite q) ⇒ TG.TG q s → Set q → Set q → FA q s
 fromGraph (TG.TG a) i f = FA { delta   = δ

@@ -118,6 +118,11 @@ instance (Finite q, Finite s) ⇒ Configuration DFA q s q where
   rejects ∷ DFA q s → [s] → Bool
   rejects m@(DFA _ _ f) w = eval m w ∉ f
 
+  -- Convert the DFA to its Transition Graph.
+  -- N.B. information is lost in this conversion, i.e. q₀ and F will be dropped
+  toGraph ∷ DFA q s → TG.TG q s
+  toGraph (DFA δ _ _) = TG.TG (\s → stars (fmap (\q → (q, [δ (q, s)])) asList))
+
 -- Determine if a string, w, synchronizes (or "resets") a DFA, m
 -- http://www.math.uni.wroc.pl/~kisiel/auto/eppstein.pdf
 -- A string, w, "resets" a DFA when ∃w ∈ Σ★, ∀q ∈ Q, δ★(q, w) = p for some p ∈ Q
@@ -372,11 +377,6 @@ toNFAMin ∷ (Ord q) ⇒ DFA q s → NFA.NFA q s
 toNFAMin m@(DFA δ _ f) = (toNFA m) { NFA.delta = δ₁ }
                    where δ₁ (q, _) | q ∈ f = (∅)  -- delete transitions out of final states
                          δ₁ (q, σ)         = singleton (δ (q, σ))
-
--- Convert the DFA to its Transition Graph.
--- N.B. information is lost in this conversion, i.e. q₀ and F will be dropped
-toGraph ∷ ∀ q s . (Finite q) ⇒ DFA q s → TG.TG q s
-toGraph (DFA δ _ _) = TG.TG (\s → stars (fmap (\q → (q, [δ (q, s)])) asList))
 
 -- Take a DFA, d, and convert it to an EFA, e, such that ℒ(d) = ℒ(e)
 toEFA ∷ DFA q s → EFA.EFA q s

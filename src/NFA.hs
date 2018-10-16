@@ -102,6 +102,9 @@ instance (Finite q, Finite s) ⇒ Configuration NFA q s (Set q) where
   eval ∷ NFA q s → [s] → Set q
   eval m@(NFA _ q₀ _) w = delta' m (q₀, w)
 
+  toGraph ∷ NFA q s → TG.TG q s
+  toGraph (NFA δ _ _) = TG.TG (\s → stars (fmap (\q → (q, Set.toList (δ (q, s)))) asList))
+
 corange ∷ (Finite q, Finite s) ⇒ NFA q s → Set (q, s)
 corange m = qs m × sigma m
 
@@ -246,9 +249,6 @@ fromFA' m | size' (FA.initial m) == 1 = Just NFA { delta = FA.delta m
                                                  , fs    = FA.final m
                                                  }
           | otherwise                 = Nothing
-
-toGraph ∷ ∀ q s . (Finite q) ⇒ NFA q s → TG.TG q s
-toGraph (NFA δ _ _) = TG.TG (\s -> stars (fmap (\q → (q, Set.toList (δ (q, s)))) asList))
 
 fromGraph ∷ (Finite s, Finite q) ⇒ TG.TG q s → q → Set q → NFA q s
 fromGraph (TG.TG a) q₀ f = NFA { delta = δ

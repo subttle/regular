@@ -26,7 +26,7 @@ import           Common
 import qualified TransitionGraph as TG
 import qualified FA
 import qualified RegExp as RE
-import           Algebra.Graph.Relation as Relation
+-- import           Algebra.Graph.Relation as Relation
 import           Config
 
 -- Nondeterministic Finite Automaton with ε-transitions
@@ -108,6 +108,12 @@ instance (Finite q, Finite s) ⇒ Configuration EFA q s (Set q) where
   -- Take an EFA, m, and a string, and then compute the resulting states, which may be an empty set
   eval ∷ EFA q s → [s] → Set q
   eval m@(EFA _ q₀ _) w = delta' m (q₀, w)
+
+  toGraph ∷ EFA q s → TG.TG q s
+  toGraph = undefined  -- TODO epsilon elimination
+  -- toGraph ∷ EFA q s → TG.ETG q s
+  -- toGraph (EFA δ _ _) = TG.ETG (\s → stars (fmap (\q → (q, Set.toList (δ (q, s)))) asList))
+
 
 -- Convert the transition function to a Map
 deltaToMap ∷ (Finite q, Finite s) ⇒ EFA q s → Map (q, Maybe s) (Set q)
@@ -261,6 +267,3 @@ fromFA (FA.FA δ i f) = EFA { delta = Set.map Right . δ₁
                            } where δ₁ (Left (), Nothing) = i
                                    δ₁ (Right q, Just  σ) = δ (q, σ)
                                    δ₁ _                  = (∅)
-
-toGraph ∷ ∀ q s . (Finite q) ⇒ EFA q s → TG.ETG q s
-toGraph (EFA δ _ _) = TG.ETG (\s → stars (fmap (\q → (q, Set.toList (δ (q, s)))) asList))
