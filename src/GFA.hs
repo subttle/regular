@@ -18,7 +18,7 @@ import           Data.Set as Set
 -- import           Data.Set.Unicode
 import           Data.Bool.Unicode
 import qualified Data.Map as Map (fromList)
--- import           Data.Either
+import           Data.Either
 import           Data.Void
 import           Data.Pointed
 -- import           Data.Functor.Contravariant
@@ -74,10 +74,11 @@ table (GFA δ) = zip domain image
     where domain = asList ∷ [(Either Init q, Either Final q)]
           image  = fmap δ domain
 
--- Rip out all of `q` leaving only a two state GFA (only `Left (Init ())` and `Left (Final ())` states)
+-- Rip out all of `q` leaving only a two state GFA (only the two qᵢ and qᶠ states)
 reduce ∷ (Finite q, Ord s) ⇒ GFA q s → GFA Void s
 -- reduce m = GFA { delta = \(q₁, q₂) → delta m' (Left (fromLeft impossible q₁), Left (fromLeft impossible q₂)) }
-reduce m = GFA { delta = \(Left q₁, Left q₂) → delta m' (Left q₁, Left q₂) }
+-- reduce m = GFA { delta = \(Left qᵢ, Left qᶠ) → delta m' (Left qᵢ, Left qᶠ) }
+reduce m = GFA { delta = \(qᵢ, qᶠ) → delta m' (vacuous qᵢ, vacuous qᶠ) }
     where m' = Set.foldl rip m asSet
 
 -- δ₁(q, p) = δ(q, r) ⊗ δ(r, r)⋆ ⊗ δ(r, p) ⊕ δ(q, p) where q, p, r ∈ Q, and r is the state to "rip"
