@@ -53,8 +53,7 @@ instance Applicative (GFA q) where
   pure = point
 
   (<*>) ∷ GFA q (s → g) → GFA q s → GFA q g
-  (<*>) (GFA δ₁) (GFA δ₂) = GFA { delta = δ }
-      where δ (q, p) = δ₁ (q, p) <*> δ₂ (q, p)
+  (<*>) (GFA δ₁) (GFA δ₂) = GFA { delta = \(q, p) → δ₁ (q, p) <*> δ₂ (q, p) }
 
 instance Profunctor.Profunctor GFA where
   rmap ∷ (s → g) → GFA q s → GFA q g
