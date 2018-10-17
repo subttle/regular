@@ -6,7 +6,7 @@
 {-# LANGUAGE ScopedTypeVariables       #-}
 {-# LANGUAGE InstanceSigs              #-}
 {-# LANGUAGE UnicodeSyntax             #-}
--- {-# OPTIONS_GHC -Wall                  #-}
+{-# OPTIONS_GHC -Wall                  #-}
 
 module GFA where
 
@@ -70,15 +70,15 @@ instance (Show q, Finite q, Show s, Finite s) ⇒ Show (GFA q s) where
          "\n, qᶠ = "     ++ show (Final ())                        ++ ")"
 
 table ∷ ∀ q s . (Finite q) ⇒ GFA q s → [((Either Init q, Either Final q), RE.RegExp s)]
-table m@(GFA δ) = zip domain image
-    where domain = asList :: [(Either Init q, Either Final q)]
+table (GFA δ) = zip domain image
+    where domain = asList ∷ [(Either Init q, Either Final q)]
           image  = fmap δ domain
 
-reduce ∷ ∀ q s . (Finite q, Ord s) ⇒ GFA q s → GFA Void s
-reduce m = GFA { delta  = δ₁ }
-     where m' = Set.foldl rip m (asSet :: Set q)  -- rip out all of `Right q`
-           δ₁ ∷ (Either Init Void, Either Final Void) → RegExp s
-           δ₁ (Left (Init ()), Left (Final ())) = delta m' (Left (Init ()), Left (Final ()))
+-- Rip out all of `q` leaving only a two state GFA (only `Left (Init ())` and `Left (Final ())` states)
+reduce ∷ (Finite q, Ord s) ⇒ GFA q s → GFA Void s
+-- reduce m = GFA { delta = \(q₁, q₂) → delta m' (Left (fromLeft impossible q₁), Left (fromLeft impossible q₂)) }
+reduce m = GFA { delta = \(Left q₁, Left q₂) → delta m' (Left q₁, Left q₂) }
+    where m' = Set.foldl rip m asSet
 
 -- δ₁(q, p) = δ(q, r) ⊗ δ(r, r)⋆ ⊗ δ(r, p) ⊕ δ(q, p) where q, p, r ∈ Q, and r is the state to "rip"
 rip ∷ ∀ q s . (Ord s, Ord q) ⇒ GFA q s → q → GFA q s
