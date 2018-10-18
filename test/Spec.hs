@@ -1,5 +1,6 @@
+{-# LANGUAGE UnicodeSyntax              #-}
+-- {-# LANGUAGE FlexibleInstances          #-}
 -- {-# OPTIONS_GHC -Wall #-}
--- {-# LANGUAGE FlexibleInstances      #-}
 
 import           DFA
 import qualified NFA
@@ -16,5 +17,5 @@ import           Data.Bool.Unicode
 import           Config
 import           Data.Functor.Contravariant
 
-main :: IO ()
+main ∷ IO ()
 main = putStrLn "Test suite not yet implemented"

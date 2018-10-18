@@ -37,32 +37,32 @@ class (Enum a, Bounded a, Ord a) ⇒ Finite a where
   asSet ∷ Set a
   asSet = Set.fromDistinctAscList asList
 
-class (Finite sigma) => Σ formalism sigma | formalism -> sigma where
+class (Finite sigma) ⇒ Σ formalism sigma | formalism → sigma where
   -- Σ, The alphabet of the formalism
-  sigma :: formalism -> Set sigma
+  sigma ∷ formalism → Set sigma
   sigma _ = asSet
 
   -- Σ⋆, Given a formalism, use its alphabet to lazily generate all possible strings
-  sigmaStar :: formalism -> [[sigma]]
+  sigmaStar ∷ formalism → [[sigma]]
   sigmaStar _ = freeMonoid asList
 
   -- Σ⁺ = Σ⋆ \ {ε}, the positive closure
-  sigmaPlus :: formalism -> [[sigma]]
+  sigmaPlus ∷ formalism → [[sigma]]
   sigmaPlus _ = freeSemigroup asList
 
   -- (Σ ∪ {ε})
-  sigma_ε :: formalism -> Set (Maybe sigma)
+  sigma_ε ∷ formalism → Set (Maybe sigma)
   sigma_ε m = Nothing `Set.insert` Set.mapMonotonic Just (sigma m)
 
 -- Note well: some classes such as `MYT` and `GFA` need to account for extra states when declaring an instance of `Q`!
-class (Finite q) => Q automaton q | automaton -> q where
+class (Finite q) ⇒ Q automaton q | automaton → q where
   -- Q, The states of the Automaton
-  qs :: automaton -> Set q
+  qs ∷ automaton → Set q
   qs _ = asSet
 
-class (Finite g) => Γ automaton g | automaton -> g where
+class (Finite g) ⇒ Γ automaton g | automaton → g where
   -- Γ, the external alphabet of the automaton
-  gamma :: automaton -> Set g
+  gamma ∷ automaton → Set g
   gamma _ = asSet
 
 instance                                                      Finite () where
@@ -221,7 +221,7 @@ instance (Finite a) ⇒                                         Finite  (Predica
               as = asList
               bs ∷ [Bool]
               bs = asList
-              bits :: [[Bool]]
+              bits ∷ [[Bool]]
               bits = replicateM (length as) bs
               toFunction ∷ [(a, Bool)] → a → Bool
               -- toFunction list = \a → fromJust (lookup a list) -- TODO I like this better but need to get rid of hlint warning -- {-# ANN asList "HLint: warn Redundant lambda" #-}
@@ -232,7 +232,7 @@ instance                                                       Finite Alpha wher
   asList = [A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z]
 
 -- TODO move this helper function back to Common once `ℕ` is added to unicode lib; putting it in Common would cause an import cycle for now though..
-toDigits :: ℕ -> [Fin Nat10]
+toDigits ∷ ℕ → [Fin Nat10]
 toDigits = fmap (toEnum . digitToInt) . show
 
 data DNA = Adenine | Cytosine | Guanine | Thymine deriving (Eq, Ord, Bounded, Enum)

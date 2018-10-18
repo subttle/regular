@@ -199,7 +199,7 @@ farmerw = NFA.NFA { NFA.delta = δ
                         δ _                            = (∅)
 
 -- https://www.researchgate.net/publication/269628569_DNA_Pattern_Analysis_using_Finite_Automata
-figure2 :: NFA.NFA (Fin Nat8) DNA
+figure2 ∷ NFA.NFA (Fin Nat8) DNA
 figure2 = NFA.NFA { NFA.delta = δ
                   , NFA.q0    = 0
                   , NFA.fs    = singleton 7
