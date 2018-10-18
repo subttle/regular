@@ -61,14 +61,14 @@ instance (Show s, Finite s) ⇒ Show (SomeNFA s) where
   show (SomeNFA m) = show m
 
 instance (Finite q, Finite s) ⇒ Configuration NFA q s (Set q) where
+  complete      ∷ NFA q s → Bool
+  complete      m = all ((≥ 1) . size') (range m)
+
   deterministic ∷ NFA q s → Bool
   deterministic m = all ((≤ 1) . size') (range m)
   
   codeterministic ∷ NFA q s → Bool
   codeterministic = deterministic . FA.reversal . toFA
-
-  complete ∷ NFA q s → Bool
-  complete m = all ((≥ 1) . size') (range m)
 
   occupied ∷ NFA q s → Set q → Set q
   occupied _ = id
@@ -250,7 +250,7 @@ fromFA' m | size' (FA.initial m) == 1 = Just NFA { delta = FA.delta m
                                                  }
           | otherwise                 = Nothing
 
-fromGraph ∷ (Finite s, Finite q) ⇒ TG.TG q s → q → Set q → NFA q s
+fromGraph ∷ (Finite q, Finite s) ⇒ TG.TG q s → q → Set q → NFA q s
 fromGraph (TG.TG a) q₀ f = NFA { delta = δ
                                , q0    = q₀
                                , fs    = f

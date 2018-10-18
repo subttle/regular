@@ -79,19 +79,19 @@ reduce ∷ (Finite q, Ord s) ⇒ GFA q s → GFA Void s
 reduce m = GFA { delta = \(qᵢ, qᶠ) → delta (Set.foldl rip m asSet) (vacuous qᵢ, vacuous qᶠ) }
 
 -- δ₁(q, p) = δ(q, r) ⊗ δ(r, r)⋆ ⊗ δ(r, p) ⊕ δ(q, p) where q, p, r ∈ Q, and r is the state to "rip"
-rip ∷ ∀ q s . (Ord s, Ord q) ⇒ GFA q s → q → GFA q s
+rip ∷ ∀ q s . (Eq q, Ord s) ⇒ GFA q s → q → GFA q s
 rip (GFA δ) qᵣ' = GFA { delta = δ₁ }
   where qᵣ ∷ Either a q
         qᵣ = Right qᵣ'
         δ₁ (q, p) | (q == qᵣ) ∨ (p == qᵣ) = zero -- We are ripping qᵣ out, so if qᵣ is an arg to δ₁, return Zero
         δ₁ (q, p)                         = δ (q, qᵣ) * (star (δ (qᵣ, qᵣ)) * δ (qᵣ, p)) + δ (q, p)
         -- or
-        -- δ₁ (q, p) = δ (q, p) + (δ (q, qᵣ) * (star (δ (qᵣ, qᵣ)) * δ (qᵣ, p)))
+        -- δ₁ (q, p)                         = δ (q, p) + (δ (q, qᵣ) * (star (δ (qᵣ, qᵣ)) * δ (qᵣ, p)))
 
 extract ∷ GFA Void s → RE.RegExp s
 extract (GFA δ) = δ (Left (Init ()), Left (Final ()))
 
-toRE ∷ (Ord s, Finite q) ⇒ GFA q s → RE.RegExp s
+toRE ∷ (Finite q, Ord s) ⇒ GFA q s → RE.RegExp s
 toRE = extract . reduce
 
 fromRE ∷         RegExp s → GFA Void s
