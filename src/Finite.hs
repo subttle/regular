@@ -175,21 +175,37 @@ type Nat13  = Nat.S Nat12
 type Nat14  = Nat.S Nat13
 type Nat15  = Nat.S Nat14
 
-instance Finite (Fin Nat.Nat1)
-instance Finite (Fin Nat.Nat2)
-instance Finite (Fin Nat.Nat3)
-instance Finite (Fin Nat.Nat4)
-instance Finite (Fin Nat.Nat5)
-instance Finite (Fin Nat.Nat6)
-instance Finite (Fin Nat.Nat7)
-instance Finite (Fin Nat.Nat8)
-instance Finite (Fin Nat.Nat9)
-instance Finite (Fin Nat10)
-instance Finite (Fin Nat11)
-instance Finite (Fin Nat12)
-instance Finite (Fin Nat13)
-instance Finite (Fin Nat14)
-instance Finite (Fin Nat15)
+type Fin₁  = Fin Nat.Nat1
+type Fin₂  = Fin Nat.Nat2
+type Fin₃  = Fin Nat.Nat3
+type Fin₄  = Fin Nat.Nat4
+type Fin₅  = Fin Nat.Nat5
+type Fin₆  = Fin Nat.Nat6
+type Fin₇  = Fin Nat.Nat7
+type Fin₈  = Fin Nat.Nat8
+type Fin₉  = Fin Nat.Nat9
+type Fin₁₀ = Fin Nat10
+type Fin₁₁ = Fin Nat11
+type Fin₁₂ = Fin Nat12
+type Fin₁₃ = Fin Nat13
+type Fin₁₄ = Fin Nat14
+type Fin₁₅ = Fin Nat15
+
+instance Finite Fin₁
+instance Finite Fin₂
+instance Finite Fin₃
+instance Finite Fin₄
+instance Finite Fin₅
+instance Finite Fin₆
+instance Finite Fin₇
+instance Finite Fin₈
+instance Finite Fin₉
+instance Finite Fin₁₀
+instance Finite Fin₁₁
+instance Finite Fin₁₂
+instance Finite Fin₁₃
+instance Finite Fin₁₄
+instance Finite Fin₁₅
 
 -- TODO deleteme
 instance (Show a, Finite a) ⇒ Show (Predicate a) where

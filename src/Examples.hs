@@ -29,7 +29,7 @@ import           Data.Fin
 import           Data.Type.Nat
 
 -- A DFA which accepts all binary strings ending in 1
-endsWith1 ∷ DFA Bool (Fin Nat2)
+endsWith1 ∷ DFA Bool Fin₂
 endsWith1 = DFA { delta = delta
                 , q0    = False
                 , fs    = singleton True
@@ -39,11 +39,11 @@ endsWith1 = DFA { delta = delta
                         delta (True,  1) = True
 
 -- The set of strings which end in [0, 1]
-endsWith01 ∷ NFA.NFA (Fin Nat4) (Fin Nat2)
+endsWith01 ∷ NFA.NFA Fin₄ Fin₂
 endsWith01 = NFA.NFA { NFA.delta = delta
                      , NFA.q0    = 0
                      , NFA.fs    = singleton 2
-                     } where delta ∷ (Fin Nat4, Fin Nat2) → Set (Fin Nat4)
+                     } where delta ∷ (Fin₄, Fin₂) → Set Fin₄
                              delta (0, 0) = fromList  [0, 1]
                              delta (0, 1) = singleton 0
                              delta (9, 1) = singleton 2
@@ -51,7 +51,7 @@ endsWith01 = NFA.NFA { NFA.delta = delta
 
 -- https://en.wikipedia.org/wiki/File:NFAexample.svg
 -- Generates the language where w has an even number of 0s or an even number of 1s
-even0or1 ∷ EFA.EFA (Fin Nat5) (Fin Nat2)
+even0or1 ∷ EFA.EFA Fin₅ Fin₂
 even0or1 = EFA.EFA { EFA.delta = delta
                    , EFA.q0    = 0
                    , EFA.fs    = fromList [1, 3]
@@ -67,7 +67,7 @@ even0or1 = EFA.EFA { EFA.delta = delta
                            delta (_, _      ) = (∅)
 
 -- A number is divisible by 5 iff its last digit is 0 or 5
-by5 ∷ DFA Bool (Fin Nat10)
+by5 ∷ DFA Bool Fin₁₀
 by5 = DFA { delta = delta
           , q0    = False
           , fs    = singleton True
@@ -78,13 +78,13 @@ by5 = DFA { delta = delta
 -- A regular expression to match the language of the `by5` DFA
 -- [0-9]★[0+5]
 -- ((0+(1+(2+(3+(4+(5+(6+(7+(8+9))))))))))★·(0+5)
-by5' ∷ RE.RegExp (Fin Nat10)
+by5' ∷ RE.RegExp Fin₁₀
 by5' = RE.star RE.dot RE.* RE.fromSet (fromList [0, 5])
 
 -- A number is divisible by 3 iff the sum of its digits is divisible by 3
 -- The state we are in is the (running total % 3)
 -- (We add a single starting state `Left ()` to avoid accepting the empty string.)
-by3 ∷ DFA (Either () (Fin Nat3)) (Fin Nat10)
+by3 ∷ DFA (Either () Fin₃) Fin₁₀
 by3 = DFA { delta = Right . toEnum . (`mod` 3) . \(q, digit) → fromEnum (fromRight 0 q) + fromEnum digit
           , q0    = Left ()
           , fs    = singleton (Right 0)
@@ -176,30 +176,30 @@ farmer = DFA { delta = δ
 -- https://en.wikipedia.org/wiki/File:Fox_goose_beans_puzzle_visualisation.svg
 farmerw ∷ NFA.NFA (Bool, Bool, Bool) Objects
 farmerw = NFA.NFA { NFA.delta = δ
-                , NFA.q0    =           (False, False, False)  -- Everything starts not across the river
-                , NFA.fs    = singleton (True,  True,  True )  -- We are finished when everything is safely across the river
-                } where
-                        -- fgb
-                        δ ((False, False, False), Hen) = singleton (False, True,  False)
-                        -- fGb
-                        δ ((False, True,  False), Fox) = singleton (True,  True,  False)
-                        δ ((False, True,  False), Bag) = singleton (False, True,  True)
-                        -- FGb
-                        δ ((True,  True,  False), Hen) = singleton (True,  False, False)
-                        -- Fgb
-                        δ ((True,  False, False), Bag) = singleton (True,  False, True)
-                        -- FgB
-                        δ ((True,  False, True),  Bag) = singleton (True,  False, False)
-                        δ ((True,  False, True),  Hen) = singleton (True,  True,  True)
-                        δ ((True,  False, True),  Fox) = singleton (False, False, True)
-                        -- fGB
-                        δ ((False, True,  True),  Hen) = singleton (False, False, True)
-                        -- fgB
-                        δ ((False, False, True),  Fox) = singleton (True,  False, True)
-                        δ _                            = (∅)
+                  , NFA.q0    =           (False, False, False)  -- Everything starts not across the river
+                  , NFA.fs    = singleton (True,  True,  True )  -- We are finished when everything is safely across the river
+                  } where
+                          -- fgb
+                          δ ((False, False, False), Hen) = singleton (False, True,  False)
+                          -- fGb
+                          δ ((False, True,  False), Fox) = singleton (True,  True,  False)
+                          δ ((False, True,  False), Bag) = singleton (False, True,  True)
+                          -- FGb
+                          δ ((True,  True,  False), Hen) = singleton (True,  False, False)
+                          -- Fgb
+                          δ ((True,  False, False), Bag) = singleton (True,  False, True)
+                          -- FgB
+                          δ ((True,  False, True),  Bag) = singleton (True,  False, False)
+                          δ ((True,  False, True),  Hen) = singleton (True,  True,  True)
+                          δ ((True,  False, True),  Fox) = singleton (False, False, True)
+                          -- fGB
+                          δ ((False, True,  True),  Hen) = singleton (False, False, True)
+                          -- fgB
+                          δ ((False, False, True),  Fox) = singleton (True,  False, True)
+                          δ _                            = (∅)
 
 -- https://www.researchgate.net/publication/269628569_DNA_Pattern_Analysis_using_Finite_Automata
-figure2 ∷ NFA.NFA (Fin Nat8) DNA
+figure2 ∷ NFA.NFA Fin₈ DNA
 figure2 = NFA.NFA { NFA.delta = δ
                   , NFA.q0    = 0
                   , NFA.fs    = singleton 7
@@ -225,7 +225,7 @@ figure2 = NFA.NFA { NFA.delta = δ
                           δ (7, _)        = (∅)
 
 -- Generates the language [[1], [2], [3]]
-oneTwoThree ∷ EFA.EFA Bool (Fin Nat4)
+oneTwoThree ∷ EFA.EFA Bool Fin₄
 oneTwoThree = EFA.EFA { EFA.delta = delta
                       , EFA.q0    = False
                       , EFA.fs    = singleton True
@@ -236,7 +236,7 @@ oneTwoThree = EFA.EFA { EFA.delta = delta
 
 -- An EFA which accepts only strings which start with 0 and end with 1
 -- A similar example is given in this video lecture https://youtu.be/yzb4J7oSyLA
-startsWith0endsWith1 ∷ EFA.EFA (Fin Nat4) (Fin Nat2)
+startsWith0endsWith1 ∷ EFA.EFA Fin₄ Fin₂
 startsWith0endsWith1 = EFA.EFA { EFA.delta = delta
                                , EFA.q0    = 0
                                , EFA.fs    = singleton 2
@@ -254,7 +254,7 @@ startsWith0endsWith1 = EFA.EFA { EFA.delta = delta
                                        delta (_, Nothing) = (∅)
 
 -- A DFA which accepts all binary strings starting with 0
-startsWith0 ∷ DFA (Fin Nat3) (Fin Nat2)
+startsWith0 ∷ DFA Fin₃ Fin₂
 startsWith0 = DFA { delta = delta
                   , q0    = 0
                   , fs    = singleton 1
@@ -271,7 +271,7 @@ startsWith0 = DFA { delta = delta
 -- http://spark-public.s3.amazonaws.com/automata/slides/4_fa3.pdf
 data RB = Red | Black deriving (Eq, Enum, Ord, Bounded, Show)
 instance Finite RB
-board ∷ NFA.NFA (Fin Nat9) RB
+board ∷ NFA.NFA Fin₉ RB
 board = NFA.NFA { NFA.delta = delta
                 , NFA.q0    = 0
                 , NFA.fs    = singleton 8
@@ -302,7 +302,7 @@ instance Show Decimal where
   show Period = "."
 
 -- HMU Figure 2.18 Pg.73
-hmu218 ∷ EFA.EFA (Fin Nat6) (Either Decimal (Fin Nat10))
+hmu218 ∷ EFA.EFA Fin₆ (Either Decimal Fin₁₀)
 hmu218 = EFA.EFA { EFA.delta = delta
                  , EFA.q0    = 0
                  , EFA.fs    = singleton 5
@@ -318,7 +318,7 @@ hmu218 = EFA.EFA { EFA.delta = delta
                          delta  _                      = (∅)
 
 -- [[0],[1],[0,1],[0,0,0],[0,1,1],[1,1,1]
-ex144 ∷ EFA.EFA (Fin Nat6) (Fin Nat2)
+ex144 ∷ EFA.EFA Fin₆ Fin₂
 ex144 = EFA.EFA { EFA.delta = delta
                 , EFA.q0    = 0
                 , EFA.fs    = singleton 3
@@ -332,7 +332,7 @@ ex144 = EFA.EFA { EFA.delta = delta
                         delta (5, Just  0) = singleton 3
                         delta _            = (∅)
 
-closuresExample ∷ EFA.EFA (Fin Nat7) (Fin Nat2)
+closuresExample ∷ EFA.EFA Fin₇ Fin₂
 closuresExample = EFA.EFA { EFA.delta = delta
                           , EFA.q0 = 0
                           , EFA.fs = singleton 3
@@ -345,7 +345,7 @@ closuresExample = EFA.EFA { EFA.delta = delta
                                   delta _            = (∅)
 
 -- https://youtu.be/1GZOzTJOBuM
-minimal ∷ DFA (Fin Nat6) (Fin Nat2)
+minimal ∷ DFA Fin₆ Fin₂
 minimal = DFA { delta = delta
               , q0    = 0
               , fs    = singleton 4
@@ -361,7 +361,7 @@ minimal = DFA { delta = delta
                       delta (4, 1) = 2
 
 -- https://youtu.be/TvMEX2htBYw
-minimal' ∷ DFA (Fin Nat10) (Fin Nat2)
+minimal' ∷ DFA Fin₁₀ Fin₂
 minimal' = DFA { delta = delta
                , q0    = 0
                , fs    = fromList [5, 6]
@@ -384,7 +384,7 @@ minimal' = DFA { delta = delta
                        delta _      = 9
 
 -- http://i.stack.imgur.com/AD6WJ.png
-exactly20s ∷ DFA (Fin Nat4) (Fin Nat2)
+exactly20s ∷ DFA Fin₄ Fin₂
 exactly20s = DFA { delta = delta
                  , q0    = 0
                  , fs    = singleton 2
@@ -401,7 +401,7 @@ exactly20s = DFA { delta = delta
                          delta (3, 1) = 3
 
 -- http://i.stack.imgur.com/AD6WJ.png
-atleast21s ∷ DFA (Fin Nat3) (Fin Nat2)
+atleast21s ∷ DFA Fin₃ Fin₂
 atleast21s = DFA { delta = delta
                  , q0    = 0
                  , fs    = singleton 2
@@ -414,11 +414,11 @@ atleast21s = DFA { delta = delta
                          delta (2, 0) = 2
                          delta (2, 1) = 2
 
-exactly20sANDatleast21s ∷ DFA (Fin Nat4, Fin Nat3) (Fin Nat2)
+exactly20sANDatleast21s ∷ DFA (Fin₄, Fin₃) Fin₂
 exactly20sANDatleast21s  = exactly20s `DFA.intersection` atleast21s
 
 -- The language ["123456789"]
-digitsNFA ∷ NFA.NFA (Fin Nat10) (Fin Nat10)
+digitsNFA ∷ NFA.NFA Fin₁₀ Fin₁₀
 digitsNFA = NFA.NFA { NFA.delta = delta
                     , NFA.q0 = 0
                     , NFA.fs = singleton 9
@@ -438,7 +438,7 @@ data StackSym = X0 | Y0 deriving (Eq, Ord, Enum, Bounded, Show)
 
 -- The standard PDA example language {L : 0ⁿ1ⁿ for n > 0 }
 -- {"01","0011","000111","00001111","0000011111","000000111111","00000001111111","0000000011111111", ...}
-example ∷ PDA.PDA Fin₃ (Either () StackSym) (Fin N.Nat2)
+example ∷ PDA.PDA Fin₃ (Either () StackSym) Fin₂
 example = PDA.PDA { PDA.delta = delta
                   , PDA.q0    = Fin₃ 0
                   , PDA.z0    = Left ()
@@ -454,7 +454,7 @@ example = PDA.PDA { PDA.delta = delta
 -- https://en.wikipedia.org/wiki/Pushdown_automaton#/media/File:Pda-example.svg
 -- The standard PDA example language {L : 0ⁿ1ⁿ | n ≥ 0 }
 -- "", "01","0011","000111","00001111","0000011111","000000111111","00000001111111","0000000011111111", ...
-wiki ∷ PDA.PDA (Fin N.Nat3) (Fin N.Nat2) (Fin N.Nat2)
+wiki ∷ PDA.PDA Fin₃ Fin₂ Fin₂
 wiki = PDA.PDA { PDA.delta = delta
                , PDA.q0 = 0
                , PDA.z0 = 1
@@ -469,7 +469,7 @@ wiki = PDA.PDA { PDA.delta = delta
 
 -- wwʳ (or "w then w-reversed"), even length palindromes
 -- 62, Page 230, HMU 3rd Edition
-wwʳ ∷ PDA.PDA (Fin Nat3) (Either () Bool) (Fin N.Nat2)
+wwʳ ∷ PDA.PDA Fin₃ (Either () Bool) Fin₂
 wwʳ = PDA.PDA { PDA.delta = δ
               , PDA.q0    = 0
               , PDA.z0    = Left ()
@@ -486,7 +486,7 @@ wwʳ = PDA.PDA { PDA.delta = δ
                       δ (1, Just  0, Right False) = singleton (1, [                        ])
                       δ (1, Just  1, Right  True) = singleton (1, [                        ])
                       δ (1, Nothing, Left     ()) = singleton (2, [             Left     ()])
-                      δ _                              = (∅) -- otherwise kill the computation
+                      δ _                         = (∅) -- otherwise kill the computation
 
 data LP = LParen deriving (Enum, Eq, Ord, Bounded)
 instance Show LP where
@@ -514,18 +514,18 @@ balanced = PDA.PDA { PDA.delta = delta
 {-
 -- Example from Stanford Automata course, the "Turing Machines" lecture
 -- Stanford Automata lecture 4 - 4 - 16, "Turing Machines"
-exampleTM ∷ TM.TM Bool (Fin N.Nat2) Void
+exampleTM ∷ TM.TM Bool Fin₂ Void
 exampleTM = TM.TM { TM.delta = delta
                   , TM.q0    = False
                   , TM.fs    = singleton True
                   } where delta (False, Left  0      ) = Just (False, Left 0, TM.R')
                           delta (False, Left  1      ) = Just ( True, Left 0, TM.R')
-                          delta (False, Right Nothing) = Just (False, Left  1, TM.L')
+                          delta (False, Right Nothing) = Just (False, Left 1, TM.L')
                           delta _                      = Nothing  -- Halt
 
 -- HMU pg 329, Figure 8.9
 -- { 0ⁿ1ⁿ | n ≥ 1 }
-hmu89 ∷ TM.TM (Fin N.Nat6) (Fin N.Nat2) StackSym
+hmu89 ∷ TM.TM Fin₆ Fin₂ StackSym
 hmu89 = TM.TM { TM.delta = delta
               , TM.q0    = 0
               , TM.fs    = singleton 4
@@ -544,10 +544,10 @@ hmu89 = TM.TM { TM.delta = delta
 
 -- TODO accepts by halting, create a new data type without fs?
 {-
-So the successor’s output on 111101 was 000011 which is the reverse (Fin N.Nat2) representation of 48.
+So the successor’s output on 111101 was 000011 which is the reverse binary representation of 48.
 www.cs.columbia.edu/~zeph/3261/L14/TuringMachine.pdf   L14
 -}
-successor ∷ TM.TM Bool (Fin N.Nat2) Void
+successor ∷ TM.TM Bool Fin₂ Void
 successor = TM.TM { TM.delta = delta
                   , TM.q0    = False
                   , TM.fs    = singleton True

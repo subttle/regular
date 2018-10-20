@@ -9,7 +9,7 @@ Here is a small example of what FizzBuzz looks like with DFA:
 ```Haskell
 
 -- A number is divisible by 5 iff its last digit is 0 or 5
-by5 ∷ DFA Bool (Fin Nat10)
+by5 ∷ DFA Bool Fin₁₀
 by5 = DFA { delta = delta
           , q0    = False
           , fs    = singleton True
@@ -20,7 +20,7 @@ by5 = DFA { delta = delta
 -- A number is divisible by 3 iff the sum of its digits is divisible by 3
 -- The state we are in is the (running total % 3)
 -- (We add a single starting state `Left ()` to avoid accepting the empty string.)
-by3 ∷ DFA (Either () (Fin Nat3)) (Fin Nat10)
+by3 ∷ DFA (Either () Fin₃) Fin₁₀
 by3 = DFA { delta = Right . toEnum . (`mod` 3) . \(q, digit) → fromEnum (fromRight 0 q) + fromEnum digit
           , q0    = Left ()
           , fs    = singleton (Right 0)
