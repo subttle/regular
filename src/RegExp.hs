@@ -9,7 +9,6 @@
 {-# LANGUAGE DeriveFunctor             #-}
 {-# LANGUAGE DeriveFoldable            #-}
 {-# LANGUAGE DeriveTraversable         #-}
--- {-# LANGUAGE DataKinds                 #-}
 -- {-# LANGUAGE PostfixOperators          #-}
 {-# OPTIONS_GHC -Wall                  #-}
 
@@ -48,7 +47,7 @@ import           Numeric.Semiring.ZeroProduct (ZeroProductSemiring)
 import           Numeric.Decidable.Zero
 import           Numeric.Dioid.Class
 
--- α, β ⩴ ∅ | ε | σ | α∣β | α·β | α★   where σ ∈ Σ
+-- α, β ⩴ ∅ | ε | σ | α∣β | α·β | α★  where σ ∈ Σ
 data RegExp s where
   Zero ∷                       RegExp s  -- The empty language         -- ℒ(Zero)  = ∅
   One  ∷                       RegExp s  -- The empty string, epsilon  -- ℒ(One)   = {ε}
@@ -99,7 +98,6 @@ instance (Ord s) ⇒ InvolutiveMultiplication (RegExp s) where
 
 -- An Additive semigroup
 instance (Ord s) ⇒ Additive (RegExp s) where
-
   (+) ∷ RegExp s → RegExp s → RegExp s
   -- Identity
   α        +     Zero             = α
