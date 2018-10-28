@@ -26,7 +26,6 @@ import           Data.Functor.Contravariant
 -- import           Data.Functor.Contravariant.Divisible
 import           Algebra.Graph.Relation as Relation hiding (domain)
 import           Config
--- import           Data.Maybe (fromJust)
 
 -- Nondeterministic Finite Automaton
 data NFA q s =

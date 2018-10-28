@@ -6,7 +6,6 @@ import           DFA
 import qualified NFA
 import qualified EFA
 import qualified GFA
--- import qualified PDA
 import           Common
 import           Finite
 import qualified RegExp as RE

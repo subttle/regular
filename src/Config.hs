@@ -156,8 +156,6 @@ class (Q (automaton q s) q, Σ (automaton q s) s, Eq occupy) ⇒ Configuration a
     -- TODO
     -- toFA ∷ automaton q s → FA.FA q s
     -- toFA m = FA.FA { delta = undefined, FA.initial = initial, FA.final = final }
-    -- TODO
-    -- toTG ∷ automaton q s → TG.TG q s
 
     -- Take an automaton, m, and a string, w, and decide if that string is accepted/recognized
     -- m accepts a string, w ∈ Σ★, iff δ★(I, w) ∩ F ≠ ∅

@@ -16,11 +16,8 @@ import           Data.Map            as Map (Map, fromList)
 import qualified Data.Map            as Map (fromSet, toAscList)
 import           Prelude             hiding (map)
 import           Data.Set            as Set hiding (foldl)
--- import qualified Data.Set            as Set (filter)
 import           Data.Set.Unicode
--- import           Data.List           hiding (map)
 import qualified Data.List.NonEmpty  as NE
--- import           Data.Maybe          (catMaybes)
 import           Finite
 import           Common
 import qualified TransitionGraph as TG
@@ -66,9 +63,9 @@ instance (Show s, Finite s) ⇒ Show (SomeEFA s) where
 
 instance (Finite q, Finite s) ⇒ Configuration EFA q s (Set q) where
   complete ∷ EFA q s → Bool
-  complete = undefined -- FIXME implemnt when I restructure to allow conversions
+  complete = undefined -- FIXME implement when I restructure to allow conversions
 
-  deterministic ∷ EFA q s → Bool -- FIXME implemnt when I restructure to allow conversions
+  deterministic ∷ EFA q s → Bool -- FIXME implement when I restructure to allow conversions
   deterministic = undefined -- FIXME should I use the noEpsilonClosures ?
 
   codeterministic ∷ EFA q s → Bool
