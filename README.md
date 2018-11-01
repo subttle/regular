@@ -40,14 +40,27 @@ main = mapM_ (putStrLn . fizzbuzz . toDigits) [1 .. 100]
 
 TODO A quick explanation of what is going on in the example.
 
+## Try
+
+This project currently uses [stack](https://docs.haskellstack.org/en/stable/README/stack) to build. Try out some of the code in the REPL:
+
+```shell
+
+git clone https://github.com/subttle/regular
+cd regular
+stack build
+stack ghci
+
+```
+
 For now it should be clear that I value correctness and simplicity over speed. This is my first ever project in Haskell and it is not yet complete.
 
-The code is not yet structured properly, so expect major refactoring and restructuring. Once I have everything correct I can start to worry about speed. For now this code is SLOW.
+The code is not yet structured properly, so expect major refactoring and restructuring. Once I have everything correct I can start to worry about speed. For now this code is slow.
 
 I'm patiently (and gratefully!) waiting on a few things from some of the best projects out there right now:
 
-- Labelled graphs in alga
-- Easytest from Unison
+- Labelled graphs in [alga](https://github.com/snowleopard/alga)
+- Easytest from [Unison](https://github.com/unisonweb/unison/)
 - Linear types in Haskell
 - Better dependent type support in Haskell
 
