@@ -175,6 +175,7 @@ type Nat13  = Nat.S Nat12
 type Nat14  = Nat.S Nat13
 type Nat15  = Nat.S Nat14
 
+type Fin₀  = Fin Nat.Nat0
 type Fin₁  = Fin Nat.Nat1
 type Fin₂  = Fin Nat.Nat2
 type Fin₃  = Fin Nat.Nat3
