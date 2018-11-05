@@ -14,6 +14,7 @@ import           Data.Functor.Contravariant
 import           Prelude             hiding (map)
 import           Data.Set            as Set hiding (foldl, intersection)
 import           Data.Set.Unicode
+import           Data.Eq.Unicode
 import           Data.Bool.Unicode
 import qualified Data.Map            as Map
 import           Common
@@ -198,6 +199,14 @@ synchronizing = not . isZero . power
 palindromic ∷ (Finite q, Finite s) ⇒                    DFA q s → Bool
 palindromic m = all palindrome (upToLength (3 * n) (language m))
           where n = size' (qs m)
+
+-- A is a permutation automaton if and only if
+-- for every two distinct states qᵢ and qⱼ in Q and every input symbol σ in Σ, δ(qᵢ, σ) ≠ δ(qⱼ, σ).
+-- https://en.wikipedia.org/wiki/Permutation_automaton
+permutation ∷ (Finite q, Finite s) ⇒ DFA q s → Bool
+permutation m@(DFA δ _ _) = all (\(qᵢ, qⱼ) → all (\σ → δ (qᵢ, σ) ≠ δ (qⱼ, σ)) (sigma m)) pairsOfDistinctStates
+    where -- pairsOfDistinctStates ∷ Set (q, q)
+          pairsOfDistinctStates = Set.filter (uncurry (==)) (qs m × qs m)
 
 -- Given two DFAs, decide if they produce the exact same language, i.e.
 -- ℒ(m₁) ≟ ℒ(m₂)
