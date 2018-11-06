@@ -14,7 +14,6 @@ import           Data.Functor.Contravariant
 import           Prelude             hiding (map)
 import           Data.Set            as Set hiding (foldl, intersection)
 import           Data.Set.Unicode
-import           Data.Eq.Unicode
 import           Data.Bool.Unicode
 import qualified Data.Map            as Map
 import           Common
@@ -200,13 +199,11 @@ palindromic ∷ (Finite q, Finite s) ⇒                    DFA q s → Bool
 palindromic m = all palindrome (upToLength (3 * n) (language m))
           where n = size' (qs m)
 
--- M is a permutation automaton if and only if
--- for every two distinct states qᵢ and qⱼ in Q and every input symbol σ in Σ, δ(qᵢ, σ) ≠ δ(qⱼ, σ).
--- https://en.wikipedia.org/wiki/Permutation_automaton
--- An automaton A = (S, I, δ, s₀, F) is said to be a permutation
+-- An automaton M = (S, I, δ, s₀, F) is said to be a permutation
 -- automaton, or more simply a p-automaton, if and only if δ(sᵢ, a) = δ(sⱼ, a), where sᵢ, sⱼ ∈ S, a ∈ I, implies that sᵢ = sⱼ.
 -- Permutation Automata by G. THIERRIN
 -- TODO untested
+-- TODO better to place in src/FA.hs?
 permutation ∷ (Finite q, Finite s) ⇒ DFA q s → Bool
 permutation m@(DFA δ _ _) = all (\(qᵢ, qⱼ) → 
                                              all (\σ → 
