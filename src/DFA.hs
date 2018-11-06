@@ -200,13 +200,19 @@ palindromic ∷ (Finite q, Finite s) ⇒                    DFA q s → Bool
 palindromic m = all palindrome (upToLength (3 * n) (language m))
           where n = size' (qs m)
 
--- A is a permutation automaton if and only if
+-- M is a permutation automaton if and only if
 -- for every two distinct states qᵢ and qⱼ in Q and every input symbol σ in Σ, δ(qᵢ, σ) ≠ δ(qⱼ, σ).
 -- https://en.wikipedia.org/wiki/Permutation_automaton
+-- An automaton A = (S, I, δ, s₀, F) is said to be a permutation
+-- automaton, or more simply a p-automaton, if and only if δ(sᵢ, a) = δ(sⱼ, a), where sᵢ, sⱼ ∈ S, a ∈ I, implies that sᵢ = sⱼ.
+-- Permutation Automata by G. THIERRIN
+-- TODO untested
 permutation ∷ (Finite q, Finite s) ⇒ DFA q s → Bool
-permutation m@(DFA δ _ _) = all (\(qᵢ, qⱼ) → all (\σ → δ (qᵢ, σ) ≠ δ (qⱼ, σ)) (sigma m)) pairsOfDistinctStates
-    where -- pairsOfDistinctStates ∷ Set (q, q)
-          pairsOfDistinctStates = Set.filter (uncurry (==)) (qs m × qs m)
+permutation m@(DFA δ _ _) = all (\(qᵢ, qⱼ) → 
+                                             all (\σ → 
+                                                       (δ (qᵢ, σ) == δ (qⱼ, σ)) `implies` (qᵢ == qⱼ)
+                                                 ) (sigma m)
+                                ) (qs m × qs m)
 
 -- Given two DFAs, decide if they produce the exact same language, i.e.
 -- ℒ(m₁) ≟ ℒ(m₂)

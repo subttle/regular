@@ -56,6 +56,13 @@ infixl 5 <<-
 (<<-) ∷ (Ord a) ⇒ a → Set a → Set a
 (<<-) = Set.insert
 
+-- https://mail.haskell.org/pipermail/libraries/2016-January/026565.html
+-- Boolean implication.
+infix 4 `implies` 
+implies :: Bool -> Bool -> Bool
+implies True  b = b
+implies False _ = True
+
 -- Two sets intersect if A ∩ B ≠ ∅
 intersects ∷ (Ord a) ⇒ Set a → Set a → Bool
 intersects x y = not (Set.disjoint x y)
