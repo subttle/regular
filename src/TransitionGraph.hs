@@ -31,11 +31,11 @@ instance Contravariant (ETG q) where
   contramap ∷ (a → b) → ETG q b → ETG q a
   contramap f (ETG g) = ETG (g . fmap f)
 
-instance (Show q, Show s, Finite q, Finite s) => Show (TG q s) where
+instance (Show q, Show s, Finite q, Finite s) ⇒ Show (TG q s) where
   show ∷ TG q s → String
   show (TG m) = concatMap (\s → show s ++ " → " ++ show (m s) ++ "\n") (sigma (TG m))
 
-instance (Show q, Show s, Finite q, Finite s) => Show (ETG q s) where
+instance (Show q, Show s, Finite q, Finite s) ⇒ Show (ETG q s) where
   show ∷ ETG q s → String
   show (ETG m) = concatMap (\s → show s ++ " → " ++ show (m s) ++ "\n") (sigma_ε (ETG m))
 

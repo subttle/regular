@@ -10,7 +10,6 @@
 
 module EFA where
 
-import           Control.Monad
 import           Data.Functor.Contravariant
 import           Data.Map            as Map (Map, fromList)
 import qualified Data.Map            as Map (fromSet, toAscList)

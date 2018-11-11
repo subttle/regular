@@ -2,14 +2,12 @@
 {-# LANGUAGE FlexibleInstances         #-}
 {-# LANGUAGE GADTs                     #-}
 {-# LANGUAGE MultiParamTypeClasses     #-}
--- {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE ScopedTypeVariables       #-}
 {-# LANGUAGE InstanceSigs              #-}
 {-# LANGUAGE UnicodeSyntax             #-}
 {-# LANGUAGE DeriveFunctor             #-}
 {-# LANGUAGE DeriveFoldable            #-}
 {-# LANGUAGE DeriveTraversable         #-}
--- {-# LANGUAGE PostfixOperators          #-}
 {-# OPTIONS_GHC -Wall                  #-}
 
 module RegExp (RegExp (..), one, zero, literal, (*), (+), star, (*.), (.*),
