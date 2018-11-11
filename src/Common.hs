@@ -106,19 +106,19 @@ quotations = ("\"" ++) . (++ "\"")
 
 -- DFA q s → [((q, s), q)]
 format ∷ (Show c, Show r) ⇒ Map c r → String
-format m = foldl1 (\a b → a ++ "\n" ++ b )  -- manually intercalate the Map with newlines. -- FIXME make portable
+format m = foldl1 (\a b → a ++ "\n" ++ b )  -- manually intercalate the Map with newlines.
            (mapWithKey (\k v → "  δ " ++ show k ++ " ↦ " ++ show v) m)
 
 format' ∷ (Show c, Show r) ⇒ Map c (Set r) → String
 format' = go -- .  Map.filter (not . Set.null)
     where go m | Map.null m = "  δ _ ↦ ∅"
-          go m              = foldl1 (\a b → a ++ "\n" ++ b )  -- manually intercalate the Map with newlines. -- FIXME make portable
+          go m              = foldl1 (\a b → a ++ "\n" ++ b )  -- manually intercalate the Map with newlines.
                               (mapWithKey (\k v → "  δ " ++ show k ++ " ↦ " ++ show (Set' v)) m)
 
 format'' ∷ (Show q, Show s, Show r) ⇒ Map (q, Maybe s) (Set r) → String
 format'' = go -- .  Map.filter (not . Set.null)
     where go m | Map.null m = "  δ _ ↦ ∅"
-          go m              = foldl1 (\a b → a ++ "\n" ++ b )  -- manually intercalate the Map with newlines. -- FIXME make portable
+          go m              = foldl1 (\a b → a ++ "\n" ++ b )  -- manually intercalate the Map with newlines.
                               (mapWithKey (\k v → "  δ " ++ show' k ++ " ↦ " ++ show (Set' v)) m)
           show' (q, Just  σ) = "(" ++ show q ++ "," ++ show σ ++ ")"
           show' (q, Nothing) = "(" ++ show q ++ ",ε)"
