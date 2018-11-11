@@ -1,4 +1,5 @@
 {-# LANGUAGE UnicodeSyntax             #-}
+{-# OPTIONS_GHC -Wall                  #-}
 
 module Common where
 
@@ -95,6 +96,7 @@ indexed = indexed' 0 -- To use an index starting at 1, change this `0` to `1`
           indexed' n (x : xs) = (x, n) : indexed' (n + 1) xs
 
 -- impossible ∷ forall (r ∷ RuntimeRep). forall (a ∷ TYPE r). HasCallStack ⇒ [Char] → a
+impossible ∷ a
 impossible = error "Why, sometimes I've believed as many as six impossible things before breakfast."
 
 hom ∷ (Monoid m) ⇒ (a → m) → [a] → m
@@ -147,7 +149,7 @@ invert ∷ (Ord k, Ord v) ⇒ Map k v → Map v (Set k)
 invert = foldlWithKey (\acc k v → insertWith (∪) v (Set.singleton k) acc) Map.empty
 
 flattenKeys ∷ (Ord k, Ord v, Foldable t) ⇒ Map (t k) v → Map k (Set v)
-flattenKeys = foldlWithKey (\acc keys v → Map.unionsWith Set.union (acc : fmap (`Map.singleton` Set.singleton v) (Foldable.toList keys))) Map.empty
+flattenKeys = foldlWithKey (\acc k v → Map.unionsWith Set.union (acc : fmap (`Map.singleton` Set.singleton v) (Foldable.toList k))) Map.empty
 
 invertBijection ∷ (Ord k, Ord v) ⇒ Map k v → Map v k
 invertBijection = foldrWithKey (flip Map.insert) Map.empty

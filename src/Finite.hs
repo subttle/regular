@@ -12,7 +12,6 @@ module Finite where
 
 import           Data.Set as Set
 import           Data.Set.Unicode
-import           Data.Bool.Unicode
 import           Data.Eq.Unicode
 import           Control.Monad
 import           Control.Applicative
@@ -25,7 +24,7 @@ import           GHC.Enum
 import           Data.Char
 import           Data.Fin (Fin)
 import qualified Data.Type.Nat as Nat
-import qualified Data.Universe as U
+-- import qualified Data.Universe as U
 
 -- An imperfect, somewhat practical, representation of a Finite type constraint
 -- The poor Haskeller's version of a Finite type constraint without reaching for dependent types
@@ -168,12 +167,12 @@ instance                                                      Finite  Void where
   asList = []
   asSet  = (∅)
 
-type Nat10  = Nat.S Nat.Nat9
-type Nat11  = Nat.S Nat10
-type Nat12  = Nat.S Nat11
-type Nat13  = Nat.S Nat12
-type Nat14  = Nat.S Nat13
-type Nat15  = Nat.S Nat14
+type Nat10  = 'Nat.S Nat.Nat9
+type Nat11  = 'Nat.S Nat10
+type Nat12  = 'Nat.S Nat11
+type Nat13  = 'Nat.S Nat12
+type Nat14  = 'Nat.S Nat13
+type Nat15  = 'Nat.S Nat14
 
 type Fin₀  = Fin Nat.Nat0
 type Fin₁  = Fin Nat.Nat1
