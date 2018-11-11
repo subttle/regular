@@ -42,7 +42,7 @@ endsWith01 = NFA.NFA { NFA.delta = delta
                      } where delta ∷ (Fin₄, Fin₂) → Set Fin₄
                              delta (0, 0) = fromList  [0, 1]
                              delta (0, 1) = singleton 0
-                             delta (9, 1) = singleton 2
+                             delta (1, 1) = singleton 2
                              delta _      = (∅)
 
 -- https://en.wikipedia.org/wiki/File:NFAexample.svg
