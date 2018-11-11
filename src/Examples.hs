@@ -1,10 +1,6 @@
-{-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE GADTs                      #-}
-{-# LANGUAGE ExplicitForAll             #-}
 {-# LANGUAGE UnicodeSyntax              #-}
 {-# LANGUAGE InstanceSigs               #-}
-{-# LANGUAGE MultiParamTypeClasses      #-}
 
 module Examples where
 
@@ -297,8 +293,8 @@ board = NFA.NFA { NFA.delta = delta
 data Decimal = Plus | Minus | Period deriving (Eq, Ord, Enum, Bounded)
 instance Finite Decimal
 instance Show Decimal where
-  show Plus = "+"
-  show Minus = "-"
+  show Plus   = "+"
+  show Minus  = "-"
   show Period = "."
 
 -- HMU Figure 2.18 Pg.73
