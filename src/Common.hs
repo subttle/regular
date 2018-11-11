@@ -1,8 +1,4 @@
 {-# LANGUAGE UnicodeSyntax             #-}
-{-# LANGUAGE FlexibleInstances         #-}
-{-# LANGUAGE InstanceSigs              #-}
-{-# LANGUAGE MultiParamTypeClasses     #-}
-{-# LANGUAGE ExistentialQuantification #-}
 
 module Common where
 
@@ -12,16 +8,12 @@ import           Data.Set (Set)
 import qualified Data.Set as Set
 import           Data.Set.Unicode
 import           Data.List as List
-import qualified Data.List.NonEmpty as NE
 import           Data.Foldable as Foldable
-import           Data.Functor.Contravariant
 import           Control.Monad
 import           Numeric.Natural
-import           Control.Applicative
 
 -- TODO deleteme after this is closed: https://github.com/roelvandijk/base-unicode-symbols/issues/18
 type ℕ = Natural
-
 
 -- type level flip
 newtype Flip t b a = Flip { unFlip ∷ t a b }
