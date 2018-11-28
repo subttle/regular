@@ -27,6 +27,9 @@ library
                      , fin
                      , universe
   default-language:    Haskell2010
+  default-extensions: UnicodeSyntax
+                      ScopedTypeVariables
+                      GADTs
 
 executable regular-exe
   hs-source-dirs:      app
@@ -43,6 +46,9 @@ executable regular-exe
                      , pointed
                      , fin
                      , universe
+  default-extensions: UnicodeSyntax
+                      ScopedTypeVariables
+                      GADTs
 
 test-suite regular-test
   type:                exitcode-stdio-1.0
@@ -53,6 +59,9 @@ test-suite regular-test
                      , regular
   ghc-options:         -threaded
   default-language:    Haskell2010
+  default-extensions: UnicodeSyntax
+                      ScopedTypeVariables
+                      GADTs
 
 source-repository head
   type:     git

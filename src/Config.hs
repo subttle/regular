@@ -1,5 +1,4 @@
 {-# LANGUAGE MultiParamTypeClasses  #-}
-{-# LANGUAGE UnicodeSyntax          #-}
 {-# LANGUAGE FunctionalDependencies #-}
 
 module Config where

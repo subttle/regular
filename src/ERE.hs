@@ -1,7 +1,5 @@
 {-# LANGUAGE InstanceSigs          #-}
-{-# LANGUAGE GADTs                 #-}
 {-# LANGUAGE PostfixOperators      #-}
-{-# LANGUAGE UnicodeSyntax         #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE DeriveFunctor         #-}

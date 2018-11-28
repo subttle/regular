@@ -1,4 +1,3 @@
-{-# LANGUAGE UnicodeSyntax             #-}
 {-# OPTIONS_GHC -Wall                  #-}
 
 module Common where

@@ -1,17 +1,15 @@
 {-# LANGUAGE FlexibleContexts          #-}
 {-# LANGUAGE FlexibleInstances         #-}
-{-# LANGUAGE GADTs                     #-}
 {-# LANGUAGE MultiParamTypeClasses     #-}
 {-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE ScopedTypeVariables       #-}
 {-# LANGUAGE InstanceSigs              #-}
-{-# LANGUAGE UnicodeSyntax             #-}
 {-# OPTIONS_GHC -Wall                  #-}
 
 module DFA where
 
 import           Data.Functor.Contravariant
 import           Prelude             hiding (map)
+import qualified Data.List           as List
 import           Data.Set            as Set hiding (foldl, intersection)
 import           Data.Set.Unicode
 import           Data.Bool.Unicode
@@ -36,6 +34,7 @@ data DFA q s =                 -- q is the set of states, Q
          ,    fs ∷ Set q       -- The final states,                F ⊆ Q
          }
 
+-- A DFA constructor where the `q` type parameter is an existential
 data SomeDFA s where
   SomeDFA ∷ (Show q, Finite q) ⇒ DFA q s → SomeDFA s
 
@@ -52,12 +51,14 @@ instance Contravariant SomeDFA where
   contramap h (SomeDFA m) = SomeDFA (contramap h m)
 
 instance (Show q, Finite q, Show s, Finite s) ⇒ Show (DFA q s) where
-  show m@(DFA _ q₀ f) = "( Q  = " ++ (show . Set' . qs)    m ++
-                      "\n, Σ  = " ++ (show . Set' . sigma) m ++
-                      "\n, δ  : Q × Σ → Q"                   ++
-                      "\n"        ++ (format . deltaToMap) m ++
-                      "\n, q₀ = " ++  show  q₀               ++
-                      "\n, F  = " ++ (show . Set' $ f)       ++ " )"
+  show m@(DFA _ q₀ f) = List.intercalate "\n, "
+                        [ "( Q  = " ++ (show . Set' . qs)    m
+                        ,   "Σ  = " ++ (show . Set' . sigma) m
+                        ,   "δ  : Q × Σ → Q"
+                        ,              (format . deltaToMap) m
+                        ,   "q₀ = " ++  show  q₀
+                        ,   "F  = " ++ (show . Set' $ f) ++ ")"
+                        ]
 
 instance (Show s, Finite s) ⇒ Show (SomeDFA s) where
   show (SomeDFA m) = show m

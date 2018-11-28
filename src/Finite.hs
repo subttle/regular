@@ -2,9 +2,7 @@
 {-# LANGUAGE TypeSynonymInstances       #-}
 {-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE UnicodeSyntax              #-}
 {-# LANGUAGE ExplicitForAll             #-}
-{-# LANGUAGE ScopedTypeVariables        #-}
 {-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE FunctionalDependencies     #-}
 

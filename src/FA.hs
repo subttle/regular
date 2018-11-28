@@ -1,10 +1,7 @@
 {-# LANGUAGE FlexibleInstances         #-}
-{-# LANGUAGE GADTs                     #-}
 {-# LANGUAGE MultiParamTypeClasses     #-}
 {-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE ScopedTypeVariables       #-}
 {-# LANGUAGE InstanceSigs              #-}
-{-# LANGUAGE UnicodeSyntax             #-}
 {-# OPTIONS_GHC -Wall                  #-}
 
 module FA where

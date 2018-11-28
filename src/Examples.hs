@@ -1,5 +1,4 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE UnicodeSyntax              #-}
 {-# LANGUAGE InstanceSigs               #-}
 
 module Examples where
