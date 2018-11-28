@@ -11,6 +11,7 @@ import           Prelude hiding ((*), (+))
 import           Common
 import           Finite
 import           RegExp as RE
+import qualified Data.List as List
 import           Data.Set as Set
 -- import           Data.Set.Unicode
 import           Data.Bool.Unicode
@@ -59,12 +60,13 @@ instance Profunctor.Profunctor GFA where
   lmap f (GFA δ) = GFA { delta = \(p₁, p₂) → δ (fmap f p₁, fmap f p₂) }
 
 instance (Show q, Finite q, Show s, Finite s) ⇒ Show (GFA q s) where
-  show m = "( Q      = " ++ (show . Set' . qs)                   m ++
-         "\n, Σ      = " ++ (show . Set' . sigma)                m ++
-         "\n, δ : (Q ∖ {qᶠ}) × (Q ∖ {qᵢ}) → Regular Expression"    ++
-         "\n"            ++ (format . Map.fromList . table)      m ++
-         "\n, qᵢ = "     ++ show (Init  ())                        ++
-         "\n, qᶠ = "     ++ show (Final ())                        ++ ")"
+  show m = List.intercalate "\n, " 
+           [ "( Q  = "                                              ++ (show . Set' . qs)              m
+           ,   "Σ  = "                                              ++ (show . Set' . sigma)           m
+           ,   "δ : (Q ∖ {qᶠ}) × (Q ∖ {qᵢ}) → Regular Expression\n" ++ (format . Map.fromList . table) m
+           ,   "qᵢ = "                                              ++ show (Init  ())
+           ,   "qᶠ = "                                              ++ show (Final ()) ++ ")"
+           ]
 
 table ∷ ∀ q s . (Finite q) ⇒ GFA q s → [((Either Init q, Either Final q), RE.RegExp s)]
 table (GFA δ) = zip domain image

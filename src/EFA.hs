@@ -13,6 +13,7 @@ import qualified Data.Map            as Map (fromSet, toAscList)
 import           Prelude             hiding (map)
 import           Data.Set            as Set hiding (foldl)
 import           Data.Set.Unicode
+import qualified Data.List           as List
 import qualified Data.List.NonEmpty  as NE
 import           Finite
 import           Common
@@ -47,12 +48,13 @@ instance Contravariant SomeEFA where
   contramap h (SomeEFA m) = SomeEFA (contramap h m)
 
 instance (Show q, Finite q, Show s, Finite s) ⇒ Show (EFA q s) where
-  show m@(EFA _ q₀ f) = "( Q  = " ++ (show . Set' . qs)                m ++
-                      "\n, Σ  = " ++ (show . Set' . sigma)             m ++
-                      "\n, δ : Q × (Σ ∪ {ε}) → P(Q)"                     ++
-                      "\n"        ++ (format'' . Map.fromList . table) m ++
-                      "\n, q0 = " ++ show q₀                             ++
-                      "\n, F  = " ++ (show . Set' $ f)                   ++ " )"
+  show m@(EFA _ q₀ f) = List.intercalate "\n, "
+                        [ "( Q  = "                      ++ (show . Set' . qs)                m
+                        ,   "Σ  = "                      ++ (show . Set' . sigma)             m
+                        ,   "δ : Q × (Σ ∪ {ε}) → P(Q)\n" ++ (format'' . Map.fromList . table) m
+                        ,   "q₀ = "                      ++ show q₀
+                        ,   "F  = "                      ++ (show . Set' $ f) ++ " )"
+                        ]
 
 instance (Show s, Finite s) ⇒ Show (SomeEFA s) where
   show (SomeEFA m) = show m

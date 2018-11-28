@@ -10,6 +10,7 @@ import           Common
 import           Data.Map            as Map (Map, fromList)
 import qualified Data.Map            as Map (fromSet, toAscList)
 import           Data.Set            as Set hiding (foldl)
+import qualified Data.List           as List
 import qualified Data.List.NonEmpty  as NE
 import           Data.Set.Unicode
 import           Data.Ord.Unicode
@@ -46,12 +47,13 @@ instance Contravariant SomeNFA where
   contramap h (SomeNFA m) = SomeNFA (contramap h m)
 
 instance (Show q, Finite q, Show s, Finite s) ⇒ Show (NFA q s) where
-  show m@(NFA _ q₀ f) = "( Q  = " ++ (show . Set' . qs)               m ++
-                      "\n, Σ  = " ++ (show . Set' . sigma)            m ++
-                      "\n, δ  : Q × Σ → P(Q)"                           ++
-                      "\n"        ++ (format' . Map.fromList . table) m ++
-                      "\n, q0 = " ++  show q₀                           ++
-                      "\n, F  = " ++ (show . Set' $ f)                  ++ " )"
+  show m@(NFA _ q₀ f) = List.intercalate "\n, "
+                        [ "( Q  = "               ++ (show . Set' . qs)               m
+                        ,   "Σ  = "               ++ (show . Set' . sigma)            m
+                        ,   "δ  : Q × Σ → P(Q)\n" ++ (format' . Map.fromList . table) m
+                        ,   "q₀ = "               ++  show q₀
+                        ,   "F  = "               ++ (show . Set' $ f) ++ " )"
+                        ]
 
 instance (Show s, Finite s) ⇒ Show (SomeNFA s) where
   show (SomeNFA m) = show m

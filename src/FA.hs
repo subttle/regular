@@ -6,6 +6,7 @@
 
 module FA where
 
+import qualified Data.List as List
 import           Data.Set as Set
 import           Data.Set.Unicode
 import           Data.Bool.Unicode
@@ -143,12 +144,13 @@ fromGraph (TG.TG a) i f = FA { delta   = δ
                              } where δ (q, s) = postSet q (a s)
 
 instance (Show q, Finite q, Show s, Finite s) ⇒ Show (FA q s) where
-  show m = "( Q = " ++ (show . Set' .      qs)          m ++
-         "\n, Σ = " ++ (show . Set' .   sigma)          m ++
-         "\n, δ : Q × Σ → P(Q)"                           ++
-         "\n"       ++ (format' . Map.fromList . table) m ++
-         "\n, I = " ++ (show . Set' . initial)          m ++
-         "\n, F = " ++ (show . Set' .   final)          m ++ " )"
+  show m = List.intercalate "\n, "
+           ["( Q = "               ++ (show . Set' .      qs)          m
+           ,  "Σ = "               ++ (show . Set' .   sigma)          m
+           ,  "δ : Q × Σ → P(Q)\n" ++ (format' . Map.fromList . table) m
+           ,  "I = "               ++ (show . Set' . initial)          m
+           ,  "F = "               ++ (show . Set' .   final)          m ++ " )"
+           ]
 
 -- Determinize the FA without transforming it to a DFA type
 determinization ∷ (Finite q) ⇒ FA q s → FA (Set q) s
