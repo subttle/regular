@@ -3,5 +3,5 @@ extra-package-dbs: []
 packages:
 - .
 extra-deps:
-- algebraic-graphs-0.2
+- algebraic-graphs-0.3
 resolver: lts-12.20
