@@ -182,6 +182,7 @@ cofinite = finite . complement
 
 -- Theorem (Cerny, 1964): A DFA M is (directable) synchronizing iff ∀q ∈ Q, ∃p ∈ Q, ∃w ∈ Σ★: δ(q,w) = δ(p, w)
 -- That is, there exists a word w, such that evaluation of w from from any state, q, always ends up in the same state, p.
+-- "A DFA is synchronizing if there exists a word that sends all states of the automaton to the same state." - https://arxiv.org/abs/1507.06070
 synchronizing ∷ (Finite q, Finite s) ⇒                  DFA q s → Bool
 synchronizing = not . isZero . power
           where power ∷ (Finite q) ⇒ DFA q s → DFA (Set q) s -- FIXME supposed to be a non-empty set -- TODO alter this to check for shortest path to get shortest reset word?
