@@ -25,7 +25,6 @@ library
                      , profunctors
                      , pointed
                      , fin
-                     , universe
   default-language:    Haskell2010
   default-extensions: UnicodeSyntax
                       ScopedTypeVariables
@@ -45,7 +44,7 @@ executable regular-exe
                      , profunctors
                      , pointed
                      , fin
-                     , universe
+                     , algebraic-graphs
   default-extensions: UnicodeSyntax
                       ScopedTypeVariables
                       GADTs
