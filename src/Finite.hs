@@ -11,6 +11,7 @@ module Finite where
 import           Data.Set as Set
 import           Data.Set.Unicode
 import           Data.Eq.Unicode
+import           Numeric.Natural.Unicode
 import           Control.Monad
 import           Control.Applicative
 import           Data.Maybe

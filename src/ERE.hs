@@ -10,6 +10,7 @@ module ERE where
 
 import           Common
 import           Data.Set.Unicode
+import           Numeric.Natural.Unicode
 import           Data.Pointed
 import           Finite (Finite, Σ)
 

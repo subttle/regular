@@ -33,6 +33,7 @@ import           Data.Set.Unicode
 import           Data.Bool.Unicode
 import           Data.Foldable (toList)
 import           Data.Pointed
+import           Numeric.Natural.Unicode
 import           Numeric.Additive.Class (Additive, (+), Idempotent, Abelian)
 import           Numeric.Order.Class
 import           Numeric.Algebra.Class (Monoidal, Multiplicative, (*), zero, LeftModule, (.*), RightModule, (*.), Semiring, sumWith)
@@ -199,12 +200,13 @@ instance (Ord s) ⇒ KleeneAlgebra (RegExp s) where
   star α        = Star α
 
 instance (Show s) ⇒ Show (RegExp s) where
-   show Zero     = "∅"
-   show One      = "ε"
-   show (Lit  σ) = show σ
-   show (α :| β) = "(" ++ show α ++ "∣" ++ show β ++ ")"
-   show (α :. β) = "(" ++ show α ++ "·" ++ show β ++ ")"
-   show (Star α) = "(" ++ show α ++ ")★"
+  show ∷ Show s ⇒ RegExp s → String
+  show Zero     = "∅"
+  show One      = "ε"
+  show (Lit  σ) = show σ
+  show (α :| β) = "(" ++ show α ++ "∣" ++ show β ++ ")"
+  show (α :. β) = "(" ++ show α ++ "·" ++ show β ++ ")"
+  show (Star α) = "(" ++ show α ++ ")★"
 
 instance Pointed RegExp where
   point ∷ s → RegExp s

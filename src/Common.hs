@@ -10,10 +10,7 @@ import           Data.Set.Unicode
 import           Data.List as List
 import           Data.Foldable as Foldable
 import           Control.Monad
-import           Numeric.Natural
-
--- TODO deleteme after this is closed: https://github.com/roelvandijk/base-unicode-symbols/issues/18
-type ℕ = Natural
+import           Numeric.Natural.Unicode
 
 -- type level flip
 newtype Flip t b a = Flip { unFlip ∷ t a b }

@@ -3,6 +3,7 @@ import Examples
 import Common
 import Finite
 import Config
+import Numeric.Natural.Unicode
 
 main'' ∷ IO ()
 main'' = mapM_ (\n → putStrLn (fizzbuzz n)) [1 .. 100]

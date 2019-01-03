@@ -9,6 +9,7 @@ import           Data.Set as Set
 import           Data.Set.Unicode
 import           Data.Eq.Unicode
 import           Data.Bool.Unicode
+import           Numeric.Natural.Unicode
 import qualified TransitionGraph as TG
 
 -- When `occupy` is `q` the automaton is deterministic, and when `occupy` is `Set q` it enables nondeterminism
