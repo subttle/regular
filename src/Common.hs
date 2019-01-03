@@ -9,6 +9,7 @@ import qualified Data.Set as Set
 import           Data.Set.Unicode
 import           Data.List as List
 import           Data.Foldable as Foldable
+import           Control.Applicative (liftA2)
 import           Control.Monad
 import           Numeric.Natural.Unicode
 
@@ -68,6 +69,11 @@ fixedPoint f x
   | f x == x  = x
   | otherwise = fixedPoint f (f x)
 
+-- `replicateM` with parameter of type ℕ (instead of parameter of type ℤ)
+replicateM' ∷ (Applicative m) ⇒ ℕ → m a → m [a]
+replicateM' 0 _ = pure []
+replicateM' n f = liftA2 (:) f (replicateM' (n - 1) f)
+
 -- Something like free monoid. Lazily generate all possible finite sequences over the given alphabet.
 freeMonoid ∷ [a] → [[a]]
 freeMonoid []       = [[]]
@@ -76,7 +82,7 @@ freeMonoid alphabet = concatMap (`replicateM` alphabet) [0..]
 -- FIXME test, comment etc.
 freeMonoidFrom ∷ ℕ → [s] → [[s]]
 freeMonoidFrom 0 = freeMonoid
-freeMonoidFrom n = ([n..] >>=) . flip (replicateM . fromIntegral)
+freeMonoidFrom n = ([n..] >>=) . flip replicateM'
 
 -- Something like free semigroup over the given alphabet
 freeSemigroup ∷ [a] → [[a]]
