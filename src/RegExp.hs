@@ -200,13 +200,13 @@ instance (Ord s) ⇒ KleeneAlgebra (RegExp s) where
   star α        = Star α
 
 instance (Show s) ⇒ Show (RegExp s) where
-  show ∷ Show s ⇒ RegExp s → String
-  show Zero     = "∅"
-  show One      = "ε"
-  show (Lit  σ) = show σ
-  show (α :| β) = "(" ++ show α ++ "∣" ++ show β ++ ")"
-  show (α :. β) = "(" ++ show α ++ "·" ++ show β ++ ")"
-  show (Star α) = "(" ++ show α ++ ")★"
+  showsPrec ∷ Show s ⇒ Int → RegExp s → ShowS
+  showsPrec _          Zero     = showString "∅"
+  showsPrec _          One      = showString "ε"
+  showsPrec _          (Lit  σ) = shows σ
+  showsPrec precedence (α :| β) = showParen (precedence >= 6) (showsPrec 6 α . showString "∣" . showsPrec 6 β)
+  showsPrec precedence (α :. β) = showParen (precedence >= 7) (showsPrec 6 α . showString "·" . showsPrec 7 β)
+  showsPrec precedence (Star α) = showParen (precedence >= 8) (showsPrec 8 α . showString "★")
 
 instance Pointed RegExp where
   point ∷ s → RegExp s
@@ -282,15 +282,14 @@ height (α :. β) = max (height α) (height β)
 height (Star α) = 1 + height α
 
 heightAlgebra ∷ Algebra (RegExpF s) ℕ
-heightAlgebra = Algebra heightf
-        where heightf ∷ RegExpF s ℕ → ℕ
-              heightf ZeroF         = 0
-              heightf OneF          = 0
-              heightf (LitF  _)     = 0
-              heightf (UnionF  α β) = max α β
-              heightf (ConcatF α β) = max α β
-              heightf (StarF   α)   = 1 + α
-
+heightAlgebra = Algebra φ
+        where φ ∷ RegExpF s ℕ → ℕ
+              φ ZeroF         = 0
+              φ OneF          = 0
+              φ (LitF  _)     = 0
+              φ (UnionF  α β) = max α β
+              φ (ConcatF α β) = max α β
+              φ (StarF   α)   = 1 + α
 
 -- https://arxiv.org/pdf/0802.2869.pdf
 -- "We define the size of an extended regular expression r over Σ, denoted by |r|, as
@@ -304,16 +303,15 @@ size (α :| β) = 1 + RegExp.size α + RegExp.size β
 size (α :. β) = 1 + RegExp.size α + RegExp.size β
 size (Star α) = 1 + RegExp.size α
 
--- TODO if this is unambiguous it can be written `φ` instead of `sizef`? https://wiki.haskell.org/Catamorphisms
 sizeAlgebra ∷ Algebra (RegExpF s) ℕ
-sizeAlgebra = Algebra sizef
-        where sizef ∷ RegExpF s ℕ → ℕ
-              sizef ZeroF         = 1
-              sizef OneF          = 1
-              sizef (LitF _)      = 1
-              sizef (UnionF  α β) = 1 + α + β
-              sizef (ConcatF α β) = 1 + α + β
-              sizef (StarF   α)   = 1 + α
+sizeAlgebra = Algebra φ
+        where φ ∷ RegExpF s ℕ → ℕ
+              φ ZeroF         = 1
+              φ OneF          = 1
+              φ (LitF _)      = 1
+              φ (UnionF  α β) = 1 + α + β
+              φ (ConcatF α β) = 1 + α + β
+              φ (StarF   α)   = 1 + α
 
 -- Associativity, commutativity and idempotency (ACI) properties normalized
 -- Note:  ℒ(γ) ≡ ℒ(normalize γ)
