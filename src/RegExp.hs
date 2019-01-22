@@ -31,6 +31,7 @@ import           Data.List as List hiding (last, map)
 import           Data.Set as Set
 import           Data.Set.Unicode
 import           Data.Bool.Unicode
+import           Data.Ord.Unicode
 import           Data.Foldable (toList)
 import           Data.Pointed
 import           Numeric.Natural.Unicode
@@ -204,9 +205,9 @@ instance (Show s) ⇒ Show (RegExp s) where
   showsPrec _          Zero     = showString "∅"
   showsPrec _          One      = showString "ε"
   showsPrec _          (Lit  σ) = shows σ
-  showsPrec precedence (α :| β) = showParen (precedence >= 6) (showsPrec 6 α . showString "∣" . showsPrec 6 β)
-  showsPrec precedence (α :. β) = showParen (precedence >= 7) (showsPrec 6 α . showString "·" . showsPrec 7 β)
-  showsPrec precedence (Star α) = showParen (precedence >= 8) (showsPrec 8 α . showString "★")
+  showsPrec precedence (α :| β) = showParen (precedence ≥ 6) (showsPrec 6 α . showString "∣" . showsPrec 6 β)
+  showsPrec precedence (α :. β) = showParen (precedence ≥ 7) (showsPrec 6 α . showString "·" . showsPrec 7 β)
+  showsPrec precedence (Star α) = showParen (precedence ≥ 8) (showsPrec 8 α . showString "★")
 
 instance Pointed RegExp where
   point ∷ s → RegExp s
