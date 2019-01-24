@@ -206,7 +206,7 @@ instance (Show s) ⇒ Show (RegExp s) where
   showsPrec _          One      = showChar 'ε'
   showsPrec _          (Lit  σ) = shows σ
   showsPrec precedence (α :| β) = showParen (precedence ≥ 6) (showsPrec 6 α . showChar '∣' . showsPrec 6 β)
-  showsPrec precedence (α :. β) = showParen (precedence ≥ 7) (showsPrec 6 α . showChar '·' . showsPrec 7 β)
+  showsPrec precedence (α :. β) = showParen (precedence ≥ 7) (showsPrec 7 α . showChar '·' . showsPrec 7 β)
   showsPrec precedence (Star α) = showParen (precedence ≥ 8) (showsPrec 8 α . showChar '★')
 
 instance Pointed RegExp where
