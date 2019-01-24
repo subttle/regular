@@ -379,12 +379,12 @@ language γ | RegExp.finite γ' = Set.toList (language' γ')
            language' Zero     = (∅)
            -- The language consisting of the empty string,     {ε}
            language' One      = Set.singleton []
-            -- The language consisting of a literal symbol,     {σ}, for σ ∈ Σ
+           -- The language consisting of a literal symbol,     {σ}, for σ ∈ Σ
            language' (Lit  σ) = Set.singleton [σ]
            -- ℒ(E ∣ F) = ℒ(E) ∪ ℒ(F)
            language' (α :| β) = language' α ∪ language' β
            -- ℒ(E · F) = ℒ(E) · ℒ(F) = { w₁ · w₂ | w₁ ∈ ℒ(E) ∧ w₂ ∈ ℒ(F) }
-           language' (α :. β) = foldMap (\w₁ → (Set.map (\w₂ → w₁ ++ w₂) (language' β))) (language' α)
+           language' (α :. β) = foldMap (\w₁ → Set.map (\w₂ → w₁ ++ w₂) (language' β)) (language' α)
            -- ℒ(E★)  = (ℒ(E))★  -- Providing this comment for completeness but this case is impossible
            language' (Star _) = impossible -- if the RegExp is normalized and finite then this case is impossible!
 
