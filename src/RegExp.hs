@@ -27,6 +27,7 @@ isZero, KleeneAlgebra) where
 import           Common
 import           Finite
 import           Prelude hiding ((+), (*), last, map)
+import           Control.Monad
 import           Data.List as List hiding (last, map)
 import           Data.Set as Set
 import           Data.Set.Unicode
@@ -215,17 +216,15 @@ instance Pointed RegExp where
 
 instance Applicative RegExp where
   pure ∷ s → RegExp s
-  pure = point
+  pure = return
 
   (<*>) ∷ RegExp (a → b) → RegExp a → RegExp b
-  (<*>) Zero     _ = Zero
-  (<*>) One      _ = One
-  (<*>) (Lit  f) γ = fmap f γ
-  (<*>) (α :| β) γ = (α <*> γ) :| (β <*> γ)
-  (<*>) (α :. β) γ = (α <*> γ) :. (β <*> γ)
-  (<*>) (Star α) γ = Star (α <*> γ)
+  (<*>) = ap
 
 instance Monad RegExp where
+  return ∷ s → RegExp s
+  return = point
+
   (>>=) ∷ RegExp a → (a → RegExp b) → RegExp b
   (>>=) Zero     _ = Zero
   (>>=) One      _ = One
