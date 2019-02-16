@@ -5,6 +5,7 @@
 {-# LANGUAGE DeriveFunctor             #-}
 {-# LANGUAGE DeriveFoldable            #-}
 {-# LANGUAGE DeriveTraversable         #-}
+{-# LANGUAGE DeriveGeneric             #-}
 {-# OPTIONS_GHC -Wall                  #-}
 
 module RegExp (RegExp (..), one, zero, literal, (*), (+), star, (*.), (.*),
@@ -44,6 +45,7 @@ import           Numeric.Algebra.Involutive
 import           Numeric.Semiring.ZeroProduct (ZeroProductSemiring)
 import           Numeric.Decidable.Zero
 import           Numeric.Dioid.Class
+import           GHC.Generics
 
 -- α, β ⩴ ∅ | ε | σ | α∣β | α·β | α★  where σ ∈ Σ
 data RegExp s where
@@ -53,7 +55,7 @@ data RegExp s where
   (:|) ∷ RegExp s → RegExp s → RegExp s  -- Union, plus, or            -- ℒ(α ∣ β) = ℒ(α) ∪ ℒ(β)
   (:.) ∷ RegExp s → RegExp s → RegExp s  -- Concatenation              -- ℒ(α · β) = ℒ(α) · ℒ(β)
   Star ∷            RegExp s → RegExp s  -- Kleene star, repetition    -- ℒ(α★)    = ℒ(α)★
-  deriving (Eq, Ord, Functor, Foldable, Traversable)
+  deriving (Eq, Ord, Functor, Foldable, Traversable, Generic1)
 
 -- TODO coinductive Kleene Algebra http://www.math.ucla.edu/~znorwood/290d.2.14s/papers/Rutten-v1.pdf
 -- also A coalgebraic approach to Kleene algebra with tests
