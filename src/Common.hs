@@ -16,8 +16,10 @@ import           Numeric.Natural.Unicode
 -- type level flip
 newtype Flip t b a = Flip { unFlip ∷ t a b }
 
-newtype   Algebra f t =   Algebra (f t →   t)
-newtype CoAlgebra f t = CoAlgebra (  t → f t)
+newtype    Algebra f t =    Algebra (f         t  →                   t)
+newtype  CoAlgebra f t =  CoAlgebra (          t  → f                 t)
+newtype   RAlgebra f t =   RAlgebra (f (Fix f, t) →                   t)
+newtype RCoAlgebra f t = RCoAlgebra (          t  → f (Either (Fix f) t))
 
 newtype Fix f = Fix (f (Fix f))
 
@@ -25,12 +27,20 @@ unFix ∷ Fix f → f (Fix f)
 unFix (Fix x) = x
 
 -- Catamorphism
-cata ∷ Functor f ⇒ Algebra f a → Fix f → a
+cata ∷ (Functor f) ⇒ Algebra f a → Fix f → a
 cata (Algebra alg) = alg . fmap (cata (Algebra alg)) . unFix
 
 -- Anamorphism
-ana ∷ Functor f ⇒ CoAlgebra f a → a → Fix f
+ana ∷ (Functor f) ⇒ CoAlgebra f a → a → Fix f
 ana (CoAlgebra coalg) = Fix . fmap (ana (CoAlgebra coalg)) . coalg
+
+-- Paramorphism
+para ∷ (Functor f) ⇒ RAlgebra f a → Fix f → a
+para (RAlgebra ralg) = ralg . fmap (\t → (t, para (RAlgebra ralg) t)) . unFix
+
+-- Apomorphism
+apo ∷ (Functor f) ⇒ RCoAlgebra f a → a → Fix f
+apo (RCoAlgebra rcoalg) = Fix . fmap (either id (apo (RCoAlgebra rcoalg))) . rcoalg
 
 -- requires containers-0.5.11 or newer
 -- TODO deleteme after this is closed: https://github.com/roelvandijk/containers-unicode-symbols/issues/6
