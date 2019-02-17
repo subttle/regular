@@ -28,6 +28,10 @@ unFix (Fix x) = x
 cata ∷ Functor f ⇒ Algebra f a → Fix f → a
 cata (Algebra alg) = alg . fmap (cata (Algebra alg)) . unFix
 
+-- Anamorphism
+ana ∷ Functor f ⇒ CoAlgebra f a → a → Fix f
+ana (CoAlgebra coalg) = Fix . fmap (ana (CoAlgebra coalg)) . coalg
+
 -- requires containers-0.5.11 or newer
 -- TODO deleteme after this is closed: https://github.com/roelvandijk/containers-unicode-symbols/issues/6
 (×) ∷ (Ord a, Ord b) ⇒ Set a → Set b → Set (a, b)
@@ -46,12 +50,13 @@ infixl 5 <<-
 (<<-) ∷ (Ord a) ⇒ a → Set a → Set a
 (<<-) = Set.insert
 
--- https://mail.haskell.org/pipermail/libraries/2016-January/026565.html
+while ∷ (a → Bool) → (a → a) → a → a
+while p = until (not . p)
+
 -- Boolean implication.
-infix 4 `implies` 
 implies ∷ Bool → Bool → Bool
-implies True  b = b
-implies False _ = True
+implies True  = id
+implies False = const True
 
 -- Two sets intersect if A ∩ B ≠ ∅
 intersects ∷ (Ord a) ⇒ Set a → Set a → Bool
