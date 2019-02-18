@@ -9,6 +9,7 @@ import qualified Data.Set as Set
 import           Data.Set.Unicode
 import           Data.List as List
 import           Data.Foldable as Foldable
+import           Data.Functor.Foldable (Fix (..), unfix)
 import           Control.Applicative (liftA2)
 import           Control.Monad
 import           Numeric.Natural.Unicode
@@ -21,14 +22,9 @@ newtype  CoAlgebra f t =  CoAlgebra (          t  → f                 t)
 newtype   RAlgebra f t =   RAlgebra (f (Fix f, t) →                   t)
 newtype RCoAlgebra f t = RCoAlgebra (          t  → f (Either (Fix f) t))
 
-newtype Fix f = Fix (f (Fix f))
-
-unFix ∷ Fix f → f (Fix f)
-unFix (Fix x) = x
-
 -- Catamorphism
 cata ∷ (Functor f) ⇒ Algebra f a → Fix f → a
-cata (Algebra alg) = alg . fmap (cata (Algebra alg)) . unFix
+cata (Algebra alg) = alg . fmap (cata (Algebra alg)) . unfix
 
 -- Anamorphism
 ana ∷ (Functor f) ⇒ CoAlgebra f a → a → Fix f
@@ -36,7 +32,7 @@ ana (CoAlgebra coalg) = Fix . fmap (ana (CoAlgebra coalg)) . coalg
 
 -- Paramorphism
 para ∷ (Functor f) ⇒ RAlgebra f a → Fix f → a
-para (RAlgebra ralg) = ralg . fmap (\t → (t, para (RAlgebra ralg) t)) . unFix
+para (RAlgebra ralg) = ralg . fmap (\t → (t, para (RAlgebra ralg) t)) . unfix
 
 -- Apomorphism
 apo ∷ (Functor f) ⇒ RCoAlgebra f a → a → Fix f

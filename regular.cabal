@@ -20,6 +20,7 @@ library
                      , containers >= 0.5.11.0
                      , containers-unicode-symbols
                      , contravariant
+                     , recursion-schemes
                      , algebra
                      , algebraic-graphs
                      , profunctors

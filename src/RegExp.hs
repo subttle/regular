@@ -35,6 +35,7 @@ import           Data.Set.Unicode
 import           Data.Bool.Unicode
 import           Data.Ord.Unicode
 import           Data.Foldable (toList)
+import           Data.Functor.Foldable (Fix (..))
 import           Data.Pointed
 import           Numeric.Natural.Unicode
 import           Numeric.Additive.Class (Additive, (+), Idempotent, Abelian)
@@ -468,7 +469,7 @@ matches α         [] = constant α == One
 matches α    (a : w) = matches (derivative α a) w
 
 -- automorphism -- http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.50.7458&rep=rep1&type=pdf
-reversal ∷ (Ord s) ⇒ RegExp s → RegExp s
+reversal ∷ RegExp s → RegExp s
 reversal Zero     = Zero
 reversal One      = One
 reversal (Lit  σ) = Lit σ
