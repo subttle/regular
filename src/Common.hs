@@ -38,6 +38,10 @@ para (RAlgebra ralg) = ralg . fmap (\t → (t, para (RAlgebra ralg) t)) . unfix
 apo ∷ (Functor f) ⇒ RCoAlgebra f a → a → Fix f
 apo (RCoAlgebra rcoalg) = Fix . fmap (either id (apo (RCoAlgebra rcoalg))) . rcoalg
 
+-- Metamorphism (Gibbons')
+meta ∷ (Functor f, Functor g) ⇒ Algebra f a → CoAlgebra g b → (a → b) → Fix f → Fix g
+meta alg coalg h = ana coalg . h . cata alg
+
 -- requires containers-0.5.11 or newer
 -- TODO deleteme after this is closed: https://github.com/roelvandijk/containers-unicode-symbols/issues/6
 (×) ∷ (Ord a, Ord b) ⇒ Set a → Set b → Set (a, b)
