@@ -42,6 +42,10 @@ apo (RCoAlgebra rcoalg) = Fix . fmap (either id (apo (RCoAlgebra rcoalg))) . rco
 meta ∷ (Functor f, Functor g) ⇒ Algebra f a → CoAlgebra g b → (a → b) → Fix f → Fix g
 meta alg coalg h = ana coalg . h . cata alg
 
+-- Hylomorphism
+hylo :: (Functor f) ⇒ Algebra f a → CoAlgebra f b → b → a
+hylo (Algebra alg) (CoAlgebra coalg) = alg . fmap (hylo (Algebra alg) (CoAlgebra coalg)) . coalg
+
 -- requires containers-0.5.11 or newer
 -- TODO deleteme after this is closed: https://github.com/roelvandijk/containers-unicode-symbols/issues/6
 (×) ∷ (Ord a, Ord b) ⇒ Set a → Set b → Set (a, b)
