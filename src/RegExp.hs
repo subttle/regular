@@ -10,7 +10,7 @@
 
 module RegExp (RegExp (..), one, zero, literal, (*), (+), star, (*.), (.*),
 language, finite, infinite, nullable,
-derivative, derivative',
+derivative, derivative', derivatives,
 matches, constant, reversal,
 normalize,
 similar, dissimilar,
@@ -118,15 +118,9 @@ instance (Ord s) ⇒ Additive (RegExp s) where
 -- a + a = a
 instance (Ord s) ⇒ Idempotent (RegExp s) where
 
+-- A partial order (a, ≤)
+-- TODO With respect to ≤, K is an upper semilattice with join given by + and minimum element 0.
 instance (Ord s) ⇒ Order (RegExp s) where
-  -- http://www.inf.ed.ac.uk/teaching/courses/inf2a/slides/2014_inf2a_L05_slides.pdf
-  -- "
-  -- α ≤ β means L(α) ⊆ L(β) (or equivalently α + β = β).
-  -- it follows that
-  -- αγ + β ≤ γ ⇒ α∗β ≤ γ
-  -- β + γα ≤ γ ⇒ βα∗ ≤ γ
-  -- "
-  -- TODO language equality? Might need to factor distributivity first
   (<~) ∷ RegExp s → RegExp s → Bool
   (<~) α β = α + β == β
 
@@ -167,33 +161,34 @@ instance (Ord s) ⇒ ZeroProductSemiring (RegExp s) where
 -- infixl 7 * (Numeric.Algebra.Class)
 infixr 8 `star`  -- Numeric.Exp?
 
--- A Kleene algebra is a dioid (idempotent semiring) with star and an annihilator for multiplication
---        α + α ≡ α            -- (+) Idempotent
---        α + 1 ≡ α            -- (+) Right identity
---        1 + α ≡ α            -- (+) Left  identity
---        α + β ≡ β + α        -- (+) Commutivity
---  (α + β) + γ ≡ α + (β + γ)  -- (+) Associativity
---        (αβ)γ ≡ α(βγ)        -- (*) Associativity
---           α0 ≡ 0            -- (*) Right annihilator
---           0α ≡ 0            -- (*) Left  annihilator
---     α(β + γ) ≡ αβ + αγ      -- Left distributivity
---     (β + γ)α ≡ βα + γα      -- Right distributivity
--- TODO replace these with axioms below
---           0★ ≡ 1
---           1★ ≡ 1
---          α★★ ≡ α★           -- (★) IdempotentFun
+-- A Kleene algebra is an algebraic structure K = (k, +, ∙, ★, 0, 1)
+-- satisfying the following equations and equational implications:
+--  (α + β) + γ = α + (β + γ)  -- (+) Associativity
+--        α + β = β + α        -- (+) Commutivity
+--        α + 0 = α            -- (+) Identity
+--        α + α = α            -- (+) Idempotent
+--        (αβ)γ = α(βγ)        -- (∙) Associativity
+--           1α = α            -- (∙) Left identity
+--           α1 = α            -- (∙) Right identity
+--        α + 1 = α            -- (+) Right identity
+--        1 + α = α            -- (+) Left  identity
+--     α(β + γ) = αβ + αγ      -- Left distributivity
+--     (β + γ)α = βα + γα      -- Right distributivity
+--           0α = 0            -- (∙) Left  annihilator
+--           α0 = 0            -- (∙) Right annihilator
+--      1 + αα★ ≤ α★           -- (★) Unfold
+--      1 + α★α ≤ α★           -- (★) Unfold
+--   β + αγ ≤ γ ⇒ α★β ≤ γ      -- (★) Induction
+--   β + γα ≤ γ ⇒ βα★ ≤ γ      -- (★) Induction
+-- where ≤ refers to the natural partial order on K:
+--      (α ≤ β) ↔ (α + β) = β
+-- A Completeness Theorem for Kleene Algebras and
+-- the Algebra of Regular Events
+-- Kozen
+-- https://www.cs.cornell.edu/~kozen/Papers/ka.pdf
 
--- TODO Arden’s rule: Given an equation of the form X = αX + β, its smallest solution is X = α∗β. What’s more, if  6∈ L(α), this is the only solution. http://www.inf.ed.ac.uk/teaching/courses/inf2a/slides/2014_inf2a_L05_slides.pdf
--- http://events.cs.bham.ac.uk/mgs2012/lectures/StruthSlides.pdf
--- http://hoefner-online.de/home/pdfs_tr/trCS-07-04-Shef.pdf
--- 1 + αα★ ≤ α★          -- star unfold axiom
--- 1 + α★α ≤ α★
--- β + αγ  ≤ γ ⇒ α★β ≤ γ -- star induction axiom
--- β + γα  ≤ γ ⇒ βα★ ≤ γ
-
--- FIXME: So I need to add the Order, right? Can I move the Definition down here then?
--- N.B. These functions (`star`, `(+)`, and `(*)`) assume they were passed a normalized regular expression.
-class (Dioid a, ZeroProductSemiring a) ⇒ KleeneAlgebra a where
+-- N.B. These functions (`star`, `(+)`, and `(*)`) assume they were passed already normalized regular expressions.
+class (Dioid a, ZeroProductSemiring a, Order a) ⇒ KleeneAlgebra a where
   star ∷ a → a
 
 instance (Ord s) ⇒ KleeneAlgebra (RegExp s) where
@@ -441,6 +436,9 @@ derivative (Star α) σ =  derivative α σ * star α
 -- "The derivative of a language ℒ ⊆ Σ★ with respect to a string w ∈ Σ★ is defined to be ∂w ℒ = { v | w · v ∈ ℒ }."
 derivative' ∷ (Ord s) ⇒ RegExp s → [s] → RegExp s
 derivative' = List.foldl derivative
+
+derivatives ∷ (Finite s) ⇒ RegExp s → Set (RegExp s)
+derivatives a = map (derivative a) asSet
 
 -- "Antimirov [2] proposed the notion of partial derivative, which is a nondeterministic
 -- version of the Brzozowski derivative. Instead of a deterministic finite automaton, the
