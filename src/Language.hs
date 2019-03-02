@@ -39,6 +39,9 @@ lit _ _    = False
 complement ∷ ℒ s → ℒ s
 complement ℓ = not . ℓ
 
+reversed ∷ ℒ s → ℒ s
+reversed ℓ = ℓ . reverse
+
 union ∷ ℒ s → ℒ s → ℒ s
 union ℓ₁ ℓ₂ w = ℓ₁ w ∨ ℓ₂ w
 
