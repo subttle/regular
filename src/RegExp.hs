@@ -15,7 +15,7 @@ matches, constant, reversal,
 normalize,
 similar, dissimilar,
 fromSet, RegExp.fromList, RegExp.toSet, RegExp.toList,
-fromLang,
+fromWords,
 partial, partial',
 linear,
 first, last,
@@ -27,6 +27,7 @@ isZero, KleeneAlgebra) where
 
 import           Common
 import           Finite
+import qualified Language
 import           Prelude hiding ((+), (*), last, map)
 import           Control.Monad
 import           Data.List as List hiding (last, map)
@@ -240,8 +241,8 @@ fromSet = sumWith point
 fromList ∷ [s] → RegExp s
 fromList = productWith point
 
-fromLang ∷ (Ord s) ⇒ [[s]] → RegExp s
-fromLang = sumWith RegExp.fromList
+fromWords ∷ (Ord s) ⇒ [[s]] → RegExp s
+fromWords = sumWith RegExp.fromList
 
 -- "occurences"
 -- http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.56.3425&rep=rep1&type=pdf pg 46. def 4.57
@@ -384,6 +385,14 @@ language γ | RegExp.finite γ' = Set.toList (language' γ')
            language' (α :. β) = foldMap (\w₁ → Set.map (\w₂ → w₁ ++ w₂) (language' β)) (language' α)
            -- ℒ(E★)  = (ℒ(E))★  -- Providing this comment for completeness but this case is impossible
            language' (Star _) = impossible -- if the RegExp is normalized and finite then this case is impossible!
+
+toLanguage ∷ (Finite s) ⇒ RegExp s → Language.ℒ s
+toLanguage Zero     = Language.empty
+toLanguage One      = Language.epsilon
+toLanguage (Lit  σ) = Language.lit σ
+toLanguage (α :| β) = Language.union       (toLanguage α) (toLanguage β)
+toLanguage (α :. β) = Language.concatenate (toLanguage α) (toLanguage β)
+toLanguage (Star α) = Language.star        (toLanguage α)
 
 convert ∷ (Ord s) ⇒ RegExp s → Fix (RegExpF s)
 convert Zero     = Fix ZeroF
