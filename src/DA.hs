@@ -8,7 +8,7 @@ module DA where
 import qualified Language
 import           Language (ℒ)
 -- import           Finite
--- import           Data.Bool.Unicode
+import           Data.Bool.Unicode
 -- import           Data.Functor.Contravariant
 -- import           Data.Functor.Contravariant.Divisible
 -- import           Data.Void
@@ -46,3 +46,16 @@ empty = DA { output     = const False
 
 complement ∷ DA q s → DA q s
 complement m@(DA o _) = m { output = not . o }
+
+intersection ∷ DA q s → DA p s → DA (q, p) s
+intersection (DA o₁ t₁) (DA o₂ t₂) = DA { output     = \(q , p)   → o₁ q ∧ o₂ p
+                                        , transition = \(q , p) σ → (t₁ q σ , t₂ p σ)
+                                        }
+
+union ∷ DA q s → DA p s → DA (q, p) s
+union (DA o₁ t₁) (DA o₂ t₂) = DA { output     = \(q , p)   → o₁ q ∨ o₂ p
+                                 , transition = \(q , p) σ → (t₁ q σ , t₂ p σ)
+                                 }
+
+difference ∷ DA q s → DA p s → DA (q, p) s
+difference m₁ m₂ = intersection m₁ (complement m₂)
