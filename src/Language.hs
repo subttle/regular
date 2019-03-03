@@ -1,6 +1,10 @@
+{-# LANGUAGE MultiParamTypeClasses     #-}
+{-# LANGUAGE FlexibleInstances         #-}
+
 module Language where
 
 import           Common
+import           Finite
 import           Data.Bool.Unicode
 import           Data.List
 import qualified Data.List.NonEmpty as NE
@@ -12,6 +16,8 @@ import           Data.Functor.Contravariant
 
 -- Language over Σ
 type ℒ s = [s] → Bool
+
+instance (Finite s) ⇒ Σ (ℒ s) s
 
 -- provided for convenience/clarity.
 -- ℓ `accepts` w ≡ ℓ w
@@ -75,3 +81,6 @@ derivative' ℓ v w = ℓ (v ++ w)
 -- some useful instances are defined over this type
 predicate ∷ ℒ s → Predicate [s]
 predicate = Predicate
+
+language ∷ (Finite s) ⇒ ℒ s → [[s]]
+language ℓ = filter ℓ (sigmaStar ℓ)
