@@ -9,6 +9,7 @@
 module ERE where
 
 import           Common
+import           Control.Monad
 import           Data.Set.Unicode
 import           Numeric.Natural.Unicode
 import           Data.Pointed
@@ -56,19 +57,15 @@ instance Pointed ExRE where
 
 instance Applicative ExRE where
   pure ∷ s → ExRE s
-  pure = point
+  pure = return
 
   (<*>) ∷ ExRE (a → b) → ExRE a → ExRE b
-  (<*>) Zero     _ = Zero
-  (<*>) One      _ = One
-  (<*>) (Lit  f) γ = fmap f γ
-  (<*>) (α :| β) γ = (α <*> γ) :| (β <*> γ)
-  (<*>) (α :. β) γ = (α <*> γ) :. (β <*> γ)
-  (<*>) (α :& β) γ = (α <*> γ) :& (β <*> γ)
-  (<*>) (Comp α) γ = Comp (α <*> γ)
-  (<*>) (Star α) γ = Star (α <*> γ)
+  (<*>) = ap
 
 instance Monad ExRE where
+  return ∷ s → ExRE s
+  return = point
+
   (>>=) ∷ ExRE a → (a → ExRE b) → ExRE b
   (>>=) Zero     _ = Zero
   (>>=) One      _ = One
