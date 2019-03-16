@@ -13,7 +13,7 @@ language, finite, infinite, nullable,
 derivative, derivative', derivatives,
 matches, constant, reversal,
 normalize,
-similar, dissimilar,
+similar, dissimilar, equivalent,
 fromSet, RegExp.fromList, RegExp.toSet, RegExp.toList,
 fromWords, toLanguage,
 partial, partial',
@@ -31,7 +31,7 @@ import qualified Language
 import           Prelude hiding ((+), (*), last, map)
 import           Control.Monad
 import           Data.List as List hiding (last, map)
-import           Data.Set as Set
+import           Data.Set as Set hiding ((\\))
 import           Data.Set.Unicode
 import           Data.Bool.Unicode
 import           Data.Ord.Unicode
@@ -328,6 +328,18 @@ similar a b = normalize a == normalize b
 
 dissimilar ∷ (Eq s, Ord s) ⇒ RegExp s → RegExp s → Bool
 dissimilar a b = not (similar a b)
+
+equivalent ∷ forall s . (Finite s) ⇒ RegExp s → RegExp s → Bool
+equivalent a b = and (List.unfoldr bisim seed)
+      where seed = ([(normalize a, normalize b)], [])
+            bisim ∷ (Finite s)
+                  ⇒ ([(RegExp s, RegExp s)], [(RegExp s, RegExp s)])
+                  → Maybe (Bool, ([(RegExp s, RegExp s)], [(RegExp s, RegExp s)]))
+            bisim ([],            _      ) = Nothing
+            bisim ((α, β) : todo, history) = Just (nullable α == nullable β, (todo', history'))
+                                      where derivatives' = fmap (\σ → (derivative α σ, derivative β σ)) asList
+                                            todo'        = (todo `mappend` derivatives') \\ history
+                                            history'     = (α, β) : history
 
 -- Return true iff every symbol σ ∈ Σ is seen as a literal at most once
 -- TODO test property that for any RE, r, `linear (mark r)` should evaluate to `true`
