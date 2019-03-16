@@ -12,6 +12,7 @@ import           Data.Foldable as Foldable
 import           Data.Functor.Foldable (Fix (..), unfix)
 import           Control.Applicative (liftA2)
 import           Control.Monad
+import           Control.Arrow ((|||), (&&&))
 import           Numeric.Natural.Unicode
 
 -- type level flip
@@ -24,27 +25,33 @@ newtype RCoAlgebra f t = RCoAlgebra (          t  → f (Either (Fix f) t))
 
 -- Catamorphism
 cata ∷ (Functor f) ⇒ Algebra f a → Fix f → a
-cata (Algebra alg) = alg . fmap (cata (Algebra alg)) . unfix
+cata (Algebra φ) = φ . fmap (cata (Algebra φ)) . unfix
 
 -- Anamorphism
 ana ∷ (Functor f) ⇒ CoAlgebra f a → a → Fix f
-ana (CoAlgebra coalg) = Fix . fmap (ana (CoAlgebra coalg)) . coalg
+ana (CoAlgebra ψ) = Fix . fmap (ana (CoAlgebra ψ)) . ψ
 
 -- Paramorphism
 para ∷ (Functor f) ⇒ RAlgebra f a → Fix f → a
-para (RAlgebra ralg) = ralg . fmap (\t → (t, para (RAlgebra ralg) t)) . unfix
+para (RAlgebra φ) = φ . fmap (\t → (t, para (RAlgebra φ) t)) . unfix
 
 -- Apomorphism
 apo ∷ (Functor f) ⇒ RCoAlgebra f a → a → Fix f
-apo (RCoAlgebra rcoalg) = Fix . fmap (either id (apo (RCoAlgebra rcoalg))) . rcoalg
+apo (RCoAlgebra ψ) = Fix . fmap (either id (apo (RCoAlgebra ψ))) . ψ
 
 -- Metamorphism (Gibbons')
 meta ∷ (Functor f, Functor g) ⇒ Algebra f a → CoAlgebra g b → (a → b) → Fix f → Fix g
-meta alg coalg h = ana coalg . h . cata alg
+meta φ ψ h = ana ψ . h . cata φ
 
 -- Hylomorphism
 hylo :: (Functor f) ⇒ Algebra f a → CoAlgebra f b → b → a
-hylo (Algebra alg) (CoAlgebra coalg) = alg . fmap (hylo (Algebra alg) (CoAlgebra coalg)) . coalg
+hylo (Algebra φ) (CoAlgebra ψ) = φ . fmap (hylo (Algebra φ) (CoAlgebra ψ)) . ψ
+
+elgot :: (Functor f) ⇒ Algebra f b → (a → Either b (f a)) → a → b
+elgot (Algebra φ) ψ = (id ||| φ . fmap (elgot (Algebra φ) ψ)) . ψ                
+
+coelgot :: (Functor f) ⇒ ((a, f b) → b) → CoAlgebra f a → a → b
+coelgot φ (CoAlgebra ψ) = φ . (id &&& fmap (coelgot φ (CoAlgebra ψ)) . ψ)
 
 -- requires containers-0.5.11 or newer
 -- TODO deleteme after this is closed: https://github.com/roelvandijk/containers-unicode-symbols/issues/6
@@ -171,14 +178,14 @@ toStrings'  = fmap ((>>= show) . Maybe.catMaybes)
 toStrings'' ∷ (Show a, Show b) ⇒ [[Either a b]] → [String]
 toStrings'' = fmap  (>>= either show show)
 
-upToLength ∷ ℕ → [[l]] → [[l]]
+upToLength ∷ ℕ → [[a]] → [[a]]
 upToLength n = takeWhile ((< n) . genericLength)
 
 interleave ∷ [[a]] → [a]
 interleave = concat . transpose
 
 -- from https://github.com/haskell/containers/issues/346
-catMaybes ∷ Ord a ⇒ Set (Maybe a) → Set a
+catMaybes ∷ (Ord a) ⇒ Set (Maybe a) → Set a
 catMaybes = Set.mapMonotonic fromJust . Set.dropWhileAntitone isNothing
 
 invert ∷ (Ord k, Ord v) ⇒ Map k v → Map v (Set k)
