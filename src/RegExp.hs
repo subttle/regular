@@ -20,7 +20,7 @@ partial, partial',
 linear,
 first, last,
 awidth, height, RegExp.size,
-heightAlgebra, sizeAlgebra,
+heightAlgebra, sizeAlgebra, languageAlg,
 convert,
 RegExp.optional, atLeastOnce, dot,
 isZero, KleeneAlgebra) where
@@ -330,7 +330,7 @@ dissimilar ∷ (Eq s, Ord s) ⇒ RegExp s → RegExp s → Bool
 dissimilar a b = not (similar a b)
 
 equivalent ∷ forall s . (Finite s) ⇒ RegExp s → RegExp s → Bool
-equivalent a b = and (List.unfoldr bisim seed)
+equivalent a b = and (unfoldr bisim seed)
       where seed = ([(normalize a, normalize b)], [])
             bisim ∷ (Finite s)
                   ⇒ ([(RegExp s, RegExp s)], [(RegExp s, RegExp s)])
@@ -405,6 +405,16 @@ toLanguage (Lit  σ) = Language.lit σ
 toLanguage (α :| β) = Language.union       (toLanguage α) (toLanguage β)
 toLanguage (α :. β) = Language.concatenate (toLanguage α) (toLanguage β)
 toLanguage (Star α) = Language.star        (toLanguage α)
+
+languageAlg ∷ (Eq s) ⇒ Algebra (RegExpF s) (Language.ℒ s)
+languageAlg = Algebra φ
+      where φ ∷ (Eq s) ⇒ RegExpF s (Language.ℒ s) → Language.ℒ s
+            φ ZeroF         = Language.empty
+            φ OneF          = Language.epsilon
+            φ (LitF σ)      = Language.lit σ
+            φ (UnionF  α β) = Language.union α β
+            φ (ConcatF α β) = Language.concatenate α β
+            φ (StarF α)     = Language.star α
 
 convert ∷ (Ord s) ⇒ RegExp s → Fix (RegExpF s)
 convert Zero     = Fix ZeroF
