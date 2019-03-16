@@ -7,9 +7,10 @@ import           Data.Map as Map
 import           Data.Set (Set)
 import qualified Data.Set as Set
 import           Data.Set.Unicode
+import           Data.Bool.Unicode
 import           Data.List as List
 import           Data.Foldable as Foldable
-import           Data.Functor.Foldable (Fix (..), unfix)
+import           Data.Functor.Foldable (Fix (..), unfix, ListF (..))
 import           Control.Applicative (liftA2)
 import           Control.Monad
 import           Control.Arrow ((|||), (&&&))
@@ -52,6 +53,12 @@ elgot (Algebra φ) ψ = (id ||| φ . fmap (elgot (Algebra φ) ψ)) . ψ
 
 coelgot :: (Functor f) ⇒ ((a, f b) → b) → CoAlgebra f a → a → b
 coelgot φ (CoAlgebra ψ) = φ . (id &&& fmap (coelgot φ (CoAlgebra ψ)) . ψ)
+
+andAlg ∷ Algebra (ListF Bool) Bool
+andAlg = Algebra φ
+  where φ ∷ ListF Bool Bool → Bool
+        φ Nil        = True
+        φ (Cons x y) = x ∧ y
 
 -- requires containers-0.5.11 or newer
 -- TODO deleteme after this is closed: https://github.com/roelvandijk/containers-unicode-symbols/issues/6
