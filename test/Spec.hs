@@ -15,6 +15,10 @@ import           Data.List as List
 import           Data.Bool.Unicode
 import           Config
 import           Data.Functor.Contravariant
+import           EasyTest
+
+suite :: Test ()
+suite = ok
 
 main ∷ IO ()
-main = putStrLn "Test suite not yet implemented"
+main = run suite
