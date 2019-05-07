@@ -25,6 +25,7 @@ import qualified GFA
 import qualified RegExp as RE
 import qualified FA
 -- import qualified PDA
+import qualified Language
 
 -- Deterministic Finite Automaton
 data DFA q s =                 -- q is the set of states, Q
@@ -438,6 +439,9 @@ toGFA m@(DFA _ q₀ f) = GFA.GFA { GFA.delta = δ }
 
 toRE ∷ (Finite q, Finite s) ⇒ DFA q s → RE.RegExp s
 toRE = GFA.toRE . toGFA
+
+toLanguage ∷ (Finite q, Finite s) ⇒ DFA q s → Language.ℒ s
+toLanguage = RE.toLanguage . toRE
 
 {-
 -- Take a DFA, m, and convert it to an PDA, p, such that ℒ(m) = ℒ(p)
