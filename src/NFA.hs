@@ -156,14 +156,14 @@ permutations s = NFA { delta = δ
                      } where δ (q, σ) | σ ∈ s ∧ σ ∉ q ∨ Set.null s = singleton (σ `insert` q)
                              δ _                                   = (∅)
 
--- Avoid using `foldl` because the base case introduces more states than necessary, i.e.
--- `foldl (\(SomeNFA acc) σ → SomeNFA (concatenate acc (literal σ))) (SomeNFA epsilon)`
--- will concatenate the last symbol in the string with epsilon.
--- Could also just use `fromRE` instead... Confirm this way is better?
+-- TODO Could just use `fromRE` instead... Confirm this way is better?
 fromList ∷ (Eq s) ⇒ [s] → SomeNFA s
 fromList []      = SomeNFA epsilon
 fromList (σ : w) = fromNE (σ NE.:| w)
 
+-- Avoid using `foldl` (as opposed to `foldl1`) because the base case introduces more states than
+-- necessary, i.e. `foldl (\(SomeNFA acc) σ → SomeNFA (concatenate acc (literal σ))) (SomeNFA epsilon)`
+-- will concatenate the last symbol in the string with epsilon.
 fromNE ∷ (Eq s) ⇒ NE.NonEmpty s → SomeNFA s
 fromNE  w = foldl1 (\(SomeNFA acc) (SomeNFA σ) → SomeNFA (concatenate acc σ)) (fmap (SomeNFA . literal) w)
 
