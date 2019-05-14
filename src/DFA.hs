@@ -24,7 +24,6 @@ import qualified EFA
 import qualified GFA
 import qualified RegExp as RE
 import qualified FA
--- import qualified PDA
 import qualified Language
 
 -- Deterministic Finite Automaton
@@ -442,27 +441,3 @@ toRE = GFA.toRE . toGFA
 
 toLanguage ∷ (Finite q, Finite s) ⇒ DFA q s → Language.ℒ s
 toLanguage = RE.toLanguage . toRE
-
-{-
--- Take a DFA, m, and convert it to an PDA, p, such that ℒ(m) = ℒ(p)
-toPDA ∷ DFA q s → PDA.PDA q () s
-toPDA (DFA δ q₀ f) = PDA.PDA { PDA.delta = δₚ
-                             , PDA.q0    = q₀
-                             , PDA.fs    = f
-                             , PDA.z0    = ()
-                             } where δₚ (q, Just  σ, _) = singleton (δ (q, σ), [()])
-                                     δₚ (_, Nothing, _) = (∅)
-
--- http://infolab.stanford.edu/~ullman/ialc/spr10/slides/cfl5.pdf 34
--- Stanford Automata, 4 - 3 - 15. Decision and closure properties for CFL-'s (35 min.).mp4 @ 34:00
--- Intuitively this runs a PDA and DFA in parallel and accepts a word if both accept individually.
-toPDAIntersection ∷ ∀ q p s z . (Ord p, Ord q, Ord z) ⇒ DFA q s → PDA.PDA p z s → PDA.PDA (q, p) z s
-toPDAIntersection (DFA δ q₀ f) (PDA.PDA δₚ p₀ z₀ fₚ) = PDA.PDA { PDA.delta = δ₁
-                                                               , PDA.q0    = (q₀, p₀)
-                                                               , PDA.z0    = z₀
-                                                               -- The final states are (q, p) such that q ∈ f and p ∈ fₚ
-                                                               , PDA.fs    = f × fₚ
-                                                               } where δ₁ ∷ ((q, p), Maybe s, z) → Set ((q, p), [z])
-                                                                       δ₁ ((q, p), Nothing, z) = Set.map (\(p', zs) → ((q,        p'), zs)) (δₚ (p, Nothing, z))
-                                                                       δ₁ ((q, p), Just  σ, z) = Set.map (\(p', zs) → ((δ (q, σ), p'), zs)) (δₚ (p, Just  σ, z))
--}                                                                       
