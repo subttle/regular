@@ -36,7 +36,9 @@ language (DA o t) q (a : w) = language (DA o t) (t q a) w
 accepts ∷ DA q s → q → [s] → Bool
 accepts (DA o t) q = o . foldl t q
 
--- "automaton of languages"
+-- "automaton of languages" or "the final automaton of languages"
+-- "This automaton has the pleasing property that the language accepted by a state L in ℒ [the set of all languages] is precisely L itself."
+-- Automata and Coinduction (An Exercise in Coalgebra) J.J.M.M. Rutten
 automaton ∷ DA (ℒ s) s
 automaton = DA { output     = Language.nullable
                , transition = Language.derivative
