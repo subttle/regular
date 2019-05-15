@@ -33,6 +33,9 @@ language ∷ DA q s → q → ℒ s
 language (DA o _) q []      = o q
 language (DA o t) q (a : w) = language (DA o t) (t q a) w
 
+accepts ∷ DA q s → q → [s] → Bool
+accepts (DA o t) q = o . foldl t q
+
 -- "automaton of languages"
 automaton ∷ DA (ℒ s) s
 automaton = DA { output     = Language.nullable
