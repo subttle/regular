@@ -121,10 +121,10 @@ freeMonoidFrom n = ([n..] >>=) . flip replicateM'
 freeSemigroup ∷ [a] → [[a]]
 freeSemigroup = freeMonoidFrom 1
 
--- partitions [1..3] = [ [[1,2,3]]
---                     , [[1],[2,3]]
+-- partitions [1..3] = [ [[1],[2],[3]]
 --                     , [[1,2],[3]]
---                     , [[1],[2],[3]]
+--                     , [[1],[2,3]]
+--                     , [[1,2,3]]
 --                     ]
 partitions ∷ [a] → [[[a]]]
 partitions list = part (reverse list) [] []
@@ -133,8 +133,8 @@ partitions list = part (reverse list) [] []
         part []       ys zs = [ys : zs]
         part (x : xs) [] zs = part xs [x]            zs
         -- flip (++) arguments to reverse order of output
-        part (x : xs) ys zs = part xs (x : ys)       zs
-                           ++ part xs [x]      (ys : zs)
+        part (x : xs) ys zs = part xs [x]      (ys : zs)
+                           ++ part xs (x : ys)       zs
 
 -- A version of List.findIndex which returns `Maybe ℕ` instead of `Maybe Int`
 findIndex' ∷ (a → Bool) → [a] → Maybe ℕ
