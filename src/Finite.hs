@@ -215,7 +215,7 @@ instance (Show a, Finite a) ⇒ Show (Predicate a) where
 
 instance (Finite a) ⇒                                         Eq      (Predicate a) where
   (==) ∷ Predicate a → Predicate a → Bool
-  (Predicate f) == (Predicate g) = and (fmap (\x → f x == g x) asList)
+  (Predicate f) == (Predicate g) = all (\x → f x == g x) asList
 instance (Finite a) ⇒                                         Bounded (Predicate a) where
   minBound = Predicate (const False)
   maxBound = Predicate (const True)
@@ -241,6 +241,38 @@ instance (Finite a) ⇒                                         Finite  (Predica
               toFunction ∷ [(a, Bool)] → a → Bool
               -- toFunction list = \a → fromJust (lookup a list) -- TODO I like this better but need to get rid of hlint warning -- {-# ANN asList "HLint: warn Redundant lambda" #-}
               toFunction list a = fromJust (lookup a list)
+
+-- TODO may want to move this code (if keeping it) to testing folder when done implementing `Finite` instance for `Equivalence`.
+
+-- Reflexive
+refl ∷ (Finite a) ⇒ Equivalence a → Bool
+refl (Equivalence r) = all (\x → r x x) asSet
+
+-- Symmetric
+sym ∷ (Finite a) ⇒  Equivalence a → Bool
+sym (Equivalence r) = all (\(x, y) → r x y == r y x) (asSet × asSet)
+
+-- Transitive
+trans ∷ (Finite a) ⇒ Equivalence a → Bool
+trans (Equivalence r) = all (\(x, y, z) → (r x y ∧ r y z) `implies` r x z) (liftA3 (,,) asList asList asList) -- TODO may be some redundant checks here I can eliminate
+
+-- Check that the equivalence relation is lawful
+lawful ∷ (Finite a) ⇒ Equivalence a → Bool
+lawful r = refl  r
+         ∧ sym   r
+         ∧ trans r
+
+-- TODO probably going to be lots of room for optimization in these instance defs, but for now I want to focus on correctness
+instance (Finite a) ⇒                                         Eq      (Equivalence a) where
+  (==) ∷ Equivalence a → Equivalence a → Bool
+  (Equivalence f) == (Equivalence g) = all (\(x, y) → f x y == g x y) (asSet × asSet)
+-- N.B. this is just one possible implementation
+instance (Eq a) ⇒                                             Bounded (Equivalence a) where
+  -- Each element is it's own equivalence class
+  -- N.B. `Equivalence (const (const False))` would violate reflexivity
+  minBound = defaultEquivalence
+  -- One big equivalence class
+  maxBound = Equivalence (const (const True))
 
 data Alpha = A | B | C | D | E | F | G | H | I | J | K | L | M | N | O | P | Q | R | S | T | U | V | W | X | Y | Z deriving (Eq, Ord, Enum, Bounded, Show, Read)
 instance                                                       Finite Alpha where
