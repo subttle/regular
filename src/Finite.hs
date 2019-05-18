@@ -16,7 +16,7 @@ import           Numeric.Natural.Unicode
 import           Control.Monad
 import           Control.Applicative
 import           Data.Maybe
-import           Data.List
+import           Data.List as List
 import           Data.Void
 import           Data.Functor.Contravariant
 import           Common
@@ -262,6 +262,35 @@ lawful ∷ (Finite a) ⇒ Equivalence a → Bool
 lawful r = refl  r
          ∧ sym   r
          ∧ trans r
+
+-- TODO meant to be used with the `partitions''` fn and an index
+-- TODO move (to a `where` clause?) and possibly rename?
+-- partitions'' {0..2} = [ [[0,1,2]]
+--                       , [[1,2],[0]]
+--                       , [[0,2],[1]]
+--                       , [[2],[0,1]]
+--                       , [[2],[1],[0]]
+--                       ]
+-- for each list, check if both a₁ and a₂ are in it
+-- if they are in the same list (which represents an equivalence class) return true, otherwise false
+toEquivalence ∷ (Finite a) ⇒ [[a]] → Equivalence a
+toEquivalence parts = Equivalence (\a₁ a₂ → any (\xs → (a₁ `elem` xs) ∧ (a₂ `elem` xs)) parts)
+
+fromEquivalence ∷ forall a . (Finite a) ⇒ Equivalence a → [[a]]
+fromEquivalence (Equivalence r) = unfoldr go asList
+      where go :: [a] → Maybe ([a], [a])
+            go []       = Nothing
+            go (x : xs) = Just (x : p, np)
+                    where (p, np) = List.partition (r x) xs
+
+-- TODO deleteme
+instance (Show a, Finite a) ⇒ Show (Equivalence a) where
+  show equivalence = show (fromEquivalence equivalence)
+    {- unlines (fmap show' res1)
+               where domain          = liftA2 (,) asList asList
+                     res1            = fmap (\(x, y) → (x, y, p x y)) domain
+                     show' (a, b, c) = show a ++ ", " ++ show b ++ " ↦ " ++ show c
+                     -}
 
 -- TODO probably going to be lots of room for optimization in these instance defs, but for now I want to focus on correctness
 instance (Finite a) ⇒                                         Eq      (Equivalence a) where
