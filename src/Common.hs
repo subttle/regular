@@ -9,6 +9,7 @@ import qualified Data.Set as Set
 import           Data.Set.Unicode
 import           Data.Bool.Unicode
 import           Data.List as List
+import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)))
 import           Data.Foldable as Foldable
 import           Data.Functor.Foldable (Fix (..), unfix, ListF (..))
 import           Control.Applicative (liftA2)
@@ -121,20 +122,19 @@ freeMonoidFrom n = ([n..] >>=) . flip replicateM'
 freeSemigroup ∷ [a] → [[a]]
 freeSemigroup = freeMonoidFrom 1
 
--- partitions [1..3] = [ [[1],[2],[3]]
---                     , [[1,2],[3]]
---                     , [[1],[2,3]]
---                     , [[1,2,3]]
+-- partitions of a list
+-- partitions [0..2] = [ [[0],[1],[2]]
+--                     , [[0],[1,2]]
+--                     , [[0,1],[2]]
+--                     , [[0,1,2]]
 --                     ]
 partitions ∷ [a] → [[[a]]]
-partitions list = part (reverse list) [] []
-  where part ∷ [a] → [a] → [[a]] → [[[a]]]
-        part []       [] zs = [zs]
-        part []       ys zs = [ys : zs]
-        part (x : xs) [] zs = part xs [x]            zs
-        -- flip (++) arguments to reverse order of output
-        part (x : xs) ys zs = part xs [x]      (ys : zs)
-                           ++ part xs (x : ys)       zs
+partitions []      = [[[]]]
+partitions (h : t) = partitions' (h :| t)
+
+partitions' ∷ NonEmpty a → [[[a]]]
+partitions' (x :| [])      = [[[x]]]
+partitions' (x :| (h : t)) = [([x] :), \(y : z) → (x : y) : z] <*> partitions' (h :| t)
 
 -- A version of List.findIndex which returns `Maybe ℕ` instead of `Maybe Int`
 findIndex' ∷ (a → Bool) → [a] → Maybe ℕ
