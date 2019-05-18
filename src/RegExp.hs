@@ -166,13 +166,12 @@ infixr 8 `star`  -- Numeric.Exp?
 -- satisfying the following equations and equational implications:
 --  (α + β) + γ = α + (β + γ)  -- (+) Associativity
 --        α + β = β + α        -- (+) Commutivity
---        α + 0 = α            -- (+) Identity
+--        α + 0 = α            -- (+) Right identity
+--        0 + α = α            -- (+) Left  identity
 --        α + α = α            -- (+) Idempotent
 --        (αβ)γ = α(βγ)        -- (∙) Associativity
 --           1α = α            -- (∙) Left identity
 --           α1 = α            -- (∙) Right identity
---        α + 1 = α            -- (+) Right identity
---        1 + α = α            -- (+) Left  identity
 --     α(β + γ) = αβ + αγ      -- Left distributivity
 --     (β + γ)α = βα + γα      -- Right distributivity
 --           0α = 0            -- (∙) Left  annihilator

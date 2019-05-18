@@ -9,7 +9,7 @@ import qualified Language
 import           Language (ℒ)
 -- import           Finite
 import           Data.Bool.Unicode
--- import           Data.Functor.Contravariant
+import           Data.Functor.Contravariant
 -- import           Data.Functor.Contravariant.Divisible
 -- import           Data.Void
 
@@ -28,6 +28,10 @@ data DA q s =                 -- q is the set of states, Q
      DA { output     ∷ q → Bool
         , transition ∷ q → (s → q)
         }
+
+instance Contravariant (DA q) where
+    contramap ∷ (b → a) → DA q a → DA q b
+    contramap h m@(DA _ t) = m { transition = \a → t a . h }
 
 language ∷ DA q s → q → ℒ s
 language (DA o _) q []      = o q
