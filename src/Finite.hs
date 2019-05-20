@@ -272,8 +272,8 @@ lawful r = refl  r
 --                       , [[2],[0,1]]
 --                       , [[2],[1],[0]]
 --                       ]
--- for each list, check if both a₁ and a₂ are in it
--- if they are in the same list (which represents an equivalence class) return true, otherwise false
+-- for each list (which represents an equivalence class), check if both a₁ and a₂ are in it
+-- if they are in the same list return true, otherwise false
 toEquivalence ∷ (Finite a) ⇒ [NonEmpty a] → Equivalence a
 toEquivalence parts = Equivalence (\a₁ a₂ → any (\xs → (a₁ `elem` xs) ∧ (a₂ `elem` xs)) parts)
 
@@ -304,6 +304,20 @@ instance (Eq a) ⇒                                             Bounded (Equival
   minBound = defaultEquivalence
   -- One big equivalence class
   maxBound = Equivalence (const (const True))
+instance (Finite a) ⇒                                         Ord     (Equivalence a) where
+  compare ∷ Equivalence a → Equivalence a → Ordering
+  compare (Equivalence f) (Equivalence g) = undefined -- FIXME want to ensure this is consistent with Enum and Finite ordering
+  -- mconcat (fmap (\(x, y) → f x y `compare` g x y) (liftA2 (,) asList asList))
+instance (Finite a) ⇒                                         Enum    (Equivalence a) where
+  toEnum   ∷ Int         → Equivalence a
+  toEnum     =                       (asList !!)
+  fromEnum ∷ Equivalence a → Int
+  fromEnum t = fromJust (elemIndex t  asList)
+  enumFrom ∷ Equivalence a → [Equivalence a]
+  enumFrom t = dropWhile (≠ t)        asList
+instance (Finite a) ⇒                                         Finite  (Equivalence a) where
+  asList ∷ [Equivalence a]
+  asList = fmap toEquivalence (partitions' asList)
 
 data Alpha = A | B | C | D | E | F | G | H | I | J | K | L | M | N | O | P | Q | R | S | T | U | V | W | X | Y | Z deriving (Eq, Ord, Enum, Bounded, Show, Read)
 instance                                                       Finite Alpha where
