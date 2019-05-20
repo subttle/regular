@@ -137,17 +137,17 @@ partitions (x : xs) = go (x :| xs)
             go (a :| (h : t)) = [((a :| []) :), \(y : z) → (a <| y) : z] <*> go (h :| t)
 
 -- partitions of a set
--- partitions {0..2} = [ [[0,1,2]]
---                     , [[1,2],[0]]
---                     , [[0,2],[1]]
---                     , [[2],[0,1]]
---                     , [[2],[1],[0]]
---                     ]
+-- partitions' {0..2} = [ [[0],[1],[2]]
+--                      , [[0],[2,1]]
+--                      , [[2,0],[1]]
+--                      , [[1,0],[2]]
+--                      , [[2,1,0]]
+--                      ]
 partitions' ∷ (Foldable t) ⇒ t a → [[NonEmpty a]]
-partitions' = Foldable.foldr ((=<<) . go) [[]]
+partitions' = Foldable.foldl (\xs → (xs >>=) . go) [[]]
    where go ∷ a → [NonEmpty a] → [[NonEmpty a]]
          go x []       = [[ x :| [] ]]
-         go x (y : ys) = ((x :| NE.toList y) : ys) : fmap (y :) (go x ys)
+         go x (y : ys) = fmap (y :) (go x ys) <> [(x :| NE.toList y) : ys]
 
 -- A version of List.findIndex which returns `Maybe ℕ` instead of `Maybe Int`
 findIndex' ∷ (a → Bool) → [a] → Maybe ℕ
