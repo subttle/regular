@@ -9,7 +9,8 @@ import qualified Data.Set as Set
 import           Data.Set.Unicode
 import           Data.Bool.Unicode
 import           Data.List as List
-import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)))
+import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)), (<|))
+-- import qualified Data.List.NonEmpty as NE
 import           Data.Foldable as Foldable
 import           Data.Functor.Foldable (Fix (..), unfix, ListF (..))
 import           Control.Applicative (liftA2)
@@ -128,13 +129,12 @@ freeSemigroup = freeMonoidFrom 1
 --                     , [[0,1],[2]]
 --                     , [[0,1,2]]
 --                     ]
-partitions ∷ [a] → [[[a]]]
-partitions []      = [[[]]]
-partitions (h : t) = partitions' (h :| t)
-
-partitions' ∷ NonEmpty a → [[[a]]]
-partitions' (x :| [])      = [[[x]]]
-partitions' (x :| (h : t)) = [([x] :), \(y : z) → (x : y) : z] <*> partitions' (h :| t)
+partitions ∷ forall a . [a] → [[NonEmpty a]]
+partitions []       = [[]]
+partitions (x : xs) = go (x :| xs)
+      where go ∷ NonEmpty a → [[NonEmpty a]]
+            go (a :| [])      = [[a :| []]]
+            go (a :| (h : t)) = [((a :| []) :), \(y : z) → (a <| y) : z] <*> go (h :| t)
 
 -- A version of List.findIndex which returns `Maybe ℕ` instead of `Maybe Int`
 findIndex' ∷ (a → Bool) → [a] → Maybe ℕ
