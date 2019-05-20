@@ -1,5 +1,4 @@
 {-# LANGUAGE InstanceSigs               #-}
-{-# LANGUAGE TypeSynonymInstances       #-}
 {-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE ExplicitForAll             #-}
@@ -15,8 +14,10 @@ import           Data.Bool.Unicode
 import           Numeric.Natural.Unicode
 import           Control.Monad
 import           Control.Applicative
-import           Data.Maybe
 import           Data.List as List
+import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)), (<|))
+import qualified Data.List.NonEmpty as NE
+import           Data.Maybe
 import           Data.Void
 import           Data.Functor.Contravariant
 import           Common
@@ -273,19 +274,19 @@ lawful r = refl  r
 --                       ]
 -- for each list, check if both a₁ and a₂ are in it
 -- if they are in the same list (which represents an equivalence class) return true, otherwise false
-toEquivalence ∷ (Finite a) ⇒ [[a]] → Equivalence a
+toEquivalence ∷ (Finite a) ⇒ [NonEmpty a] → Equivalence a
 toEquivalence parts = Equivalence (\a₁ a₂ → any (\xs → (a₁ `elem` xs) ∧ (a₂ `elem` xs)) parts)
 
-fromEquivalence ∷ forall a . (Finite a) ⇒ Equivalence a → [[a]]
+fromEquivalence ∷ forall a . (Finite a) ⇒ Equivalence a → [NonEmpty a]
 fromEquivalence (Equivalence r) = unfoldr go asList
-      where go :: [a] → Maybe ([a], [a])
+      where go ∷ [a] → Maybe (NonEmpty a, [a])
             go []       = Nothing
-            go (x : xs) = Just (x : p, np)
+            go (x : xs) = Just (x :| p, np)
                     where (p, np) = List.partition (r x) xs
 
 -- TODO deleteme
 instance (Show a, Finite a) ⇒ Show (Equivalence a) where
-  show equivalence = show (fromEquivalence equivalence)
+  show equivalence = show (fmap NE.toList (fromEquivalence equivalence))
     {- unlines (fmap show' res1)
                where domain          = liftA2 (,) asList asList
                      res1            = fmap (\(x, y) → (x, y, p x y)) domain
