@@ -60,7 +60,7 @@ concatenate ℓ₁ ℓ₂ w =  any (\(w₁ , w₂) → ℓ₁ w₁ ∧ ℓ₂ w�
 -- Kleene star
 star ∷ ℒ s → ℒ s
 star _ [] = True
-star ℓ w  = any (all ℓ) (partitions w)
+star ℓ w  = any (all (ℓ . NE.toList)) (partitions w)
 
 -- inverse homomorphism
 invhom ∷ ([s] → [g]) → ℒ g → ℒ s
