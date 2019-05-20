@@ -10,7 +10,7 @@ import           Data.Set.Unicode
 import           Data.Bool.Unicode
 import           Data.List as List
 import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)), (<|))
--- import qualified Data.List.NonEmpty as NE
+import qualified Data.List.NonEmpty as NE
 import           Data.Foldable as Foldable
 import           Data.Functor.Foldable (Fix (..), unfix, ListF (..))
 import           Control.Applicative (liftA2)
@@ -135,6 +135,19 @@ partitions (x : xs) = go (x :| xs)
       where go ∷ NonEmpty a → [[NonEmpty a]]
             go (a :| [])      = [[a :| []]]
             go (a :| (h : t)) = [((a :| []) :), \(y : z) → (a <| y) : z] <*> go (h :| t)
+
+-- partitions of a set
+-- partitions {0..2} = [ [[0,1,2]]
+--                     , [[1,2],[0]]
+--                     , [[0,2],[1]]
+--                     , [[2],[0,1]]
+--                     , [[2],[1],[0]]
+--                     ]
+partitions' ∷ (Foldable t) ⇒ t a → [[NonEmpty a]]
+partitions' = Foldable.foldr ((=<<) . go) [[]]
+   where go ∷ a → [NonEmpty a] → [[NonEmpty a]]
+         go x []       = [[ x :| [] ]]
+         go x (y : ys) = ((x :| NE.toList y) : ys) : fmap (y :) (go x ys)
 
 -- A version of List.findIndex which returns `Maybe ℕ` instead of `Maybe Int`
 findIndex' ∷ (a → Bool) → [a] → Maybe ℕ
