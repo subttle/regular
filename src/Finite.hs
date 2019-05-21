@@ -264,10 +264,15 @@ lawful r = refl  r
          ∧ sym   r
          ∧ trans r
 
--- r₁ ⊆? r₂
--- if r₁ is a refinement of r₂, then each equivalence class of r₂ is a union of some of the equivalence classes of r₁.
-refinement ∷ (Finite a) ⇒ Equivalence a → Equivalence a → Bool
-refinement (Equivalence r₁) (Equivalence r₂) = all (\(x, y) → r₁ x y `implies` r₂ x y) (liftA2 (,) asList asList)
+-- r₁ is "finer" r₂ iff r₁ ⊆ r₂   i.e. r₁ is a refinement of r₂
+-- if r₁ is a refinement of r₂ then each equivalence class of r₂ is
+-- a union of some of the equivalence classes of r₁.
+-- The finer-than relation reflexive, transitive, and antisymmetric (a partial order)
+finer ∷ (Finite a) ⇒ Equivalence a → Equivalence a → Bool
+finer (Equivalence r₁) (Equivalence r₂) = all (\(x, y) → r₁ x y `implies` r₂ x y) (liftA2 (,) asList asList)
+
+coarser ∷ (Finite a) ⇒ Equivalence a → Equivalence a → Bool
+coarser = flip finer
 
 -- TODO meant to be used with the `partitions''` fn and an index
 -- TODO move (to a `where` clause?) and possibly rename?
@@ -304,10 +309,10 @@ instance (Finite a) ⇒                                         Eq      (Equival
   (Equivalence f) == (Equivalence g) = all (\(x, y) → f x y == g x y) (asSet × asSet)
 -- N.B. this is just one possible implementation
 instance (Eq a) ⇒                                             Bounded (Equivalence a) where
-  -- Each element is it's own equivalence class
+  -- Each element is it's own equivalence class (the finest, i.e. the identity relation: {(x, x) | x ∈ U})
   -- N.B. `Equivalence (const (const False))` would violate reflexivity
   minBound = defaultEquivalence
-  -- One big equivalence class
+  -- One big equivalence class (the coarsest, i.e. the universal relation: {(x, y) | x,y ∈ U})
   maxBound = Equivalence (const (const True))
 instance (Finite a) ⇒                                         Ord     (Equivalence a) where
   compare ∷ Equivalence a → Equivalence a → Ordering
