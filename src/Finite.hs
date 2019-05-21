@@ -264,6 +264,11 @@ lawful r = refl  r
          ∧ sym   r
          ∧ trans r
 
+-- r₁ ⊆? r₂
+-- if r₁ is a refinement of r₂, then each equivalence class of r₂ is a union of some of the equivalence classes of r₁.
+refinement ∷ (Finite a) ⇒ Equivalence a → Equivalence a → Bool
+refinement (Equivalence r₁) (Equivalence r₂) = all (\(x, y) → r₁ x y `implies` r₂ x y) (liftA2 (,) asList asList)
+
 -- TODO meant to be used with the `partitions''` fn and an index
 -- TODO move (to a `where` clause?) and possibly rename?
 -- partitions'' {0..2} = [ [[0,1,2]]
