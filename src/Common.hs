@@ -13,7 +13,7 @@ import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)), (<|))
 import qualified Data.List.NonEmpty as NE
 import           Data.Foldable as Foldable
 import           Data.Functor.Foldable (Fix (..), unfix, ListF (..))
-import           Control.Applicative (liftA2)
+import           Control.Applicative (liftA2, getZipList, ZipList (..))
 import           Control.Monad
 import           Control.Arrow ((|||), (&&&))
 import           Numeric.Natural.Unicode
@@ -203,6 +203,11 @@ upToLength n = takeWhile ((< n) . genericLength)
 
 interleave ∷ [[a]] → [a]
 interleave = concat . transpose
+
+-- Sliding window of exactly size n
+windowed ∷ (Foldable t) ⇒ ℕ → t a → [[a]]
+windowed 0 = const []
+windowed n = getZipList . traverse ZipList . genericTake n . tails . Foldable.toList
 
 -- from https://github.com/haskell/containers/issues/346
 catMaybes ∷ (Ord a) ⇒ Set (Maybe a) → Set a

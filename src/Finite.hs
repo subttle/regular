@@ -276,12 +276,12 @@ coarser = flip finer
 
 -- TODO meant to be used with the `partitions''` fn and an index
 -- TODO move (to a `where` clause?) and possibly rename?
--- partitions'' {0..2} = [ [[0,1,2]]
---                       , [[1,2],[0]]
---                       , [[0,2],[1]]
---                       , [[2],[0,1]]
---                       , [[2],[1],[0]]
---                       ]
+-- partitions' {0..2} = [ [[0,1,2]]
+--                      , [[1,2],[0]]
+--                      , [[0,2],[1]]
+--                      , [[2],[0,1]]
+--                      , [[2],[1],[0]]
+--                      ]
 -- for each list (which represents an equivalence class), check if both a₁ and a₂ are in it
 -- if they are in the same list return true, otherwise false
 toEquivalence ∷ (Finite a) ⇒ [NonEmpty a] → Equivalence a
