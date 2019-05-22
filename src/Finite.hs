@@ -287,7 +287,7 @@ coarser = flip finer
 toEquivalence ∷ (Finite a) ⇒ [NonEmpty a] → Equivalence a
 toEquivalence parts = Equivalence (\a₁ a₂ → any (\xs → (a₁ `elem` xs) ∧ (a₂ `elem` xs)) parts)
 
-fromEquivalence ∷ forall a . (Finite a) ⇒ Equivalence a → [NonEmpty a]
+fromEquivalence ∷ ∀ a . (Finite a) ⇒ Equivalence a → [NonEmpty a]
 fromEquivalence (Equivalence r) = unfoldr go asList
       where go ∷ [a] → Maybe (NonEmpty a, [a])
             go []       = Nothing

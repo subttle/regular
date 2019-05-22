@@ -328,7 +328,7 @@ similar a b = normalize a == normalize b
 dissimilar ∷ (Eq s, Ord s) ⇒ RegExp s → RegExp s → Bool
 dissimilar a b = not (similar a b)
 
-equivalent ∷ forall s . (Finite s) ⇒ RegExp s → RegExp s → Bool
+equivalent ∷ ∀ s . (Finite s) ⇒ RegExp s → RegExp s → Bool
 equivalent a b = and (unfoldr bisim seed)
       where seed = ([(normalize a, normalize b)], [])
             bisim ∷ (Finite s)

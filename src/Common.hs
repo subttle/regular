@@ -129,7 +129,7 @@ freeSemigroup = freeMonoidFrom 1
 --                     , [[0,1],[2]]
 --                     , [[0,1,2]]
 --                     ]
-partitions ∷ forall a . [a] → [[NonEmpty a]]
+partitions ∷ ∀ a . [a] → [[NonEmpty a]]
 partitions []       = [[]]
 partitions (x : xs) = go (x :| xs)
       where go ∷ NonEmpty a → [[NonEmpty a]]
