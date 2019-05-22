@@ -17,6 +17,7 @@ import           Data.Set as Set
 import           Data.Bool.Unicode
 import qualified Data.Map as Map (fromList)
 -- import           Data.Either
+-- import           Control.Selective
 import           Data.Void
 import           Data.Pointed
 -- import           Data.Functor.Contravariant
@@ -67,6 +68,9 @@ instance (Show q, Finite q, Show s, Finite s) ⇒ Show (GFA q s) where
            ,   "qᵢ = "                                              ++ show (Init  ())
            ,   "qᶠ = "                                              ++ show (Final ()) ++ ")"
            ]
+
+accepts ∷ (Finite q, Ord s) ⇒ GFA q s → [s] → Bool
+accepts = RE.matches . toRE
 
 table ∷ ∀ q s . (Finite q) ⇒ GFA q s → [((Either Init q, Either Final q), RE.RegExp s)]
 table (GFA δ) = zip domain image
