@@ -14,6 +14,8 @@ import           Data.Set            as Set hiding (foldl, intersection)
 import           Data.Set.Unicode
 import           Data.Bool.Unicode
 import qualified Data.Map            as Map
+import           Data.Pointed
+import           Numeric.Algebra.Class
 import           Common
 import           Finite
 import           Config
@@ -160,11 +162,6 @@ indistinguishable m q p = right m q `DFA.equal` right m p
 -- The equivalence relation formed on Q by indistinguishable states for m
 indistinguishability ∷ (Finite q, Finite s) ⇒ DFA q s → Equivalence q
 indistinguishability m = Equivalence { getEquivalence = indistinguishable m }
-
--- Given two states, q₁ and q₂, determine the (possibly empty) set of
--- symbols which will take you directly from q₁ to q₂
-transitions ∷ (Eq q, Finite s) ⇒ DFA q s → q → q → Set s
-transitions m@(DFA δ _ _) q₁ q₂ = foldl (\acc σ → if δ (q₁, σ) == q₂ then insert σ acc else acc) (∅) (sigma m)
 
 corange ∷ (Finite q, Finite s) ⇒ DFA q s → Set (q, s)
 corange m = qs m × sigma m
@@ -421,20 +418,21 @@ toEFAHalf m@(DFA δ q₀ f) = EFA.EFA { EFA.delta = δ₁
 toFA ∷ (Finite q) ⇒ DFA q s → FA.FA q s
 toFA = NFA.toFA . toNFA
 
+-- Convert a DFA to a Generalized Nondeterministic Finite Automaton with ε-transitions
+-- δ(q₁, σ) = q₂ ⟺ δ'(q₁, q₂) = σ
 toGFA ∷ (Finite s, Ord q) ⇒ DFA q s → GFA.GFA q s
-toGFA m@(DFA _ q₀ f) = GFA.GFA { GFA.delta = δ }
-     where
-       -- Connect the new (forced) GFA start state to q₀ with an epsilon.
-       δ (Left  (Init ()), Right          p) | p == q₀ = RE.one
-       -- Connect the new (forced) GFA final state to each element of f with an epsilon.
-       δ (Right         q, Left  (Final ())) | q ∈ f   = RE.one
-       -- If q and p were connected (often via multiple transitions) in the DFA,
-       -- lift all symbols into RE.Lit, and let multiple transitions be represented
-       -- by the union of said literals. If no transitions between q and p in DFA then, RE.zero.
-       δ (Right         q, Right          p)           = RE.fromSet (transitions m q p)
-       -- Besides the explicitly given epsilon connections, no connections
-       -- to the new final state nor from the new start state should exist.
-       δ _                                             = RE.zero
+toGFA (DFA δ q₀ f) = GFA.GFA { GFA.delta = δ' }
+     where -- Connect the new (forced) GFA start state to q₀ with an ε.
+           δ' (Left  (Init _), Right        q₂) | q₂ == q₀ = RE.one
+           -- Connect the new (forced) GFA final state to each element of f with an ε.
+           δ' (Right       q₁, Left  (Final _)) | q₁ ∈ f   = RE.one
+           -- If q₁ and q₂ were connected (often via multiple transitions) in the DFA,
+           -- lift all symbols into RE.Lit, and let multiple transitions be represented
+           -- by the union of said literals. If no transitions between q₁ and q₂ in DFA then, RE.zero.
+           δ' (Right       q₁, Right        q₂)            = sumWith RE.Lit (Set.filter (\σ → δ (q₁, σ) == q₂) (sigma m))
+           -- Besides the explicitly given epsilon connections, no connections
+           -- to the new final state nor from the new start state should exist.
+           δ' _                                            = RE.zero
 
 toRE ∷ (Finite q, Finite s) ⇒ DFA q s → RE.RegExp s
 toRE = GFA.toRE . toGFA
