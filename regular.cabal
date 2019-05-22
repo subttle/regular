@@ -26,6 +26,7 @@ library
                      , profunctors
                      , pointed
                      , fin
+                     , selective
   default-language:    Haskell2010
   default-extensions: UnicodeSyntax
                       ScopedTypeVariables
@@ -63,6 +64,7 @@ test-suite regular-test
   default-language:    Haskell2010
   default-extensions: UnicodeSyntax
                       ScopedTypeVariables
+                      InstanceSigs
                       GADTs
 
 source-repository head
