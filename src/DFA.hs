@@ -14,8 +14,7 @@ import           Data.Set            as Set hiding (foldl, intersection)
 import           Data.Set.Unicode
 import           Data.Bool.Unicode
 import qualified Data.Map            as Map
-import           Data.Pointed
-import           Numeric.Algebra.Class
+import           Numeric.Algebra.Class (sumWith)
 import           Common
 import           Finite
 import           Config
@@ -421,7 +420,7 @@ toFA = NFA.toFA . toNFA
 -- Convert a DFA to a Generalized Nondeterministic Finite Automaton with ε-transitions
 -- δ(q₁, σ) = q₂ ⟺ δ'(q₁, q₂) = σ
 toGFA ∷ (Finite s, Ord q) ⇒ DFA q s → GFA.GFA q s
-toGFA (DFA δ q₀ f) = GFA.GFA { GFA.delta = δ' }
+toGFA m@(DFA δ q₀ f) = GFA.GFA { GFA.delta = δ' }
      where -- Connect the new (forced) GFA start state to q₀ with an ε.
            δ' (Left  (Init _), Right        q₂) | q₂ == q₀ = RE.one
            -- Connect the new (forced) GFA final state to each element of f with an ε.
