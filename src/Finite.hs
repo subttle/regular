@@ -1,4 +1,3 @@
-{-# LANGUAGE InstanceSigs               #-}
 {-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE ExplicitForAll             #-}

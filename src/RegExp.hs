@@ -1,7 +1,6 @@
 {-# LANGUAGE FlexibleContexts          #-}
 {-# LANGUAGE FlexibleInstances         #-}
 {-# LANGUAGE MultiParamTypeClasses     #-}
-{-# LANGUAGE InstanceSigs              #-}
 {-# LANGUAGE DeriveFunctor             #-}
 {-# LANGUAGE DeriveFoldable            #-}
 {-# LANGUAGE DeriveTraversable         #-}

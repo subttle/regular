@@ -1,4 +1,3 @@
-{-# LANGUAGE InstanceSigs          #-}
 {-# LANGUAGE PostfixOperators      #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances     #-}

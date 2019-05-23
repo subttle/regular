@@ -1,5 +1,4 @@
 {-# LANGUAGE MultiParamTypeClasses     #-}
-{-# LANGUAGE InstanceSigs              #-}
 {-# OPTIONS_GHC -Wall                  #-}
 
 module DA where

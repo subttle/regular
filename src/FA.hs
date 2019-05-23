@@ -1,7 +1,6 @@
 {-# LANGUAGE FlexibleInstances         #-}
 {-# LANGUAGE MultiParamTypeClasses     #-}
 {-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE InstanceSigs              #-}
 {-# OPTIONS_GHC -Wall                  #-}
 
 module FA where

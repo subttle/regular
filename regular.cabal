@@ -30,6 +30,7 @@ library
   default-language:    Haskell2010
   default-extensions: UnicodeSyntax
                       ScopedTypeVariables
+                      InstanceSigs
                       GADTs
 
 executable regular-exe
@@ -49,6 +50,7 @@ executable regular-exe
                      , algebraic-graphs
   default-extensions: UnicodeSyntax
                       ScopedTypeVariables
+                      InstanceSigs
                       GADTs
 
 test-suite regular-test
