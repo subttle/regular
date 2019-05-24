@@ -28,6 +28,7 @@ import           Common
 import           Finite
 import qualified Language
 import           Prelude hiding ((+), (*), last, map)
+import           Data.Function
 import           Control.Monad
 import           Data.List as List hiding (last, map)
 import           Data.Set as Set hiding ((\\))
@@ -322,7 +323,7 @@ normalize (Star α) = star (normalize α)
 
 -- ACI-similar
 similar ∷ (Eq s, Ord s) ⇒    RegExp s → RegExp s → Bool
-similar a b = normalize a == normalize b
+similar = (==) `on` normalize
 
 dissimilar ∷ (Eq s, Ord s) ⇒ RegExp s → RegExp s → Bool
 dissimilar a b = not (similar a b)
