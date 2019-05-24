@@ -339,7 +339,7 @@ closuresExample = EFA.EFA { EFA.delta = delta
                                   delta _            = (∅)
 
 -- https://youtu.be/1GZOzTJOBuM
-minimal ∷ DFA Fin₆ Fin₂
+minimal ∷ DFA Fin₅ Fin₂
 minimal = DFA { delta = delta
               , q0    = 0
               , fs    = singleton 4
