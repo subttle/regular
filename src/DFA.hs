@@ -8,6 +8,7 @@ module DFA where
 
 import           Data.Functor.Contravariant
 import           Prelude             hiding (map)
+import           Data.Function
 import qualified Data.List           as List
 import           Data.Set            as Set hiding (foldl, intersection)
 import           Data.Set.Unicode
@@ -155,7 +156,7 @@ left m q = m { fs = singleton q }
 -- Two states having the same right language are indistinguishable
 -- they both lead to the same words being accepted.
 indistinguishable ∷ (Finite q, Finite s) ⇒ DFA q s → q → q → Bool
-indistinguishable m q p = right m q `DFA.equal` right m p
+indistinguishable = (DFA.equal `on`) . right
 
 -- The equivalence relation formed on Q by indistinguishable states for m
 indistinguishability ∷ (Finite q, Finite s) ⇒ DFA q s → Equivalence q
