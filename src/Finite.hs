@@ -18,6 +18,7 @@ import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)), (<|))
 import qualified Data.List.NonEmpty as NE
 import           Data.Maybe
 import           Data.Void
+import           Data.Function
 import           Data.Functor.Contravariant
 import           Common
 import           GHC.Enum
@@ -273,7 +274,7 @@ finer (Equivalence r₁) (Equivalence r₂) = all (\(x, y) → r₁ x y `implies
 coarser ∷ (Finite a) ⇒ Equivalence a → Equivalence a → Bool
 coarser = flip finer
 
--- TODO meant to be used with the `partitions''` fn and an index
+-- TODO meant to be used with the `partitions'` fn and an index
 -- TODO move (to a `where` clause?) and possibly rename?
 -- partitions' {0..2} = [ [[0,1,2]]
 --                      , [[1,2],[0]]
@@ -292,6 +293,15 @@ fromEquivalence (Equivalence r) = unfoldr go asList
             go []       = Nothing
             go (x : xs) = Just (x :| p, np)
                     where (p, np) = List.partition (r x) xs
+
+-- There is a way to do this safely by generating the NonEmpty list for the equivalence class
+-- and then using comonadic extract to guarentee the representative will always be there
+-- and thus avoiding the unsafe `head` but that seems like too much overhead for right now
+representative ∷ (Finite a) ⇒ Equivalence a → a → a
+representative (Equivalence r) a = head (List.filter (r a) asList)
+
+eq' ∷ (Finite a) ⇒ Equivalence a → a → a → Bool
+eq' = ((==) `on`) . representative
 
 -- TODO deleteme
 instance (Show a, Finite a) ⇒ Show (Equivalence a) where
