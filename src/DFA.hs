@@ -307,6 +307,16 @@ complement m@(DFA _ _ f) = m { fs = qs m ∖ f }
 minimize ∷ (Finite q, Finite s) ⇒ DFA q s → DFA (Set (Set q)) s
 minimize = DFA.fromFA . FA.codeterminization . toFA
 
+-- Quotient automaton
+-- FIXME see about necessarily starting with trim automaton, may have to return `Maybe (DFA q s)`
+-- FIXME or maybe something like trim the `DFA` as a `SomeDFA`
+quotient ∷ ∀ q s . (Finite q, Finite s) ⇒ DFA q s → DFA q s
+quotient m@(DFA δ q₀ f) = DFA { delta = representative equiv . δ
+                              , q0    = representative equiv q₀
+                              , fs    = Set.map (representative equiv) f
+                              } where equiv ∷ Equivalence q
+                                      equiv = indistinguishability m
+
 -- The DFA, empty, which produces the empty language, such that
 -- ℒ(empty) = ∅
 empty ∷ DFA () s
