@@ -7,9 +7,9 @@ import           DFA
 -- import qualified EFA
 -- import qualified GFA
 -- import qualified RegExp as RE
--- import           Common
+import           Common
 import           Finite
--- import           Examples
+import           Examples
 import           Data.Set
 import           Config
 import           EasyTest
@@ -29,6 +29,7 @@ suite = tests [ scope "DFA.empty"     . expect $ Config.language DFA.empty      
                                                      , Config.accepts e3L1L2 [C, A, R, R]
                                                      , Prelude.take 2 (Config.language e3L1L2) == [[C, A, R, R], [C, A, R, R, O]]
                                                      ]
+              , scope "DFA.quotient"  . expect $ minimal `DFA.equal` (quotient minimal) && size' (useful (quotient minimal)) < size' (useful (minimal))
               ]
     where e3L1 ∷ DFA Fin₈ Alpha
           e3L1   = DFA { delta = δ
