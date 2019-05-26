@@ -21,7 +21,7 @@ import           Data.Void
 import           Data.Pointed
 -- import           Data.Functor.Contravariant
 -- import           Data.Functor.Contravariant.Divisible
-import qualified Data.Profunctor as Profunctor
+import           Data.Profunctor as Profunctor
 
 -- Generalized Nondeterministic Finite Automaton with ε-transitions
 
@@ -78,7 +78,7 @@ table (GFA δ) = zip domain image
 
 -- Rip out all of `q` leaving only a two state GFA (only the two qᵢ and qᶠ states)
 reduce ∷ (Finite q, Ord s) ⇒ GFA q s → GFA Void s
-reduce m = GFA { delta = \(qᵢ, qᶠ) → delta (Set.foldl rip m asSet) (vacuous qᵢ, vacuous qᶠ) }
+reduce m = lmap absurd (Set.foldl rip m asSet)
 
 -- δ₁(q, p) = δ(q, r) ⊗ δ(r, r)⋆ ⊗ δ(r, p) ⊕ δ(q, p) where q, p, r ∈ Q, and r is the state to "rip"
 rip ∷ ∀ q s . (Eq q, Ord s) ⇒ GFA q s → q → GFA q s
