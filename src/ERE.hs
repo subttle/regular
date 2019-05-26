@@ -14,17 +14,17 @@ import           Numeric.Natural.Unicode
 import           Data.Pointed
 import           Finite (Finite, Σ)
 
--- α, β ⩴ ∅ | ε | σ | α|β | α·β | α&β | ¬α | α★
+-- Extended Regular Expressions (extended with intersection operation)
+-- α, β ⩴ ∅ | ε | σ | α|β | α·β | α&β | α★
 -- where σ ∈ Σ
 data ExRE s where
   Zero ∷     ExRE s                    -- The empty language         -- ℒ(Zero)  = ∅
   One  ∷     ExRE s                    -- The empty string, epsilon  -- ℒ(One)   = {ε}
   Lit  ∷ s → ExRE s                    -- Literal, single symbol     -- ℒ(σ)     = {σ}, for σ ∈ Σ
-  (:.) ∷     ExRE s → ExRE s → ExRE s  -- Concatenation              -- ℒ(α · β) = ℒ(α) · ℒ(β)
   (:|) ∷     ExRE s → ExRE s → ExRE s  -- Union, plus, or            -- ℒ(α | β) = ℒ(α) ∪ ℒ(β)
+  (:.) ∷     ExRE s → ExRE s → ExRE s  -- Concatenation              -- ℒ(α · β) = ℒ(α) · ℒ(β)
   (:&) ∷     ExRE s → ExRE s → ExRE s  -- logical and                -- ℒ(α & β) = ℒ(α) ∩ ℒ(β)
   Star ∷     ExRE s → ExRE s           -- Kleene star, repetition    -- ℒ(α★)    = ℒ(α)★
-  Comp ∷     ExRE s → ExRE s           -- complement ¬               -- ℒ(¬α)    = Σ★ \ ℒ(α)
   deriving (Eq, Ord, Functor, Foldable, Traversable)
 
 data ExREF s a where
@@ -35,7 +35,6 @@ data ExREF s a where
   ConcatF ∷ a → a → ExREF s a
   InterF  ∷ a → a → ExREF s a
   StarF   ∷     a → ExREF s a
-  CompF   ∷     a → ExREF s a
   deriving (Eq, Functor)
 
 instance (Finite s) ⇒ Σ (ExRE  s  ) s
@@ -49,7 +48,6 @@ instance (Show s) ⇒ Show (ExRE s) where
    show (α :. β) =  "(" ++ show α ++ "·" ++ show β ++ ")"
    show (α :& β) =  "(" ++ show α ++ "&" ++ show β ++ ")"
    show (Star α) =  "(" ++ show α ++ ")★"
-   show (Comp α) = "¬(" ++ show α ++ ")"
 
 instance Pointed ExRE where
   point = Lit
@@ -73,7 +71,6 @@ instance Monad ExRE where
   (>>=) (α :. β) f = (α >>= f) :. (β >>= f)
   (>>=) (α :& β) f = (α >>= f) :& (β >>= f)
   (>>=) (Star α) f = Star (α >>= f)
-  (>>=) (Comp α) f = Comp (α >>= f)
 
 -- "star height"
 height ∷ ExRE s → ℕ
@@ -84,9 +81,8 @@ height (α :| β) = max (height α) (height β)
 height (α :. β) = max (height α) (height β)
 height (α :& β) = max (height α) (height β)
 height (Star α) = 1 + height α
-height (Comp α) = height α
 
--- TODO once the algebraic `(+)`, `(*)`, `(&)`, `star`, `comp` operators are properly defined
+-- TODO once the algebraic `(+)`, `(*)`, `(&)`, `star` operators are properly defined
 -- these functions can then be used:
 {-
 normalize ∷ (Ord s) ⇒ ExRE s → ExRE s
@@ -97,7 +93,6 @@ normalize (α :| β)    = normalize α + normalize β
 normalize (α :. β)    = normalize α * normalize β
 normalize (α :& β)    = normalize α & normalize β
 normalize (Star α)    = star (normalize α)
-normalize (Comp α)    = comp (normalize α)
 
 -- Brzozowski ∂ with respect to σ ∈ Σ
 derivative ∷ (Ord s) ⇒ ExRE s → s → ExRE s
@@ -108,7 +103,6 @@ derivative (α :| β) σ = derivative α σ + derivative β σ
 derivative (α :. β) σ = (derivative α σ * β) + (constant α * derivative β σ)
 derivative (α :& β) σ = derivative α σ & derivative β σ
 derivative (Star α) σ = derivative α σ * star α
-derivative (Comp α) σ = comp (derivative α σ)
 
 -- Brzozowski ∂ extended to strings
 derivative' ∷ (Ord s) ⇒ ExRE s → [s] → ExRE s
@@ -128,13 +122,10 @@ nullable = nullable' . normalize
         nullable' (α :. β) = nullable' α ∧ nullable' β
         nullable' (α :& β) = nullable' α ∧ nullable' β
         nullable' (Star _) = True
-        nullable' (Comp α) = not (nullable' α)
 
 constant ∷ (Ord s) ⇒ ExRE s → ExRE s
 constant α | nullable α = One
            | otherwise  = Zero
 
-difference ∷ ExRE s → ExRE s → ExRE s
-difference α β =  α & comp β
 
 -}
