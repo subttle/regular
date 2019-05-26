@@ -13,6 +13,7 @@ import           Data.Set.Unicode
 import           Numeric.Natural.Unicode
 import           Data.Pointed
 import           Finite (Finite, Σ)
+import qualified Language
 
 -- Extended Regular Expressions (extended with intersection operation)
 -- α, β ⩴ ∅ | ε | σ | α|β | α·β | α&β | α★
@@ -81,6 +82,15 @@ height (α :| β) = max (height α) (height β)
 height (α :. β) = max (height α) (height β)
 height (α :& β) = max (height α) (height β)
 height (Star α) = 1 + height α
+
+toLanguage ∷ (Eq s) ⇒ ExRE s → Language.ℒ s
+toLanguage Zero     = Language.empty
+toLanguage One      = Language.epsilon
+toLanguage (Lit  σ) = Language.lit σ
+toLanguage (α :| β) = Language.union        (toLanguage α) (toLanguage β)
+toLanguage (α :. β) = Language.concatenate  (toLanguage α) (toLanguage β)
+toLanguage (α :& β) = Language.intersection (toLanguage α) (toLanguage β)
+toLanguage (Star α) = Language.star         (toLanguage α)
 
 -- TODO once the algebraic `(+)`, `(*)`, `(&)`, `star` operators are properly defined
 -- these functions can then be used:
