@@ -1,73 +1,69 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+-- Unfortunately, using Fin types breaks the warnings for incomplete patterns at this time
+{-# OPTIONS_GHC -fno-warn-incomplete-patterns #-}
 
 module Examples where
 
 import           DFA
 import qualified NFA
 import qualified EFA
-import qualified GFA
+-- import qualified GFA
 import qualified RegExp as RE
 -- import qualified PDA
 -- import qualified TM
-import           Common
 import           Finite
 import           Data.Set
 import           Data.Set.Unicode
 import           Data.Bool.Unicode
 import           Data.Eq.Unicode
-import           Data.Void
-import           Data.Maybe
 import           Data.Either
-import           Data.Functor.Contravariant
-import           Data.Fin
-import           Data.Type.Nat
 
 -- A DFA which accepts all binary strings ending in 1
 endsWith1 ∷ DFA Bool Fin₂
-endsWith1 = DFA { delta = delta
+endsWith1 = DFA { delta = δ
                 , q0    = False
                 , fs    = singleton True
-                } where delta (False, 0) = False
-                        delta (False, 1) = True
-                        delta (True,  0) = False
-                        delta (True,  1) = True
+                } where δ (False, 0) = False
+                        δ (False, 1) = True
+                        δ (True,  0) = False
+                        δ (True,  1) = True
 
 -- The set of strings which end in [0, 1]
 endsWith01 ∷ NFA.NFA Fin₄ Fin₂
-endsWith01 = NFA.NFA { NFA.delta = delta
+endsWith01 = NFA.NFA { NFA.delta = δ
                      , NFA.q0    = 0
                      , NFA.fs    = singleton 2
-                     } where delta ∷ (Fin₄, Fin₂) → Set Fin₄
-                             delta (0, 0) = fromList  [0, 1]
-                             delta (0, 1) = singleton 0
-                             delta (1, 1) = singleton 2
-                             delta _      = (∅)
+                     } where δ ∷ (Fin₄, Fin₂) → Set Fin₄
+                             δ (0, 0) = fromList  [0, 1]
+                             δ (0, 1) = singleton 0
+                             δ (1, 1) = singleton 2
+                             δ _      = (∅)
 
 -- https://en.wikipedia.org/wiki/File:NFAexample.svg
 -- Generates the language where w has an even number of 0s or an even number of 1s
 even0or1 ∷ EFA.EFA Fin₅ Fin₂
-even0or1 = EFA.EFA { EFA.delta = delta
+even0or1 = EFA.EFA { EFA.delta = δ
                    , EFA.q0    = 0
                    , EFA.fs    = fromList [1, 3]
-                   } where delta (0, Nothing) = fromList  [1, 3]
-                           delta (1, Just  0) = singleton 2
-                           delta (1, Just  1) = singleton 1
-                           delta (2, Just  0) = singleton 1
-                           delta (2, Just  1) = singleton 2
-                           delta (3, Just  0) = singleton 3
-                           delta (3, Just  1) = singleton 4
-                           delta (4, Just  0) = singleton 4
-                           delta (4, Just  1) = singleton 3
-                           delta (_, _      ) = (∅)
+                   } where δ (0, Nothing) = fromList  [1, 3]
+                           δ (1, Just  0) = singleton 2
+                           δ (1, Just  1) = singleton 1
+                           δ (2, Just  0) = singleton 1
+                           δ (2, Just  1) = singleton 2
+                           δ (3, Just  0) = singleton 3
+                           δ (3, Just  1) = singleton 4
+                           δ (4, Just  0) = singleton 4
+                           δ (4, Just  1) = singleton 3
+                           δ (_, _      ) = (∅)
 
 -- A number is divisible by 5 iff its last digit is 0 or 5
 by5 ∷ DFA Bool Fin₁₀
-by5 = DFA { delta = delta
+by5 = DFA { delta = δ
           , q0    = False
           , fs    = singleton True
-          } where delta (_, 0) = True
-                  delta (_, 5) = True
-                  delta _      = False
+          } where δ (_, 0) = True
+                  δ (_, 5) = True
+                  δ _      = False
 
 -- A regular expression to match the language of the `by5` DFA
 -- [0-9]★[0+5]
@@ -106,38 +102,18 @@ troth sounding. Please tell me what manipulations of
 incense and organ I should make to get the house quiet, and
 to keep it so"
 [1] An Introduction to Cybernetics, W. Ross Ashby, 1956, pg 60-61
-[2] http://csseminar.kadm.usu.ru/tarragona_volkov2008.pdf                      -}
+[2] http://csseminar.kadm.usu.ru/tarragona_volkov2008.pdf              -}
 
--- Ghosts:  Singing and Laughing
-newtype Sing    = Sing    Bool deriving (Eq, Ord, Enum, Bounded)
-newtype Laugh   = Laugh   Bool deriving (Eq, Ord, Enum, Bounded)
--- Actions: play organ, light incense
-newtype Organ   = Organ   Bool deriving (Eq, Ord, Enum, Bounded)
-newtype Incense = Incense Bool deriving (Eq, Ord, Enum, Bounded)
-instance Finite Sing
-instance Finite Laugh
-instance Finite Organ
-instance Finite Incense
-instance Show Sing where
-  show (Sing      True) = "Singing"
-  show (Sing     False) = "Not Singing"
-instance Show Laugh where
-  show (Laugh     True) = "Laughing"
-  show (Laugh    False) = "Not Laughing"
-instance Show Organ where
-  show (Organ     True) = "Playing organ"
-  show (Organ    False) = "Not playing organ"
-instance Show Incense where
-  show (Incense   True) = "Burning incense"
-  show (Incense  False) = "Not burning incense"
-
-haunted ∷ DFA (Sing, Laugh) (Organ, Incense)
-haunted = DFA { delta = delta
-              , q0    =           (Sing  True, Laugh  True)
-              , fs    = singleton (Sing False, Laugh False)
-              } where delta ((Sing singing, Laugh laughing), (Organ organ, Incense incense)) = (left, right)
-                                                         where left  = Sing  ((if not laughing ∧ organ then not else  id) singing)
-                                                               right = Laugh ((if incense              then id  else not) singing)
+-- The states, i.e. Q : (Bool × Bool) represent the status of the ghosts singing and laughing, respectively,
+-- and the alphabet, i.e. Σ : (Bool × Bool) represents the actions of playing an organ and lighting incense, respectively.
+-- Each word accepted by the automaton is a solution
+haunted ∷ DFA (Bool, Bool) (Bool, Bool)
+haunted = DFA { delta = δ
+              -- Start with ghosts both singing and laughing
+              , q0    =           (True,  True)
+              -- End with ghosts neither singing nor laughing
+              , fs    = singleton (False, False)
+              } where δ ((singing, laughing), (organ, incense)) = (if not laughing ∧ organ then not singing else singing, if incense then singing else not singing)
 
 -- Farmer's problem
 -- The goal of the problem is to get all the items safely and efficiently to the opposite
@@ -220,73 +196,73 @@ figure2 = NFA.NFA { NFA.delta = δ
 
 -- Generates the language [[1], [2], [3]]
 oneTwoThree ∷ EFA.EFA Bool Fin₄
-oneTwoThree = EFA.EFA { EFA.delta = delta
+oneTwoThree = EFA.EFA { EFA.delta = δ
                       , EFA.q0    = False
                       , EFA.fs    = singleton True
-                      } where delta (False, Just 1) = singleton True
-                              delta (False, Just 2) = singleton True
-                              delta (False, Just 3) = singleton True
-                              delta _               = (∅)
+                      } where δ (False, Just 1) = singleton True
+                              δ (False, Just 2) = singleton True
+                              δ (False, Just 3) = singleton True
+                              δ _               = (∅)
 
 -- An EFA which accepts only strings which start with 0 and end with 1
 -- A similar example is given in this video lecture https://youtu.be/yzb4J7oSyLA
 startsWith0endsWith1 ∷ EFA.EFA Fin₄ Fin₂
-startsWith0endsWith1 = EFA.EFA { EFA.delta = delta
+startsWith0endsWith1 = EFA.EFA { EFA.delta = δ
                                , EFA.q0    = 0
                                , EFA.fs    = singleton 2
-                               } where delta (0, Just  0) = singleton 1
-                                       delta (0, Just  1) = singleton 3
+                               } where δ (0, Just  0) = singleton 1
+                                       δ (0, Just  1) = singleton 3
 
-                                       delta (1, Just  0) = singleton 1
-                                       delta (1, Just  1) = singleton 2
+                                       δ (1, Just  0) = singleton 1
+                                       δ (1, Just  1) = singleton 2
 
-                                       delta (2, Just  0) = singleton 1
-                                       delta (2, Just  1) = singleton 2
+                                       δ (2, Just  0) = singleton 1
+                                       δ (2, Just  1) = singleton 2
 
-                                       delta (3, Just  0) = singleton 3
-                                       delta (3, Just  1) = singleton 3
-                                       delta (_, Nothing) = (∅)
+                                       δ (3, Just  0) = singleton 3
+                                       δ (3, Just  1) = singleton 3
+                                       δ (_, Nothing) = (∅)
 
 -- A DFA which accepts all binary strings starting with 0
 startsWith0 ∷ DFA Fin₃ Fin₂
-startsWith0 = DFA { delta = delta
+startsWith0 = DFA { delta = δ
                   , q0    = 0
                   , fs    = singleton 1
-                  } where delta (0, 0) = 1
-                          delta (0, 1) = 2
+                  } where δ (0, 0) = 1
+                          δ (0, 1) = 2
 
-                          delta (1, 0) = 1
-                          delta (1, 1) = 1
+                          δ (1, 0) = 1
+                          δ (1, 1) = 1
 
-                          delta (2, 0) = 2
-                          delta (2, 1) = 2
+                          δ (2, 0) = 2
+                          δ (2, 1) = 2
 
 -- Coursera Stanford Automata, NFA lecture
 -- http://spark-public.s3.amazonaws.com/automata/slides/4_fa3.pdf
 data RB = Red | Black deriving (Eq, Enum, Ord, Bounded, Show)
 instance Finite RB
 board ∷ NFA.NFA Fin₉ RB
-board = NFA.NFA { NFA.delta = delta
+board = NFA.NFA { NFA.delta = δ
                 , NFA.q0    = 0
                 , NFA.fs    = singleton 8
-                } where delta (0,   Red) = fromList  [1, 3]
-                        delta (0, Black) = singleton  4
-                        delta (1,   Red) = fromList  [3, 5]
-                        delta (1, Black) = fromList  [0, 2, 4]
-                        delta (2,   Red) = fromList  [1, 5]
-                        delta (2, Black) = singleton  4
-                        delta (3,   Red) = fromList  [1, 7]
-                        delta (3, Black) = fromList  [0, 4, 6]
-                        delta (4,   Red) = fromList  [1, 3, 5, 7]
-                        delta (4, Black) = fromList  [0, 2, 6, 8]
-                        delta (5,   Red) = fromList  [1, 7]
-                        delta (5, Black) = fromList  [2, 4, 8]
-                        delta (6,   Red) = fromList  [3, 7]
-                        delta (6, Black) = singleton  4
-                        delta (7,   Red) = fromList  [3, 5]
-                        delta (7, Black) = fromList  [4, 6, 8]
-                        delta (8,   Red) = fromList  [5, 7]
-                        delta (8, Black) = singleton  4
+                } where δ (0,   Red) = fromList  [1, 3]
+                        δ (0, Black) = singleton  4
+                        δ (1,   Red) = fromList  [3, 5]
+                        δ (1, Black) = fromList  [0, 2, 4]
+                        δ (2,   Red) = fromList  [1, 5]
+                        δ (2, Black) = singleton  4
+                        δ (3,   Red) = fromList  [1, 7]
+                        δ (3, Black) = fromList  [0, 4, 6]
+                        δ (4,   Red) = fromList  [1, 3, 5, 7]
+                        δ (4, Black) = fromList  [0, 2, 6, 8]
+                        δ (5,   Red) = fromList  [1, 7]
+                        δ (5, Black) = fromList  [2, 4, 8]
+                        δ (6,   Red) = fromList  [3, 7]
+                        δ (6, Black) = singleton  4
+                        δ (7,   Red) = fromList  [3, 5]
+                        δ (7, Black) = fromList  [4, 6, 8]
+                        δ (8,   Red) = fromList  [5, 7]
+                        δ (8, Black) = singleton  4
 
 data Decimal = Plus | Minus | Period deriving (Eq, Ord, Enum, Bounded)
 instance Finite Decimal
@@ -297,135 +273,135 @@ instance Show Decimal where
 
 -- HMU Figure 2.18 Pg.73
 hmu218 ∷ EFA.EFA Fin₆ (Either Decimal Fin₁₀)
-hmu218 = EFA.EFA { EFA.delta = delta
+hmu218 = EFA.EFA { EFA.delta = δ
                  , EFA.q0    = 0
                  , EFA.fs    = singleton 5
-                 } where delta (0, Just (Left   Plus)) = singleton 1
-                         delta (0, Just (Left  Minus)) = singleton 1
-                         delta (0,            Nothing) = singleton 1
-                         delta (1, Just (Left Period)) = singleton 2
-                         delta (1, Just (Right     _)) = fromList  [1, 4]
-                         delta (2, Just (Right     _)) = singleton 3
-                         delta (3, Just (Right     _)) = singleton 3
-                         delta (3,            Nothing) = singleton 5
-                         delta (4, Just (Left Period)) = singleton 3
-                         delta  _                      = (∅)
+                 } where δ (0, Just (Left   Plus)) = singleton 1
+                         δ (0, Just (Left  Minus)) = singleton 1
+                         δ (0,            Nothing) = singleton 1
+                         δ (1, Just (Left Period)) = singleton 2
+                         δ (1, Just (Right     _)) = fromList  [1, 4]
+                         δ (2, Just (Right     _)) = singleton 3
+                         δ (3, Just (Right     _)) = singleton 3
+                         δ (3,            Nothing) = singleton 5
+                         δ (4, Just (Left Period)) = singleton 3
+                         δ  _                      = (∅)
 
 -- [[0],[1],[0,1],[0,0,0],[0,1,1],[1,1,1]
 ex144 ∷ EFA.EFA Fin₆ Fin₂
-ex144 = EFA.EFA { EFA.delta = delta
+ex144 = EFA.EFA { EFA.delta = δ
                 , EFA.q0    = 0
                 , EFA.fs    = singleton 3
-                } where delta (0, Just  0) = singleton 4
-                        delta (0, Just  1) = singleton 1
-                        delta (1, Just  1) = singleton 2
-                        delta (1, Nothing) = singleton 3
-                        delta (2, Just  1) = singleton 3
-                        delta (4, Just  0) = singleton 5
-                        delta (4, Nothing) = fromList  [1, 2]
-                        delta (5, Just  0) = singleton 3
-                        delta _            = (∅)
+                } where δ (0, Just  0) = singleton 4
+                        δ (0, Just  1) = singleton 1
+                        δ (1, Just  1) = singleton 2
+                        δ (1, Nothing) = singleton 3
+                        δ (2, Just  1) = singleton 3
+                        δ (4, Just  0) = singleton 5
+                        δ (4, Nothing) = fromList  [1, 2]
+                        δ (5, Just  0) = singleton 3
+                        δ _            = (∅)
 
 closuresExample ∷ EFA.EFA Fin₇ Fin₂
-closuresExample = EFA.EFA { EFA.delta = delta
+closuresExample = EFA.EFA { EFA.delta = δ
                           , EFA.q0 = 0
                           , EFA.fs = singleton 3
-                          } where delta (0, Nothing) = fromList  [1, 2]
-                                  delta (1, Just  1) = singleton 4
-                                  delta (1, Nothing) = singleton 3
-                                  delta (2, Just  0) = singleton 6
-                                  delta (2, Nothing) = singleton 5
-                                  delta (5, Nothing) = singleton 0
-                                  delta _            = (∅)
+                          } where δ (0, Nothing) = fromList  [1, 2]
+                                  δ (1, Just  1) = singleton 4
+                                  δ (1, Nothing) = singleton 3
+                                  δ (2, Just  0) = singleton 6
+                                  δ (2, Nothing) = singleton 5
+                                  δ (5, Nothing) = singleton 0
+                                  δ _            = (∅)
 
 -- https://youtu.be/1GZOzTJOBuM
 minimal ∷ DFA Fin₅ Fin₂
-minimal = DFA { delta = delta
+minimal = DFA { delta = δ
               , q0    = 0
               , fs    = singleton 4
-              } where delta (0, 0) = 1
-                      delta (0, 1) = 2
-                      delta (1, 0) = 1
-                      delta (1, 1) = 3
-                      delta (2, 0) = 1
-                      delta (2, 1) = 2
-                      delta (3, 0) = 1
-                      delta (3, 1) = 4
-                      delta (4, 0) = 1
-                      delta (4, 1) = 2
+              } where δ (0, 0) = 1
+                      δ (0, 1) = 2
+                      δ (1, 0) = 1
+                      δ (1, 1) = 3
+                      δ (2, 0) = 1
+                      δ (2, 1) = 2
+                      δ (3, 0) = 1
+                      δ (3, 1) = 4
+                      δ (4, 0) = 1
+                      δ (4, 1) = 2
 
 -- https://youtu.be/TvMEX2htBYw
 minimal' ∷ DFA Fin₁₀ Fin₂
-minimal' = DFA { delta = delta
+minimal' = DFA { delta = δ
                , q0    = 0
                , fs    = fromList [5, 6]
-               } where delta (0, 0) = 7
-                       delta (0, 1) = 1
-                       delta (1, 0) = 7
-                       delta (1, 1) = 0
-                       delta (2, 0) = 4
-                       delta (2, 1) = 5
-                       delta (3, 0) = 4
-                       delta (3, 1) = 5
-                       delta (4, 0) = 6
-                       delta (4, 1) = 6
-                       delta (5, 0) = 5
-                       delta (5, 1) = 5
-                       delta (6, 0) = 6
-                       delta (6, 1) = 5
-                       delta (7, 0) = 2
-                       delta (7, 1) = 2
-                       delta _      = 9
+               } where δ (0, 0) = 7
+                       δ (0, 1) = 1
+                       δ (1, 0) = 7
+                       δ (1, 1) = 0
+                       δ (2, 0) = 4
+                       δ (2, 1) = 5
+                       δ (3, 0) = 4
+                       δ (3, 1) = 5
+                       δ (4, 0) = 6
+                       δ (4, 1) = 6
+                       δ (5, 0) = 5
+                       δ (5, 1) = 5
+                       δ (6, 0) = 6
+                       δ (6, 1) = 5
+                       δ (7, 0) = 2
+                       δ (7, 1) = 2
+                       δ _      = 9
 
 -- http://i.stack.imgur.com/AD6WJ.png
 exactly20s ∷ DFA Fin₄ Fin₂
-exactly20s = DFA { delta = delta
+exactly20s = DFA { delta = δ
                  , q0    = 0
                  , fs    = singleton 2
-                 } where delta (0, 0) = 1
-                         delta (0, 1) = 0
+                 } where δ (0, 0) = 1
+                         δ (0, 1) = 0
 
-                         delta (1, 0) = 2
-                         delta (1, 1) = 1
+                         δ (1, 0) = 2
+                         δ (1, 1) = 1
 
-                         delta (2, 0) = 3
-                         delta (2, 1) = 2
+                         δ (2, 0) = 3
+                         δ (2, 1) = 2
 
-                         delta (3, 0) = 3
-                         delta (3, 1) = 3
+                         δ (3, 0) = 3
+                         δ (3, 1) = 3
 
 -- http://i.stack.imgur.com/AD6WJ.png
 atleast21s ∷ DFA Fin₃ Fin₂
-atleast21s = DFA { delta = delta
+atleast21s = DFA { delta = δ
                  , q0    = 0
                  , fs    = singleton 2
-                 } where delta (0, 0) = 0
-                         delta (0, 1) = 1
+                 } where δ (0, 0) = 0
+                         δ (0, 1) = 1
 
-                         delta (1, 0) = 1
-                         delta (1, 1) = 2
+                         δ (1, 0) = 1
+                         δ (1, 1) = 2
 
-                         delta (2, 0) = 2
-                         delta (2, 1) = 2
+                         δ (2, 0) = 2
+                         δ (2, 1) = 2
 
 exactly20sANDatleast21s ∷ DFA (Fin₄, Fin₃) Fin₂
 exactly20sANDatleast21s  = exactly20s `DFA.intersection` atleast21s
 
 -- The language ["123456789"]
 digitsNFA ∷ NFA.NFA Fin₁₀ Fin₁₀
-digitsNFA = NFA.NFA { NFA.delta = delta
+digitsNFA = NFA.NFA { NFA.delta = δ
                     , NFA.q0 = 0
                     , NFA.fs = singleton 9
-                    } where delta (0, 1) = singleton 1
-                            delta (1, 2) = singleton 2
-                            delta (2, 3) = singleton 3
-                            delta (3, 4) = singleton 4
-                            delta (4, 5) = singleton 5
-                            delta (5, 6) = singleton 6
-                            delta (6, 7) = singleton 7
-                            delta (7, 8) = singleton 8
-                            delta (8, 9) = singleton 9
-                            delta _      = (∅)
+                    } where δ (0, 1) = singleton 1
+                            δ (1, 2) = singleton 2
+                            δ (2, 3) = singleton 3
+                            δ (3, 4) = singleton 4
+                            δ (4, 5) = singleton 5
+                            δ (5, 6) = singleton 6
+                            δ (6, 7) = singleton 7
+                            δ (7, 8) = singleton 8
+                            δ (8, 9) = singleton 9
+                            δ _      = (∅)
 
 {-
 data StackSym = X0 | Y0 deriving (Eq, Ord, Enum, Bounded, Show)
@@ -433,33 +409,33 @@ data StackSym = X0 | Y0 deriving (Eq, Ord, Enum, Bounded, Show)
 -- The standard PDA example language {L : 0ⁿ1ⁿ for n > 0 }
 -- {"01","0011","000111","00001111","0000011111","000000111111","00000001111111","0000000011111111", ...}
 example ∷ PDA.PDA Fin₃ (Either () StackSym) Fin₂
-example = PDA.PDA { PDA.delta = delta
+example = PDA.PDA { PDA.delta = δ
                   , PDA.q0    = Fin₃ 0
                   , PDA.z0    = Left ()
                   , PDA.fs    = singleton (Fin₃ 2)
-                  } where delta (Fin₃ 0, Just 0,  Left  ()) = singleton (Fin₃ 0, [Right X0, Left  ()])
-                          delta (Fin₃ 0, Just 0,  Right X0) = singleton (Fin₃ 0, [Right X0, Right X0])
-                          delta (Fin₃ 0, Just 1,  Right X0) = singleton (Fin₃ 1, [                  ])
-                          delta (Fin₃ 1, Just 1,  Right X0) = singleton (Fin₃ 1, [                  ])
-                          delta (Fin₃ 1, Nothing, Left  ()) = singleton (Fin₃ 2, [           Left ()])
-                          delta _                           = (∅)
+                  } where δ (Fin₃ 0, Just 0,  Left  ()) = singleton (Fin₃ 0, [Right X0, Left  ()])
+                          δ (Fin₃ 0, Just 0,  Right X0) = singleton (Fin₃ 0, [Right X0, Right X0])
+                          δ (Fin₃ 0, Just 1,  Right X0) = singleton (Fin₃ 1, [                  ])
+                          δ (Fin₃ 1, Just 1,  Right X0) = singleton (Fin₃ 1, [                  ])
+                          δ (Fin₃ 1, Nothing, Left  ()) = singleton (Fin₃ 2, [           Left ()])
+                          δ _                           = (∅)
 
 -- https://en.wikipedia.org/wiki/Pushdown_automaton#Example
 -- https://en.wikipedia.org/wiki/Pushdown_automaton#/media/File:Pda-example.svg
 -- The standard PDA example language {L : 0ⁿ1ⁿ | n ≥ 0 }
 -- "", "01","0011","000111","00001111","0000011111","000000111111","00000001111111","0000000011111111", ...
 wiki ∷ PDA.PDA Fin₃ Fin₂ Fin₂
-wiki = PDA.PDA { PDA.delta = delta
+wiki = PDA.PDA { PDA.delta = δ
                , PDA.q0 = 0
                , PDA.z0 = 1
                , PDA.fs = singleton 2
-               } where delta (0, Just  0, 1) = singleton (0, [0, 1])
-                       delta (0, Just  0, 0) = singleton (0, [0, 0])
-                       delta (0, Nothing, 1) = singleton (1, [   1])
-                       delta (0, Nothing, 0) = singleton (1, [   0])
-                       delta (1, Just  1, 0) = singleton (1, [    ])
-                       delta (1, Nothing, 1) = singleton (2, [   1])
-                       delta _               = (∅)
+               } where δ (0, Just  0, 1) = singleton (0, [0, 1])
+                       δ (0, Just  0, 0) = singleton (0, [0, 0])
+                       δ (0, Nothing, 1) = singleton (1, [   1])
+                       δ (0, Nothing, 0) = singleton (1, [   0])
+                       δ (1, Just  1, 0) = singleton (1, [    ])
+                       δ (1, Nothing, 1) = singleton (2, [   1])
+                       δ _               = (∅)
 
 -- wwʳ (or "w then w-reversed"), even length palindromes
 -- 62, Page 230, HMU 3rd Edition
@@ -495,45 +471,45 @@ instance Finite RP
 -- fmap (>>= (either show show)) (take 10 $ PDA.language balanced)
 -- ["","()","(())","()()","((()))","(()())","(())()","()(())","()()()","(((())))"]
 balanced ∷ PDA.PDA Bool (Either () LP) (Either LP RP)
-balanced = PDA.PDA { PDA.delta = delta
+balanced = PDA.PDA { PDA.delta = δ
                    , PDA.q0    = False
                    , PDA.z0    = Left ()
                    , PDA.fs    = singleton True
-                   } where delta (False, Just (Left  LParen), Left      ()) = singleton (False, [Right LParen, Left      ()])
-                           delta (False, Just (Left  LParen), Right LParen) = singleton (False, [Right LParen, Right LParen])
-                           delta (False, Just (Right RParen), Right LParen) = singleton (False, [                          ])
-                           delta (False,             Nothing, Left      ()) = singleton (True,  [              Left      ()])
-                           delta _                                          = (∅)
+                   } where δ (False, Just (Left  LParen), Left      ()) = singleton (False, [Right LParen, Left      ()])
+                           δ (False, Just (Left  LParen), Right LParen) = singleton (False, [Right LParen, Right LParen])
+                           δ (False, Just (Right RParen), Right LParen) = singleton (False, [                          ])
+                           δ (False,             Nothing, Left      ()) = singleton (True,  [              Left      ()])
+                           δ _                                          = (∅)
 -}
 {-
 -- Example from Stanford Automata course, the "Turing Machines" lecture
 -- Stanford Automata lecture 4 - 4 - 16, "Turing Machines"
 exampleTM ∷ TM.TM Bool Fin₂ Void
-exampleTM = TM.TM { TM.delta = delta
+exampleTM = TM.TM { TM.delta = δ
                   , TM.q0    = False
                   , TM.fs    = singleton True
-                  } where delta (False, Left  0      ) = Just (False, Left 0, TM.R')
-                          delta (False, Left  1      ) = Just ( True, Left 0, TM.R')
-                          delta (False, Right Nothing) = Just (False, Left 1, TM.L')
-                          delta _                      = Nothing  -- Halt
+                  } where δ (False, Left  0      ) = Just (False, Left 0, TM.R')
+                          δ (False, Left  1      ) = Just ( True, Left 0, TM.R')
+                          δ (False, Right Nothing) = Just (False, Left 1, TM.L')
+                          δ _                      = Nothing  -- Halt
 
 -- HMU pg 329, Figure 8.9
 -- { 0ⁿ1ⁿ | n ≥ 1 }
 hmu89 ∷ TM.TM Fin₆ Fin₂ StackSym
-hmu89 = TM.TM { TM.delta = delta
+hmu89 = TM.TM { TM.delta = δ
               , TM.q0    = 0
               , TM.fs    = singleton 4
-              } where delta (0, Left  0        ) = Just (1, Right (Just X0), TM.R')
-                      delta (0, Right (Just Y0)) = Just (3, Right (Just Y0), TM.R')
-                      delta (1, Left  0        ) = Just (1, Left  0,         TM.R')
-                      delta (1, Left  1        ) = Just (2, Right (Just Y0), TM.L')
-                      delta (1, Right (Just Y0)) = Just (1, Right (Just Y0), TM.R')
-                      delta (2, Left  0        ) = Just (2, Left  0,         TM.L')
-                      delta (2, Right (Just X0)) = Just (0, Right (Just X0), TM.R')
-                      delta (2, Right (Just Y0)) = Just (2, Right (Just Y0), TM.L')
-                      delta (3, Right (Just Y0)) = Just (3, Right (Just Y0), TM.R')
-                      delta (3, Right Nothing  ) = Just (4, Right Nothing,   TM.R')
-                      delta _                    = Nothing
+              } where δ (0, Left  0        ) = Just (1, Right (Just X0), TM.R')
+                      δ (0, Right (Just Y0)) = Just (3, Right (Just Y0), TM.R')
+                      δ (1, Left  0        ) = Just (1, Left  0,         TM.R')
+                      δ (1, Left  1        ) = Just (2, Right (Just Y0), TM.L')
+                      δ (1, Right (Just Y0)) = Just (1, Right (Just Y0), TM.R')
+                      δ (2, Left  0        ) = Just (2, Left  0,         TM.L')
+                      δ (2, Right (Just X0)) = Just (0, Right (Just X0), TM.R')
+                      δ (2, Right (Just Y0)) = Just (2, Right (Just Y0), TM.L')
+                      δ (3, Right (Just Y0)) = Just (3, Right (Just Y0), TM.R')
+                      δ (3, Right Nothing  ) = Just (4, Right Nothing,   TM.R')
+                      δ _                    = Nothing
 
 
 -- TODO accepts by halting, create a new data type without fs?
@@ -542,11 +518,11 @@ So the successor’s output on 111101 was 000011 which is the reverse binary rep
 www.cs.columbia.edu/~zeph/3261/L14/TuringMachine.pdf   L14
 -}
 successor ∷ TM.TM Bool Fin₂ Void
-successor = TM.TM { TM.delta = delta
+successor = TM.TM { TM.delta = δ
                   , TM.q0    = False
                   , TM.fs    = singleton True
-                  } where delta (False, Left  0      ) = Just ( True, Left  1, TM.R')
-                          delta (False, Left  1      ) = Just (False, Left 0, TM.R')
-                          delta (False, Right Nothing) = Just ( True, Left  1, TM.R')
-                          delta _                      = Nothing
+                  } where δ (False, Left  0      ) = Just ( True, Left  1, TM.R')
+                          δ (False, Left  1      ) = Just (False, Left 0, TM.R')
+                          δ (False, Right Nothing) = Just ( True, Left  1, TM.R')
+                          δ _                      = Nothing
 -}

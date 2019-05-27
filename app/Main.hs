@@ -1,6 +1,5 @@
 import DFA
 import Examples
-import Common
 import Finite
 import Config
 import Numeric.Natural.Unicode

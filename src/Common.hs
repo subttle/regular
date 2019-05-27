@@ -47,13 +47,13 @@ meta ∷ (Functor f, Functor g) ⇒ Algebra f a → CoAlgebra g b → (a → b) 
 meta φ ψ h = ana ψ . h . cata φ
 
 -- Hylomorphism
-hylo :: (Functor f) ⇒ Algebra f a → CoAlgebra f b → b → a
+hylo ∷ (Functor f) ⇒ Algebra f a → CoAlgebra f b → b → a
 hylo (Algebra φ) (CoAlgebra ψ) = φ . fmap (hylo (Algebra φ) (CoAlgebra ψ)) . ψ
 
-elgot :: (Functor f) ⇒ Algebra f b → (a → Either b (f a)) → a → b
+elgot ∷ (Functor f) ⇒ Algebra f b → (a → Either b (f a)) → a → b
 elgot (Algebra φ) ψ = (id ||| φ . fmap (elgot (Algebra φ) ψ)) . ψ                
 
-coelgot :: (Functor f) ⇒ ((a, f b) → b) → CoAlgebra f a → a → b
+coelgot ∷ (Functor f) ⇒ ((a, f b) → b) → CoAlgebra f a → a → b
 coelgot φ (CoAlgebra ψ) = φ . (id &&& fmap (coelgot φ (CoAlgebra ψ)) . ψ)
 
 andAlg ∷ Algebra (ListF Bool) Bool

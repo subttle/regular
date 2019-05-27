@@ -160,7 +160,7 @@ indistinguishable = (DFA.equal `on`) . right
 
 -- The equivalence relation formed on Q by indistinguishable states for m
 indistinguishability ∷ (Finite q, Finite s) ⇒ DFA q s → Equivalence q
-indistinguishability m = Equivalence { getEquivalence = indistinguishable m }
+indistinguishability = Equivalence . indistinguishable
 
 corange ∷ (Finite q, Finite s) ⇒ DFA q s → Set (q, s)
 corange m = qs m × sigma m
@@ -170,7 +170,7 @@ deltaToMap m@(DFA δ _ _) = Map.fromSet δ (corange m)
 
 -- The transition table of the DFA's δ function
 table ∷ (Finite q, Finite s) ⇒ DFA q s → [((q, s), q)]
-table m = Map.toAscList (deltaToMap m)
+table = Map.toAscList . deltaToMap
 
 -- ℒ(m) is cofinite in Σ★ iff the complement of ℒ(m) (in Σ★) is finite.
 cofinite ∷ (Finite q, Finite s) ⇒                       DFA q s → Bool
