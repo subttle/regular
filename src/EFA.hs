@@ -19,6 +19,7 @@ import           Common
 import qualified TransitionGraph as TG
 import qualified FA
 import qualified RegExp as RE
+import qualified ERE as Ex
 -- import           Algebra.Graph.Relation as Relation
 import           Config
 
@@ -180,8 +181,8 @@ fromLang [] = SomeEFA EFA.empty
 fromLang ws = foldl1 (\(SomeEFA m₁) (SomeEFA m₂) → SomeEFA (EFA.union m₁ m₂)) (fmap EFA.fromList ws)
 
 -- TODO deleteme
--- lang ∷ (Finite s) ⇒ SomeEFA s → [[s]]
--- lang (SomeEFA m) = language m
+lang ∷ (Finite s) ⇒ SomeEFA s → [[s]]
+lang (SomeEFA m) = language m
 
 -- Thompson's construction
 fromRE ∷ (Eq s) ⇒ RE.RegExp s → SomeEFA s
@@ -197,6 +198,39 @@ fromRE (α RE.:. β) = concatenate' (fromRE α) (fromRE β)
 fromRE (RE.Star α) = star'        (fromRE α)
                where star'        ∷             SomeEFA s → SomeEFA s
                      star'                     (SomeEFA m)  = SomeEFA (EFA.star m)
+
+-- Thompson's construction on regular expressions extended with intersection
+fromERE ∷ forall s . (Eq s) ⇒ Ex.ExRE s → SomeEFA s
+fromERE Ex.Zero     = SomeEFA EFA.empty
+fromERE Ex.One      = SomeEFA epsilon
+fromERE (Ex.Lit  σ) = SomeEFA (literal σ)
+fromERE (α Ex.:| β) = union'       (fromERE α) (fromERE β)
+                where union'       ∷ SomeEFA s → SomeEFA s → SomeEFA s
+                      union'       (SomeEFA m₁) (SomeEFA m₂) = SomeEFA (EFA.union       m₁ m₂)
+fromERE (α Ex.:. β) = concatenate' (fromERE α) (fromERE β)
+                where concatenate' ∷ SomeEFA s → SomeEFA s → SomeEFA s
+                      concatenate' (SomeEFA m₁) (SomeEFA m₂) = SomeEFA (EFA.concatenate m₁ m₂)
+fromERE (α Ex.:& β) = intersect'   (fromERE α) (fromERE β)
+                where intersect'   ∷ SomeEFA s → SomeEFA s → SomeEFA s
+                      intersect'   (SomeEFA m₁) (SomeEFA m₂) = SomeEFA (EFA.synchronous m₁ m₂)
+fromERE (Ex.Star α) = star'        (fromERE α)
+                where star'        ∷             SomeEFA s → SomeEFA s
+                      star'                     (SomeEFA m)  = SomeEFA (EFA.star m)
+
+-- Intersection via the synchronous product automaton
+-- TODO I haven't yet verified that this follows the same McNaughton-Yamada-Thompson constraints used
+-- TODO in all the other functions (noted with "for Thompson's construction") but the preliminary
+-- TODO testing I've done so far seems to indicate that it works
+-- Pg 58. http://www.dcc.fc.up.pt/~nam/web/resources/rafaelamsc.pdf
+synchronous ∷ forall q p s . (Ord q, Ord p) ⇒ EFA q s → EFA p s → EFA (q, p) s
+synchronous (EFA δ₁ q₀ f₁) (EFA δ₂ p₀ f₂) = EFA { delta = δ
+                                                , q0    = (q₀, p₀)
+                                                , fs    = f₁ × f₂
+                                                } where δ ∷ ((q, p), Maybe s) → Set (q, p)
+                                                        δ ((q, p), Nothing) = (δ₁ (q, Nothing) × δ₂ (p, Nothing))
+                                                                            ∪  δ₁ (q, Nothing) × singleton p
+                                                                            ∪ singleton q      × δ₂ (p, Nothing)
+                                                        δ ((q, p), σ)       =  δ₁ (q, σ)       × δ₂ (p, σ)
 
 -- Union for Thompson's construction
 union ∷ (Ord q, Ord p) ⇒ EFA q s → EFA p s → EFA (Either Bool (Either q p)) s
@@ -232,15 +266,6 @@ star (EFA δ q₀ f) = EFA { delta = δ₁
                                 δ₁ (Left     _,       _)         = (∅)
                                 δ₁ (Right    q, Nothing) | q ∈ f = map Right (δ (q, Nothing)) ∪ Set.fromList [Right q₀, Left True]
                                 δ₁ (Right    q,       σ)         = map Right (δ (q,       σ))
-
--- FIXME test this
--- The product construction
--- Essentially this runs two NFAs (which both share the same alphabet) "in parallel" together in lock step
-synchronous ∷ (Ord q, Ord p) ⇒ EFA q s → EFA p s → EFA (q, p) s
-synchronous (EFA δ₁ q₀ f₁) (EFA δ₂ p₀ f₂) = EFA { delta = δ
-                                                , q0    = (q₀, p₀)
-                                                , fs    = f₁ × f₂
-                                                } where δ ((q, p), σ) = δ₁ (q, σ) × δ₂ (p, σ)
 
 -- FIXME test me, I wrote this when tired
 -- The asynchronous product of two EFA

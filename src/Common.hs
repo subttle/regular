@@ -151,7 +151,7 @@ partitions' = Foldable.foldl (\xs → (xs >>=) . go) [[]]
 
 -- A version of List.findIndex which returns `Maybe ℕ` instead of `Maybe Int`
 findIndex' ∷ (a → Bool) → [a] → Maybe ℕ
-findIndex' p xs = fmap fromIntegral (List.findIndex p xs)
+findIndex' p = fmap fromIntegral . List.findIndex p
 
 indexed ∷ [a] → [(a, ℕ)]
 indexed = indexed' 0 -- To use an index starting at 1, change this `0` to `1`
