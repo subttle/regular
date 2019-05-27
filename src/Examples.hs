@@ -102,7 +102,7 @@ troth sounding. Please tell me what manipulations of
 incense and organ I should make to get the house quiet, and
 to keep it so"
 [1] An Introduction to Cybernetics, W. Ross Ashby, 1956, pg 60-61
-[2] http://csseminar.kadm.usu.ru/tarragona_volkov2008.pdf              -}
+[2] http://csseminar.imkn.urfu.ru/tarragona_volkov2008.pdf             -}
 
 -- The states, i.e. Q : (Bool × Bool) represent the status of the ghosts singing and laughing, respectively,
 -- and the alphabet, i.e. Σ : (Bool × Bool) represents the actions of playing an organ and lighting incense, respectively.
