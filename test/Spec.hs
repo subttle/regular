@@ -6,7 +6,7 @@ import           DFA
 -- import qualified NFA
 -- import qualified EFA
 -- import qualified GFA
--- import qualified RegExp as RE
+import qualified RegExp as RE
 import           Common
 import           Finite
 import           Examples
@@ -30,6 +30,7 @@ suite = tests [ scope "DFA.empty"     . expect $ Config.language DFA.empty      
                                                      , Prelude.take 2 (Config.language e3L1L2) == [[C, A, R, R], [C, A, R, R, O]]
                                                      ]
               , scope "DFA.quotient"  . expect $ minimal `DFA.equal` (quotient minimal) && size' (useful (quotient minimal)) < size' (useful (minimal))
+              , scope "DFA.toRE"      . expect $ toRE by5 `RE.equivalent` by5'
               ]
     where e3L1 ∷ DFA Fin₈ Alpha
           e3L1   = DFA { delta = δ
