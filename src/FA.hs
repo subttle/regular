@@ -44,7 +44,7 @@ instance (Finite q, Finite s) ⇒ Configuration FA q s (Set q) where
   codeterministic = deterministic . reversal
 
   complete ∷ FA q s → Bool
-  complete      m            =                all ((≥ 1) . size') (range m)
+  complete                   =                all ((≥ 1) . size') . range
 
   occupied ∷ FA q s → Set q → Set q
   occupied _ = id
@@ -177,4 +177,4 @@ range ∷ (Finite q, Finite s) ⇒ FA q s → Set (Set q)
 range m@(FA δ _ _) = Set.map δ (corange m)
 
 table ∷ (Finite q, Finite s) ⇒ FA q s → [((q, s), Set q)]
-table m = Map.toAscList (deltaToMap m)
+table = Map.toAscList . deltaToMap

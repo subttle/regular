@@ -123,7 +123,7 @@ range m@(EFA δ _ _) = Set.map δ (corange m)
 
 -- The transition table of the EFA
 table ∷ (Finite q, Finite s) ⇒ EFA q s → [((q, Maybe s), Set q)]
-table m = Map.toAscList (deltaToMap m)
+table = Map.toAscList . deltaToMap
 
 -- ε-closure of a set of states
 -- Computes the set of states accessible from given state when no input can be consumed (0 or more ε-transitions)

@@ -59,10 +59,10 @@ instance (Show s, Finite s) ⇒ Show (SomeNFA s) where
 
 instance (Finite q, Finite s) ⇒ Configuration NFA q s (Set q) where
   complete      ∷ NFA q s → Bool
-  complete      m = all ((≥ 1) . size') (range m)
+  complete      = all ((≥ 1) . size') . range
 
   deterministic ∷ NFA q s → Bool
-  deterministic m = all ((≤ 1) . size') (range m)
+  deterministic = all ((≤ 1) . size') . range
   
   codeterministic ∷ NFA q s → Bool
   codeterministic = deterministic . FA.reversal . toFA
@@ -113,7 +113,7 @@ range m@(NFA δ _ _) = Set.map δ (corange m)
 
 -- The transition table of the NFA
 table ∷ (Finite q, Finite s) ⇒ NFA q s → [((q, s), Set q)]
-table m = Map.toAscList (deltaToMap m)
+table = Map.toAscList . deltaToMap
 
 -- The NFA, empty, such that
 -- ℒ(empty) = ∅
@@ -164,7 +164,7 @@ fromList (σ : w) = fromNE (σ NE.:| w)
 -- necessary, i.e. `foldl (\(SomeNFA acc) σ → SomeNFA (concatenate acc (literal σ))) (SomeNFA epsilon)`
 -- will concatenate the last symbol in the string with epsilon.
 fromNE ∷ (Eq s) ⇒ NE.NonEmpty s → SomeNFA s
-fromNE  w = foldl1 (\(SomeNFA acc) (SomeNFA σ) → SomeNFA (concatenate acc σ)) (fmap (SomeNFA . literal) w)
+fromNE = foldl1 (\(SomeNFA acc) (SomeNFA σ) → SomeNFA (concatenate acc σ)) . fmap (SomeNFA . literal)
 
 -- Given two NFAs m₁ and m₂, return an NFA which recognizes any string from
 -- m₁ immediately followed by any string from m₂
