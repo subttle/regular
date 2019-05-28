@@ -29,8 +29,9 @@ import           Data.Profunctor as Profunctor
 
 -- By using types in this way we can enforce many conditions for GFA
 -- (e.g. qᵢ can have no incoming arrows, qᶠ can have no outgoing arrows)
-data GFA q s =   -- δ : (Q \ {qᶠ}) × (Q \ {qᵢ}) → Regular Expression
-     GFA { delta ∷ (Either Init q, Either Final q) → RE.RegExp s }
+data GFA q s where
+  -- δ : (Q \ {qᶠ}) × (Q \ {qᵢ}) → Regular Expression
+  GFA ∷ { delta ∷ (Either Init q, Either Final q) → RE.RegExp s } → GFA q s
 
 instance (Finite q) ⇒ Q (GFA q s) (Either (Either Init Final) q)
 instance (Finite s) ⇒ Σ (GFA q s) s

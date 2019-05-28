@@ -59,10 +59,10 @@ instance (Show s, Finite s) ⇒ Show (SomeNFA s) where
 
 instance (Finite q, Finite s) ⇒ Configuration NFA q s (Set q) where
   complete      ∷ NFA q s → Bool
-  complete      = all ((≥ 1) . size') . range
+  complete      = all ((≥ 1) . size') . image
 
   deterministic ∷ NFA q s → Bool
-  deterministic = all ((≤ 1) . size') . range
+  deterministic = all ((≤ 1) . size') . image
   
   codeterministic ∷ NFA q s → Bool
   codeterministic = deterministic . FA.reversal . toFA
@@ -102,14 +102,14 @@ instance (Finite q, Finite s) ⇒ Configuration NFA q s (Set q) where
   toGraph ∷ NFA q s → TG.TG q s
   toGraph (NFA δ _ _) = TG.TG (\s → stars (fmap (\q → (q, Set.toList (δ (q, s)))) asList))
 
-corange ∷ (Finite q, Finite s) ⇒ NFA q s → Set (q, s)
-corange m = qs m × sigma m
+domain ∷ (Finite q, Finite s) ⇒ NFA q s → Set (q, s)
+domain m = qs m × sigma m
 
 deltaToMap ∷ (Finite q, Finite s) ⇒ NFA q s → Map (q, s) (Set q)
-deltaToMap m@(NFA δ _ _) = Map.fromSet δ (corange m)
+deltaToMap m@(NFA δ _ _) = Map.fromSet δ (domain m)
 
-range ∷ (Finite q, Finite s) ⇒ NFA q s → Set (Set q)
-range m@(NFA δ _ _) = Set.map δ (corange m)
+image ∷ (Finite q, Finite s) ⇒ NFA q s → Set (Set q)
+image m@(NFA δ _ _) = Set.map δ (domain m)
 
 -- The transition table of the NFA
 table ∷ (Finite q, Finite s) ⇒ NFA q s → [((q, s), Set q)]
@@ -180,10 +180,10 @@ concatenate (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA { delta = δ
 -- The product construction
 -- Essentially this runs two NFAs (which both share the same alphabet) "in parallel" together in lock step
 synchronous ∷ (Ord q, Ord p) ⇒ NFA q s → NFA p s → NFA (q, p) s
-synchronous (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA { delta = δ
+synchronous (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA { delta = \((q, p), σ) → δ₁ (q, σ) × δ₂ (p, σ)
                                                 , q0    = (q₀, p₀)
                                                 , fs    = f₁ × f₂
-                                                } where δ ((q, p), σ) = δ₁ (q, σ) × δ₂ (p, σ)
+                                                }
 
 -- The asynchronous product of two NFA
 -- Essentially this runs two NFAs with different alphabets "in parallel" independently
@@ -215,19 +215,19 @@ toEFA (NFA δ q₀ f) = EFA.EFA { EFA.delta = δₑ
 -- TODO test property that `determinisitic (NFA.determinization m)` is always true
 -- TODO also test that ℒ(m) = ℒ(det(m))
 determinization ∷ (Finite q) ⇒ NFA q s → NFA (Set q) s
-determinization m@(NFA δ q₀ f) = NFA { delta = δ₁
+determinization m@(NFA δ q₀ f) = NFA { delta = \(states, σ) → Set.map (\q → δ (q, σ)) states
                                      , q0    = singleton q₀
                                      , fs    = Set.filter (intersects f) (powerSet (qs m))
-                                     } where δ₁ (states, σ) = Set.map (\q → δ (q, σ)) states
+                                     }
 
 -- Take an EFA and generate an equivalent NFA (Stanford Coursera algo Nondeterminism lecture)
 -- TODO also offer subset construction method?
 fromEFA ∷ (Finite q) ⇒ EFA.EFA q s → NFA q s
-fromEFA m@(EFA.EFA δ q₀ f) = NFA { delta = δₙ
+fromEFA m@(EFA.EFA δ q₀ f) = NFA { delta = \(q, σ) → foldMap (\p → δ (p, Just σ)) (EFA.eclosure m (singleton q))
                                  , q0    = q₀
                                  -- Any state which can reach a final state via epsilon transitions
                                  , fs    = Set.filter (intersects f . EFA.eclosure m . singleton) (qs m)
-                                 } where δₙ (q, σ) = foldMap (\p → δ (p, Just σ)) (EFA.eclosure m (singleton q))
+                                 }
 
 -- For testing if a particular sequence of moves will work
 noEpsilonClosures ∷ (Finite q) ⇒ EFA.EFA q s → NFA q (Maybe s)
@@ -248,7 +248,7 @@ fromFA' m | size' (FA.initial m) == 1 = Just NFA { delta = FA.delta m
           | otherwise                 = Nothing
 
 fromGraph ∷ (Finite q, Finite s) ⇒ TG.TG q s → q → Set q → NFA q s
-fromGraph (TG.TG a) q₀ f = NFA { delta = δ
+fromGraph (TG.TG t) q₀ f = NFA { delta = \(q, s) → postSet q (t s)
                                , q0    = q₀
                                , fs    = f
-                               } where δ (q, s) = postSet q (a s)
+                               }

@@ -1,4 +1,3 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 -- Unfortunately, using Fin types breaks the warnings for incomplete patterns at this time
 {-# OPTIONS_GHC -fno-warn-incomplete-patterns #-}
 
@@ -106,12 +105,14 @@ to keep it so"
 -- and the alphabet, i.e. Σ : (Bool × Bool) represents the actions of playing an organ and lighting incense, respectively.
 -- Each word accepted by the automaton is a solution
 haunted ∷ DFA (Bool, Bool) (Bool, Bool)
-haunted = DFA { delta = δ
+haunted = DFA { delta = \((song, laughter), (organ, incense)) → ( if not laughter ∧ organ then not song else song
+                                                                , if incense then song else not song
+                                                                )
               -- Start with ghosts both singing and laughing
               , q0    =           (True,  True)
               -- End with ghosts neither singing nor laughing
               , fs    = singleton (False, False)
-              } where δ ((singing, laughing), (organ, incense)) = (if not laughing ∧ organ then not singing else singing, if incense then singing else not singing)
+              }
 
 -- Farmer's problem
 -- The goal of the problem is to get all the items safely and efficiently to the opposite

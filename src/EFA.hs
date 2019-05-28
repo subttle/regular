@@ -112,14 +112,14 @@ instance (Finite q, Finite s) ⇒ Configuration EFA q s (Set q) where
 
 -- Convert the transition function to a Map
 deltaToMap ∷ (Finite q, Finite s) ⇒ EFA q s → Map (q, Maybe s) (Set q)
-deltaToMap m@(EFA δ _ _) = Map.fromSet δ (corange m)
+deltaToMap m@(EFA δ _ _) = Map.fromSet δ (domain m)
 
-corange ∷ (Finite q, Finite s) ⇒ EFA q s → Set (q, Maybe s)
-corange m = qs m × sigma_ε m
+domain ∷ (Finite q, Finite s) ⇒ EFA q s → Set (q, Maybe s)
+domain m = qs m × sigma_ε m
 
--- The range of the transition function
-range ∷ (Finite q, Finite s) ⇒ EFA q s → Set (Set q)
-range m@(EFA δ _ _) = Set.map δ (corange m)
+-- The image of the transition function
+image ∷ (Finite q, Finite s) ⇒ EFA q s → Set (Set q)
+image m@(EFA δ _ _) = Set.map δ (domain m)
 
 -- The transition table of the EFA
 table ∷ (Finite q, Finite s) ⇒ EFA q s → [((q, Maybe s), Set q)]

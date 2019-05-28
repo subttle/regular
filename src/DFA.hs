@@ -162,11 +162,11 @@ indistinguishable = (DFA.equal `on`) . right
 indistinguishability ∷ (Finite q, Finite s) ⇒ DFA q s → Equivalence q
 indistinguishability = Equivalence . indistinguishable
 
-corange ∷ (Finite q, Finite s) ⇒ DFA q s → Set (q, s)
-corange m = qs m × sigma m
+domain ∷ (Finite q, Finite s) ⇒ DFA q s → Set (q, s)
+domain m = qs m × sigma m
 
 deltaToMap ∷ (Finite q, Finite s) ⇒ DFA q s → Map.Map (q, s) q
-deltaToMap m@(DFA δ _ _) = Map.fromSet δ (corange m)
+deltaToMap m@(DFA δ _ _) = Map.fromSet δ (domain m)
 
 -- The transition table of the DFA's δ function
 table ∷ (Finite q, Finite s) ⇒ DFA q s → [((q, s), q)]
@@ -246,10 +246,10 @@ intersection = synchronous
 -- The product construction
 -- Essentially this runs two DFAs (which both share the same alphabet) "in parallel" together in lock step
 synchronous ∷ (Ord q, Ord p) ⇒        DFA q s → DFA p s → DFA (q, p) s
-synchronous (DFA δ₁ q₀ f₁) (DFA δ₂ p₀ f₂) = DFA { delta = δ
+synchronous (DFA δ₁ q₀ f₁) (DFA δ₂ p₀ f₂) = DFA { delta = \((q, p), σ) → (δ₁ (q, σ), δ₂ (p, σ))
                                                 , q0    = (q₀, p₀)
                                                 , fs    = f₁ × f₂
-                                                } where δ ((q, p), σ) = (δ₁ (q, σ), δ₂ (p, σ))
+                                                }
 
 -- The asynchronous product of two DFA
 -- Essentially this runs two DFAs with different alphabets "in parallel" independently

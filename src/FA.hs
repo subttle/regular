@@ -18,7 +18,7 @@ import           Config hiding (initial, final)
 import qualified Config
 import           Finite
 import qualified TransitionGraph as TG
-import           Algebra.Graph.Relation as Relation
+import           Algebra.Graph.Relation (postSet, stars)
 
 -- This is essentially an NFA with multiple start states
 -- Having this type simplifies some algorithms (such as Brzozowski minimization)
@@ -38,13 +38,13 @@ instance Contravariant (FA q) where
 
 instance (Finite q, Finite s) ⇒ Configuration FA q s (Set q) where
   deterministic ∷ FA q s → Bool
-  deterministic m@(FA _ i _) = size' i == 1 ∧ all ((≤ 1) . size') (range m)
+  deterministic m@(FA _ i _) = size' i == 1 ∧ all ((≤ 1) . size') (image m)
 
   codeterministic ∷ FA q s → Bool
   codeterministic = deterministic . reversal
 
   complete ∷ FA q s → Bool
-  complete                   =                all ((≥ 1) . size') . range
+  complete                   =                all ((≥ 1) . size') . image
 
   occupied ∷ FA q s → Set q → Set q
   occupied _ = id
@@ -121,10 +121,10 @@ concatenate (FA δ₁ i₁ f₁) (FA δ₂ i₂ f₂) = FA { delta   = δ
 
 -- The product construction
 synchronous ∷ (Ord q, Ord p) ⇒ FA q s → FA p s → FA (q, p) s
-synchronous (FA δ₁ i₁ f₁) (FA δ₂ i₂ f₂) = FA { delta   = δ
+synchronous (FA δ₁ i₁ f₁) (FA δ₂ i₂ f₂) = FA { delta   = \((q, p), σ) → δ₁ (q, σ) × δ₂ (p, σ)
                                              , initial = i₁ × i₂
                                              , final   = f₁ × f₂
-                                             } where δ ((q, p), σ) = δ₁ (q, σ) × δ₂ (p, σ)
+                                             }
 
 asynchronous ∷ (Ord q, Ord p) ⇒ FA q s → FA p g → FA (q, p) (Either s g)
 asynchronous (FA δ₁ i₁ f₁) (FA δ₂ i₂ f₂) = FA { delta   = δ
@@ -137,10 +137,10 @@ reversal ∷ (Finite q, Finite s) ⇒ FA q s → FA q s
 reversal m@(FA.FA _ i f) = fromGraph (TG.reverse (toGraph m)) f i
 
 fromGraph ∷ (Finite s, Finite q) ⇒ TG.TG q s → Set q → Set q → FA q s
-fromGraph (TG.TG a) i f = FA { delta   = δ
+fromGraph (TG.TG t) i f = FA { delta   = \(q, s) → postSet q (t s)
                              , initial = i
                              , final   = f
-                             } where δ (q, s) = postSet q (a s)
+                             }
 
 instance (Show q, Finite q, Show s, Finite s) ⇒ Show (FA q s) where
   show m = List.intercalate "\n, "
@@ -168,13 +168,13 @@ minimize ∷ (Finite q, Finite s) ⇒ FA q s → FA (Set (Set q)) s
 minimize = determinization . reversal . determinization . reversal -- or even `determinization . codeterminization`
 
 deltaToMap ∷ (Finite q, Finite s) ⇒ FA q s → Map (q, s) (Set q)
-deltaToMap m@(FA δ _ _) = Map.fromSet δ (corange m)
+deltaToMap m@(FA δ _ _) = Map.fromSet δ (domain m)
 
-corange ∷ (Finite q, Finite s) ⇒ FA q s → Set (q, s)
-corange m = qs m × sigma m
+domain ∷ (Finite q, Finite s) ⇒ FA q s → Set (q, s)
+domain m = qs m × sigma m
 
-range ∷ (Finite q, Finite s) ⇒ FA q s → Set (Set q)
-range m@(FA δ _ _) = Set.map δ (corange m)
+image ∷ (Finite q, Finite s) ⇒ FA q s → Set (Set q)
+image m@(FA δ _ _) = Set.map δ (domain m)
 
 table ∷ (Finite q, Finite s) ⇒ FA q s → [((q, s), Set q)]
 table = Map.toAscList . deltaToMap
