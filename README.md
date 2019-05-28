@@ -1,6 +1,6 @@
 # regular (WIP)
 
-Formalisms for representing Regular Languages (Deterministic Finite Automata, Nondeterministic Finite Automata, Regular Expressions, etc.) in Haskell.
+Type-safe formalisms for representing Regular Languages (Deterministic Finite Automata, Nondeterministic Finite Automata, Regular Expressions, etc.) in Haskell.
 
 ## Example
 
@@ -10,12 +10,12 @@ Here is a small example of what FizzBuzz looks like with DFA:
 
 -- A number is divisible by 5 iff its last digit is 0 or 5
 by5 ∷ DFA Bool Fin₁₀
-by5 = DFA { delta = delta
+by5 = DFA { delta = δ
           , q0    = False
           , fs    = singleton True
-          } where delta (_, 0) = True
-                  delta (_, 5) = True
-                  delta _      = False
+          } where δ (_, 0) = True
+                  δ (_, 5) = True
+                  δ _      = False
 
 -- A number is divisible by 3 iff the sum of its digits is divisible by 3
 -- The state we are in is the (running total % 3)
@@ -60,7 +60,6 @@ The code is not yet structured properly, so expect major refactoring and restruc
 I'm patiently (and gratefully!) waiting on a few things from some of the best projects out there right now:
 
 - Labelled graphs in [alga](https://github.com/snowleopard/alga)
-- Easytest from [Unison](https://github.com/unisonweb/unison/)
 - Linear types in Haskell
 - Better dependent type support in Haskell
 
