@@ -47,6 +47,9 @@ instance Contravariant (DFA q) where
   contramap ∷ (g → s) → DFA q s → DFA q g
   contramap h m@(DFA δ _ _) = m { delta = \(q, γ) → δ (q, h γ) }
 
+invhomimage ∷ (g → [s]) → DFA q s → DFA q g
+invhomimage h m@(DFA δ _ _) = m { delta = \(q, γ) → foldl (curry δ) q (h γ) }
+
 instance Contravariant SomeDFA where
   contramap ∷ (g → s) → SomeDFA s → SomeDFA g
   contramap h (SomeDFA m) = SomeDFA (contramap h m)
