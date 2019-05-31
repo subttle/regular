@@ -66,9 +66,16 @@ star ℓ w  = any (all (ℓ . NE.toList)) (partitions w)
 invhom ∷ ([s] → [g]) → ℒ g → ℒ s
 invhom h ℓ = ℓ . h
 
--- ε-free inverse homomorphic image of L under h
-invhomEpsFree ∷ (s → NE.NonEmpty g) → ℒ g → ℒ s
-invhomEpsFree h ℓ = ℓ . concatMap (NE.toList . h)
+-- inverse homomorphic image of ℓ under h
+invhomimage ∷ (s → [g]) → ℒ g → ℒ s
+invhomimage h ℓ = ℓ . concatMap h
+
+-- ε-free inverse homomorphic image of ℓ under h
+invhomimageEpsFree ∷ (s → NE.NonEmpty g) → ℒ g → ℒ s
+invhomimageEpsFree h ℓ = ℓ . concatMap (NE.toList . h)
+
+invhomimagew ∷ (Eq g) ⇒ (s → [g]) → [g] → ℒ s
+invhomimagew h w = (w ==) . concatMap h
 
 -- derivative with respect to some symbol in Σ
 derivative ∷ ℒ s → s → ℒ s
