@@ -4,6 +4,7 @@ import Finite
 import Config
 import Numeric.Natural.Unicode
 
+-- A Haskell version of FizzBuzz (without DFA)
 main'' ∷ IO ()
 main'' = mapM_ (\n → putStrLn (fizzbuzz n)) [1 .. 100]
   where fizz ∷ ℕ → Bool
@@ -18,6 +19,7 @@ main'' = mapM_ (\n → putStrLn (fizzbuzz n)) [1 .. 100]
                    | buzz n    = "Buzz"
                    | otherwise = show n
 
+-- A Haskell version of FizzBuzz (with DFA)
 main' ∷ IO ()
 main' = mapM_ (\n → putStrLn (fizzbuzz n)) [1 .. 100]
       where fizz ∷ ℕ → Bool
@@ -33,6 +35,7 @@ main' = mapM_ (\n → putStrLn (fizzbuzz n)) [1 .. 100]
               | buzz n    = "Buzz"
               | otherwise = show n
 
+-- Same idea as `main'` above, just a shorter version
 main ∷ IO ()
 main = mapM_ (putStrLn . fizzbuzz . toDigits) [1 .. 100]
        where fizz = accepts  by3
