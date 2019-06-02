@@ -14,13 +14,15 @@ import           Finite
 import           Examples
 import           Data.Set
 import           Config
+import           Numeric.Natural.Unicode
 import           EasyTest
 
 main ∷ IO ()
 main = run suite
 
 suite ∷ Test ()
-suite = tests [ scope "DFA.empty"     . expect $ Config.language DFA.empty          == ([]   ∷ [[Bool]])
+suite = tests [ testFizzBuzz
+              , scope "DFA.empty"     . expect $ Config.language DFA.empty          == ([]   ∷ [[Bool]])
               , scope "DFA.epsilon"   . expect $ Config.language DFA.epsilon        == ([[]] ∷ [[Bool]])
               , scope "DFA.literal"   . expect $ Config.language (DFA.literal True) == [[True]]
               , scope "DFA.quotient"  . expect $ minimal `DFA.equal` quotient minimal && size' (useful (quotient minimal)) < size' (useful (minimal))
@@ -28,6 +30,38 @@ suite = tests [ scope "DFA.empty"     . expect $ Config.language DFA.empty      
               , testDFArquotient
               , testDFAinvhomimage
               ]
+
+-- Test that ordinary FizzBuzz has the same output as the FizzBuzz which uses DFA
+testFizzBuzz ∷ Test ()
+testFizzBuzz = scope "main.FizzBuzz" . expect $ woDFA == wDFA
+        where -- FizzBuzz (without DFA)
+              woDFA ∷ [String]
+              woDFA = fmap fizzbuzz [1 .. 100]
+                  where fizz ∷ ℕ → Bool
+                        fizz n = n `mod` 3 == 0
+                        buzz ∷ ℕ → Bool
+                        buzz n = n `mod` 5 == 0
+                        fbzz ∷ ℕ → Bool
+                        fbzz n = fizz n && buzz n
+                        fizzbuzz ∷ ℕ → String
+                        fizzbuzz n | fbzz n    = "FizzBuzz"
+                                   | fizz n    = "Fizz"
+                                   | buzz n    = "Buzz"
+                                   | otherwise = show n
+              -- FizzBuzz (with DFA)
+              wDFA ∷ [String]
+              wDFA = fmap fizzbuzz [1 .. 100]
+                  where fizz ∷ ℕ → Bool
+                        fizz n = accepts  by3                         (toDigits n)
+                        buzz ∷ ℕ → Bool
+                        buzz n = accepts                         by5  (toDigits n)
+                        fbzz ∷ ℕ → Bool
+                        fbzz n = accepts (by3 `DFA.intersection` by5) (toDigits n)
+                        fizzbuzz ∷ ℕ → String
+                        fizzbuzz n | fbzz n    = "FizzBuzz"
+                                   | fizz n    = "Fizz"
+                                   | buzz n    = "Buzz"
+                                   | otherwise = show n
  
 -- https://math.stackexchange.com/questions/871662/finding-right-quotient-of-languages
 testDFArquotient ∷ Test ()
