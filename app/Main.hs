@@ -1,6 +1,6 @@
 import DFA
 import Examples
-import Finite
+import Common
 import Config
 
 -- FizzBuzz using DFA

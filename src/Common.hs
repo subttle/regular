@@ -1,4 +1,5 @@
-{-# OPTIONS_GHC -Wall                  #-}
+{-# OPTIONS_GHC -Wall #-}
+{-# LANGUAGE DataKinds                  #-}
 
 module Common where
 
@@ -11,6 +12,9 @@ import           Data.Bool.Unicode
 import           Data.List as List
 import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)), (<|))
 import qualified Data.List.NonEmpty as NE
+import qualified Data.Type.Nat as Nat
+import           Data.Fin (Fin)
+import           Data.Char (digitToInt)
 import           Data.Foldable as Foldable
 import           Data.Functor.Foldable (Fix (..), unfix, ListF (..))
 import           Control.Applicative (liftA2, getZipList, ZipList (..))
@@ -197,6 +201,11 @@ toStrings'  = fmap ((>>= show) . Maybe.catMaybes)
 
 toStrings'' ∷ (Show a, Show b) ⇒ [[Either a b]] → [String]
 toStrings'' = fmap  (>>= either show show)
+
+-- The type should be `ℕ → [Fin₁₀]` but that alias is defined in Finite.hs which if
+-- imported would cause an import cycle, so avoid that by just inlining the type alias
+toDigits ∷ ℕ → [Fin ('Nat.S Nat.Nat9)]
+toDigits = fmap (toEnum . digitToInt) . show
 
 upToLength ∷ ℕ → [[a]] → [[a]]
 upToLength n = takeWhile ((< n) . genericLength)

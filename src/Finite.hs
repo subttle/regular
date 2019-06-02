@@ -344,10 +344,6 @@ data Alpha = A | B | C | D | E | F | G | H | I | J | K | L | M | N | O | P | Q |
 instance                                                       Finite Alpha where
   asList = [A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z]
 
--- TODO move this helper function back to Common once `ℕ` is added to unicode lib; putting it in Common would cause an import cycle for now though..
-toDigits ∷ ℕ → [Fin₁₀]
-toDigits = fmap (toEnum . digitToInt) . show
-
 data DNA = Adenine | Cytosine | Guanine | Thymine deriving (Eq, Ord, Bounded, Enum)
 instance Show DNA where
   show Adenine  = "A"
@@ -370,4 +366,3 @@ instance                                                       Finite Final wher
   asSet  = Set.singleton (Final ())
 instance Show Final where
   show (Final ()) = "qᶠ"
-type InitOrFinal = Either Init Final
