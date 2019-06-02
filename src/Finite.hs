@@ -70,6 +70,8 @@ instance                                                      Finite () where
   asSet  = Set.singleton ()
 instance                                                      Finite Bool where
   asList = [False, True]
+instance                                                      Finite Ordering where
+  asList = [LT, EQ, GT]
 instance                                                      Finite Char
 
 instance (Finite a) ⇒                                         Bounded (Set a) where
@@ -284,7 +286,7 @@ coarser = flip finer
 --                      ]
 -- for each list (which represents an equivalence class), check if both a₁ and a₂ are in it
 -- if they are in the same list return true, otherwise false
-toEquivalence ∷ (Finite a) ⇒ [NonEmpty a] → Equivalence a
+toEquivalence ∷ (Finite a, Foldable t) ⇒ t (NonEmpty a) → Equivalence a
 toEquivalence parts = Equivalence (\a₁ a₂ → any (\xs → (a₁ `elem` xs) ∧ (a₂ `elem` xs)) parts)
 
 fromEquivalence ∷ ∀ a . (Finite a) ⇒ Equivalence a → [NonEmpty a]
