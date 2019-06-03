@@ -7,9 +7,7 @@
 
 module ERE where
 
-import           Common
 import           Control.Monad
-import           Data.Set.Unicode
 import           Numeric.Natural.Unicode
 import           Data.Pointed
 import           Data.Ord.Unicode

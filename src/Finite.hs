@@ -10,11 +10,10 @@ import           Data.Set as Set
 import           Data.Set.Unicode
 import           Data.Eq.Unicode
 import           Data.Bool.Unicode
-import           Numeric.Natural.Unicode
 import           Control.Monad
 import           Control.Applicative
 import           Data.List as List
-import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)), (<|))
+import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)))
 import qualified Data.List.NonEmpty as NE
 import           Data.Maybe
 import           Data.Void
@@ -22,7 +21,6 @@ import           Data.Function
 import           Data.Functor.Contravariant
 import           Common
 import           GHC.Enum
-import           Data.Char
 import           Data.Fin (Fin)
 import qualified Data.Type.Nat as Nat
 -- import qualified Data.Universe as U

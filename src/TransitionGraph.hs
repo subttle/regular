@@ -3,12 +3,9 @@
 
 module TransitionGraph where
 
-import           Common
 import           Finite
 import           Algebra.Graph.Relation as Relation
-import           Algebra.Graph.Class
 import           Data.Functor.Contravariant
--- import           Data.Functor.Contravariant.Divisible
 
 -- Transition Graph of an automaton
 newtype  TG q s =  TG (      s → Relation q)
