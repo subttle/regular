@@ -8,7 +8,9 @@ Here is a small example of what FizzBuzz looks like with DFA:
 
 ```Haskell
 
--- A number is divisible by 5 iff its last digit is 0 or 5
+-- A DFA which accepts numbers (as a string of digits) only when
+-- they are evenly divisible by 5.
+-- Theorem: A number is divisible by 5 iff its last digit is 0 or 5.
 by5 ∷ DFA Bool Fin₁₀
 by5 = DFA { delta = δ
           , q0    = False
@@ -17,15 +19,21 @@ by5 = DFA { delta = δ
                   δ (_, 5) = True
                   δ _      = False
 
--- A number is divisible by 3 iff the sum of its digits is divisible by 3
--- The state we are in is the (running total % 3)
--- (We add a single starting state `Left ()` to avoid accepting the empty string.)
+-- A DFA which accepts numbers (as a string of digits) only when
+-- they are evenly divisible by 3.
+-- Theorem: A number is divisible by 3 iff the sum of its digits is divisible by 3.
+-- The transition function effectively keeps a running total modulo three by 
+-- totaling the numeric value of its current state and the numeric value of the
+-- incoming digit, performing the modulo, and then converting that value back to a state.
+-- There is a bit of overhead complexity added by the fact that an extra state, `Left ()`,
+-- is introduced only to avoid accepting the empty string.
 by3 ∷ DFA (Either () Fin₃) Fin₁₀
 by3 = DFA { delta = Right . toEnum . (`mod` 3) . \(q, digit) → fromEnum (fromRight 0 q) + fromEnum digit
           , q0    = Left ()
           , fs    = singleton (Right 0)
           }
 
+-- FizzBuzz using DFA
 main ∷ IO ()
 main = mapM_ (putStrLn . fizzbuzz . toDigits) [1 .. 100]
        where fizz = accepts  by3
@@ -37,8 +45,6 @@ main = mapM_ (putStrLn . fizzbuzz . toDigits) [1 .. 100]
                | buzz n    = "Buzz"
                | otherwise = n >>= show
 ```
-
-TODO A quick explanation of what is going on in the example.
 
 ## Try
 
