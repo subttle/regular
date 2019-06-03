@@ -53,7 +53,9 @@ even0or1 = EFA.EFA { EFA.delta = δ
                            δ (4, Just  1) = singleton 3
                            δ (_, _      ) = (∅)
 
--- A number is divisible by 5 iff its last digit is 0 or 5
+-- A DFA which accepts numbers (as a string of digits) only when
+-- they are evenly divisible by 5.
+-- Theorem: A number is divisible by 5 iff its last digit is 0 or 5.
 by5 ∷ DFA Bool Fin₁₀
 by5 = DFA { delta = δ
           , q0    = False
@@ -68,9 +70,14 @@ by5 = DFA { delta = δ
 by5' ∷ RE.RegExp Fin₁₀
 by5' = RE.star RE.dot RE.* RE.fromSet (fromList [0, 5])
 
--- A number is divisible by 3 iff the sum of its digits is divisible by 3
--- The state we are in is the (running total % 3)
--- (We add a single starting state `Left ()` to avoid accepting the empty string.)
+-- A DFA which accepts numbers (as a string of digits) only when
+-- they are evenly divisible by 3.
+-- Theorem: A number is divisible by 3 iff the sum of its digits is divisible by 3.
+-- The transition function effectively keeps a running total modulo three by
+-- totaling the numeric value of its current state and the numeric value of the
+-- incoming digit, performing the modulo, and then converting that value back to a state.
+-- There is a bit of overhead complexity added by the fact that an extra state, `Left ()`,
+-- is introduced only to avoid accepting the empty string.
 by3 ∷ DFA (Either () Fin₃) Fin₁₀
 by3 = DFA { delta = Right . toEnum . (`mod` 3) . \(q, digit) → fromEnum (fromRight 0 q) + fromEnum digit
           , q0    = Left ()
