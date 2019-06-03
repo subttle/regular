@@ -48,7 +48,7 @@ main = mapM_ (putStrLn . fizzbuzz . toDigits) [1 .. 100]
 
 ## Try
 
-This project currently uses [stack](https://docs.haskellstack.org/en/stable/README/stack) to build. Try out some of the code in the REPL:
+This project currently uses [stack](https://docs.haskellstack.org/en/stable/README/) to build. Try out some of the code in the REPL:
 
 ```shell
 
