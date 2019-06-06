@@ -8,7 +8,8 @@ import           DFA
 -- import qualified NFA
 -- import qualified EFA
 -- import qualified GFA
-import qualified RegExp as RE
+import           RegExp (RegExp (..))
+import qualified RegExp as RE hiding (RegExp (..))
 import           Common
 import           Finite
 import           Examples
@@ -25,10 +26,11 @@ suite = tests [ testFizzBuzz
               , scope "DFA.empty"     . expect $ Config.language DFA.empty          == ([]   ∷ [[Bool]])
               , scope "DFA.epsilon"   . expect $ Config.language DFA.epsilon        == ([[]] ∷ [[Bool]])
               , scope "DFA.literal"   . expect $ Config.language (DFA.literal True) == [[True]]
-              , scope "DFA.quotient"  . expect $ minimal `DFA.equal` quotient minimal && size' (useful (quotient minimal)) < size' (useful (minimal))
+              , scope "DFA.quotient"  . expect $ minimal `DFA.equal` quotient minimal && size' (useful (quotient minimal)) < size' (useful minimal)
               , scope "DFA.toRE"      . expect $ toRE by5 `RE.equivalent` by5'
               , testDFArquotient
               , testDFAinvhomimage
+              , testRESubstitution
               ]
 
 -- Test that ordinary FizzBuzz has the same output as the FizzBuzz which uses DFA
@@ -114,5 +116,24 @@ testDFAinvhomimage = scope "DFA.invhomimage" . expect $ DFA.invhomimage h slide2
                                             δ (2, False) = 2
                                             δ (2, True)  = 2
 
+-- Substitution
+-- A Second Course in Formal Languages and Automata Theory (Pg 55, Example 3.3.4)
+-- s(101) = (cd)*(a+ab)*(cd)*
+testRESubstitution ∷ Test ()
+testRESubstitution = scope "RE.>>=" . expect $ result == expected -- N.B. the use of structural equality is intentional here
+            where original ∷ RegExp Fin₂
+                  original = RE.fromList [1, 0, 1]
+                  -- h(0) = {a, ab}*
+                  -- h(1) = (cd)*
+                  h ∷ Fin₂ → RegExp Fin₄
+                  h 0 = Star (Lit 0 :| RE.fromList [0,1])
+                  h 1 = Star (RE.fromList [2, 3])
+                  result ∷ RegExp Fin₄
+                  result = original >>= h
+                  -- (cd)*(a+ab)*(cd)*
+                  expected ∷ RegExp Fin₄
+                  expected =  Star (RE.fromList [2,3])
+                          :. (Star (Lit 0 :| RE.fromList [0, 1])
+                          :.  Star (RE.fromList [2,3]))
 
 
