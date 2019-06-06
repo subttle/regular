@@ -468,12 +468,12 @@ derivative' ∷ (Ord s) ⇒ RegExp s → [s] → RegExp s
 derivative' = List.foldl derivative
 
 derivatives ∷ (Finite s) ⇒ RegExp s → Set (RegExp s)
-derivatives a = map (derivative a) asSet
+derivatives α = map (derivative α) asSet
 
 -- "Antimirov [2] proposed the notion of partial derivative, which is a nondeterministic
 -- version of the Brzozowski derivative. Instead of a deterministic finite automaton, the
 -- partial derivative leads to a construction of a nondeterministic finite automaton"
--- -- http://www.dcc.fc.up.pt/~nam/web/resources/rafaelamsc.pdf 3.3 (pg. 20)
+-- http://www.dcc.fc.up.pt/~nam/web/resources/rafaelamsc.pdf 3.3 (pg. 20)
 partial ∷ (Ord s) ⇒ RegExp s → s → Set (RegExp s)
 partial Zero     _              = (∅)
 partial One      _              = (∅)
@@ -492,9 +492,7 @@ partial' = List.foldl (foldMap partial) . singleton
 -- Given a Regular Expression α, and a string w, determine if w matches α, i.e.
 -- w ∈ ℒ(α)
 matches ∷ (Ord s) ⇒ RegExp s → [s] → Bool
-matches Zero       _ = False
-matches α         [] = constant α == One
-matches α    (a : w) = matches (derivative α a) w
+matches α = nullable . derivative' α
 
 -- automorphism -- http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.50.7458&rep=rep1&type=pdf
 reversal ∷ RegExp s → RegExp s
