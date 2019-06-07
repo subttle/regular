@@ -294,6 +294,12 @@ fromEquivalence (Equivalence r) = unfoldr go asList
             go (x : xs) = Just (x :| p, np)
                     where (p, np) = List.partition (r x) xs
 
+-- TODO better name?
+-- fromPredicate (Predicate (> 2) ∷ Predicate Fin₁₀) == [[0,1,2],[3,4,5,6,7,8,9]]
+-- N.B. information is lost here, we can't distinguish `p` from `(not . p)` anymore
+fromPredicate ∷ Predicate a → Equivalence a
+fromPredicate (Predicate p) = contramap p defaultEquivalence
+
 -- There is a way to do this safely by generating the NonEmpty list for the equivalence class
 -- and then using comonadic extract to guarentee the representative will always be there
 -- and thus avoiding the unsafe `head` but that seems like too much overhead for right now
