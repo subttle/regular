@@ -89,5 +89,6 @@ derivative' ℓ v w = ℓ (v ++ w)
 predicate ∷ ℒ s → Predicate [s]
 predicate = Predicate
 
+-- N.B. this is a convenience function, it does not terminate even for finite languages!
 language ∷ (Finite s) ⇒ ℒ s → [[s]]
 language ℓ = filter ℓ (sigmaStar ℓ)
