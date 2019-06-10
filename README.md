@@ -59,9 +59,9 @@ stack ghci
 
 ```
 
-For now it should be clear that I value correctness and simplicity over speed. This is my first ever project in Haskell and it is not yet complete.
+## WIP status
 
-The code is not yet structured properly, so expect major refactoring and restructuring. Once I have everything correct I can start to worry about speed. For now this code is slow.
+For now it should be clear that I value correctness and simplicity over speed. Some of the code here is experimental and some is not yet structured properly, so expect major refactoring and restructuring. Once I have everything correct I can start to worry about speed. For now this code is slow.
 
 I'm patiently (and gratefully!) waiting on a few things from some of the best projects out there right now:
 
