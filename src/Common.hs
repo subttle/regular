@@ -151,7 +151,16 @@ partitions' ∷ (Foldable t) ⇒ t a → [[NonEmpty a]]
 partitions' = Foldable.foldl (\xs → (xs >>=) . go) [[]]
    where go ∷ a → [NonEmpty a] → [[NonEmpty a]]
          go x []       = [[ x :| [] ]]
-         go x (y : ys) = fmap (y :) (go x ys) <> [(x :| NE.toList y) : ys]
+         go x (y : ys) = fmap (y :) (go x ys) <> [(x :| toList y) : ys]
+
+-- Bell number
+-- Count the possible partitions of a set of the given cardinality
+bell ∷ ℕ → ℕ
+bell n = NE.head (nth n (\ns → NE.scanl1 (+) (NE.last ns :| Foldable.toList ns)) (1 :| []))
+
+-- Apply a function `n` times
+nth ∷ ℕ → (a → a) → a → a
+nth n = Foldable.foldr (.) id . genericReplicate n
 
 -- A version of List.findIndex which returns `Maybe ℕ` instead of `Maybe Int`
 findIndex' ∷ (a → Bool) → [a] → Maybe ℕ
