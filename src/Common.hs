@@ -151,7 +151,7 @@ partitions' ∷ (Foldable t) ⇒ t a → [[NonEmpty a]]
 partitions' = Foldable.foldl (\xs → (xs >>=) . go) [[]]
    where go ∷ a → [NonEmpty a] → [[NonEmpty a]]
          go x []       = [[ x :| [] ]]
-         go x (y : ys) = fmap (y :) (go x ys) <> [(x :| toList y) : ys]
+         go x (y : ys) = fmap (y :) (go x ys) <> [(x :| Foldable.toList y) : ys]
 
 -- Bell number
 -- Count the possible partitions of a set of the given cardinality

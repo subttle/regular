@@ -210,15 +210,16 @@ instance Finite Fin₁₅
 
 -- TODO deleteme
 instance (Show a, Finite a) ⇒ Show (Predicate a) where
-  show (Predicate p) = unlines (fmap show' res1)
+  show (Predicate p) = unlines (fmap show' graph)
                  where domain = asList ∷ [a]
-                       res1 = zip domain (fmap p domain)
+                       image  = fmap p domain
+                       graph  = zip domain image
                        show' (a, b) = show a ++ " ↦ " ++ show b
 
 instance (Finite a) ⇒                                         Eq      (Predicate a) where
   (==) ∷ Predicate a → Predicate a → Bool
   (Predicate f) == (Predicate g) = all (\x → f x == g x) asList
-instance (Finite a) ⇒                                         Bounded (Predicate a) where
+instance                                                      Bounded (Predicate a) where
   minBound = Predicate (const False)
   maxBound = Predicate (const True)
 instance (Finite a) ⇒                                         Ord     (Predicate a) where
@@ -312,9 +313,10 @@ eq' = ((==) `on`) . representative
 -- TODO deleteme
 instance (Show a, Finite a) ⇒ Show (Equivalence a) where
   show equivalence = show (fmap NE.toList (fromEquivalence equivalence))
-    {- unlines (fmap show' res1)
+  {-
+                     unlines (fmap show' graph)
                where domain          = liftA2 (,) asList asList
-                     res1            = fmap (\(x, y) → (x, y, p x y)) domain
+                     graph           = fmap (\(a, y) → (a, y, (getEquivalence equivalence) a y)) domain
                      show' (a, b, c) = show a ++ ", " ++ show b ++ " ↦ " ++ show c
                      -}
 
@@ -327,7 +329,7 @@ instance (Eq a) ⇒                                             Bounded (Equival
   -- Each element is it's own equivalence class (the finest, i.e. the identity relation: {(x, x) | x ∈ U})
   -- N.B. `Equivalence (const (const False))` would violate reflexivity
   minBound = defaultEquivalence
-  -- One big equivalence class (the coarsest, i.e. the universal relation: {(x, y) | x,y ∈ U})
+  -- One big equivalence class (the coarsest, i.e. the universal relation: {(x, y) | x, y ∈ U})
   maxBound = Equivalence (const (const True))
 instance (Finite a) ⇒                                         Ord     (Equivalence a) where
   compare ∷ Equivalence a → Equivalence a → Ordering
