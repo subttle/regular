@@ -22,7 +22,7 @@ import           Algebra.Graph.Relation as Relation hiding (domain)
 import qualified TransitionGraph as TG
 import qualified NFA
 import qualified EFA
-import qualified GFA
+import qualified GNFA
 import qualified RegExp as RE
 import qualified FA
 import qualified Language
@@ -432,11 +432,11 @@ toFA = NFA.toFA . toNFA
 
 -- Convert a DFA to a Generalized Nondeterministic Finite Automaton with ε-transitions
 -- δ(q₁, σ) = q₂ ⟺ δ'(q₁, q₂) = σ
-toGFA ∷ (Finite s, Ord q) ⇒ DFA q s → GFA.GFA q s
-toGFA m@(DFA δ q₀ f) = GFA.GFA { GFA.delta = δ' }
-     where -- Connect the new (forced) GFA start state to q₀ with an ε.
+toGNFA ∷ (Finite s, Ord q) ⇒ DFA q s → GNFA.GNFA q s
+toGNFA m@(DFA δ q₀ f) = GNFA.GNFA { GNFA.delta = δ' }
+     where -- Connect the new (forced) GNFA start state to q₀ with an ε.
            δ' (Left  (Init _), Right        q₂) | q₂ == q₀ = RE.one
-           -- Connect the new (forced) GFA final state to each element of f with an ε.
+           -- Connect the new (forced) GNFA final state to each element of f with an ε.
            δ' (Right       q₁, Left  (Final _)) | q₁ ∈ f   = RE.one
            -- If q₁ and q₂ were connected (often via multiple transitions) in the DFA,
            -- lift all symbols into RE.Lit, and let multiple transitions be represented
@@ -447,7 +447,7 @@ toGFA m@(DFA δ q₀ f) = GFA.GFA { GFA.delta = δ' }
            δ' _                                            = RE.zero
 
 toRE ∷ (Finite q, Finite s) ⇒ DFA q s → RE.RegExp s
-toRE = GFA.toRE . toGFA
+toRE = GNFA.toRE . toGNFA
 
 toLanguage ∷ (Finite q, Finite s) ⇒ DFA q s → Language.ℒ s
 toLanguage = RE.toLanguage . toRE
