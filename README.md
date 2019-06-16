@@ -46,6 +46,26 @@ main = mapM_ (putStrLn . fizzbuzz . toDigits) [1 .. 100]
                | otherwise = n >>= show
 ```
 
+
+## Type Safety
+
+Consider, for example, the `GNFA q s` type defined in `src/GNFA.hs` which is the type used to represent [Generalized Nondeterministic Finite Automaton](https://en.wikipedia.org/wiki/Generalized_nondeterministic_finite_automaton) in this library. 
+
+```Haskell
+data GNFA q s where
+  -- δ : (Q \ {qᶠ}) × (Q \ {qᵢ}) → Regular Expression
+  GNFA ∷ { delta ∷ (Either Init q, Either Final q) → RegExp s } → GNFA q s
+```
+
+Striving for correctness by construction, the type alone enforces many required invariants:
+* A GNFA must have only one transition between any two states
+* A GNFA must have no arcs coming into its start state
+* A GNFA must have no arcs leaving its final state
+* A GNFA must have only one start state and one accept state, and these cannot be the same state
+
+That means, any time you have some `GNFA` (and we assume pure functional programming), those invariants hold, without any extra work or runtime checks.
+
+
 ## Try
 
 This project currently uses [stack](https://docs.haskellstack.org/en/stable/README/) to build. Try out some of the code in the REPL:
@@ -57,6 +77,14 @@ cd regular
 stack build
 stack ghci
 
+```
+
+```
+λ> Examples.by5'
+(0∣(1∣(2∣(3∣(4∣(5∣(6∣(7∣(8∣9)))))))))★·(0∣5)
+λ> take 10 $ RegExp.language by5'
+[[0],[5],[0,0],[0,5],[1,0],[1,5],[2,0],[2,5],[3,0],[3,5]]
+λ>
 ```
 
 ## WIP status
