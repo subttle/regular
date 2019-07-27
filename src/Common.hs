@@ -1,5 +1,6 @@
 {-# OPTIONS_GHC -Wall #-}
 {-# LANGUAGE DataKinds                  #-}
+{-# LANGUAGE RankNTypes                 #-}
 
 module Common where
 
@@ -29,6 +30,12 @@ newtype    Algebra f t =    Algebra (f         t  →                   t)
 newtype  CoAlgebra f t =  CoAlgebra (          t  → f                 t)
 newtype   RAlgebra f t =   RAlgebra (f (Fix f, t) →                   t)
 newtype RCoAlgebra f t = RCoAlgebra (          t  → f (Either (Fix f) t))
+-- Mendler-style
+newtype   MAlgebra f t =   MAlgebra (∀ a. (a → t) → (f a → t))
+
+-- Mendler-style Catamorphism
+mcata :: MAlgebra f c → Fix f → c
+mcata (MAlgebra φ) = φ (mcata (MAlgebra φ)) . unfix
 
 -- Catamorphism
 cata ∷ (Functor f) ⇒ Algebra f a → Fix f → a
