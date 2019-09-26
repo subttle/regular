@@ -134,6 +134,18 @@ freeMonoidFrom n = ([n..] >>=) . flip replicateM'
 freeSemigroup ∷ [a] → [[a]]
 freeSemigroup = freeMonoidFrom 1
 
+-- A more general version of `partitionEithers` from `Data.Either`
+partitionEithers' ∷ (Foldable t) ⇒ t (Either a b) → ([a], [b])
+partitionEithers' = partitionEithers . Foldable.toList
+
+-- A more general version of `lefts` from `Data.Either`
+lefts' ∷ (Foldable t) ⇒ t (Either a b) → [a]
+lefts' = lefts . Foldable.toList
+
+-- A more general version of `rights` from `Data.Either`
+rights' ∷ (Foldable t) ⇒ t (Either a b) → [b]
+rights' = rights . Foldable.toList
+
 -- partitions of a list
 -- partitions [0..2] = [ [[0],[1],[2]]
 --                     , [[0],[1,2]]
