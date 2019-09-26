@@ -16,6 +16,7 @@ import qualified Data.List.NonEmpty as NE
 import qualified Data.Type.Nat as Nat
 import           Data.Fin (Fin)
 import           Data.Char (digitToInt)
+import           Data.Either (lefts, rights, partitionEithers, fromLeft, fromRight, isLeft, isRight)
 import           Data.Foldable as Foldable
 import           Data.Functor.Foldable (Fix (..), unfix, ListF (..))
 import           Control.Applicative (liftA2, getZipList, ZipList (..))
@@ -145,6 +146,12 @@ lefts' = lefts . Foldable.toList
 -- A more general version of `rights` from `Data.Either`
 rights' ∷ (Foldable t) ⇒ t (Either a b) → [b]
 rights' = rights . Foldable.toList
+
+unionLefts ∷ (Ord a) ⇒ Set (Either a b) → Set a
+unionLefts  = Set.mapMonotonic (fromLeft  undefined) . Set.filter isRight -- Set.dropWhileAntitone isRight -- TODO can I use `dropWhileAntitone` here to improve efficiency? is ordering needed on `Either a b`?
+
+unionRights ∷ (Ord b) ⇒ Set (Either a b) → Set b
+unionRights = Set.mapMonotonic (fromRight undefined) . Set.filter isLeft  -- Set.dropWhileAntitone isLeft -- TODO can I use `dropWhileAntitone` here to improve efficiency? is ordering needed on `Either a b`?
 
 -- partitions of a list
 -- partitions [0..2] = [ [[0],[1],[2]]
