@@ -326,11 +326,11 @@ instance (Finite a) ⇒                                         Eq      (Equival
   (Equivalence f) == (Equivalence g) = all (\(x, y) → f x y == g x y) (asSet × asSet)
 -- N.B. this is just one possible implementation
 instance (Eq a) ⇒                                             Bounded (Equivalence a) where
+  -- One big equivalence class (the coarsest, i.e. the universal relation: {(x, y) | x, y ∈ U})
+  minBound = Equivalence (const (const True))
   -- Each element is it's own equivalence class (the finest, i.e. the identity relation: {(x, x) | x ∈ U})
   -- N.B. `Equivalence (const (const False))` would violate reflexivity
-  minBound = defaultEquivalence
-  -- One big equivalence class (the coarsest, i.e. the universal relation: {(x, y) | x, y ∈ U})
-  maxBound = Equivalence (const (const True))
+  maxBound = defaultEquivalence
 instance (Finite a) ⇒                                         Ord     (Equivalence a) where
   compare ∷ Equivalence a → Equivalence a → Ordering
   compare (Equivalence f) (Equivalence g) = undefined -- FIXME want to ensure this is consistent with Enum and Finite ordering
