@@ -122,9 +122,19 @@ instance (Finite a, Finite b) ⇒                               Finite  (Either 
 
 -- For tuples where types `a` and `b` are enumerable, allow the tuple to be enumerated as `a` × `b`
 instance (Finite a, Finite b) ⇒                               Enum   (a, b) where
-  toEnum     =                       (asList !!)
-  fromEnum t = fromJust (elemIndex t  asList)
-  enumFrom t = dropWhile (≠ t)        asList
+  toEnum ∷ Int → (a, b)
+  toEnum i₀ = (toEnum aᵢ, toEnum bᵢ)
+    where (i₁, bᵢ) = i₀ `quotRem` length (asList ∷ [b])
+          (_,  aᵢ) = i₁ `quotRem` length (asList ∷ [a])
+  fromEnum ∷ (a, b) → Int
+  fromEnum (a, b) = (aᵢ * lb) + bᵢ
+    where (aᵢ, bᵢ) = (fromEnum a, fromEnum b)
+          lb = length (asList ∷ [b])
+
+  enumFrom ∷ (a, b) → [(a, b)]
+  -- enumFrom t = dropWhile (≠ t)        asList
+  enumFrom = boundedEnumFrom
+
 instance (Finite a, Finite b) ⇒                               Finite (a, b) where
   asSet  = asSet × asSet
   asList = liftA2 (,)    asList asList
@@ -132,27 +142,69 @@ instance (Finite a, Finite b) ⇒                               Finite (a, b) wh
 
 -- For tuples where types `a`, `b`, and `c` are enumerable, allow the tuple to be enumerated as `a` × `b` × `c`
 instance (Finite a, Finite b, Finite c) ⇒                     Enum   (a, b, c) where
-  toEnum     =                       (asList !!)
-  fromEnum t = fromJust (elemIndex t  asList)
-  enumFrom t = dropWhile (≠ t)        asList
+  toEnum ∷ Int → (a, b, c)
+  toEnum i₀ = (toEnum aᵢ, toEnum bᵢ, toEnum cᵢ)
+    where (i₁, cᵢ) = i₀ `quotRem` length (asList ∷ [c])
+          (i₂, bᵢ) = i₁ `quotRem` length (asList ∷ [b])
+          (_,  aᵢ) = i₂ `quotRem` length (asList ∷ [a])
+  fromEnum ∷ (a, b, c) → Int
+  fromEnum (a, b, c) = (aᵢ * lb * lc) + (bᵢ * lc) + cᵢ
+    where (aᵢ, bᵢ, cᵢ) = (fromEnum a, fromEnum b, fromEnum c)
+          lb = length (asList ∷ [b])
+          lc = length (asList ∷ [c])
+  enumFrom ∷ (a, b, c) → [(a, b, c)]
+  -- enumFrom t = dropWhile (≠ t)        asList
+  enumFrom = boundedEnumFrom
+
 instance (Finite a, Finite b, Finite c) ⇒                     Finite (a, b, c) where
   asList = liftA3 (,,)   asList asList asList
 
 
 -- For tuples where types `a`, `b`, `c` and `d` are enumerable, allow the tuple to be enumerated as `a` × `b` × `c` × `d`
 instance (Finite a, Finite b, Finite c, Finite d) ⇒           Enum   (a, b, c, d) where
-  toEnum     =                       (asList !!)
-  fromEnum t = fromJust (elemIndex t  asList)
-  enumFrom t = dropWhile (≠ t)        asList
+  toEnum ∷ Int → (a, b, c, d)
+  toEnum i₀ = (toEnum aᵢ, toEnum bᵢ, toEnum cᵢ, toEnum dᵢ)
+    where (i₁, dᵢ) = i₀ `quotRem` length (asList ∷ [d])
+          (i₂, cᵢ) = i₁ `quotRem` length (asList ∷ [c])
+          (i₃, bᵢ) = i₂ `quotRem` length (asList ∷ [b])
+          (_,  aᵢ) = i₃ `quotRem` length (asList ∷ [a])
+  fromEnum ∷ (a, b, c, d) → Int
+  fromEnum (a, b, c, d) = (aᵢ * lb * lc * ld) + (bᵢ * lc * ld) + (cᵢ * ld) + dᵢ
+    where (aᵢ, bᵢ, cᵢ, dᵢ) = (fromEnum a, fromEnum b, fromEnum c, fromEnum d)
+          lb = length (asList ∷ [b])
+          lc = length (asList ∷ [c])
+          ld = length (asList ∷ [d])
+  enumFrom ∷ (a, b, c, d) → [(a, b, c, d)]
+  -- enumFrom t = dropWhile (≠ t)        asList
+  enumFrom = boundedEnumFrom
+
 instance (Finite a, Finite b, Finite c, Finite d) ⇒           Finite (a, b, c, d) where
   asList = liftM4 (,,,)  asList asList asList asList
 
 
 -- For tuples where types `a`, `b`, `c` and `d` are enumerable, allow the tuple to be enumerated as `a` × `b` × `c` × `d`
 instance (Finite a, Finite b, Finite c, Finite d, Finite e) ⇒ Enum   (a, b, c, d, e) where
-  toEnum     =                       (asList !!)
-  fromEnum t = fromJust (elemIndex t  asList)
-  enumFrom t = dropWhile (≠ t)        asList
+  toEnum ∷ Int → (a, b, c, d, e)
+  toEnum i₀ = (toEnum aᵢ, toEnum bᵢ, toEnum cᵢ, toEnum dᵢ, toEnum eᵢ)
+    where
+      (i₁, eᵢ) = i₀ `quotRem` length (asList ∷ [e])
+      (i₂, dᵢ) = i₁ `quotRem` length (asList ∷ [d])
+      (i₃, cᵢ) = i₂ `quotRem` length (asList ∷ [c])
+      (i₄, bᵢ) = i₃ `quotRem` length (asList ∷ [b])
+      (_,  aᵢ) = i₄ `quotRem` length (asList ∷ [a])
+
+  fromEnum ∷ (a, b, c, d, e) → Int
+  fromEnum (a, b, c, d, e) = (aᵢ * lb * lc * ld * le) + (bᵢ * lc * ld * le) + (cᵢ * ld * le) + (dᵢ * le) + eᵢ
+    where (aᵢ, bᵢ, cᵢ, dᵢ, eᵢ) = (fromEnum a, fromEnum b, fromEnum c, fromEnum d, fromEnum e)
+          lb = length (asList ∷ [b])
+          lc = length (asList ∷ [c])
+          ld = length (asList ∷ [d])
+          le = length (asList ∷ [e])
+
+  enumFrom ∷ (a, b, c, d, e) → [(a, b, c, d, e)]
+  -- enumFrom t = dropWhile (≠ t)        asList
+  enumFrom = boundedEnumFrom
+
 instance (Finite a, Finite b, Finite c, Finite d, Finite e) ⇒ Finite (a, b, c, d, e) where
   asList = liftM5 (,,,,) asList asList asList asList asList
 
