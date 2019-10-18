@@ -16,11 +16,12 @@ import           Data.List as List
 import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)))
 import qualified Data.List.NonEmpty as NE
 import           Data.Maybe
+import           Data.These
 import           Data.Void
 import           Data.Function
 import           Data.Functor.Contravariant
 import           Common
-import           GHC.Enum
+import           GHC.Enum (boundedEnumFrom)
 import           Data.Fin (Fin)
 import qualified Data.Type.Nat as Nat
 -- import qualified Data.Universe as U
@@ -119,6 +120,33 @@ instance (Finite a, Finite b) ⇒                               Finite  (Either 
   asList = toList asSet
   asSet  = asSet ⊎ asSet
 
+instance (Bounded a, Bounded b) ⇒                             Bounded (These a b) where
+  minBound ∷ These a b
+  minBound = This  minBound
+  maxBound ∷ These a b
+  maxBound = These  maxBound maxBound  -- maxBound = That  maxBound
+instance (Finite a, Finite b) ⇒                               Enum    (These a b) where
+  toEnum     =                       (asList !!)
+  fromEnum t = fromJust (elemIndex t  asList)
+  enumFrom t = dropWhile (≠ t)        asList
+instance (Finite a, Finite b) ⇒                               Finite  (These a b) where
+  asList ∷ [These a b]
+  asList = toList asSet
+  asSet ∷ Set (These a b)
+  asSet = Set.map to (products ⊎ sums)
+    where
+      to   ∷ Either (a, b) (Either a b) → These a b
+      to   (Left  (a, b)  )             = These a b
+      to   (Right (Right b))            = That    b
+      to   (Right (Left  a))            = This  a
+      from ∷ These a b                  → Either (a, b) (Either a b)
+      from (These a b)                  = Left  (a, b)
+      from (That    b)                  = Right (Right b)
+      from (This  a  )                  = Right (Left  a)
+      products ∷ Set (a, b) 
+      products = asSet
+      sums ∷ Set (Either a b)
+      sums = asSet -- asSet ⊎ asSet
 
 -- For tuples where types `a` and `b` are enumerable, allow the tuple to be enumerated as `a` × `b`
 instance (Finite a, Finite b) ⇒                               Enum   (a, b) where
@@ -270,13 +298,13 @@ instance (Show a, Finite a) ⇒ Show (Predicate a) where
 
 instance (Finite a) ⇒                                         Eq      (Predicate a) where
   (==) ∷ Predicate a → Predicate a → Bool
-  (Predicate f) == (Predicate g) = all (\x → f x == g x) asList
+  (Predicate p₁) == (Predicate p₂) = all (\a → p₁ a == p₂ a) asList
 instance                                                      Bounded (Predicate a) where
   minBound = Predicate (const False)
   maxBound = Predicate (const True)
 instance (Finite a) ⇒                                         Ord     (Predicate a) where
   compare ∷ Predicate a → Predicate a → Ordering
-  compare (Predicate f) (Predicate g) = mconcat (fmap (\x → f x `compare` g x) asList)
+  compare (Predicate p₁) (Predicate p₂) = mconcat (fmap (\a → p₁ a `compare` p₂ a) asList)
 instance (Finite a) ⇒                                         Enum    (Predicate a) where
   toEnum   ∷ Int         → Predicate a
   toEnum     =                       (asList !!)
@@ -301,21 +329,21 @@ instance (Finite a) ⇒                                         Finite  (Predica
 
 -- Reflexive
 refl ∷ (Finite a) ⇒ Equivalence a → Bool
-refl (Equivalence r) = all (\x → r x x) asSet
+refl (Equivalence (≡)) = all (\x → x ≡ x) asSet
 
 -- Symmetric
 sym ∷ (Finite a) ⇒  Equivalence a → Bool
-sym (Equivalence r) = all (\(x, y) → r x y == r y x) (asSet × asSet)
+sym (Equivalence (≡)) = all (\(x, y) → (x ≡ y) == (y ≡ x)) (asSet × asSet)
 
 -- Transitive
 trans ∷ (Finite a) ⇒ Equivalence a → Bool
-trans (Equivalence r) = all (\(x, y, z) → (r x y ∧ r y z) `implies` r x z) (liftA3 (,,) asList asList asList) -- TODO may be some redundant checks here I can eliminate
+trans (Equivalence (≡)) = all (\(x, y, z) → ((x ≡ y) ∧ (y ≡ z)) `implies` (x ≡ z)) (liftA3 (,,) asList asList asList) -- TODO may be some redundant checks here I can eliminate
 
 -- Check that the equivalence relation is lawful
 lawful ∷ (Finite a) ⇒ Equivalence a → Bool
-lawful r = refl  r
-         ∧ sym   r
-         ∧ trans r
+lawful (≡) = refl  (≡)
+           ∧ sym   (≡)
+           ∧ trans (≡)
 
 -- r₁ is "finer" r₂ iff r₁ ⊆ r₂   i.e. r₁ is a refinement of r₂
 -- if r₁ is a refinement of r₂ then each equivalence class of r₂ is
@@ -357,7 +385,7 @@ fromPredicate (Predicate p) = contramap p defaultEquivalence
 -- and then using comonadic extract to guarentee the representative will always be there
 -- and thus avoiding the unsafe `head` but that seems like too much overhead for right now
 representative ∷ (Finite a) ⇒ Equivalence a → a → a
-representative (Equivalence r) a = head (List.filter (r a) asList)
+representative (Equivalence (≡)) a = head (List.filter ((≡) a) asList)
 
 eq' ∷ (Finite a) ⇒ Equivalence a → a → a → Bool
 eq' = ((==) `on`) . representative
