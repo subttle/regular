@@ -100,6 +100,12 @@ implies ∷ Bool → Bool → Bool
 implies True  = id
 implies False = const True
 
+-- exclusive-or
+-- The name `xor` is already used by `Data.List.NonEmpty`
+xor' ∷ Bool → Bool → Bool
+xor' True  = not
+xor' False = id
+
 -- Two sets intersect if A ∩ B ≠ ∅
 intersects ∷ (Ord a) ⇒ Set a → Set a → Bool
 intersects x y = not (Set.disjoint x y)
