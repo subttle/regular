@@ -26,6 +26,7 @@ library
                      , profunctors
                      , pointed
                      , fin
+                     , these
                      , selective
   default-language:    Haskell2010
   default-extensions: UnicodeSyntax
