@@ -375,6 +375,9 @@ fromEquivalence (Equivalence r) = unfoldr go asList
             go (x : xs) = Just (x :| p, np)
                     where (p, np) = List.partition (r x) xs
 
+toPredicate ∷ (Foldable t, Eq a) ⇒ t a → Predicate a
+toPredicate = Predicate . flip elem
+
 -- TODO better name?
 -- fromPredicate (Predicate (> 2) ∷ Predicate Fin₁₀) == [[0,1,2],[3,4,5,6,7,8,9]]
 -- N.B. information is lost here, we can't distinguish `p` from `(not . p)` anymore
@@ -382,10 +385,17 @@ fromPredicate ∷ Predicate a → Equivalence a
 fromPredicate (Predicate p) = contramap p defaultEquivalence
 
 -- There is a way to do this safely by generating the NonEmpty list for the equivalence class
--- and then using comonadic extract to guarentee the representative will always be there
+-- and then using comonadic extract to guarantee the representative will always be there
 -- and thus avoiding the unsafe `head` but that seems like too much overhead for right now
+-- The correct type for this should actually be:
+-- representative ∷ (Finite a) ⇒ Equivalence a → Maybe (a → a)
+-- Because the null relation is (vacuously) a lawful equivalence relation
+-- https://proofwiki.org/wiki/Relation_on_Empty_Set_is_Equivalence
 representative ∷ (Finite a) ⇒ Equivalence a → a → a
 representative (Equivalence (≡)) a = head (List.filter ((≡) a) asList)
+
+representatives ∷ (Finite a) ⇒ Equivalence a → [a]
+representatives (Equivalence (≡)) = nubBy (≡) asList
 
 eq' ∷ (Finite a) ⇒ Equivalence a → a → a → Bool
 eq' = ((==) `on`) . representative
