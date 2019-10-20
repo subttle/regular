@@ -1,9 +1,7 @@
 flags: {}
 extra-package-dbs: []
 packages:
-resolver: lts-13.19
+resolver: lts-14.10
 extra-deps:
 - algebra-4.3.1@sha256:38b3e2e7f1058b8f51dcb97c906d4e9871876fd82029a316970ee613fcca130f
 - containers-unicode-symbols-0.3.1.1@sha256:2f8e14cf2ec9c5f65614d3a3113b047c623729993dd12365b737b9d93ea30da2
-- containers-0.5.11.0@sha256:28ad7337057442f75bc689315ab4ec7bdf5e6b2c39668f306672cecd82c02798
-- selective-0.2
