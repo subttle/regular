@@ -185,8 +185,29 @@ partitions' = Foldable.foldl (\xs → (xs >>=) . go) [[]]
          go x []       = [[ x :| [] ]]
          go x (y : ys) = fmap (y :) (go x ys) <> [(x :| Foldable.toList y) : ys]
 
+-- Stirling numbers of the first kind
+-- "The Stirling numbers of the first kind s(n, k) count the number of ways to permute a list of `n` items into `k` cycles"
+-- http://mathforum.org/advanced/robertd/stirling1.html
+stirling₁ ∷ (ℕ, ℕ) → ℕ
+stirling₁ (0, 0) = 1
+stirling₁ (0, _) = 0
+stirling₁ (_, 0) = 0
+stirling₁ (n, k) = stirling₁ (n - 1, k - 1) + stirling₁ (n - 1, k) * (n - 1)
+
+-- Stirling numbers of the second kind
+-- "The Stirling numbers of the second kind describe the number of ways a set with `n` elements can be partitioned into `k` disjoint, non-empty subsets."
+-- http://mathforum.org/advanced/robertd/stirling2.html
+-- N.B. requires k ≤ n to ensure each part is nonempty
+stirling₂ ∷ (ℕ, ℕ) → ℕ
+stirling₂ (0, 0) = 1
+stirling₂ (0, _) = 0
+stirling₂ (_, 0) = 0
+stirling₂ (n, k) = stirling₂ (n - 1, k - 1) + stirling₂ (n - 1, k) * k
+
 -- Bell number
 -- Count the possible partitions of a set of the given cardinality
+-- bell ∷ ℕ → ℕ
+-- bell n = sum (fmap (\k → stirling₂ (n, k)) [0 .. n])
 bell ∷ ℕ → ℕ
 bell n = NE.head (nth n (\ns → NE.scanl1 (+) (NE.last ns :| Foldable.toList ns)) (1 :| []))
 
