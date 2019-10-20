@@ -1,4 +1,4 @@
-:set -Wall
+:set -Wall -XTypeApplications
 :set prompt "\x03BB> "
 :set prompt-cont "\x03BB| "
 :!cls
