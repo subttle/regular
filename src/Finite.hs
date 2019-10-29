@@ -513,6 +513,7 @@ data Rank where
   King  ∷ Rank
   Ace   ∷ Rank
   deriving (Eq, Enum, Ord, Bounded)
+
 instance Fancy Rank where
   unicode ∷ Rank → Char
   unicode Two   = '⑵'
@@ -542,7 +543,206 @@ instance Fancy Rank where
   plain Queen = "Queen"
   plain King  = "King"
   plain Ace   = "Ace"
+
 instance Show Rank where
   show = show'
+
 instance Finite Rank
 
+data Card where
+  Card ∷ { rank ∷ Rank, suit ∷ Suit } → Card
+  deriving (Ord, Eq, Bounded)
+
+instance Enum Card where
+  toEnum ∷ Int → Card
+  toEnum n = uncurry Card (asList !! n) -- Card (fst res) (snd res)
+  fromEnum ∷ Card → Int
+  fromEnum (Card r s) = fromJust (List.elemIndex (r, s) asList)
+  enumFrom ∷ Card → [Card]
+  enumFrom = boundedEnumFrom
+
+instance Finite Card
+
+instance Fancy Card where
+  unicode ∷ Card → Char
+  unicode (Card Ace   Spade  ) = '🂡'
+  unicode (Card Ace   Heart  ) = '🂱'
+  unicode (Card Ace   Diamond) = '🃁'
+  unicode (Card Ace   Club   ) = '🃑'
+  unicode (Card King  Spade  ) = '🂮'
+  unicode (Card King  Heart  ) = '🂾'
+  unicode (Card King  Diamond) = '🃎'
+  unicode (Card King  Club   ) = '🃞'
+  unicode (Card Queen Spade  ) = '🂭'
+  unicode (Card Queen Heart  ) = '🂽'
+  unicode (Card Queen Diamond) = '🃍'
+  unicode (Card Queen Club   ) = '🃝'
+  unicode (Card Jack  Spade  ) = '🂫'
+  unicode (Card Jack  Heart  ) = '🂻'
+  unicode (Card Jack  Diamond) = '🃋'
+  unicode (Card Jack  Club   ) = '🃛'
+  unicode (Card Ten   Spade  ) = '🂪'
+  unicode (Card Ten   Heart  ) = '🂺'
+  unicode (Card Ten   Diamond) = '🃊'
+  unicode (Card Ten   Club   ) = '🃚'
+  unicode (Card Nine  Spade  ) = '🂩'
+  unicode (Card Nine  Heart  ) = '🂹'
+  unicode (Card Nine  Diamond) = '🃉'
+  unicode (Card Nine  Club   ) = '🃙'
+  unicode (Card Eight Spade  ) = '🂨'
+  unicode (Card Eight Heart  ) = '🂸'
+  unicode (Card Eight Diamond) = '🃈'
+  unicode (Card Eight Club   ) = '🃘'
+  unicode (Card Seven Spade  ) = '🂧'
+  unicode (Card Seven Heart  ) = '🂷'
+  unicode (Card Seven Diamond) = '🃇'
+  unicode (Card Seven Club   ) = '🃗'
+  unicode (Card Six   Spade  ) = '🂦'
+  unicode (Card Six   Heart  ) = '🂶'
+  unicode (Card Six   Diamond) = '🃆'
+  unicode (Card Six   Club   ) = '🃖'
+  unicode (Card Five  Spade  ) = '🂥'
+  unicode (Card Five  Heart  ) = '🂵'
+  unicode (Card Five  Diamond) = '🃅'
+  unicode (Card Five  Club   ) = '🃕'
+  unicode (Card Four  Spade  ) = '🂤'
+  unicode (Card Four  Heart  ) = '🂴'
+  unicode (Card Four  Diamond) = '🃄'
+  unicode (Card Four  Club   ) = '🃔'
+  unicode (Card Three Spade  ) = '🂣'
+  unicode (Card Three Heart  ) = '🂳'
+  unicode (Card Three Diamond) = '🃃'
+  unicode (Card Three Club   ) = '🃓'
+  unicode (Card Two   Spade  ) = '🂢'
+  unicode (Card Two   Heart  ) = '🂲'
+  unicode (Card Two   Diamond) = '🃂'
+  unicode (Card Two   Club   ) = '🃒'
+  plain ∷ Card → String
+  plain (Card rank suit) = plain rank ++ " of " ++ plain suit ++ "s"
+
+--
+
+instance Show Card where
+  show ∷ Card → String
+  -- show c = show' c `toColor` toDisplayColor (colorOf c)
+  show c@(Card _ Spade  ) = charToString (unicode c)   `toColor` Black'
+  show c@(Card _ Heart  ) = charToString (unicode c)   `toColor` Red'
+  show c@(Card _ Diamond) = charToString (unicode c)   `toColor` Red'
+  show c@(Card _ Club   ) = charToString (unicode c)   `toColor` Black'
+
+(🂡) ∷ Card
+(🂡) = Card Ace Spade
+(🂱) ∷ Card
+(🂱) = Card Ace Heart
+(🃑) ∷ Card
+(🃑) = Card Ace Club
+(🃁) ∷ Card
+(🃁) = Card Ace Diamond
+
+(🂮) ∷ Card
+(🂮) = Card King  Spade
+(🂾) ∷ Card
+(🂾) = Card King  Heart
+(🃎) ∷ Card
+(🃎) = Card King  Diamond
+(🃞) ∷ Card
+(🃞) = Card King  Club
+
+(🂭) ∷ Card
+(🂭) = Card Queen Spade
+(🂽) ∷ Card
+(🂽) = Card Queen Heart
+(🃍) ∷ Card
+(🃍) = Card Queen Diamond
+(🃝) ∷ Card
+(🃝) = Card Queen Club
+
+(🂫) ∷ Card
+(🂫) = Card Jack  Spade
+(🂻) ∷ Card
+(🂻) = Card Jack  Heart
+(🃋) ∷ Card
+(🃋) = Card Jack  Diamond
+(🃛) ∷ Card
+(🃛) = Card Jack  Club
+
+(🂪) ∷ Card
+(🂪) = Card Ten   Spade
+(🂺) ∷ Card
+(🂺) = Card Ten   Heart
+(🃊) ∷ Card
+(🃊) = Card Ten   Diamond
+(🃚) ∷ Card
+(🃚) = Card Ten   Club
+
+(🂩) ∷ Card
+(🂩) = Card Nine  Spade
+(🂹) ∷ Card
+(🂹) = Card Nine  Heart
+(🃉) ∷ Card
+(🃉) = Card Nine  Diamond
+(🃙) ∷ Card
+(🃙) = Card Nine  Club
+
+(🂨) ∷ Card
+(🂨) = Card Eight Spade
+(🂸) ∷ Card
+(🂸) = Card Eight Heart
+(🃈) ∷ Card
+(🃈) = Card Eight Diamond
+(🃘) ∷ Card
+(🃘) = Card Eight Club
+
+(🂧) ∷ Card
+(🂧) = Card Seven Spade
+(🂷) ∷ Card
+(🂷) = Card Seven Heart
+(🃇) ∷ Card
+(🃇) = Card Seven Diamond
+(🃗) ∷ Card
+(🃗) = Card Seven Club
+
+(🂦) ∷ Card
+(🂦) = Card Six   Spade
+(🂶) ∷ Card
+(🂶) = Card Six   Heart
+(🃆) ∷ Card
+(🃆) = Card Six   Diamond
+(🃖) ∷ Card
+(🃖) = Card Six   Club
+
+(🂥) ∷ Card
+(🂥) = Card Five  Spade
+(🂵) ∷ Card
+(🂵) = Card Five  Heart
+(🃅) ∷ Card
+(🃅) = Card Five  Diamond
+(🃕) ∷ Card
+(🃕) = Card Five  Club
+
+(🂤) ∷ Card
+(🂤) = Card Four  Spade
+(🂴) ∷ Card
+(🂴) = Card Four  Heart
+(🃄) ∷ Card
+(🃄) = Card Four  Diamond
+(🃔) ∷ Card
+(🃔) = Card Four  Club
+
+(🂣) ∷ Card
+(🂣) = Card Three Spade
+(🂳) ∷ Card
+(🂳) = Card Three Heart
+(🃃) ∷ Card
+(🃃) = Card Three Diamond
+(🃓) ∷ Card
+(🃓) = Card Three Club
+
+(🂢) ∷ Card
+(🂢) = Card Two   Spade
+(🂲) ∷ Card
+(🂲) = Card Two   Heart
+(🃂) ∷ Card
+(🃂) = Card Two   Diamond
+(🃒) ∷ Card
+(🃒) = Card Two   Club
