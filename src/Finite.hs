@@ -462,3 +462,40 @@ instance                                                       Finite Final wher
   asSet  = Set.singleton (Final ())
 instance Show Final where
   show (Final ()) = "qᶠ"
+
+data Suit where
+  Spade   ∷ Suit
+  Heart   ∷ Suit
+  Diamond ∷ Suit
+  Club    ∷ Suit
+  deriving (Eq, Enum, Ord, Bounded)
+
+instance Finite Suit
+
+instance Fancy Suit where
+  unicode  ∷ Suit → Char
+  unicode  Spade   = '♠'
+  unicode  Heart   = '♥'
+  unicode  Diamond = '♦'
+  unicode  Club    = '♣'
+  unicode' ∷ Suit → Char
+  unicode' Spade   = '♤'
+  unicode' Heart   = '♡'
+  unicode' Diamond = '♢'
+  unicode' Club    = '♧'
+  plain ∷ Suit → String
+  plain Spade   = "Spade"
+  plain Heart   = "Heart"
+  plain Diamond = "Diamond"
+  plain Club    = "Club"
+  show' ∷ Suit → String
+  show' Spade   = charToString (unicode Spade)   `toColor` Black'
+  show' Heart   = charToString (unicode Heart)   `toColor` Red'
+  show' Diamond = charToString (unicode Diamond) `toColor` Red'
+  show' Club    = charToString (unicode Club)    `toColor` Black'
+
+instance Show Suit where
+  show ∷ Suit → String
+  -- show = charToString . unicodeSuit
+  -- show s = show' s `toColor` toDisplayColor (color s)
+  show = show'
