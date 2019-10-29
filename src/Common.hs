@@ -173,17 +173,17 @@ partitions (x : xs) = go (x :| xs)
             go (a :| (h : t)) = [((a :| []) :), \(y : z) → (a <| y) : z] <*> go (h :| t)
 
 -- partitions of a set
--- partitions' {0..2} = [ [[0],[1],[2]]
---                      , [[0],[2,1]]
---                      , [[2,0],[1]]
+-- partitions' {0..2} = [ [[2,1,0]]
 --                      , [[1,0],[2]]
---                      , [[2,1,0]]
+--                      , [[2,0],[1]]
+--                      , [[0],[2,1]]
+--                      , [[0],[1],[2]]
 --                      ]
 partitions' ∷ (Foldable t) ⇒ t a → [[NonEmpty a]]
 partitions' = Foldable.foldl (\xs → (xs >>=) . go) [[]]
    where go ∷ a → [NonEmpty a] → [[NonEmpty a]]
-         go x []       = [[ x :| [] ]]
-         go x (y : ys) = fmap (y :) (go x ys) <> [(x :| Foldable.toList y) : ys]
+         go a []       = [[ a :| [] ]]
+         go a (y : ys) = [(a :| Foldable.toList y) : ys] <> fmap (y :) (go a ys)
 
 -- Stirling numbers of the first kind
 -- "The Stirling numbers of the first kind s(n, k) count the number of ways to permute a list of `n` items into `k` cycles"
