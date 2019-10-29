@@ -813,28 +813,12 @@ renamed ∷ (RenameMe f) ⇒ f b → f c → f (These b c)
 renamed = renameme id
 
 renamed' ∷ (RenameMe f) ⇒ f a → f a → f a
-renamed' = ring (\s → These s s)
+renamed' = renameme (\s → These s s)
 
 instance RenameMe Predicate where
   renameme ∷ forall a b c . (a → These b c) → Predicate b → Predicate c → Predicate a
-  renameme h (Predicate pᵇ) (Predicate pᶜ) = Predicate pᵃ
-    where
-      pᵃ ∷ a → Bool
-      pᵃ = pᵇpᶜpᵇᶜ . h
-      ppa ∷ Predicate a
-      ppa = contramap h pt
+  renameme h (Predicate pᵇ) (Predicate pᶜ) = contramap h (these pᵇ pᶜ (\b c → pᵇ b ∧ pᶜ c))
 
-      pt ∷ Predicate (These b c)
-      pt = Predicate pᵇpᶜpᵇᶜ
-
-      pᵇpᶜpᵇᶜ' ∷ These b c → Bool
-      pᵇpᶜpᵇᶜ' (This  b  ) = pᵇ b
-      pᵇpᶜpᵇᶜ' (That    c) =        pᶜ c
-      pᵇpᶜpᵇᶜ' (These b c) = pᵇ b ∧ pᶜ c
-
-      pᵇpᶜpᵇᶜ ∷ These b c → Bool
-      pᵇpᶜpᵇᶜ = these pᵇ pᶜ (\b c → pᵇ b ∧ pᶜ c)
---
 instance RenameMe Equivalence where
   renameme ∷ forall a b c . (a → These b c) → Equivalence b → Equivalence c → Equivalence a
   renameme h (Equivalence (⮀)) (Equivalence (⮂)) = ppa
