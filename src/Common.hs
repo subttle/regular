@@ -306,16 +306,17 @@ instance (Show a) ⇒ Show (Set' a) where
 charToString ∷ Char → String
 charToString = (: [])
 
+-- TODO change `Black'` to `Black`, `Red'` to `Red` after resolving naming conflict
 data DisplayColor where
-      Black'  ∷ DisplayColor
-      Red'    ∷ DisplayColor
-      Green   ∷ DisplayColor
-      Yellow  ∷ DisplayColor
-      Blue    ∷ DisplayColor
-      Magenta ∷ DisplayColor
-      Cyan    ∷ DisplayColor
-      White   ∷ DisplayColor
-      deriving (Eq, Bounded, Enum, Show)
+  Black'  ∷ DisplayColor
+  Red'    ∷ DisplayColor
+  Green   ∷ DisplayColor
+  Yellow  ∷ DisplayColor
+  Blue    ∷ DisplayColor
+  Magenta ∷ DisplayColor
+  Cyan    ∷ DisplayColor
+  White   ∷ DisplayColor
+  deriving (Eq, Bounded, Enum, Show)
 
 toColor ∷ String → DisplayColor → String
 toColor string color = (fgcolor color ++) ((++ reset) string)
@@ -333,14 +334,7 @@ toColor string color = (fgcolor color ++) ((++ reset) string)
     bgcolor ∷ DisplayColor → String
     bgcolor color' = encode [40 + fromEnum color']
     colorToCode ∷ DisplayColor → Int
-    colorToCode Black'  = 0
-    colorToCode Red'    = 1
-    colorToCode Green   = 2
-    colorToCode Yellow  = 3
-    colorToCode Blue    = 4
-    colorToCode Magenta = 5
-    colorToCode Cyan    = 6
-    colorToCode White   = 7
+    colorToCode = fromEnum
 
 class (Show a) ⇒ Fancy a where
       -- assign a unicode character
