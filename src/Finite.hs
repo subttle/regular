@@ -555,7 +555,7 @@ data Card where
 
 instance Enum Card where
   toEnum ∷ Int → Card
-  toEnum n = uncurry Card (asList !! n) -- Card (fst res) (snd res)
+  toEnum = uncurry Card . (asList !!)
   fromEnum ∷ Card → Int
   fromEnum (Card r s) = fromJust (List.elemIndex (r, s) asList)
   enumFrom ∷ Card → [Card]
@@ -746,3 +746,9 @@ instance Show Card where
 (🃂) = Card Two   Diamond
 (🃒) ∷ Card
 (🃒) = Card Two   Club
+
+bySuit ∷ Equivalence Card
+bySuit = Equivalence ((==) `on` suit)
+
+byRank ∷ Equivalence Card
+byRank = Equivalence ((==) `on` rank)
