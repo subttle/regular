@@ -345,6 +345,25 @@ lawful (≡) = refl  (≡)
            ∧ sym   (≡)
            ∧ trans (≡)
 
+-- TODO clean this up, factor for modularity
+-- test if the Comparision is actually a total ordering
+lawfulComparison ∷ ∀ a . (Finite a) ⇒ Comparison a → Bool
+lawfulComparison c = connexity  c
+                   ∧ antisym    c
+                   ∧ trans      c
+  where
+    tolteq ∷ Comparison a → a → a → Bool
+    tolteq (Comparison c) a₁ a₂ = a₁ `c` a₂ == LT 
+                                ∨ a₁ `c` a₂ == EQ
+    (≤) ∷ a → a → Bool
+    (≤) = tolteq c
+    connexity ∷ Comparison a → Bool
+    connexity c = all (\(a₁, a₂) → a₁ ≤ a₂ ∨ a₂ ≤ a₁) asSet
+    antisym ∷ Comparison a → Bool
+    antisym c = all (\(a₁, a₂) → ((a₁ ≤ a₂) ∧ (a₂ ≤ a₁)) `implies` (a₁ == a₂)) (asSet × asSet)
+    trans ∷ Comparison a → Bool
+    trans c = all (\(a₁, a₂, a₃) → ((a₁ ≤ a₂) ∧ (a₂ ≤ a₃)) `implies` (a₁ ≤ a₃)) (liftA3 (,,) asList asList asList)
+
 -- r₁ is "finer" r₂ iff r₁ ⊆ r₂   i.e. r₁ is a refinement of r₂
 -- if r₁ is a refinement of r₂ then each equivalence class of r₂ is
 -- a union of some of the equivalence classes of r₁.
