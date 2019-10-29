@@ -823,17 +823,13 @@ instance RenameMe Predicate where
 
 instance RenameMe Equivalence where
   renameme ∷ forall a b c . (a → These b c) → Equivalence b → Equivalence c → Equivalence a
-  renameme h (Equivalence (⮀)) (Equivalence (⮂)) = ppa
+  renameme h (Equivalence (⮀)) (Equivalence (⮂)) = contramap h (Equivalence (≡))
     where
-      ppa ∷ Equivalence a
-      ppa = contramap h pt
-      pt ∷ Equivalence (These b c)
-      pt = Equivalence pbc
-      pbc ∷ These b c → These b c → Bool
-      pbc (This  b₁   ) (This  b₂   ) = b₁ ⮀ b₂
-      pbc (That     c₁) (That     c₂) =           c₁ ⮂ c₂
-      pbc (These b₁ c₁) (These b₂ c₂) = b₁ ⮀ b₂ ∧ c₁ ⮂ c₂
-      pbc _             _             = False
+      (≡) ∷ These b c → These b c → Bool
+      (≡) (This  b₁   ) (This  b₂   ) = b₁ ⮀ b₂
+      (≡) (That     c₁) (That     c₂) =           c₁ ⮂ c₂
+      (≡) (These b₁ c₁) (These b₂ c₂) = b₁ ⮀ b₂ ∧ c₁ ⮂ c₂
+      (≡) _             _             = False
 
       pbc' ∷ These b c → These b c → Bool
       -- This version proved True in all cases tested (still want to do proof tho)
