@@ -20,10 +20,12 @@ import           Data.These
 import           Data.Void
 import           Data.Function
 import           Data.Functor.Contravariant
+import           Data.Functor.Contravariant.Divisible (Decidable)
 import           Common
 import           GHC.Enum (boundedEnumFrom)
 import           Data.Fin (Fin)
 import qualified Data.Type.Nat as Nat
+import           Numeric.Natural.Unicode (ℕ)
 -- import qualified Data.Universe as U
 
 -- An imperfect, somewhat practical, representation of a Finite type constraint
@@ -817,7 +819,7 @@ renamed' = renameme (\s → These s s)
 
 instance RenameMe Predicate where
   renameme ∷ forall a b c . (a → These b c) → Predicate b → Predicate c → Predicate a
-  renameme h (Predicate pᵇ) (Predicate pᶜ) = contramap h (these pᵇ pᶜ (\b c → pᵇ b ∧ pᶜ c))
+  renameme h (Predicate pᵇ) (Predicate pᶜ) = contramap h (Predicate (these pᵇ pᶜ (\b c → pᵇ b ∧ pᶜ c)))
 
 instance RenameMe Equivalence where
   renameme ∷ forall a b c . (a → These b c) → Equivalence b → Equivalence c → Equivalence a
