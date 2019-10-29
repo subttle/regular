@@ -804,3 +804,59 @@ bySuit = Equivalence ((==) `on` suit)
 
 byRank ∷ Equivalence Card
 byRank = Equivalence ((==) `on` rank)
+
+-- TODO change the name :)
+class (Decidable f) ⇒ RenameMe f where
+  renameme ∷ (a → These b c) → f b → f c → f a
+
+renamed ∷ (RenameMe f) ⇒ f b → f c → f (These b c)
+renamed = renameme id
+
+renamed' ∷ (RenameMe f) ⇒ f a → f a → f a
+renamed' = ring (\s → These s s)
+
+instance RenameMe Predicate where
+  renameme ∷ forall a b c . (a → These b c) → Predicate b → Predicate c → Predicate a
+  renameme h (Predicate pᵇ) (Predicate pᶜ) = Predicate pᵃ
+    where
+      pᵃ ∷ a → Bool
+      pᵃ = pᵇpᶜpᵇᶜ . h
+      ppa ∷ Predicate a
+      ppa = contramap h pt
+
+      pt ∷ Predicate (These b c)
+      pt = Predicate pᵇpᶜpᵇᶜ
+
+      pᵇpᶜpᵇᶜ' ∷ These b c → Bool
+      pᵇpᶜpᵇᶜ' (This  b  ) = pᵇ b
+      pᵇpᶜpᵇᶜ' (That    c) =        pᶜ c
+      pᵇpᶜpᵇᶜ' (These b c) = pᵇ b ∧ pᶜ c
+
+      pᵇpᶜpᵇᶜ ∷ These b c → Bool
+      pᵇpᶜpᵇᶜ = these pᵇ pᶜ (\b c → pᵇ b ∧ pᶜ c)
+--
+instance RenameMe Equivalence where
+  renameme ∷ forall a b c . (a → These b c) → Equivalence b → Equivalence c → Equivalence a
+  renameme h (Equivalence (⮀)) (Equivalence (⮂)) = ppa
+    where
+      ppa ∷ Equivalence a
+      ppa = contramap h pt
+      pt ∷ Equivalence (These b c)
+      pt = Equivalence pbc
+      pbc ∷ These b c → These b c → Bool
+      pbc (This  b₁   ) (This  b₂   ) = b₁ ⮀ b₂
+      pbc (That     c₁) (That     c₂) =           c₁ ⮂ c₂
+      pbc (These b₁ c₁) (These b₂ c₂) = b₁ ⮀ b₂ ∧ c₁ ⮂ c₂
+      pbc _             _             = False
+
+      pbc' ∷ These b c → These b c → Bool
+      -- This version proved True in all cases tested (still want to do proof tho)
+      pbc' (This  b₁   ) (This  b₂   ) = b₁ ⮀ b₂
+      pbc' (This  _    ) (That     _ ) =                   False
+      pbc' (This  b₁   ) (These b₂ _ ) = b₁ ⮀ b₂
+      pbc' (That     c₁) (This  b₂   ) =                   False
+      pbc' (That     c₁) (That     c₂) =           c₁ ⮂ c₂
+      pbc' (That     c₁) (These _  c₂) =           c₁ ⮂ c₂
+      pbc' (These b₁ _ ) (This  b₂   ) = b₁ ⮀ b₂
+      pbc' (These _  c₁) (That     c₂) =           c₁ ⮂ c₂
+      pbc' (These b₁ c₁) (These b₂ c₂) = b₁ ⮀ b₂ ∧ c₁ ⮂ c₂
