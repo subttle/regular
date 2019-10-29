@@ -301,3 +301,56 @@ newtype Set' a = Set' { unSet' ∷ Set a }
 
 instance (Show a) ⇒ Show (Set' a) where
   show = ("{" ++) . (++ "}") . intercalate ", " . (show <$>) . Set.toList . unSet'
+
+-- Perhaps improving clarity in some spots
+charToString ∷ Char → String
+charToString = (: [])
+
+data DisplayColor where
+      Black'  ∷ DisplayColor
+      Red'    ∷ DisplayColor
+      Green   ∷ DisplayColor
+      Yellow  ∷ DisplayColor
+      Blue    ∷ DisplayColor
+      Magenta ∷ DisplayColor
+      Cyan    ∷ DisplayColor
+      White   ∷ DisplayColor
+      deriving (Eq, Bounded, Enum, Show)
+
+toColor ∷ String → DisplayColor → String
+toColor string color = (fgcolor color ++) ((++ reset) string)
+  where
+    encode ∷ [Int] → String
+    encode = ("\ESC[" ++) . (++ "m") . List.intercalate ";" . fmap show
+    reset ∷ String
+    reset = encode [0]
+    -- `30  + _` for normal
+    -- `90  + _` for bright
+    fgcolor ∷ DisplayColor → String
+    fgcolor color' = encode [30 + fromEnum color']
+    -- `40  + _` for normal
+    -- `100 + _` for bright
+    bgcolor ∷ DisplayColor → String
+    bgcolor color' = encode [40 + fromEnum color']
+    colorToCode ∷ DisplayColor → Int
+    colorToCode Black'  = 0
+    colorToCode Red'    = 1
+    colorToCode Green   = 2
+    colorToCode Yellow  = 3
+    colorToCode Blue    = 4
+    colorToCode Magenta = 5
+    colorToCode Cyan    = 6
+    colorToCode White   = 7
+
+class (Show a) ⇒ Fancy a where
+      -- assign a unicode character
+      unicode  ∷ a → Char
+      -- assign an alternative unicode character
+      unicode' ∷ a → Char
+      unicode' = unicode
+      -- the plain version
+      plain    ∷ a → String
+      show'    ∷ a → String
+      show'    = charToString . unicode
+      colored ∷ (a, DisplayColor) → String
+      colored (s, color) = show' s `toColor` color
