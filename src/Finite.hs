@@ -327,9 +327,42 @@ instance (Finite a) ⇒                                         Finite  (Predica
 
 -- TODO may want to move this code (if keeping it) to testing folder when done implementing `Finite` instance for `Equivalence`.
 
+-- Count the parts of an equivalence
+count ∷ (Finite a) ⇒ Equivalence a → ℕ
+count = genericLength . fromEquivalence
+
+byCount ∷ (Finite a) ⇒ Equivalence (Equivalence a)
+byCount = Equivalence ((==) `on` count)
+
+byLength ∷ (Foldable t) ⇒ Equivalence (t a)
+byLength = Equivalence ((==) `on` length)
+
+byThese ∷ Equivalence (These a b)
+byThese = Equivalence eq
+  where
+    eq ∷ These a b → These a b → Bool
+    eq (This  _  ) (This  _  ) = True
+    eq (This  _  ) (That    _) = False
+    eq (This  _  ) (These _ _) = False
+    eq (That    _) (This  _  ) = False
+    eq (That    _) (That    _) = True
+    eq (That    _) (These _ _) = False
+    eq (These _ _) (This  _  ) = False
+    eq (These _ _) (That    _) = False
+    eq (These _ _) (These _ _) = True
+
+byEither ∷ Equivalence (Either a b)
+byEither = Equivalence eq
+  where
+    eq ∷ Either a b → Either a b → Bool
+    eq (Left  _) (Left  _) = True
+    eq (Left  _) (Right _) = False
+    eq (Right _) (Left  _) = False
+    eq (Right _) (Right _) = True
+
 -- Reflexive
 refl ∷ (Finite a) ⇒ Equivalence a → Bool
-refl (Equivalence (≡)) = all (\x → x ≡ x) asSet
+refl (Equivalence (≡)) = all (\a → a ≡ a) asSet
 
 -- Symmetric
 sym ∷ (Finite a) ⇒  Equivalence a → Bool
