@@ -166,11 +166,12 @@ unionRights = Set.mapMonotonic (fromRight undefined) . Set.filter isLeft  -- Set
 --                     , [[0,1,2]]
 --                     ]
 partitions ∷ ∀ a . [a] → [[NonEmpty a]]
-partitions []       = [[]]
-partitions (x : xs) = go (x :| xs)
-      where go ∷ NonEmpty a → [[NonEmpty a]]
-            go (a :| [])      = [[a :| []]]
-            go (a :| (h : t)) = [((a :| []) :), \(y : z) → (a <| y) : z] <*> go (h :| t)
+partitions []      = [[]]
+partitions (h : t) = partitionsNE (h :| t)
+
+partitionsNE ∷ NonEmpty a → [[NonEmpty a]]
+partitionsNE (a₁ :| [])        = [[ a₁ :| []]]
+partitionsNE (a₁ :| (a₂ : as)) = [((a₁ :| []) :), \(h : t) → (a₁ <| h) : t] <*> partitionsNE (a₂ :| as)
 
 -- partitions of a set
 -- partitions' {0..2} = [ [[2,1,0]]
