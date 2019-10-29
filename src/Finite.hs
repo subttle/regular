@@ -496,6 +496,53 @@ instance Fancy Suit where
 
 instance Show Suit where
   show ∷ Suit → String
-  -- show = charToString . unicodeSuit
-  -- show s = show' s `toColor` toDisplayColor (color s)
   show = show'
+
+data Rank where
+  Two   ∷ Rank
+  Three ∷ Rank
+  Four  ∷ Rank
+  Five  ∷ Rank
+  Six   ∷ Rank
+  Seven ∷ Rank
+  Eight ∷ Rank
+  Nine  ∷ Rank
+  Ten   ∷ Rank
+  Jack  ∷ Rank 
+  Queen ∷ Rank
+  King  ∷ Rank
+  Ace   ∷ Rank
+  deriving (Eq, Enum, Ord, Bounded)
+instance Fancy Rank where
+  unicode ∷ Rank → Char
+  unicode Two   = '⑵'
+  unicode Three = '⑶'
+  unicode Four  = '⑷'
+  unicode Five  = '⑸'
+  unicode Six   = '⑹'
+  unicode Seven = '⑺'
+  unicode Eight = '⑻'
+  unicode Nine  = '⑼'
+  unicode Ten   = '⑽'
+  unicode Jack  = '⑾'
+  unicode Queen = '⑿'
+  unicode King  = '⒀'
+  unicode Ace   = '⒁'
+  plain ∷ Rank → String
+  plain Two   = "Two"
+  plain Three = "Three"
+  plain Four  = "Four"
+  plain Five  = "Five"
+  plain Six   = "Six"
+  plain Seven = "Seven"
+  plain Eight = "Eight"
+  plain Nine  = "Nine"
+  plain Ten   = "Ten"
+  plain Jack  = "Jack"
+  plain Queen = "Queen"
+  plain King  = "King"
+  plain Ace   = "Ace"
+instance Show Rank where
+  show = show'
+instance Finite Rank
+
