@@ -818,12 +818,12 @@ renamed' ∷ (RenameMe f) ⇒ f a → f a → f a
 renamed' = renameme (\s → These s s)
 
 instance RenameMe Predicate where
-  renameme ∷ forall a b c . (a → These b c) → Predicate b → Predicate c → Predicate a
-  renameme h (Predicate pᵇ) (Predicate pᶜ) = contramap h (Predicate (these pᵇ pᶜ (\b c → pᵇ b ∧ pᶜ c)))
+  renameme ∷ (a → These b c) → Predicate b → Predicate c → Predicate a
+  renameme h (Predicate pᵇ) (Predicate pᶜ) = h >$< Predicate (these pᵇ pᶜ (\b c → pᵇ b ∧ pᶜ c))
 
 instance RenameMe Equivalence where
   renameme ∷ forall a b c . (a → These b c) → Equivalence b → Equivalence c → Equivalence a
-  renameme h (Equivalence (⮀)) (Equivalence (⮂)) = contramap h (Equivalence (≡))
+  renameme h (Equivalence (⮀)) (Equivalence (⮂)) = h >$< Equivalence (≡)
     where
       (≡) ∷ These b c → These b c → Bool
       (≡) (This  b₁   ) (This  b₂   ) = b₁ ⮀ b₂
@@ -831,14 +831,14 @@ instance RenameMe Equivalence where
       (≡) (These b₁ c₁) (These b₂ c₂) = b₁ ⮀ b₂ ∧ c₁ ⮂ c₂
       (≡) _             _             = False
 
-      pbc' ∷ These b c → These b c → Bool
+      eqbc ∷ These b c → These b c → Bool
       -- This version proved True in all cases tested (still want to do proof tho)
-      pbc' (This  b₁   ) (This  b₂   ) = b₁ ⮀ b₂
-      pbc' (This  _    ) (That     _ ) =                   False
-      pbc' (This  b₁   ) (These b₂ _ ) = b₁ ⮀ b₂
-      pbc' (That     c₁) (This  b₂   ) =                   False
-      pbc' (That     c₁) (That     c₂) =           c₁ ⮂ c₂
-      pbc' (That     c₁) (These _  c₂) =           c₁ ⮂ c₂
-      pbc' (These b₁ _ ) (This  b₂   ) = b₁ ⮀ b₂
-      pbc' (These _  c₁) (That     c₂) =           c₁ ⮂ c₂
-      pbc' (These b₁ c₁) (These b₂ c₂) = b₁ ⮀ b₂ ∧ c₁ ⮂ c₂
+      eqbc (This  b₁   ) (This  b₂   ) = b₁ ⮀ b₂
+      eqbc (This  _    ) (That     _ ) =                   False
+      eqbc (This  b₁   ) (These b₂ _ ) = b₁ ⮀ b₂
+      eqbc (That     c₁) (This  b₂   ) =                   False
+      eqbc (That     c₁) (That     c₂) =           c₁ ⮂ c₂
+      eqbc (That     c₁) (These _  c₂) =           c₁ ⮂ c₂
+      eqbc (These b₁ _ ) (This  b₂   ) = b₁ ⮀ b₂
+      eqbc (These _  c₁) (That     c₂) =           c₁ ⮂ c₂
+      eqbc (These b₁ c₁) (These b₂ c₂) = b₁ ⮀ b₂ ∧ c₁ ⮂ c₂
