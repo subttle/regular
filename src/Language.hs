@@ -15,80 +15,118 @@ import           Data.Functor.Contravariant
 -- is not necessarily the case in Haskell, it is assumed to be total in this library to represent decidable languages.
 
 -- Language over Σ
-type ℒ s = [s] → Bool
+type ℒ s = Predicate [s]
+
+-- TODO I should experiment more because
+-- TODO I bet it would be much cleaner for some parts to implement in terms of monoid instead of list
 
 instance (Finite s) ⇒ Σ (ℒ s) s
 
 -- provided for convenience/clarity.
 -- ℓ `accepts` w ≡ ℓ w
 accepts ∷ ℒ s → [s] → Bool
-accepts = id
+-- accepts (Predicate ℓ) w = ℓ w
+-- accepts (Predicate ℓ) = ℓ
+accepts = getPredicate
+
 
 -- iff ε ∈ ℒ
 nullable ∷ ℒ s → Bool
-nullable ℓ = ℓ []
+nullable (Predicate ℓ) = ℓ []
 
 -- the language which accepts no strings
 empty ∷ ℒ s
-empty = const False
+empty = Predicate (const False)
 
 -- the language which accepts only the empty string
 epsilon ∷ ℒ s
-epsilon [] = True
-epsilon _  = False
+{-
+epsilon = Predicate p
+  where p [] = True
+        p _  = False
+-}
+epsilon = Predicate null
 
 -- the language which accepts only a single literal
-lit ∷ (Eq s) ⇒ s → ℒ s
-lit σ [σ'] = σ == σ'
-lit _ _    = False
+-- lit ∷ (Eq s) ⇒ s → ℒ s
+-- lit σ [σ'] = σ == σ'
+-- lit _ _    = False
+-- want version of `null` for NE? `isSingleton`?
+lit ∷ forall s . (Eq s) ⇒ s → ℒ s
+lit σ = Predicate p
+  where p ∷ [s] → Bool
+        p [σ'] = σ == σ'
+        p _    = False
 
 complement ∷ ℒ s → ℒ s
-complement ℓ = not . ℓ
+complement (Predicate ℓ) = Predicate (not . ℓ)
 
 reversed ∷ ℒ s → ℒ s
-reversed ℓ = ℓ . reverse
+reversed = contramap reverse
 
 union ∷ ℒ s → ℒ s → ℒ s
-union ℓ₁ ℓ₂ w = ℓ₁ w ∨ ℓ₂ w
+union        (Predicate ℓ₁) (Predicate ℓ₂) = Predicate (\w → ℓ₁ w ∨ ℓ₂ w)
 
 intersection ∷ ℒ s → ℒ s → ℒ s
-intersection ℓ₁ ℓ₂ w = ℓ₁ w ∧ ℓ₂ w
+intersection (Predicate ℓ₁) (Predicate ℓ₂) = Predicate (\w → ℓ₁ w ∧ ℓ₂ w)
+-- intersection = (<>) -- :P
 
 concatenate ∷ ℒ s → ℒ s → ℒ s
-concatenate ℓ₁ ℓ₂ w =  any (\(w₁ , w₂) → ℓ₁ w₁ ∧ ℓ₂ w₂) (zip (inits w) (tails w))
+concatenate  (Predicate ℓ₁) (Predicate ℓ₂) = Predicate (\w → any (\(w₁ , w₂) → ℓ₁ w₁ ∧ ℓ₂ w₂) (zip (inits w) (tails w)))
 
 -- Kleene star
-star ∷ ℒ s → ℒ s
-star _ [] = True
-star ℓ w  = any (all (ℓ . NE.toList)) (partitions w)
+-- star ∷ ℒ s → ℒ s
+-- star _ [] = True
+-- star ℓ w  = any (all (ℓ . NE.toList)) (partitions w)
+star ∷ forall s . ℒ s → ℒ s
+-- star _ [] = True
+-- star (Predicate ℓ) = Predicate (\w → any (all (ℓ . NE.toList)) (partitions w))
+star (Predicate ℓ) = Predicate p
+  where
+    -- TODO express in terms of `epsilon + any ...`?
+    p ∷ [s] → Bool
+    p [] = True
+    p w  = any (all (ℓ . NE.toList)) (partitions w)
+
 
 -- inverse homomorphism
 invhom ∷ ([s] → [g]) → ℒ g → ℒ s
-invhom h ℓ = ℓ . h
+-- invhom h (Predicate ℓ) = Predicate (ℓ . h)
+invhom = contramap
 
 -- inverse homomorphic image of ℓ under h
+-- invhomimage ∷ (s → [g]) → ℒ g → ℒ s
+-- invhomimage h ℓ = ℓ . concatMap h
 invhomimage ∷ (s → [g]) → ℒ g → ℒ s
-invhomimage h ℓ = ℓ . concatMap h
+-- invhomimage h (Predicate ℓ) = Predicate (ℓ . concatMap h)
+invhomimage h = contramap (concatMap h)
 
 -- ε-free inverse homomorphic image of ℓ under h
+-- invhomimageEpsFree ∷ (s → NE.NonEmpty g) → ℒ g → ℒ s
+-- invhomimageEpsFree h ℓ = ℓ . concatMap (NE.toList . h)
 invhomimageEpsFree ∷ (s → NE.NonEmpty g) → ℒ g → ℒ s
-invhomimageEpsFree h ℓ = ℓ . concatMap (NE.toList . h)
+-- invhomimageEpsFree h (Predicate ℓ) = Predicate (ℓ . concatMap (NE.toList . h))
+invhomimageEpsFree h = contramap (concatMap (NE.toList . h))
 
 invhomimagew ∷ (Eq g) ⇒ (s → [g]) → [g] → ℒ s
-invhomimagew h w = (w ==) . concatMap h
+invhomimagew h w = Predicate ((w ==) . concatMap h)
 
 -- derivative with respect to some symbol in Σ
 derivative ∷ ℒ s → s → ℒ s
-derivative ℓ a w = ℓ (a : w)
+-- derivative ℓ a w = ℓ (a : w)
+derivative (Predicate ℓ) a = Predicate (\w → ℓ (a : w))
 
 -- derivative with respect to some word ∈ Σ★
 derivative' ∷ ℒ s → [s] → ℒ s
-derivative' ℓ v w = ℓ (v ++ w)
+-- derivative' ℓ v w = ℓ (v ++ w)
+derivative' (Predicate ℓ) w₁ = Predicate (\w₂ → ℓ (w₁ ++ w₂))
 
 -- some useful instances are defined over this type
+-- predicate ∷ ℒ s → Predicate [s]
+-- predicate = Predicate
 predicate ∷ ℒ s → Predicate [s]
-predicate = Predicate
+predicate (Predicate ℓ) = Predicate ℓ -- ℒ.ℒ -- TODO lol
 
 -- N.B. this is a convenience function, it does not terminate even for finite languages!
-language ∷ (Finite s) ⇒ ℒ s → [[s]]
-language ℓ = filter ℓ (sigmaStar ℓ)
+-- language ∷ (Finite s) ⇒ ℒ s → [[s]]
+-- language (Predicate ℓ) = filter ℓ (sigmaStar ℓ)
