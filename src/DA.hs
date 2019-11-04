@@ -32,12 +32,11 @@ instance Contravariant (DA q) where
     contramap ∷ (b → a) → DA q a → DA q b
     contramap h m@(DA _ t) = m { transition = \a → t a . h }
 
-language ∷ DA q s → q → ℒ s
-language (DA o _) q []      = o q
-language (DA o t) q (a : w) = language (DA o t) (t q a) w
+language ∷ forall q s . DA q s → q → ℒ s
+language (DA o t) q = Predicate (o . foldl t q)
 
 accepts ∷ DA q s → q → [s] → Bool
-accepts (DA o t) q = o . foldl t q
+accepts (DA o t) q = getPredicate (language (DA o t) q)
 
 -- "automaton of languages" or "the final automaton of languages"
 -- "This automaton has the pleasing property that the language accepted by a state L in ℒ [the set of all languages] is precisely L itself."
@@ -56,12 +55,12 @@ complement ∷ DA q s → DA q s
 complement m@(DA o _) = m { output = not . o }
 
 intersection ∷ DA q s → DA p s → DA (q, p) s
-intersection (DA o₁ t₁) (DA o₂ t₂) = DA { output     = \(q , p)   → o₁ q ∧ o₂ p
+intersection (DA o₁ t₁) (DA o₂ t₂) = DA { output     = \(q , p)   →  o₁ q   ∧ o₂ p
                                         , transition = \(q , p) σ → (t₁ q σ , t₂ p σ)
                                         }
 
 union ∷ DA q s → DA p s → DA (q, p) s
-union (DA o₁ t₁) (DA o₂ t₂) = DA { output     = \(q , p)   → o₁ q ∨ o₂ p
+union (DA o₁ t₁) (DA o₂ t₂) = DA { output     = \(q , p)   →  o₁ q   ∨ o₂ p
                                  , transition = \(q , p) σ → (t₁ q σ , t₂ p σ)
                                  }
 
