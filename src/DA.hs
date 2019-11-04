@@ -9,8 +9,8 @@ import           Language (ℒ)
 -- import           Finite
 import           Data.Bool.Unicode
 import           Data.Functor.Contravariant
--- import           Data.Functor.Contravariant.Divisible
--- import           Data.Void
+import           Data.Functor.Contravariant.Divisible
+import           Data.Void
 
 -- Experiment based on:
 -- http://www.few.vu.nl/~cgr600/linkedfiles/swansea_slides.pdf
@@ -24,7 +24,7 @@ import           Data.Functor.Contravariant
 -- then DA has the same power as an FA (without the initial state(s)).
 data DA q s =                 -- q is the set of states, Q
                               -- s is the alphabet
-     DA { output     ∷ q → Bool
+     DA { output     ∷ Predicate q
         , transition ∷ q → (s → q)
         }
 
@@ -33,36 +33,30 @@ instance Contravariant (DA q) where
     contramap h m@(DA _ t) = m { transition = \a → t a . h }
 
 language ∷ forall q s . DA q s → q → ℒ s
-language (DA o t) q = Predicate (o . foldl t q)
+language (DA (Predicate o) t) q = Predicate (o . foldl t q)
 
 accepts ∷ DA q s → q → [s] → Bool
-accepts (DA o t) q = getPredicate (language (DA o t) q)
+accepts m = getPredicate . language m
 
 -- "automaton of languages" or "the final automaton of languages"
 -- "This automaton has the pleasing property that the language accepted by a state L in ℒ [the set of all languages] is precisely L itself."
 -- Automata and Coinduction (An Exercise in Coalgebra) J.J.M.M. Rutten
 automaton ∷ DA (ℒ s) s
-automaton = DA { output     = Language.nullable
-               , transition = Language.derivative
-               }
+automaton = DA (Predicate Language.nullable) Language.derivative
 
 empty ∷ DA q s
-empty = DA { output     = const False
-           , transition = const
-           }
+empty = DA (Predicate (const False)) const
 
 complement ∷ DA q s → DA q s
-complement m@(DA o _) = m { output = not . o }
+complement m@(DA (Predicate o) _) = m { output = Predicate (not . o) }
 
 intersection ∷ DA q s → DA p s → DA (q, p) s
-intersection (DA o₁ t₁) (DA o₂ t₂) = DA { output     = \(q , p)   →  o₁ q   ∧ o₂ p
-                                        , transition = \(q , p) σ → (t₁ q σ , t₂ p σ)
-                                        }
+intersection (DA (Predicate o₁) t₁) (DA (Predicate o₂) t₂) = DA (Predicate (\(q , p)   →  o₁ q   ∧ o₂ p  ))
+                                                                           (\(q , p) σ → (t₁ q σ , t₂ p σ))
 
 union ∷ DA q s → DA p s → DA (q, p) s
-union (DA o₁ t₁) (DA o₂ t₂) = DA { output     = \(q , p)   →  o₁ q   ∨ o₂ p
-                                 , transition = \(q , p) σ → (t₁ q σ , t₂ p σ)
-                                 }
+union (DA (Predicate o₁) t₁) (DA (Predicate o₂) t₂) = DA (Predicate (\(q , p)   →  o₁ q   ∨ o₂ p  ))
+                                                                    (\(q , p) σ → (t₁ q σ , t₂ p σ))
 
 difference ∷ DA q s → DA p s → DA (q, p) s
 difference m₁ m₂ = intersection m₁ (complement m₂)
