@@ -30,10 +30,10 @@ data DA q s =                 -- q is the set of states, Q
 
 instance Contravariant (DA q) where
     contramap ∷ (b → a) → DA q a → DA q b
-    contramap h m@(DA _ t) = m { transition = \a → t a . h }
+    contramap h (DA o t) = DA o (\q → t q . h)
 
 language ∷ forall q s . DA q s → q → ℒ s
-language (DA (Predicate o) t) q = Predicate (o . foldl t q)
+language (DA o t) q = contramap (foldl t q) o
 
 accepts ∷ DA q s → q → [s] → Bool
 accepts m = getPredicate . language m
@@ -48,7 +48,7 @@ empty ∷ DA q s
 empty = DA (Predicate (const False)) const
 
 complement ∷ DA q s → DA q s
-complement m@(DA (Predicate o) _) = m { output = Predicate (not . o) }
+complement (DA (Predicate o) t) = DA (Predicate (not . o)) t
 
 intersection ∷ DA q s → DA p s → DA (q, p) s
 intersection (DA (Predicate o₁) t₁) (DA (Predicate o₂) t₂) = DA (Predicate (\(q , p)   →  o₁ q   ∧ o₂ p  ))
