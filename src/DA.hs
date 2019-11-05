@@ -32,7 +32,23 @@ instance Contravariant (DA q) where
     contramap ∷ (b → a) → DA q a → DA q b
     contramap h (DA o t) = DA o (\q → t q . h)
 
-language ∷ forall q s . DA q s → q → ℒ s
+-- FIXME: these instances (`Divisible` and `Decidable`) are just experimental for now
+instance Divisible (DA q) where
+    divide ∷ (s → (g₁, g₂)) → DA q g₁ → DA q g₂ → DA q s
+    divide h (DA o₁ t₁) (DA o₂ t₂) = DA (o₁ <> o₂) (\q → uncurry (t₂ . t₁ q) . h)
+
+    conquer ∷ DA q a
+    conquer = DA conquer const
+
+instance Decidable (DA q) where
+    lose ∷ (a → Void) → DA q a
+    lose _ = empty
+
+    choose ∷ (s → Either g₁ g₂) → DA q g₁ → DA q g₂ → DA q s
+    choose h (DA (Predicate o₁) t₁) (DA (Predicate o₂) t₂) = DA (Predicate (\q →         o₁ q ∨ o₂ q    )) 
+                                                                           (\q → either (t₁ q) (t₂ q) . h)
+
+language ∷ DA q s → q → ℒ s
 language (DA o t) q = contramap (foldl t q) o
 
 accepts ∷ DA q s → q → [s] → Bool
