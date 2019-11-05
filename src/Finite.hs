@@ -678,11 +678,7 @@ instance Fancy Card where
 
 instance Show Card where
   show ∷ Card → String
-  -- show c = show' c `toColor` toDisplayColor (colorOf c)
-  show c@(Card _ Spade  ) = charToString (unicode c)   `toColor` Black'
-  show c@(Card _ Heart  ) = charToString (unicode c)   `toColor` Red'
-  show c@(Card _ Diamond) = charToString (unicode c)   `toColor` Red'
-  show c@(Card _ Club   ) = charToString (unicode c)   `toColor` Black'
+  show c = show' c `toColor` color c
 
 (🂡) ∷ Card
 (🂡) = Card Ace Spade
@@ -801,11 +797,26 @@ instance Show Card where
 (🃒) ∷ Card
 (🃒) = Card Two   Club
 
-bySuit ∷ Equivalence Card
-bySuit = Equivalence ((==) `on` suit)
+colorOf ∷ Suit → DisplayColor
+colorOf Spade   = Black'
+colorOf Heart   = Red'
+colorOf Diamond = Red'
+colorOf Club    = Black'
 
-byRank ∷ Equivalence Card
-byRank = Equivalence ((==) `on` rank)
+color ∷ Card → DisplayColor
+color = colorOf . suit
+
+cardsBySuit ∷ Equivalence Card
+cardsBySuit = Equivalence ((==) `on` suit)
+
+cardsByRank ∷ Equivalence Card
+cardsByRank = Equivalence ((==) `on` rank)
+
+cardsByColor ∷ Equivalence Card
+cardsByColor = Equivalence ((==) `on` color)
+
+suitsByColor ∷ Equivalence Suit
+suitsByColor = Equivalence ((==) `on` colorOf)
 
 -- TODO change the name :)
 class (Decidable f) ⇒ RenameMe f where
