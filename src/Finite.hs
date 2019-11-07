@@ -26,12 +26,13 @@ import           GHC.Enum (boundedEnumFrom)
 import           Data.Fin (Fin)
 import qualified Data.Type.Nat as Nat
 import           Numeric.Natural.Unicode (ℕ)
--- import qualified Data.Universe as U
+import           Data.Tagged (Tagged, unTagged)
+import qualified Data.Universe as U
 
 -- An imperfect, somewhat practical, representation of a Finite type constraint
 -- The poor Haskeller's version of a Finite type constraint without reaching for dependent types
 -- Will probably delete most of this once Haskell has better dependent type support :)
-class (Enum a, Bounded a, Ord a) ⇒ Finite a where
+class (Enum a, Bounded a, Ord a, U.Finite a) ⇒ Finite a where
   -- N.B. if overridding asList, make sure the list contains only distinct elements in ascending order.
   asList ∷ [a]
   asList = boundedEnumFrom minBound
@@ -66,36 +67,49 @@ class (Finite g) ⇒ Γ automaton g | automaton → g where
   gamma ∷ automaton → Set g
   gamma _ = asSet
 
-instance                                                      Finite () where
+instance Finite () where
   asList = [()]
   asSet  = Set.singleton ()
-instance                                                      Finite Bool where
+instance Finite Bool where
   asList = [False, True]
-instance                                                      Finite Ordering where
+instance Finite Ordering where
   asList = [LT, EQ, GT]
-instance                                                      Finite Char
+instance Finite Char
 
-instance (Finite a) ⇒                                         Bounded (Set a) where
+instance (Finite a)
+       ⇒ Bounded (Set a) where
+  minBound ∷ Set a
   minBound = (∅)
   -- I'd rather this were just `asSet` as in a Hasse diagram (even though there is a total order)
   -- but that would be inaccurate for the Data.Set implementation
+  maxBound ∷ Set a
   maxBound = singleton maxBound
 -- For `Set a` where `a` is enumerable, enumerate the set as the powerset.
-instance (Finite a) ⇒                                         Enum    (Set a) where
+instance (Finite a) ⇒ Enum (Set a) where
+  toEnum ∷ Int → Set a
   toEnum     =                       (asList !!)
+  fromEnum ∷ Set a → Int
   fromEnum t = fromJust (elemIndex t  asList)
+  enumFrom ∷ Set a → [Set a]
   enumFrom t = dropWhile (≠ t)        asList
-instance (Finite a) ⇒                                         Finite  (Set a) where
+instance (Finite a)
+       ⇒ Finite (Set a) where
+  asList ∷ [Set a]
   asList = Set.toList (powerSet asSet)
+  asSet ∷ Set (Set a)
   asSet  = powerSet asSet
 
 -- If `a` is bounded, then just move the lower bound to `Nothing`, and wrap the upper bound in a `Just`
 -- This is one arbitrary possible instance
-instance (Bounded a) ⇒                                        Bounded (Maybe a) where
+instance (Bounded a)
+       ⇒ Bounded (Maybe a) where
+  minBound ∷ Maybe a
   minBound = Nothing
+  maxBound ∷ Maybe a
   maxBound = Just maxBound
 -- For `Maybe a` types where `a` is enumerable, enumerate as `Nothing : fmap Just [toEnum 0..]`.
-instance (Finite a) ⇒                                         Enum    (Maybe a) where
+instance (Finite a)
+       ⇒ Enum (Maybe a) where
   toEnum   ∷ Int     → Maybe a
   toEnum 0 = Nothing
   toEnum n = Just (toEnum (n - 1))
@@ -105,33 +119,57 @@ instance (Finite a) ⇒                                         Enum    (Maybe a
   enumFrom ∷ Maybe a → [Maybe a]
   enumFrom Nothing  = asList
   enumFrom (Just t) = fmap Just (enumFrom t)
-instance (Finite a) ⇒                                         Finite  (Maybe a) where
+instance (Finite a)
+       ⇒ Finite (Maybe a) where
+  asList ∷ [Maybe a]
   asList = Nothing : fmap Just asList
+  asSet ∷ Set (Maybe a)
   asSet  = Set.insert Nothing (Set.mapMonotonic Just asSet)
 
-instance (Bounded a, Bounded b) ⇒                             Bounded (Either a b) where
+instance (Bounded a, Bounded b)
+       ⇒ Bounded (Either a b) where
+  minBound ∷ Either a b
   minBound = Left  minBound
+  maxBound ∷ Either a b
   maxBound = Right maxBound
 -- For `(Either a b)` where types `a` and `b` are enumerable,
 -- enumerate as the concatenation of the enumerations of `Left` then `Right` types.
-instance (Finite a, Finite b) ⇒                               Enum    (Either a b) where
+instance (Finite a, Finite b)
+       ⇒ Enum (Either a b) where
+  toEnum ∷ Int → Either a b
   toEnum     =                       (asList !!)
+  fromEnum ∷ Either a b → Int
   fromEnum t = fromJust (elemIndex t  asList)
+  enumFrom ∷ Either a b → [Either a b]
   enumFrom t = dropWhile (≠ t)        asList
-instance (Finite a, Finite b) ⇒                               Finite  (Either a b) where
+instance (Finite a, Finite b)
+       ⇒ Finite (Either a b) where
+  asList ∷ [Either a b]
   asList = toList asSet
+  asSet ∷ Set (Either a b)
   asSet  = asSet ⊎ asSet
 
-instance (Bounded a, Bounded b) ⇒                             Bounded (These a b) where
+instance (Bounded a, Bounded b)
+       ⇒ Bounded (These a b) where
   minBound ∷ These a b
   minBound = This  minBound
   maxBound ∷ These a b
   maxBound = These  maxBound maxBound  -- maxBound = That  maxBound
-instance (Finite a, Finite b) ⇒                               Enum    (These a b) where
+instance (Finite a, Finite b)
+       ⇒ Enum (These a b) where
+  toEnum ∷ Int → These a b
   toEnum     =                       (asList !!)
+  fromEnum ∷ These a b → Int
   fromEnum t = fromJust (elemIndex t  asList)
+  enumFrom ∷ These a b → [These a b]
   enumFrom t = dropWhile (≠ t)        asList
-instance (Finite a, Finite b) ⇒                               Finite  (These a b) where
+instance (Finite a, Finite b) ⇒ U.Finite (These a b) where
+
+-- TODO wait why do I need Finite constraints here??
+instance (Finite a, Finite b, U.Universe a, U.Universe b)
+       ⇒ U.Universe (These a b)
+instance (Finite a, Finite b)
+       ⇒ Finite (These a b) where
   asList ∷ [These a b]
   asList = toList asSet
   asSet ∷ Set (These a b)
@@ -151,103 +189,173 @@ instance (Finite a, Finite b) ⇒                               Finite  (These a
       sums = asSet -- asSet ⊎ asSet
 
 -- For tuples where types `a` and `b` are enumerable, allow the tuple to be enumerated as `a` × `b`
-instance (Finite a, Finite b) ⇒                               Enum   (a, b) where
+instance (Finite a, Finite b)
+       ⇒ Enum (a, b) where
   toEnum ∷ Int → (a, b)
   toEnum i₀ = (toEnum aᵢ, toEnum bᵢ)
-    where (i₁, bᵢ) = i₀ `quotRem` length (asList ∷ [b])
-          (_,  aᵢ) = i₁ `quotRem` length (asList ∷ [a])
+    where
+      cardinality_a ∷ ℕ
+      cardinality_a = unTagged (U.cardinality ∷ Tagged a ℕ)
+      cardinality_b ∷ ℕ
+      cardinality_b = unTagged (U.cardinality ∷ Tagged b ℕ)
+      (i₁, bᵢ) = i₀ `quotRem` fromIntegral cardinality_b
+      (_,  aᵢ) = i₁ `quotRem` fromIntegral cardinality_a
   fromEnum ∷ (a, b) → Int
-  fromEnum (a, b) = (aᵢ * lb) + bᵢ
-    where (aᵢ, bᵢ) = (fromEnum a, fromEnum b)
-          lb = length (asList ∷ [b])
-
+  fromEnum (a, b) = fromIntegral $ aᵢ * cardinality_b
+                                 +                  bᵢ
+    where
+      (aᵢ, bᵢ) = (fromEnum' a, fromEnum' b) ∷ (ℕ, ℕ)
+      cardinality_b ∷ ℕ
+      cardinality_b = unTagged (U.cardinality ∷ Tagged b ℕ)
   enumFrom ∷ (a, b) → [(a, b)]
   -- enumFrom t = dropWhile (≠ t)        asList
   enumFrom = boundedEnumFrom
 
-instance (Finite a, Finite b) ⇒                               Finite (a, b) where
+instance (Finite a, Finite b)
+       ⇒ Finite (a, b) where
+  asSet ∷ Set (a, b)
   asSet  = asSet × asSet
-  asList = liftA2 (,)    asList asList
-
+  asList ∷ [(a, b)]
+  asList = liftA2 (,) asList asList
 
 -- For tuples where types `a`, `b`, and `c` are enumerable, allow the tuple to be enumerated as `a` × `b` × `c`
-instance (Finite a, Finite b, Finite c) ⇒                     Enum   (a, b, c) where
+instance (Finite a, Finite b, Finite c)
+       ⇒ Enum (a, b, c) where
   toEnum ∷ Int → (a, b, c)
   toEnum i₀ = (toEnum aᵢ, toEnum bᵢ, toEnum cᵢ)
-    where (i₁, cᵢ) = i₀ `quotRem` length (asList ∷ [c])
-          (i₂, bᵢ) = i₁ `quotRem` length (asList ∷ [b])
-          (_,  aᵢ) = i₂ `quotRem` length (asList ∷ [a])
+    where
+      cardinality_a ∷ ℕ
+      cardinality_a = unTagged (U.cardinality ∷ Tagged a ℕ)
+      cardinality_b ∷ ℕ
+      cardinality_b = unTagged (U.cardinality ∷ Tagged b ℕ)
+      cardinality_c ∷ ℕ
+      cardinality_c = unTagged (U.cardinality ∷ Tagged c ℕ)
+      (i₁, cᵢ) = i₀ `quotRem` fromIntegral cardinality_c
+      (i₂, bᵢ) = i₁ `quotRem` fromIntegral cardinality_b
+      (_,  aᵢ) = i₂ `quotRem` fromIntegral cardinality_a
   fromEnum ∷ (a, b, c) → Int
-  fromEnum (a, b, c) = (aᵢ * lb * lc) + (bᵢ * lc) + cᵢ
-    where (aᵢ, bᵢ, cᵢ) = (fromEnum a, fromEnum b, fromEnum c)
-          lb = length (asList ∷ [b])
-          lc = length (asList ∷ [c])
+  fromEnum (a, b, c) = fromIntegral $ aᵢ * cardinality_b  * cardinality_c
+                                    +                  bᵢ * cardinality_c
+                                    +                                   cᵢ
+    where
+      (aᵢ, bᵢ, cᵢ) = (fromEnum' a, fromEnum' b, fromEnum' c) ∷ (ℕ, ℕ, ℕ)
+      cardinality_b ∷ ℕ
+      cardinality_b = unTagged (U.cardinality ∷ Tagged b ℕ)
+      cardinality_c ∷ ℕ
+      cardinality_c = unTagged (U.cardinality ∷ Tagged c ℕ)
   enumFrom ∷ (a, b, c) → [(a, b, c)]
   -- enumFrom t = dropWhile (≠ t)        asList
   enumFrom = boundedEnumFrom
 
-instance (Finite a, Finite b, Finite c) ⇒                     Finite (a, b, c) where
-  asList = liftA3 (,,)   asList asList asList
-
+instance (Finite a, Finite b, Finite c)
+       ⇒ Finite (a, b, c) where
+  asList ∷ [(a, b, c)]
+  asList = liftA3 (,,) asList asList asList
 
 -- For tuples where types `a`, `b`, `c` and `d` are enumerable, allow the tuple to be enumerated as `a` × `b` × `c` × `d`
-instance (Finite a, Finite b, Finite c, Finite d) ⇒           Enum   (a, b, c, d) where
+instance (Finite a, Finite b, Finite c, Finite d)
+       ⇒ Enum (a, b, c, d) where
   toEnum ∷ Int → (a, b, c, d)
   toEnum i₀ = (toEnum aᵢ, toEnum bᵢ, toEnum cᵢ, toEnum dᵢ)
-    where (i₁, dᵢ) = i₀ `quotRem` length (asList ∷ [d])
-          (i₂, cᵢ) = i₁ `quotRem` length (asList ∷ [c])
-          (i₃, bᵢ) = i₂ `quotRem` length (asList ∷ [b])
-          (_,  aᵢ) = i₃ `quotRem` length (asList ∷ [a])
+    where
+      cardinality_a ∷ ℕ
+      cardinality_a = unTagged (U.cardinality ∷ Tagged a ℕ)
+      cardinality_b ∷ ℕ
+      cardinality_b = unTagged (U.cardinality ∷ Tagged b ℕ)
+      cardinality_c ∷ ℕ
+      cardinality_c = unTagged (U.cardinality ∷ Tagged c ℕ)
+      cardinality_d ∷ ℕ
+      cardinality_d = unTagged (U.cardinality ∷ Tagged d ℕ)
+      (i₁, dᵢ) = i₀ `quotRem` fromIntegral cardinality_d ∷ (Int, Int)
+      (i₂, cᵢ) = i₁ `quotRem` fromIntegral cardinality_c ∷ (Int, Int)
+      (i₃, bᵢ) = i₂ `quotRem` fromIntegral cardinality_b ∷ (Int, Int)
+      (_,  aᵢ) = i₃ `quotRem` fromIntegral cardinality_a ∷ (Int, Int)
   fromEnum ∷ (a, b, c, d) → Int
-  fromEnum (a, b, c, d) = (aᵢ * lb * lc * ld) + (bᵢ * lc * ld) + (cᵢ * ld) + dᵢ
-    where (aᵢ, bᵢ, cᵢ, dᵢ) = (fromEnum a, fromEnum b, fromEnum c, fromEnum d)
-          lb = length (asList ∷ [b])
-          lc = length (asList ∷ [c])
-          ld = length (asList ∷ [d])
+  fromEnum (a, b, c, d) = fromIntegral $ aᵢ * cardinality_b  * cardinality_c  * cardinality_d
+                                       +                  bᵢ * cardinality_c  * cardinality_d
+                                       +                                   cᵢ * cardinality_d
+                                       +                                                    dᵢ
+    where
+      (aᵢ, bᵢ, cᵢ, dᵢ) = (fromEnum' a, fromEnum' b, fromEnum' c, fromEnum' d) ∷ (ℕ, ℕ, ℕ, ℕ)
+      cardinality_b ∷ ℕ
+      cardinality_b = unTagged (U.cardinality ∷ Tagged b ℕ)
+      cardinality_c ∷ ℕ
+      cardinality_c = unTagged (U.cardinality ∷ Tagged c ℕ)
+      cardinality_d ∷ ℕ
+      cardinality_d = unTagged (U.cardinality ∷ Tagged d ℕ)
   enumFrom ∷ (a, b, c, d) → [(a, b, c, d)]
   -- enumFrom t = dropWhile (≠ t)        asList
   enumFrom = boundedEnumFrom
 
-instance (Finite a, Finite b, Finite c, Finite d) ⇒           Finite (a, b, c, d) where
+instance (Finite a, Finite b, Finite c, Finite d)
+       ⇒ Finite (a, b, c, d) where
+  asList ∷ [(a, b, c, d)]
   asList = liftM4 (,,,)  asList asList asList asList
 
 
 -- For tuples where types `a`, `b`, `c` and `d` are enumerable, allow the tuple to be enumerated as `a` × `b` × `c` × `d`
-instance (Finite a, Finite b, Finite c, Finite d, Finite e) ⇒ Enum   (a, b, c, d, e) where
+instance (Finite a, Finite b, Finite c, Finite d, Finite e)
+       ⇒ Enum (a, b, c, d, e) where
   toEnum ∷ Int → (a, b, c, d, e)
   toEnum i₀ = (toEnum aᵢ, toEnum bᵢ, toEnum cᵢ, toEnum dᵢ, toEnum eᵢ)
     where
-      (i₁, eᵢ) = i₀ `quotRem` length (asList ∷ [e])
-      (i₂, dᵢ) = i₁ `quotRem` length (asList ∷ [d])
-      (i₃, cᵢ) = i₂ `quotRem` length (asList ∷ [c])
-      (i₄, bᵢ) = i₃ `quotRem` length (asList ∷ [b])
-      (_,  aᵢ) = i₄ `quotRem` length (asList ∷ [a])
-
+      cardinality_a ∷ ℕ
+      cardinality_a = unTagged (U.cardinality ∷ Tagged a ℕ)
+      cardinality_b ∷ ℕ
+      cardinality_b = unTagged (U.cardinality ∷ Tagged b ℕ)
+      cardinality_c ∷ ℕ
+      cardinality_c = unTagged (U.cardinality ∷ Tagged c ℕ)
+      cardinality_d ∷ ℕ
+      cardinality_d = unTagged (U.cardinality ∷ Tagged d ℕ)
+      cardinality_e ∷ ℕ
+      cardinality_e = unTagged (U.cardinality ∷ Tagged e ℕ)
+      (i₁, eᵢ) = i₀ `quotRem` fromIntegral cardinality_e
+      (i₂, dᵢ) = i₁ `quotRem` fromIntegral cardinality_d
+      (i₃, cᵢ) = i₂ `quotRem` fromIntegral cardinality_c
+      (i₄, bᵢ) = i₃ `quotRem` fromIntegral cardinality_b
+      (_,  aᵢ) = i₄ `quotRem` fromIntegral cardinality_a
   fromEnum ∷ (a, b, c, d, e) → Int
-  fromEnum (a, b, c, d, e) = (aᵢ * lb * lc * ld * le) + (bᵢ * lc * ld * le) + (cᵢ * ld * le) + (dᵢ * le) + eᵢ
-    where (aᵢ, bᵢ, cᵢ, dᵢ, eᵢ) = (fromEnum a, fromEnum b, fromEnum c, fromEnum d, fromEnum e)
-          lb = length (asList ∷ [b])
-          lc = length (asList ∷ [c])
-          ld = length (asList ∷ [d])
-          le = length (asList ∷ [e])
-
+  fromEnum (a, b, c, d, e) = fromIntegral $ aᵢ * cardinality_b  * cardinality_c  * cardinality_d  * cardinality_e
+                                          +                  bᵢ * cardinality_c  * cardinality_d  * cardinality_e
+                                          +                                   cᵢ * cardinality_d  * cardinality_e
+                                          +                                                    dᵢ * cardinality_e
+                                          +                                                                     eᵢ
+    where
+      (aᵢ, bᵢ, cᵢ, dᵢ, eᵢ) = (fromEnum' a, fromEnum' b, fromEnum' c, fromEnum' d, fromEnum' e)
+      cardinality_b ∷ ℕ
+      cardinality_b = unTagged (U.cardinality ∷ Tagged b ℕ)
+      cardinality_c ∷ ℕ
+      cardinality_c = unTagged (U.cardinality ∷ Tagged c ℕ)
+      cardinality_d ∷ ℕ
+      cardinality_d = unTagged (U.cardinality ∷ Tagged d ℕ)
+      cardinality_e ∷ ℕ
+      cardinality_e = unTagged (U.cardinality ∷ Tagged e ℕ)
   enumFrom ∷ (a, b, c, d, e) → [(a, b, c, d, e)]
   -- enumFrom t = dropWhile (≠ t)        asList
   enumFrom = boundedEnumFrom
 
-instance (Finite a, Finite b, Finite c, Finite d, Finite e) ⇒ Finite (a, b, c, d, e) where
+instance (Finite a, Finite b, Finite c, Finite d, Finite e)
+       ⇒ Finite (a, b, c, d, e)
+   where
+  asList ∷ [(a, b, c, d, e)]
   asList = liftM5 (,,,,) asList asList asList asList asList
 
 -- Something like Fin₀
-instance                                                      Enum    Void where
-  toEnum   = undefined
+instance Enum Void where
+  toEnum ∷ Int → Void
+  toEnum = undefined
+  fromEnum ∷ Void → Int
   fromEnum = absurd
 -- Easier to do this than write "BoundedOrEmpty" class because Enum and Bounded are everywhere :)
-instance                                                      Bounded Void where
-  minBound = undefined           
+instance Bounded Void where
+  minBound ∷ Void
+  minBound = undefined
+  maxBound ∷ Void
   maxBound = undefined
-instance                                                      Finite  Void where
+instance Finite Void where
+  asList ∷ [Void]
   asList = []
+  asSet ∷ Set Void
   asSet  = (∅)
 
 type Nat10  = 'Nat.S Nat.Nat9
@@ -274,58 +382,110 @@ type Fin₁₃ = Fin Nat13
 type Fin₁₄ = Fin Nat14
 type Fin₁₅ = Fin Nat15
 
-instance Finite Fin₁
-instance Finite Fin₂
-instance Finite Fin₃
-instance Finite Fin₄
-instance Finite Fin₅
-instance Finite Fin₆
-instance Finite Fin₇
-instance Finite Fin₈
-instance Finite Fin₉
-instance Finite Fin₁₀
-instance Finite Fin₁₁
-instance Finite Fin₁₂
-instance Finite Fin₁₃
-instance Finite Fin₁₄
-instance Finite Fin₁₅
+instance U.Universe Fin₁
+instance U.Finite   Fin₁
+instance Finite     Fin₁
+
+instance U.Universe Fin₂
+instance U.Finite   Fin₂
+instance Finite     Fin₂
+
+instance U.Universe Fin₃
+instance U.Finite   Fin₃
+instance Finite     Fin₃
+
+instance U.Universe Fin₄
+instance U.Finite   Fin₄
+instance Finite     Fin₄
+
+instance U.Universe Fin₅
+instance U.Finite   Fin₅
+instance Finite     Fin₅
+
+instance U.Universe Fin₆
+instance U.Finite   Fin₆
+instance Finite     Fin₆
+
+instance U.Universe Fin₇
+instance U.Finite   Fin₇
+instance Finite     Fin₇
+
+instance U.Universe Fin₈
+instance U.Finite   Fin₈
+instance Finite     Fin₈
+
+instance U.Universe Fin₉
+instance U.Finite   Fin₉
+instance Finite     Fin₉
+
+instance U.Universe Fin₁₀
+instance U.Finite   Fin₁₀
+instance Finite     Fin₁₀
+
+instance U.Universe Fin₁₁
+instance U.Finite   Fin₁₁
+instance Finite     Fin₁₁
+
+instance U.Universe Fin₁₂
+instance U.Finite   Fin₁₂
+instance Finite     Fin₁₂
+
+instance U.Universe Fin₁₃
+instance U.Finite   Fin₁₃
+instance Finite     Fin₁₃
+
+instance U.Universe Fin₁₄
+instance U.Finite   Fin₁₄
+instance Finite     Fin₁₄
+
+instance U.Universe Fin₁₅
+instance U.Finite   Fin₁₅
+instance Finite     Fin₁₅
 
 -- TODO deleteme
 instance (Show a, Finite a) ⇒ Show (Predicate a) where
+  show ∷ Predicate a → String
   show (Predicate p) = unlines (fmap show' graph)
                  where domain = asList ∷ [a]
                        image  = fmap p domain
                        graph  = zip domain image
                        show' (a, b) = show a ++ " ↦ " ++ show b
 
-instance (Finite a) ⇒                                         Eq      (Predicate a) where
+instance (Finite a)
+       ⇒ Eq (Predicate a) where
   (==) ∷ Predicate a → Predicate a → Bool
   (Predicate p₁) == (Predicate p₂) = all (\a → p₁ a == p₂ a) asList
-instance                                                      Bounded (Predicate a) where
+instance Bounded (Predicate a) where
+  minBound ∷ Predicate a
   minBound = Predicate (const False)
+  maxBound ∷ Predicate a
   maxBound = Predicate (const True)
-instance (Finite a) ⇒                                         Ord     (Predicate a) where
+instance (Finite a)
+       ⇒ Ord (Predicate a) where
   compare ∷ Predicate a → Predicate a → Ordering
   compare (Predicate p₁) (Predicate p₂) = mconcat (fmap (\a → p₁ a `compare` p₂ a) asList)
-instance (Finite a) ⇒                                         Enum    (Predicate a) where
+instance (Finite a)
+       ⇒ Enum (Predicate a) where
   toEnum   ∷ Int         → Predicate a
   toEnum     =                       (asList !!)
   fromEnum ∷ Predicate a → Int
   fromEnum t = fromJust (elemIndex t  asList)
   enumFrom ∷ Predicate a → [Predicate a]
   enumFrom t = dropWhile (≠ t)        asList
-instance (Finite a) ⇒                                         Finite  (Predicate a) where
+instance (Finite a)
+       ⇒ Finite (Predicate a) where
   asList ∷ [Predicate a]
   asList = fmap (Predicate . toFunction . zip as) bits
-        where as ∷ [a]
-              as = asList
-              bs ∷ [Bool]
-              bs = asList
-              bits ∷ [[Bool]]
-              bits = replicateM (length as) bs
-              toFunction ∷ [(a, Bool)] → a → Bool
-              -- toFunction list = \a → fromJust (lookup a list) -- TODO I like this better but need to get rid of hlint warning -- {-# ANN asList "HLint: warn Redundant lambda" #-}
-              toFunction list a = fromJust (lookup a list)
+        where
+           as ∷ [a]
+           as = asList
+           bs ∷ [Bool]
+           bs = asList
+           bits ∷ [[Bool]]
+           bits = replicateM (length as) bs
+           toFunction ∷ [(a, Bool)] → a → Bool
+           -- toFunction list = \a → fromJust (lookup a list) -- TODO I like this better but need to get rid of hlint warning -- {-# ANN asList "HLint: warn Redundant lambda" #-}
+           toFunction list a = fromJust (lookup a list)
 
 -- TODO may want to move this code (if keeping it) to testing folder when done implementing `Finite` instance for `Equivalence`.
 
@@ -465,56 +625,85 @@ instance (Show a, Finite a) ⇒ Show (Equivalence a) where
                      -}
 
 -- TODO probably going to be lots of room for optimization in these instance defs, but for now I want to focus on correctness
-instance (Finite a) ⇒                                         Eq      (Equivalence a) where
+instance (Finite a)
+       ⇒ Eq (Equivalence a) where
   (==) ∷ Equivalence a → Equivalence a → Bool
   (Equivalence f) == (Equivalence g) = all (\(x, y) → f x y == g x y) (asSet × asSet)
 -- N.B. this is just one possible implementation
-instance (Eq a) ⇒                                             Bounded (Equivalence a) where
+instance (Eq a)
+       ⇒ Bounded (Equivalence a) where
   -- One big equivalence class (the coarsest, i.e. the universal relation: {(x, y) | x, y ∈ U})
+  minBound ∷ Equivalence a
   minBound = Equivalence (const (const True))
   -- Each element is it's own equivalence class (the finest, i.e. the identity relation: {(x, x) | x ∈ U})
   -- N.B. `Equivalence (const (const False))` would violate reflexivity
+  maxBound ∷ Equivalence a
   maxBound = defaultEquivalence
-instance (Finite a) ⇒                                         Ord     (Equivalence a) where
+instance (Finite a)
+       ⇒ Ord (Equivalence a) where
   compare ∷ Equivalence a → Equivalence a → Ordering
   compare (Equivalence f) (Equivalence g) = undefined -- FIXME want to ensure this is consistent with Enum and Finite ordering
   -- mconcat (fmap (\(x, y) → f x y `compare` g x y) (liftA2 (,) asList asList))
-instance (Finite a) ⇒                                         Enum    (Equivalence a) where
+instance (Finite a)
+       ⇒ Enum (Equivalence a) where
   toEnum   ∷ Int         → Equivalence a
   toEnum     =                       (asList !!)
   fromEnum ∷ Equivalence a → Int
   fromEnum t = fromJust (elemIndex t  asList)
   enumFrom ∷ Equivalence a → [Equivalence a]
   enumFrom t = dropWhile (≠ t)        asList
-instance (Finite a) ⇒                                         Finite  (Equivalence a) where
+
+instance (Finite a)
+       ⇒ U.Universe (Equivalence a)
+instance (Finite a)
+       ⇒ U.Finite (Equivalence a)
+instance (Finite a)
+       ⇒ Finite (Equivalence a) where
   asList ∷ [Equivalence a]
   asList = fmap toEquivalence (partitions' asList)
 
 data Alpha = A | B | C | D | E | F | G | H | I | J | K | L | M | N | O | P | Q | R | S | T | U | V | W | X | Y | Z deriving (Eq, Ord, Enum, Bounded, Show, Read)
-instance                                                       Finite Alpha where
+instance U.Universe Alpha
+instance U.Finite   Alpha
+instance Finite Alpha where
+  asList ∷ [Alpha]
   asList = [A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z]
 
 data DNA = Adenine | Cytosine | Guanine | Thymine deriving (Eq, Ord, Bounded, Enum)
 instance Show DNA where
+  show ∷ DNA → String
   show Adenine  = "A"
   show Cytosine = "C"
   show Guanine  = "G"
   show Thymine  = "T"
+instance U.Universe DNA
+instance U.Finite   DNA
 instance Finite DNA where
+  asList ∷ [DNA]
   asList = [Adenine, Cytosine, Guanine, Thymine]
 
 
-newtype Init  =  Init () deriving (Eq, Ord, Bounded, Enum)
-instance                                                       Finite Init where
+newtype Init = Init () deriving (Eq, Ord, Bounded, Enum)
+instance U.Universe Init
+instance U.Finite   Init
+instance Finite Init where
+  asList ∷ [Init]
   asList = [Init ()]
+  asSet ∷ Set Init
   asSet  = Set.singleton (Init ())
 instance Show Init where
+  show ∷ Init → String
   show (Init ()) = "qᵢ"
 newtype Final = Final () deriving (Eq, Ord, Bounded, Enum)
-instance                                                       Finite Final where
+instance U.Universe Final
+instance U.Finite   Final
+instance Finite Final where
+  asList ∷ [Final]
   asList = [Final ()]
+  asSet ∷ Set Final
   asSet  = Set.singleton (Final ())
 instance Show Final where
+  show ∷ Final → String
   show (Final ()) = "qᶠ"
 
 data Suit where
@@ -524,7 +713,9 @@ data Suit where
   Club    ∷ Suit
   deriving (Eq, Enum, Ord, Bounded)
 
-instance Finite Suit
+instance U.Universe Suit
+instance U.Finite   Suit
+instance Finite     Suit
 
 instance Fancy Suit where
   unicode  ∷ Suit → Char
@@ -543,10 +734,7 @@ instance Fancy Suit where
   plain Diamond = "Diamond"
   plain Club    = "Club"
   show' ∷ Suit → String
-  show' Spade   = charToString (unicode Spade)   `toColor` Black'
-  show' Heart   = charToString (unicode Heart)   `toColor` Red'
-  show' Diamond = charToString (unicode Diamond) `toColor` Red'
-  show' Club    = charToString (unicode Club)    `toColor` Black'
+  show' s = charToString (unicode s) `toColor` colorOf s
 
 instance Show Suit where
   show ∷ Suit → String
@@ -599,9 +787,12 @@ instance Fancy Rank where
   plain Ace   = "Ace"
 
 instance Show Rank where
+  show ∷ Rank → String
   show = show'
 
-instance Finite Rank
+instance U.Universe Rank
+instance U.Finite   Rank
+instance Finite     Rank
 
 data Card where
   Card ∷ { rank ∷ Rank, suit ∷ Suit } → Card
@@ -615,7 +806,9 @@ instance Enum Card where
   enumFrom ∷ Card → [Card]
   enumFrom = boundedEnumFrom
 
-instance Finite Card
+instance U.Universe Card
+instance U.Finite   Card
+instance Finite     Card
 
 instance Fancy Card where
   unicode ∷ Card → Char
@@ -673,8 +866,6 @@ instance Fancy Card where
   unicode (Card Two   Club   ) = '🃒'
   plain ∷ Card → String
   plain (Card rank suit) = plain rank ++ " of " ++ plain suit ++ "s"
-
---
 
 instance Show Card where
   show ∷ Card → String

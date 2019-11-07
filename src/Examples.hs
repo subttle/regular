@@ -14,6 +14,7 @@ import           Data.Set.Unicode
 import           Data.Bool.Unicode
 import           Data.Eq.Unicode
 import           Data.Either
+import qualified Data.Universe as U
 
 -- A DFA which accepts all binary strings ending in 1
 endsWith1 ∷ DFA Bool Fin₂
@@ -130,7 +131,10 @@ haunted = DFA { delta = \((song, laughter), (organ, incense)) → ( if not laugh
 -- The states are the locations of the person, the fox, the hen, and the bag. Each one may be either across or not across the river.
 -- The symbols are transitions across the river, either the person by themself, or one of fox, hen, or bag (accompanied by the person).
 data Objects = Per | Fox | Hen | Bag deriving (Eq, Ord, Enum, Bounded, Show)
+instance U.Universe Objects
+instance U.Finite   Objects
 instance Finite Objects where
+  asList ∷ [Objects]
   asList = [Per, Fox, Hen, Bag]
 
 -- The states are the locations of the person, the fox, the hen, and the bag. Each one may be either left of the river or right of the river.
@@ -246,7 +250,9 @@ startsWith0 = DFA { delta = δ
 -- Coursera Stanford Automata, NFA lecture
 -- http://spark-public.s3.amazonaws.com/automata/slides/4_fa3.pdf
 data RB = Red | Black deriving (Eq, Enum, Ord, Bounded, Show)
-instance Finite RB
+instance U.Universe RB
+instance U.Finite   RB
+instance Finite     RB
 board ∷ NFA.NFA Fin₉ RB
 board = NFA.NFA { NFA.delta = δ
                 , NFA.q0    = 0
@@ -271,8 +277,11 @@ board = NFA.NFA { NFA.delta = δ
                         δ (8, Black) = singleton  4
 
 data Decimal = Plus | Minus | Period deriving (Eq, Ord, Enum, Bounded)
-instance Finite Decimal
+instance U.Universe Decimal
+instance U.Finite   Decimal
+instance Finite     Decimal
 instance Show Decimal where
+  show ∷ Decimal → String
   show Plus   = "+"
   show Minus  = "-"
   show Period = "."
