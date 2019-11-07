@@ -83,7 +83,7 @@ class (Q (automaton q s) q, Σ (automaton q s) s, Eq occupy) ⇒ Configuration a
     reachable' ∷ automaton q s → Set q → Set q
     reachable' m = fixedPoint (foldMap (\q → q `insert` adjacent m q))
 
-    -- Given two states, p and q, determine if p can reach q
+    -- Given two states, q₁ and q₂, determine if q₁ can reach q₂
     reaches ∷ automaton q s → q → q → Bool
     reaches m = (∋) . reachable m
 
@@ -147,7 +147,7 @@ class (Q (automaton q s) q, Σ (automaton q s) s, Eq occupy) ⇒ Configuration a
 
     -- Given an automaton, decide if it accepts all possible strings of the alphabet, i.e.
     -- A DFA M accepts Σ★ iff all the accessible states are final states.
-    -- Also valid solution to decide iff the result of minimizing M is a DFA isomorphic to the minimal DFA for Σ∗
+    -- Also valid solution to decide iff the result of minimizing M is a DFA isomorphic to the minimal DFA for Σ★
     -- ℒ ≟ Σ★
     isSigmaStar ∷ automaton q s → Bool
     isSigmaStar m = accessible m ⊆ final m
