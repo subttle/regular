@@ -7,7 +7,8 @@
 module Finite where
 
 import           Data.Set as Set
-import           Data.Set.Unicode
+import           Data.Set.Unicode ((∅))
+import           Data.Foldable.Unicode ((∈), (∋))
 import           Data.Eq.Unicode
 import           Data.Bool.Unicode
 import           Control.Monad
@@ -68,11 +69,15 @@ class (Finite g) ⇒ Γ automaton g | automaton → g where
   gamma _ = asSet
 
 instance Finite () where
+  asList ∷ [()]
   asList = [()]
+  asSet ∷ Set ()
   asSet  = Set.singleton ()
 instance Finite Bool where
+  asList ∷ [Bool]
   asList = [False, True]
 instance Finite Ordering where
+  asList ∷ [Ordering]
   asList = [LT, EQ, GT]
 instance Finite Char
 
@@ -564,7 +569,7 @@ lawfulComparison c = connexity  c
 -- a union of some of the equivalence classes of r₁.
 -- The finer-than relation reflexive, transitive, and antisymmetric (a partial order)
 finer ∷ (Finite a) ⇒ Equivalence a → Equivalence a → Bool
-finer (Equivalence r₁) (Equivalence r₂) = all (\(x, y) → r₁ x y `implies` r₂ x y) (liftA2 (,) asList asList)
+finer (Equivalence (⮀)) (Equivalence (⮂)) = all (\(x, y) → (x ⮀ y) `implies` (x ⮂ y)) (liftA2 (,) asList asList)
 
 coarser ∷ (Finite a) ⇒ Equivalence a → Equivalence a → Bool
 coarser = flip finer
@@ -580,7 +585,7 @@ coarser = flip finer
 -- for each list (which represents an equivalence class), check if both a₁ and a₂ are in it
 -- if they are in the same list return true, otherwise false
 toEquivalence ∷ (Finite a, Foldable t) ⇒ t (NonEmpty a) → Equivalence a
-toEquivalence parts = Equivalence (\a₁ a₂ → any (\xs → (a₁ `elem` xs) ∧ (a₂ `elem` xs)) parts)
+toEquivalence parts = Equivalence (\a₁ a₂ → any (\xs → (a₁ ∈ xs) ∧ (a₂ ∈ xs)) parts)
 
 fromEquivalence ∷ ∀ a . (Finite a) ⇒ Equivalence a → [NonEmpty a]
 fromEquivalence (Equivalence r) = unfoldr go asList
@@ -590,7 +595,7 @@ fromEquivalence (Equivalence r) = unfoldr go asList
                     where (p, np) = List.partition (r x) xs
 
 toPredicate ∷ (Foldable t, Eq a) ⇒ t a → Predicate a
-toPredicate = Predicate . flip elem
+toPredicate = Predicate . (∋)
 
 -- TODO better name?
 -- fromPredicate (Predicate (> 2) ∷ Predicate Fin₁₀) == [[0,1,2],[3,4,5,6,7,8,9]]
