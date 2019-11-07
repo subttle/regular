@@ -220,6 +220,10 @@ nth n = Foldable.foldr (.) id . genericReplicate n
 findIndex' ∷ (a → Bool) → [a] → Maybe ℕ
 findIndex' p = fmap fromIntegral . List.findIndex p
 
+-- A version of `fromEnum` which returns a Natural rather than an `Int`
+fromEnum' ∷ (Enum a) ⇒ a → ℕ
+fromEnum' = fromIntegral . fromEnum
+
 indexed ∷ [a] → [(a, ℕ)]
 indexed = indexed' 0 -- To use an index starting at 1, change this `0` to `1`
     where indexed' _ []       = []
@@ -251,9 +255,9 @@ format'' ∷ (Show q, Show s, Show r) ⇒ Map (q, Maybe s) (Set r) → String
 format'' = go -- .  Map.filter (not . Set.null)
     where go m | Map.null m = "  δ _ ↦ ∅"
           go m              = foldl1 (\a b → a ++ "\n" ++ b )  -- manually intercalate the Map with newlines.
-                              (mapWithKey (\k v → "  δ " ++ show' k ++ " ↦ " ++ show (Set' v)) m)
-          show' (q, Just  σ) = "(" ++ show q ++ "," ++ show σ ++ ")"
-          show' (q, Nothing) = "(" ++ show q ++ ",ε)"
+                              (mapWithKey (\k v → "  δ " ++ show'' k ++ " ↦ " ++ show (Set' v)) m)
+          show'' (q, Just  σ) = "(" ++ show q ++ "," ++ show σ ++ ")"
+          show'' (q, Nothing) = "(" ++ show q ++ ",ε)"
 
 -- Some helper functions for nicely displaying languages
 toStrings ∷ (Show s) ⇒ [[s]] → [String]
@@ -329,12 +333,12 @@ toColor string color = (fgcolor color ++) ((++ reset) string)
     -- `90  + _` for bright
     fgcolor ∷ DisplayColor → String
     fgcolor color' = encode [30 + fromEnum color']
-    -- `40  + _` for normal
-    -- `100 + _` for bright
-    bgcolor ∷ DisplayColor → String
-    bgcolor color' = encode [40 + fromEnum color']
-    colorToCode ∷ DisplayColor → Int
-    colorToCode = fromEnum
+    -- -- `40  + _` for normal
+    -- -- `100 + _` for bright
+    -- bgcolor ∷ DisplayColor → String
+    -- bgcolor color' = encode [40 + fromEnum color']
+    -- colorToCode ∷ DisplayColor → Int
+    -- colorToCode = fromEnum
 
 class (Show a) ⇒ Fancy a where
       -- assign a unicode character
