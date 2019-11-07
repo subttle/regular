@@ -22,7 +22,7 @@ import           Data.Functor.Foldable (Fix (..), unfix, ListF (..))
 import           Control.Applicative (liftA2, getZipList, ZipList (..))
 import           Control.Monad
 import           Control.Arrow ((|||), (&&&))
-import           Numeric.Natural.Unicode
+import           Numeric.Natural.Unicode (ℕ)
 
 -- type level flip
 newtype Flip t b a = Flip { unFlip ∷ t a b }

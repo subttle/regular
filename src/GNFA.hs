@@ -60,7 +60,8 @@ instance Profunctor.Profunctor GNFA where
   lmap ∷ (p → q) → GNFA q s → GNFA p s
   lmap f (GNFA δ) = GNFA { delta = \(p₁, p₂) → δ (fmap f p₁, fmap f p₂) }
 
-instance (Show q, Finite q, Show s, Finite s) ⇒ Show (GNFA q s) where
+instance (Show q, Finite q, Show s, Finite s)
+       ⇒ Show (GNFA q s) where
   show ∷ GNFA q s → String
   show m = List.intercalate "\n, " 
            [ "( Q  = "                                              ++ (show . Set' . qs)              m
