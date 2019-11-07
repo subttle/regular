@@ -21,7 +21,7 @@ import           Data.These
 import           Data.Void
 import           Data.Function
 import           Data.Functor.Contravariant
-import           Data.Functor.Contravariant.Divisible (Decidable)
+import           Data.Functor.Contravariant.Divisible (Decidable, conquer)
 import           Common
 import           GHC.Enum (boundedEnumFrom)
 import           Data.Fin (Fin)
@@ -621,6 +621,7 @@ eq' = ((==) `on`) . representative
 
 -- TODO deleteme
 instance (Show a, Finite a) ⇒ Show (Equivalence a) where
+  show ∷ Equivalence a → String
   show equivalence = show (fmap NE.toList (fromEquivalence equivalence))
   {-
                      unlines (fmap show' graph)
@@ -639,7 +640,7 @@ instance (Eq a)
        ⇒ Bounded (Equivalence a) where
   -- One big equivalence class (the coarsest, i.e. the universal relation: {(x, y) | x, y ∈ U})
   minBound ∷ Equivalence a
-  minBound = Equivalence (const (const True))
+  minBound = conquer -- Equivalence (const (const True))
   -- Each element is it's own equivalence class (the finest, i.e. the identity relation: {(x, x) | x ∈ U})
   -- N.B. `Equivalence (const (const False))` would violate reflexivity
   maxBound ∷ Equivalence a
