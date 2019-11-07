@@ -45,16 +45,17 @@ instance (Finite s) ⇒ Σ (SomeDFA s) s
 
 instance Contravariant (DFA q) where
   contramap ∷ (g → s) → DFA q s → DFA q g
-  contramap h m@(DFA δ _ _) = m { delta = \(q, γ) → δ (q, h γ) }
+  contramap h (DFA δ q₀ f) = DFA (\(q, γ) → δ (q, h γ)) q₀ f
 
 invhomimage ∷ (g → [s]) → DFA q s → DFA q g
-invhomimage h m@(DFA δ _ _) = m { delta = \(q, γ) → foldl (curry δ) q (h γ) }
+invhomimage h (DFA δ q₀ f) = DFA (\(q, γ) → foldl (curry δ) q (h γ)) q₀ f
 
 instance Contravariant SomeDFA where
   contramap ∷ (g → s) → SomeDFA s → SomeDFA g
   contramap h (SomeDFA m) = SomeDFA (contramap h m)
 
 instance (Show q, Finite q, Show s, Finite s) ⇒ Show (DFA q s) where
+  show ∷ DFA q s → String
   show m@(DFA _ q₀ f) = List.intercalate "\n, "
                         [ "( Q  = "            ++ (show . Set' . qs)    m
                         ,   "Σ  = "            ++ (show . Set' . sigma) m
@@ -64,6 +65,7 @@ instance (Show q, Finite q, Show s, Finite s) ⇒ Show (DFA q s) where
                         ]
 
 instance (Show s, Finite s) ⇒ Show (SomeDFA s) where
+  show ∷ SomeDFA s → String
   show (SomeDFA m) = show m
 
 instance (Finite q, Finite s) ⇒ Configuration DFA q s q where

@@ -55,6 +55,7 @@ instance (Show s) ⇒ Show (ExRE s) where
   showsPrec precedence (Star α) = showParen (precedence ≥ 9) (showsPrec 9 α . showChar '★')
 
 instance Pointed ExRE where
+  point ∷ s → ExRE s
   point = Lit
 
 instance Applicative ExRE where

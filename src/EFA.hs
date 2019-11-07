@@ -41,7 +41,7 @@ instance (Finite s) ⇒ Σ (SomeEFA s) s
 
 instance Contravariant (EFA q) where
   contramap ∷ (g → s) → EFA q s → EFA q g
-  contramap h m@(EFA δ _ _) = m { delta = \(q, γ) → δ (q, fmap h γ) }
+  contramap h (EFA δ q₀ f) = EFA (\(q, γ) → δ (q, fmap h γ)) q₀ f
 
 instance Contravariant SomeEFA where
   contramap ∷ (g → s) → SomeEFA s → SomeEFA g
@@ -57,6 +57,7 @@ instance (Show q, Finite q, Show s, Finite s) ⇒ Show (EFA q s) where
                         ]
 
 instance (Show s, Finite s) ⇒ Show (SomeEFA s) where
+  show ∷ SomeEFA s → String
   show (SomeEFA m) = show m
 
 instance (Finite q, Finite s) ⇒ Configuration EFA q s (Set q) where

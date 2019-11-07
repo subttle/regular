@@ -93,9 +93,11 @@ instance Multiplicative (RegExp s) where
 
 -- A multiplicative monoid
 instance Unital (RegExp s) where
+  one ∷ RegExp s
   one = One
 
 instance (Ord s) ⇒ InvolutiveMultiplication (RegExp s) where
+  adjoint ∷ RegExp s → RegExp s
   adjoint = reversal
 
 -- An Additive semigroup

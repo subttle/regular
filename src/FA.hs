@@ -143,6 +143,7 @@ fromGraph (TG.TG t) i f = FA { delta   = \(q, s) → postSet q (t s)
                              }
 
 instance (Show q, Finite q, Show s, Finite s) ⇒ Show (FA q s) where
+  show ∷ FA q s → String
   show m = List.intercalate "\n, "
            ["( Q = "               ++ (show . Set' .      qs)          m
            ,  "Σ = "               ++ (show . Set' .   sigma)          m

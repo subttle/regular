@@ -27,7 +27,6 @@ instance (Finite s) ⇒ Σ (ℒ s) s
 accepts ∷ ℒ s → [s] → Bool
 accepts = getPredicate
 
-
 -- iff ε ∈ ℒ
 nullable ∷ ℒ s → Bool
 nullable (Predicate ℓ) = ℓ []
@@ -72,7 +71,6 @@ star (Predicate ℓ) = Predicate p
     p ∷ [s] → Bool
     p [] = True
     p w  = any (all (ℓ . NE.toList)) (partitions w)
-
 
 -- inverse homomorphism
 invhom ∷ ([s] → [g]) → ℒ g → ℒ s

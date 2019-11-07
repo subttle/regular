@@ -304,6 +304,7 @@ palindrome w = w == reverse w
 newtype Set' a = Set' { unSet' ∷ Set a }
 
 instance (Show a) ⇒ Show (Set' a) where
+  show ∷ Set' a → String
   show = ("{" ++) . (++ "}") . intercalate ", " . (show <$>) . Set.toList . unSet'
 
 -- Perhaps improving clarity in some spots
