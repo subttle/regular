@@ -527,23 +527,23 @@ byEither = Equivalence eq
     eq (Right _) (Left  _) = False
     eq (Right _) (Right _) = True
 
--- Reflexive
-refl ∷ (Finite a) ⇒ Equivalence a → Bool
-refl (Equivalence (≡)) = all (\a → a ≡ a) asSet
+-- Reflexivity
+refl ∷ (Finite a) ⇒ Predicate (Equivalence a)
+refl = Predicate (\(Equivalence (≡)) → all (\a → a ≡ a) asSet)
 
 -- Symmetric
-sym ∷ (Finite a) ⇒  Equivalence a → Bool
-sym (Equivalence (≡)) = all (\(x, y) → (x ≡ y) == (y ≡ x)) (asSet × asSet)
+sym ∷ (Finite a) ⇒  Predicate (Equivalence a)
+sym = Predicate (\(Equivalence (≡)) → all (\(a₁, a₂) → (a₁ ≡ a₂) == (a₂ ≡ a₁)) (asSet × asSet))
 
--- Transitive
-trans ∷ (Finite a) ⇒ Equivalence a → Bool
-trans (Equivalence (≡)) = all (\(x, y, z) → ((x ≡ y) ∧ (y ≡ z)) `implies` (x ≡ z)) (liftA3 (,,) asList asList asList) -- TODO may be some redundant checks here I can eliminate
+-- Transitivity
+trans ∷ (Finite a) ⇒ Predicate (Equivalence a)
+trans = Predicate (\(Equivalence (≡)) → all (\(a₁, a₂, a₃) → ((a₁ ≡ a₂) ∧ (a₂ ≡ a₃)) `implies` (a₁ ≡ a₃)) (liftA3 (,,) asList asList asList)) -- TODO may be some redundant checks here I can eliminate
 
 -- Check that the equivalence relation is lawful
-lawful ∷ (Finite a) ⇒ Equivalence a → Bool
-lawful (≡) = refl  (≡)
-           ∧ sym   (≡)
-           ∧ trans (≡)
+lawful ∷ (Finite a) ⇒ Predicate (Equivalence a)
+lawful = refl
+      <> sym
+      <> trans
 
 -- TODO clean this up, factor for modularity
 -- test if the Comparision is actually a total ordering
@@ -611,7 +611,7 @@ fromPredicate (Predicate p) = contramap p defaultEquivalence
 -- Because the null relation is (vacuously) a lawful equivalence relation
 -- https://proofwiki.org/wiki/Relation_on_Empty_Set_is_Equivalence
 representative ∷ (Finite a) ⇒ Equivalence a → a → a
-representative (Equivalence (≡)) a = head (List.filter ((≡) a) asList)
+representative (Equivalence (≡)) a = head (List.filter (≡ a) asList)
 
 representatives ∷ (Finite a) ⇒ Equivalence a → [a]
 representatives (Equivalence (≡)) = nubBy (≡) asList
@@ -634,7 +634,7 @@ instance (Show a, Finite a) ⇒ Show (Equivalence a) where
 instance (Finite a)
        ⇒ Eq (Equivalence a) where
   (==) ∷ Equivalence a → Equivalence a → Bool
-  (Equivalence f) == (Equivalence g) = all (\(x, y) → f x y == g x y) (asSet × asSet)
+  (Equivalence (⮀)) == (Equivalence (⮂)) = all (\(a₁, a₂) → (a₁ ⮀ a₂) == (a₁ ⮂ a₂)) (asSet × asSet)
 -- N.B. this is just one possible implementation
 instance (Eq a)
        ⇒ Bounded (Equivalence a) where
