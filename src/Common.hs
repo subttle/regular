@@ -285,6 +285,16 @@ windowed ∷ (Foldable t) ⇒ ℕ → t a → [[a]]
 windowed 0 = const []
 windowed n = getZipList . traverse ZipList . genericTake n . tails . Foldable.toList
 
+-- Slide a two-element-wide window over a list, one element at a time,
+-- generating a list of pairs
+windowed' ∷ forall t a . (Foldable t) ⇒ t a → [(a, a)]
+windowed' = List.unfoldr pairs . Foldable.toList
+  where
+    pairs ∷ [a] → Maybe ((a, a), [a])
+    pairs []            = Nothing
+    pairs [_]           = Nothing
+    pairs (a₁ : a₂ : t) = Just ((a₁, a₂), a₂ : t)
+
 -- from https://github.com/haskell/containers/issues/346
 catMaybes ∷ (Ord a) ⇒ Set (Maybe a) → Set a
 catMaybes = Set.mapMonotonic fromJust . Set.dropWhileAntitone isNothing
