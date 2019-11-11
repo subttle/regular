@@ -584,6 +584,14 @@ instance (Finite a)
        ⇒ Eq (Comparison a) where
   (==) ∷ Comparison a → Comparison a → Bool
   (==) c₁ c₂ = comparisonToList c₁ == comparisonToList c₂
+instance (Finite a)
+       ⇒ Enum (Comparison a) where
+  toEnum ∷ Int → Comparison a
+  toEnum     =                       (asList !!)
+  fromEnum ∷ Comparison a → Int
+  fromEnum t = fromJust (elemIndex t  asList)
+  enumFrom ∷ Comparison a → [Comparison a]
+  enumFrom t = dropWhile (≠ t)        asList -- TODO `boundedEnumFrom` ?
 
 instance (Finite a)
        ⇒ Ord (Comparison a) where
@@ -597,6 +605,14 @@ instance (Finite a)
   minBound = defaultComparison
   maxBound ∷ Comparison a
   maxBound = listToComparison (reverse (comparisonToList defaultComparison))
+instance (Finite a, U.Universe a)
+       ⇒ U.Universe (Comparison a) where
+instance (Finite a)
+       ⇒ U.Finite (Comparison a) where
+instance (Finite a)
+       ⇒ Finite (Comparison a) where
+  asList ∷ [Comparison a]
+  asList = sort (fmap listToComparison (List.permutations (asList ∷ [a])))
 
 
 -- r₁ is "finer" r₂ iff r₁ ⊆ r₂   i.e. r₁ is a refinement of r₂
