@@ -642,7 +642,7 @@ instance (Eq a)
   minBound ∷ Equivalence a
   minBound = conquer -- Equivalence (const (const True))
   -- Each element is it's own equivalence class (the finest, i.e. the identity relation: {(x, x) | x ∈ U})
-  -- N.B. `Equivalence (const (const False))` would violate reflexivity
+  -- N.B. `Equivalence (const (const False))` would violate reflexivity (unless in the vacuous case, where it is technically allowed)
   maxBound ∷ Equivalence a
   maxBound = defaultEquivalence
 instance (Finite a)
