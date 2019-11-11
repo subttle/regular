@@ -9,12 +9,12 @@ import qualified EFA
 -- import qualified GFA
 import qualified RegExp as RE
 import           Finite
-import           Data.Set
-import           Data.Set.Unicode
-import           Data.Bool.Unicode
-import           Data.Eq.Unicode
-import           Data.Either
-import qualified Data.Universe as U
+import           Data.Set (Set, singleton, fromList)
+import           Data.Set.Unicode ((∅))
+import           Data.Bool.Unicode ((∨), (∧))
+import           Data.Eq.Unicode ((≠))
+import           Data.Either (fromRight)
+import qualified Data.Universe as U (Universe, Finite)
 
 -- A DFA which accepts all binary strings ending in 1
 endsWith1 ∷ DFA Bool Fin₂
