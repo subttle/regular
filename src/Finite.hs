@@ -9,17 +9,18 @@ module Finite where
 import           Data.Set as Set
 import           Data.Set.Unicode ((∅))
 import           Data.Foldable.Unicode ((∈), (∋))
-import           Data.Eq.Unicode
-import           Data.Bool.Unicode
+import           Data.Eq.Unicode ((≠))
+import           Data.Bool.Unicode ((∧), (∨))
 import           Control.Monad
 import           Control.Applicative
 import           Data.List as List
 import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)))
 import qualified Data.List.NonEmpty as NE
-import           Data.Maybe
+import           Data.Maybe (fromJust)
 import           Data.These
-import           Data.Void
-import           Data.Function
+import           Data.Void (Void, absurd)
+import qualified Data.Foldable as F
+import           Data.Function (on)
 import           Data.Functor.Contravariant
 import           Data.Functor.Contravariant.Divisible (Decidable, conquer)
 import           Common
