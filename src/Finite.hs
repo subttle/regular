@@ -720,9 +720,9 @@ instance (Eq a)
   maxBound = defaultEquivalence
 instance (Finite a)
        ⇒ Ord (Equivalence a) where
+  -- N.B. that `⮀` and `⮂` swap order of appearence so that `compare minBound maxBound` is `LT` (for types of cardinality `> 1` [: )
   compare ∷ Equivalence a → Equivalence a → Ordering
-  compare (Equivalence f) (Equivalence g) = undefined -- FIXME want to ensure this is consistent with Enum and Finite ordering
-  -- mconcat (fmap (\(x, y) → f x y `compare` g x y) (liftA2 (,) asList asList))
+  compare (Equivalence (⮀)) (Equivalence (⮂)) = foldMap (\(a₁, a₂) → (a₁ ⮂ a₂) `compare` (a₁ ⮀ a₂)) (liftA2 (,) asList asList)
 instance (Finite a)
        ⇒ Enum (Equivalence a) where
   toEnum   ∷ Int         → Equivalence a
