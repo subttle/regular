@@ -567,6 +567,38 @@ lawfulComparison c = connexity  c
 comparisonToList ∷ (Finite a) ⇒ Comparison a → [a]
 comparisonToList (Comparison c) = sortBy c asList
 
+-- TODO this works for now but think if it is possible to do this but without throwing away information every time, by which I mean an implementation
+-- TODO which could search a smaller list after each find (i.e. delete the elements from the list as we find results for them)
+listToComparison ∷ (Finite a, Foldable t) ⇒ t a → Comparison a
+listToComparison as = Comparison (\a₁ a₂ → let as' = F.toList as
+                                               i₁  = fromJust (List.elemIndex a₁ as') -- FIXME will have to think about Void case
+                                               i₂  = fromJust (List.elemIndex a₂ as') 
+                                           in  compare i₁ i₂)
+
+instance (Show a, Finite a)
+       ⇒ Show (Comparison a) where
+  show ∷ Comparison a → String
+  show c = show (comparisonToList c)
+-- instance (Eq a)
+instance (Finite a)
+       ⇒ Eq (Comparison a) where
+  (==) ∷ Comparison a → Comparison a → Bool
+  (==) c₁ c₂ = comparisonToList c₁ == comparisonToList c₂
+
+instance (Finite a)
+       ⇒ Ord (Comparison a) where
+  -- FIXME untested
+  compare ∷ Comparison a → Comparison a → Ordering
+  compare c₁ c₂ = mconcat (zipWith compare (comparisonToList c₁) (comparisonToList c₂))
+
+instance (Finite a)
+       ⇒ Bounded (Comparison a) where
+  minBound ∷ Comparison a
+  minBound = defaultComparison
+  maxBound ∷ Comparison a
+  maxBound = listToComparison (reverse (comparisonToList defaultComparison))
+
+
 -- r₁ is "finer" r₂ iff r₁ ⊆ r₂   i.e. r₁ is a refinement of r₂
 -- if r₁ is a refinement of r₂ then each equivalence class of r₂ is
 -- a union of some of the equivalence classes of r₁.
