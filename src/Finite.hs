@@ -546,23 +546,44 @@ lawful = refl
       <> trans
 
 -- TODO clean this up, factor for modularity
--- test if the Comparision is actually a total ordering
-lawfulComparison ∷ ∀ a . (Finite a) ⇒ Comparison a → Bool
-lawfulComparison c = connexity  c
-                   ∧ antisym    c
-                   ∧ trans      c
+lawfulComparison ∷ ∀ a . (Finite a) ⇒ Predicate (Comparison a)
+lawfulComparison = connexityC
+                <> antisymC
+                <> transC
+
+tolteq ∷ Comparison a → a → a → Bool
+tolteq (Comparison c) a₁ a₂ = a₁ `c` a₂ == LT
+                            ∨ a₁ `c` a₂ == EQ
+-- TODO move to seperate module (and remove "C" from the name) or just think of better name?
+connexityC ∷ ∀ a . (Finite a) ⇒ Predicate (Comparison a)
+connexityC = Predicate p
   where
-    tolteq ∷ Comparison a → a → a → Bool
-    tolteq (Comparison c) a₁ a₂ = a₁ `c` a₂ == LT 
-                                ∨ a₁ `c` a₂ == EQ
-    (≤) ∷ a → a → Bool
-    (≤) = tolteq c
-    connexity ∷ Comparison a → Bool
-    connexity c = all (\(a₁, a₂) → a₁ ≤ a₂ ∨ a₂ ≤ a₁) asSet
-    antisym ∷ Comparison a → Bool
-    antisym c = all (\(a₁, a₂) → ((a₁ ≤ a₂) ∧ (a₂ ≤ a₁)) `implies` (a₁ == a₂)) (asSet × asSet)
-    trans ∷ Comparison a → Bool
-    trans c = all (\(a₁, a₂, a₃) → ((a₁ ≤ a₂) ∧ (a₂ ≤ a₃)) `implies` (a₁ ≤ a₃)) (liftA3 (,,) asList asList asList)
+    p ∷ Comparison a → Bool
+    p c = all (\(a₁, a₂) → a₁ ≤ a₂ ∨ a₂ ≤ a₁) asSet
+      where
+        (≤) ∷ a → a → Bool
+        (≤) = tolteq c
+-- TODO move to seperate module (and remove "C" from the name) or just think of better name?
+antisymC ∷ ∀ a . (Finite a) ⇒ Predicate (Comparison a)
+antisymC  = Predicate p
+  where
+    p ∷ Comparison a → Bool
+    p c = all (\(a₁, a₂) → ((a₁ ≤ a₂) ∧ (a₂ ≤ a₁)) `implies` (a₁ == a₂)) (asSet × asSet)
+      where
+        (≤) ∷ a → a → Bool
+        (≤) = tolteq c
+-- TODO move to seperate module (and remove "C" from the name) or just think of better name?
+transC ∷ ∀ a . (Finite a) ⇒ Predicate (Comparison a)
+transC = Predicate p
+  where
+    p ∷ Comparison a → Bool
+    p c = all (\(a₁, a₂, a₃) → ((a₁ ≤ a₂) ∧ (a₂ ≤ a₃)) `implies` (a₁ ≤ a₃)) (liftA3 (,,) asList asList asList)
+      where
+        (≤) ∷ a → a → Bool
+        (≤) = tolteq c
+
+-- TODO partial equivalence relation type
+-- data PER a where
 
 comparisonToList ∷ (Finite a) ⇒ Comparison a → [a]
 comparisonToList (Comparison c) = sortBy c asList
