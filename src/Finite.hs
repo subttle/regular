@@ -564,6 +564,9 @@ lawfulComparison c = connexity  c
     trans ∷ Comparison a → Bool
     trans c = all (\(a₁, a₂, a₃) → ((a₁ ≤ a₂) ∧ (a₂ ≤ a₃)) `implies` (a₁ ≤ a₃)) (liftA3 (,,) asList asList asList)
 
+comparisonToList ∷ (Finite a) ⇒ Comparison a → [a]
+comparisonToList (Comparison c) = sortBy c asList
+
 -- r₁ is "finer" r₂ iff r₁ ⊆ r₂   i.e. r₁ is a refinement of r₂
 -- if r₁ is a refinement of r₂ then each equivalence class of r₂ is
 -- a union of some of the equivalence classes of r₁.
