@@ -29,6 +29,7 @@ import           Finite
 import qualified Language
 import           Prelude hiding ((+), (*), last, map)
 import           Data.Function
+import           Control.Selective (Selective, select, selectM)
 import           Control.Monad
 import           Data.List as List hiding (last, map)
 import           Data.Set as Set hiding ((\\))
@@ -218,14 +219,18 @@ instance Applicative RegExp where
   pure ∷ s → RegExp s
   pure = return
 
-  (<*>) ∷ RegExp (a → b) → RegExp a → RegExp b
+  (<*>) ∷ RegExp (s → g) → RegExp s → RegExp g
   (<*>) = ap
+
+instance Selective RegExp where
+  select ∷ RegExp (Either s g) → RegExp (s → g) → RegExp g
+  select = selectM
 
 instance Monad RegExp where
   return ∷ s → RegExp s
   return = point
 
-  (>>=) ∷ RegExp a → (a → RegExp b) → RegExp b
+  (>>=) ∷ RegExp s → (s → RegExp g) → RegExp g
   (>>=) Zero     _ = Zero
   (>>=) One      _ = One
   (>>=) (Lit  s) f = f s
