@@ -11,14 +11,14 @@ import qualified Data.Map            as Map (fromSet, toAscList)
 import           Data.Set            as Set hiding (foldl)
 import qualified Data.List           as List
 import qualified Data.List.NonEmpty  as NE
-import           Data.Set.Unicode
-import           Data.Ord.Unicode
-import           Data.Bool.Unicode
+import           Data.Set.Unicode ((∅), (∈), (∉))
+import           Data.Ord.Unicode ((≥), (≤))
+import           Data.Bool.Unicode ((∧), (∨))
 import qualified EFA
 import qualified FA
 import qualified TransitionGraph as TG
 import           Finite
-import           Data.Functor.Contravariant
+import           Data.Functor.Contravariant (Contravariant, contramap)
 -- import           Data.Functor.Invariant
 -- import           Data.Functor.Contravariant.Divisible
 import           Algebra.Graph.Relation as Relation hiding (domain)
@@ -121,42 +121,38 @@ table = Map.toAscList . deltaToMap
 -- The NFA, empty, such that
 -- ℒ(empty) = ∅
 empty ∷ NFA () s
-empty = NFA { delta = const (∅)
-            , q0    = ()
-            , fs    = (∅)
-            }
+empty = NFA (const (∅)) () (∅)
 
 -- The NFA, epsilon, such that
 -- ℒ(epsilon) = {ε}
 epsilon ∷ NFA () s
-epsilon = NFA { delta = const (∅)
-              , q0    = ()
-              , fs    = singleton ()
-              }
+epsilon = NFA (const (∅)) () (singleton ())
 
 -- Given a symbol, construct an NFA which recognizes exactly that symbol and nothing else
-literal ∷ (Eq s) ⇒ s → NFA Bool s
-literal σ' = NFA { delta = δ
-                 , q0    = False
-                 , fs    = singleton True
-                 } where δ (False, σ) | σ == σ' = singleton True
-                         δ _                    = (∅)
+literal ∷ ∀ s . (Eq s) ⇒ s → NFA Bool s
+literal σ' = NFA δ False (singleton True)
+  where
+    δ ∷ (Bool, s) → Set Bool
+    δ (False, σ) | σ == σ' = singleton True
+    δ _                    = (∅)
 
-fromSet ∷ (Ord s) ⇒ Set s → NFA Bool s
-fromSet s = NFA { delta = δ
-                , q0    = False
-                , fs    = singleton True
-                } where δ (False, σ) | σ ∈ s = singleton True
-                        δ _                  = (∅)
+fromSet ∷ ∀ s . (Ord s) ⇒ Set s → NFA Bool s
+fromSet s = NFA δ False (singleton True)
+  where
+    δ ∷ (Bool, s) → Set Bool
+    δ (False, σ) | σ ∈ s = singleton True
+    δ _                  = (∅)
 
 -- Return an NFA whose language is all permutations of the given set
 -- e.g. ℒ(permutations {0, 1, 2}) = {[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]}
-permutations ∷ (Ord s) ⇒ Set s → NFA (Set s) s
-permutations s = NFA { delta = δ
-                     , q0    = (∅)
-                     , fs    = singleton s
-                     } where δ (q, σ) | σ ∈ s ∧ σ ∉ q ∨ Set.null s = singleton (σ `insert` q)
-                             δ _                                   = (∅)
+permutations ∷ ∀ s . (Ord s) ⇒ Set s → NFA (Set s) s
+permutations s = NFA δ (∅) (singleton s)
+  where
+    δ ∷ (Set s, s) → Set (Set s)
+    δ (q, σ) | σ ∈ s
+             ∧ σ ∉ q
+             ∨ Set.null s = singleton (σ `insert` q)
+    δ _                   = (∅)
 
 -- TODO Could just use `fromRE` instead... Confirm this way is better?
 fromList ∷ (Eq s) ⇒ [s] → SomeNFA s
@@ -171,87 +167,70 @@ fromNE = foldl1 (\(SomeNFA acc) (SomeNFA σ) → SomeNFA (concatenate acc σ)) .
 
 -- Given two NFAs m₁ and m₂, return an NFA which recognizes any string from
 -- m₁ immediately followed by any string from m₂
-concatenate ∷ (Ord q, Ord p) ⇒ NFA q s → NFA p s → NFA (Either q p) s
-concatenate (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA { delta = δ
-                                                , q0    = Left q₀
-                                                , fs    = Set.map Right f₂
-                                                -- if this state, q, is a final state, merge q's transitions with p0's transitions
-                                                } where δ (Left  q, σ) | q ∈ f₁ =               δ₁ (q, σ) ⊎ δ₂ (p₀, σ)  -- merge any last state of m₁ with p₀
-                                                        δ (Left  q, σ)          = Set.map Left (δ₁ (q, σ))
-                                                        δ (Right p, σ)          =            Set.map Right (δ₂ (p,  σ))
+concatenate ∷ ∀ q p s . (Ord q, Ord p) ⇒ NFA q s → NFA p s → NFA (Either q p) s
+concatenate (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA δ (Left q₀) (Set.map Right f₂)
+  where
+    δ ∷ (Either q p, s) → Set (Either q p)
+    -- if this state, q, is a final state, merge q's transitions with p₀'s transitions
+    δ (Left  q, σ) | q ∈ f₁ =               δ₁ (q, σ) ⊎ δ₂ (p₀, σ)  -- merge any last state of m₁ with p₀
+    δ (Left  q, σ)          = Set.map Left (δ₁ (q, σ))
+    δ (Right p, σ)          =            Set.map Right (δ₂ (p,  σ))
 
 -- The product construction
 -- Essentially this runs two NFAs (which both share the same alphabet) "in parallel" together in lock step
 synchronous ∷ (Ord q, Ord p) ⇒ NFA q s → NFA p s → NFA (q, p) s
-synchronous (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA { delta = \((q, p), σ) → δ₁ (q, σ) × δ₂ (p, σ)
-                                                , q0    = (q₀, p₀)
-                                                , fs    = f₁ × f₂
-                                                }
+synchronous (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA (\((q, p), σ) → δ₁ (q, σ) × δ₂ (p, σ)) (q₀, p₀) (f₁ × f₂)
 
 -- The asynchronous product of two NFA
 -- Essentially this runs two NFAs with different alphabets "in parallel" independently
-asynchronous ∷ (Ord q, Ord p) ⇒ NFA q s → NFA p g → NFA (q, p) (Either s g)
-asynchronous (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA { delta = δ
-                                                 , q0    = (q₀, p₀)
-                                                 , fs    = f₁ × f₂
-                                                 } where δ ((q, p), Left  σ) = δ₁ (q, σ)   × singleton p
-                                                         δ ((q, p), Right γ) = singleton q × δ₂ (p, γ)
+asynchronous ∷ ∀ q p s g . (Ord q, Ord p) ⇒ NFA q s → NFA p g → NFA (q, p) (Either s g)
+asynchronous (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA δ (q₀, p₀) (f₁ × f₂)
+  where
+    δ ∷ ((q, p), Either s g) → Set (q, p)
+    δ ((q, p), Left  σ) = δ₁ (q, σ)   × singleton p
+    δ ((q, p), Right γ) = singleton q × δ₂ (p, γ)
 
 toFA ∷ (Finite q) ⇒ NFA q s → FA.FA q s
-toFA (NFA δ q₀ f) = FA.FA { FA.delta   = δ
-                          , FA.initial = singleton q₀
-                          , FA.final   = f
-                          }
+toFA (NFA δ q₀ f) = FA.FA δ (singleton q₀) f
 
 minimize ∷ (Finite q, Finite s) ⇒ NFA q s → NFA (Set (Set q)) s
 minimize = undefined -- fromJust . fromFA' . FA.minimize . toFA
 
 -- Given an NFA, m, convert m to an equivalant EFA (which produces exactly the same language)
-toEFA ∷ NFA q s → EFA.EFA q s
-toEFA (NFA δ q₀ f) = EFA.EFA { EFA.delta = δₑ
-                             , EFA.q0    = q₀
-                             , EFA.fs    = f
-                             } where δₑ (q, Just  σ) = δ (q, σ)
-                                     δₑ (_, Nothing) = (∅)
+toEFA ∷ ∀ q s . NFA q s → EFA.EFA q s
+toEFA (NFA δ q₀ f) = EFA.EFA δₑ q₀ f
+  where
+    δₑ ∷ (q, Maybe s) → Set q
+    δₑ (q, Just  σ) = δ (q, σ)
+    δₑ (_, Nothing) = (∅)
 
 -- Determinize the NFA without transforming it to a DFA
 -- TODO test property that `determinisitic (NFA.determinization m)` is always true
 -- TODO also test that ℒ(m) = ℒ(det(m))
 determinization ∷ (Finite q) ⇒ NFA q s → NFA (Set q) s
-determinization m@(NFA δ q₀ f) = NFA { delta = \(states, σ) → Set.map (\q → δ (q, σ)) states
-                                     , q0    = singleton q₀
-                                     , fs    = Set.filter (intersects f) (powerSet (qs m))
-                                     }
+determinization m@(NFA δ q₀ f) = NFA (\(states, σ) → Set.map (\q → δ (q, σ)) states)
+                                     (singleton q₀)
+                                     (Set.filter (intersects f) (powerSet (qs m)))
 
 -- Take an EFA and generate an equivalent NFA (Stanford Coursera algo Nondeterminism lecture)
 -- TODO also offer subset construction method?
 fromEFA ∷ (Finite q) ⇒ EFA.EFA q s → NFA q s
-fromEFA m@(EFA.EFA δ q₀ f) = NFA { delta = \(q, σ) → foldMap (\p → δ (p, Just σ)) (EFA.eclosure m (singleton q))
-                                 , q0    = q₀
+fromEFA m@(EFA.EFA δ q₀ f) = NFA (\(q, σ) → foldMap (\p → δ (p, Just σ)) (EFA.eclosure m (singleton q)))
+                                 q₀
                                  -- Any state which can reach a final state via epsilon transitions
-                                 , fs    = Set.filter (intersects f . EFA.eclosure m . singleton) (qs m)
-                                 }
+                                 (Set.filter (intersects f . EFA.eclosure m . singleton) (qs m))
 
 -- For testing if a particular sequence of moves will work
 noEpsilonClosures ∷ (Finite q) ⇒ EFA.EFA q s → NFA q (Maybe s)
-noEpsilonClosures (EFA.EFA δ q₀ f) = NFA { delta = δ
-                                         , q0    = q₀
-                                         , fs    = f
-                                         }
+noEpsilonClosures (EFA.EFA δ q₀ f) = NFA δ q₀ f
 
 fromFA ∷ (Finite q) ⇒ FA.FA q s → NFA (Either () q) s
 fromFA = NFA.fromEFA . EFA.fromFA
 
 -- If the FA only exactly one initial state then we may convert it to an NFA without adding an extra state
 fromFA' ∷ FA.FA q s → Maybe (NFA q s)
-fromFA' m | size' (FA.initial m) == 1 = Just NFA { delta = FA.delta m
-                                                 , q0    = elemAt 0 (FA.initial m)
-                                                 , fs    = FA.final m
-                                                 }
+fromFA' m | size' (FA.initial m) == 1 = Just (NFA (FA.delta m) (elemAt 0 (FA.initial m)) (FA.final m))
           | otherwise                 = Nothing
 
 fromGraph ∷ (Finite q, Finite s) ⇒ TG.TG q s → q → Set q → NFA q s
-fromGraph (TG.TG t) q₀ f = NFA { delta = \(q, s) → postSet q (t s)
-                               , q0    = q₀
-                               , fs    = f
-                               }
+fromGraph (TG.TG t) = NFA (\(q, s) → postSet q (t s))
