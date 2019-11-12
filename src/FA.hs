@@ -34,7 +34,7 @@ instance (Finite s) ⇒ Σ (SomeFA s) s
 
 instance Contravariant (FA q) where
     contramap ∷ (g → s) → FA q s → FA q g
-    contramap h m@(FA δ _ _) = m { delta = \(q, γ) → δ (q, h γ) }
+    contramap h (FA δ i f) = FA (\(q, γ) → δ (q, h γ)) i f
 
 instance (Finite q, Finite s) ⇒ Configuration FA q s (Set q) where
   deterministic ∷ FA q s → Bool
