@@ -15,7 +15,7 @@ import           Finite
 import           Examples
 import           Data.Set
 import           Config
-import           Numeric.Natural.Unicode
+import           Numeric.Natural.Unicode (ℕ)
 import           EasyTest
 
 main ∷ IO ()
@@ -74,66 +74,67 @@ testDFArquotient = scope "DFA.rquotient" . expect $ and [ Config.accepts e3L1 [C
                                                         , Config.accepts e3L1L2 [C, A, R, R]
                                                         , Prelude.take 2 (Config.language e3L1L2) == [[C, A, R, R], [C, A, R, R, O]]
                                                         ]
-             where e3L1 ∷ DFA Fin₈ Alpha
-                   e3L1   = DFA { delta = δ
-                                , q0 = 0
-                                , fs = singleton 6
-                                } where δ (0, C) = 1
-                                        δ (1, A) = 2
-                                        δ (2, R) = 3
-                                        δ (3, R) = 4
-                                        δ (4, O) = 5
-                                        δ (5, T) = 6
-                                        δ _      = 7
-                   e3L2   = DFA.union (right e3L1 4) (DFA.literal T)
-                   -- e3L2 = DFA.union (right e3L1 4) (right e3L1 5)
-                   e3L1L2 = DFA.rquotient e3L1 e3L2
+  where
+    e3L1 ∷ DFA Fin₈ Alpha
+    e3L1   = DFA δ 0 (singleton 6)
+      where
+        δ (0, C) = 1
+        δ (1, A) = 2
+        δ (2, R) = 3
+        δ (3, R) = 4
+        δ (4, O) = 5
+        δ (5, T) = 6
+        δ _      = 7
+    e3L2   = DFA.union (right e3L1 4) (DFA.literal T)
+    -- e3L2 = DFA.union (right e3L1 4) (right e3L1 5)
+    e3L1L2 = DFA.rquotient e3L1 e3L2
 
 testDFAinvhomimage ∷ Test ()
 testDFAinvhomimage = scope "DFA.invhomimage" . expect $ DFA.invhomimage h slide22 `DFA.equal` expected
-               where -- slide 22 http://infolab.stanford.edu/~ullman/ialc/spr10/slides/rs2.pdf
-                     slide22 ∷ DFA Fin₃ Fin₂
-                     slide22 = DFA { delta = δ
-                                   , q0    = 0
-                                   , fs    = singleton 2
-                                   } where δ (0, 0) = 1
-                                           δ (0, 1) = 2
-                                           δ (1, 0) = 0
-                                           δ (1, 1) = 2
-                                           δ (2, 0) = 0
-                                           δ (2, 1) = 1        
-                     h ∷ Bool → [Fin₂]
-                     h False = [0,1]
-                     h True  = []
-                     expected ∷ DFA Fin₃ Bool 
-                     expected = DFA { delta = δ
-                                    , q0    = 0
-                                    , fs    = singleton 2
-                                    } where δ (0, False) = 2
-                                            δ (0, True)  = 0
-                                            δ (1, False) = 2
-                                            δ (1, True)  = 1
-                                            δ (2, False) = 2
-                                            δ (2, True)  = 2
+  where
+    -- slide 22 http://infolab.stanford.edu/~ullman/ialc/spr10/slides/rs2.pdf
+    slide22 ∷ DFA Fin₃ Fin₂
+    slide22 = DFA δ 0 (singleton 2)
+      where
+        δ (0, 0) = 1
+        δ (0, 1) = 2
+        δ (1, 0) = 0
+        δ (1, 1) = 2
+        δ (2, 0) = 0
+        δ (2, 1) = 1        
+    h ∷ Bool → [Fin₂]
+    h False = [0,1]
+    h True  = []
+    expected ∷ DFA Fin₃ Bool 
+    expected = DFA δ 0 (singleton 2)
+      where
+        δ ∷ (Fin₃, Bool) → Fin₃
+        δ (0, False) = 2
+        δ (0, True)  = 0
+        δ (1, False) = 2
+        δ (1, True)  = 1
+        δ (2, False) = 2
+        δ (2, True)  = 2
 
 -- Substitution
 -- A Second Course in Formal Languages and Automata Theory (Pg 55, Example 3.3.4)
 -- s(101) = (cd)*(a+ab)*(cd)*
 testRESubstitution ∷ Test ()
 testRESubstitution = scope "RE.>>=" . expect $ result == expected -- N.B. the use of structural equality is intentional here
-            where original ∷ RegExp Fin₂
-                  original = RE.fromList [1, 0, 1]
-                  -- h(0) = {a, ab}*
-                  -- h(1) = (cd)*
-                  h ∷ Fin₂ → RegExp Fin₄
-                  h 0 = Star (Lit 0 :| RE.fromList [0,1])
-                  h 1 = Star (RE.fromList [2, 3])
-                  result ∷ RegExp Fin₄
-                  result = original >>= h
-                  -- (cd)*(a+ab)*(cd)*
-                  expected ∷ RegExp Fin₄
-                  expected =  Star (RE.fromList [2,3])
-                          :. (Star (Lit 0 :| RE.fromList [0, 1])
-                          :.  Star (RE.fromList [2,3]))
+  where
+    original ∷ RegExp Fin₂
+    original = RE.fromList [1, 0, 1]
+    -- h(0) = {a, ab}*
+    -- h(1) = (cd)*
+    h ∷ Fin₂ → RegExp Fin₄
+    h 0 = Star (Lit 0 :| RE.fromList [0,1])
+    h 1 = Star (RE.fromList [2, 3])
+    result ∷ RegExp Fin₄
+    result = original >>= h
+    -- (cd)*(a+ab)*(cd)*
+    expected ∷ RegExp Fin₄
+    expected =  Star (RE.fromList [2,3])
+            :. (Star (Lit 0 :| RE.fromList [0, 1])
+            :.  Star (RE.fromList [2,3]))
 
 
