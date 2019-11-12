@@ -6,13 +6,13 @@
 
 module DFA where
 
-import           Data.Functor.Contravariant
+import           Data.Functor.Contravariant (Contravariant, contramap, Equivalence, Equivalence (..))
 import           Prelude             hiding (map)
-import           Data.Function
+import           Data.Function (on)
 import qualified Data.List           as List
 import           Data.Set            as Set hiding (foldl, intersection)
-import           Data.Set.Unicode
-import           Data.Bool.Unicode
+import           Data.Set.Unicode ((∅), (∈), (∉), (∖))
+import           Data.Bool.Unicode ((∧), (∨))
 import qualified Data.Map            as Map
 import           Numeric.Algebra.Class (sumWith)
 import           Common
@@ -23,9 +23,10 @@ import qualified TransitionGraph as TG
 import qualified NFA
 import qualified EFA
 import qualified GNFA
-import qualified RegExp as RE
 import qualified FA
-import qualified Language
+import qualified RegExp as RE
+import           Language (ℒ)
+import           Numeric.Natural.Unicode (ℕ)
 
 -- Deterministic Finite Automaton
 data DFA q s =                 -- q is the set of states, Q
@@ -186,11 +187,10 @@ cofinite = finite . complement
 -- "A DFA is synchronizing if there exists a word that sends all states of the automaton to the same state." - https://arxiv.org/abs/1507.06070
 synchronizing ∷ (Finite q, Finite s) ⇒                  DFA q s → Bool
 synchronizing = not . isZero . power
-          where power ∷ (Finite q) ⇒ DFA q s → DFA (Set q) s -- FIXME supposed to be a non-empty set -- TODO alter this to check for shortest path to get shortest reset word?
-                power m@(DFA δ _ _) = DFA { delta = \(states, σ) → map (\q → δ (q, σ)) states
-                                          , q0    = qs m
-                                          , fs    = map singleton (qs m)
-                                          }
+  where
+    -- FIXME supposed to be a non-empty set
+    power ∷ (Finite q) ⇒ DFA q s → DFA (Set q) s -- TODO alter this to check for shortest path to get shortest reset word?
+    power m@(DFA δ _ _) = DFA (\(states, σ) → map (\q → δ (q, σ)) states) (qs m) (map singleton (qs m))
 
 -- A palindrome is a word w such that w = wʳ.
 -- Let ℒ ⊆ Σ★, ℒ is palindromic if every word w ∈ ℒ is a palindrome.
@@ -199,7 +199,9 @@ synchronizing = not . isZero . power
 -- TODO this is the (untested) naive implementation
 palindromic ∷ (Finite q, Finite s) ⇒                    DFA q s → Bool
 palindromic m = all palindrome (upToLength (3 * n) (language m))
-          where n = size' (qs m)
+  where
+    n ∷ ℕ
+    n = size' (qs m)
 
 -- An automaton M = (S, I, δ, s₀, F) is said to be a permutation
 -- automaton, or more simply a p-automaton, if and only if δ(sᵢ, a) = δ(sⱼ, a), where sᵢ, sⱼ ∈ S, a ∈ I, implies that sᵢ = sⱼ.
@@ -251,19 +253,16 @@ intersection = synchronous
 -- The product construction
 -- Essentially this runs two DFAs (which both share the same alphabet) "in parallel" together in lock step
 synchronous ∷ (Ord q, Ord p) ⇒        DFA q s → DFA p s → DFA (q, p) s
-synchronous (DFA δ₁ q₀ f₁) (DFA δ₂ p₀ f₂) = DFA { delta = \((q, p), σ) → (δ₁ (q, σ), δ₂ (p, σ))
-                                                , q0    = (q₀, p₀)
-                                                , fs    = f₁ × f₂
-                                                }
+synchronous (DFA δ₁ q₀ f₁) (DFA δ₂ p₀ f₂) = DFA (\((q, p), σ) → (δ₁ (q, σ), δ₂ (p, σ))) (q₀, p₀) (f₁ × f₂)
 
 -- The asynchronous product of two DFA
 -- Essentially this runs two DFAs with different alphabets "in parallel" independently
-asynchronous ∷ (Ord q, Ord p) ⇒ DFA q s → DFA p g → DFA (q, p) (Either s g)
-asynchronous (DFA δ₁ q₀ f₁) (DFA δ₂ p₀ f₂) = DFA { delta = δ
-                                                 , q0    = (q₀, p₀)
-                                                 , fs    = f₁ × f₂
-                                                 } where δ ((q, p), Left  σ) = (δ₁ (q, σ), p        )
-                                                         δ ((q, p), Right γ) = (q,         δ₂ (p, γ))
+asynchronous ∷ ∀ q p s g . (Ord q, Ord p) ⇒ DFA q s → DFA p g → DFA (q, p) (Either s g)
+asynchronous (DFA δ₁ q₀ f₁) (DFA δ₂ p₀ f₂) = DFA δ (q₀, p₀) (f₁ × f₂)
+  where
+    δ ∷ ((q, p), Either s g) → (q, p)
+    δ ((q, p), Left  σ) = (δ₁ (q, σ), p        )
+    δ ((q, p), Right γ) = (q,         δ₂ (p, γ))
 
 -- The symmetric difference ("exclusive or", or "xor") of two DFAs
 -- ℒ(m₁) ⊕ ℒ(m₂) = (ℒ(m₁) - ℒ(m₂)) ∪ (ℒ(m₂) - ℒ(m₁))
@@ -280,13 +279,13 @@ rquotient m₁ m₂ = m₁ { fs = Set.filter (DFA.intersects m₂ . right m₁) 
 
 -- min(ℒ(m)) = ℒ(m) - ℒ(m)·Σ⁺ = { w | w ∈ ℒ(m) ∧ no proper prefix of w is in ℒ(m) }
 -- a proper prefix of a string is a prefix of the string not empty and not equal to itself
-min ∷ (Ord q) ⇒ DFA q s → DFA (Either () q) s
-min (DFA δ q₀ f) = DFA { delta = δ₁
-                       , q0    =         Right q₀
-                       , fs    = Set.map Right f
-                       } where δ₁ (Left (), _)         = Left ()          -- `Left ()` is a dead state with no way to transition out
-                               δ₁ (Right q, _) | q ∈ f = Left ()          -- delete transitions out of final states by sending to the new dead state
-                               δ₁ (Right q, σ)         = Right (δ (q, σ))
+min ∷ ∀ q s . (Ord q) ⇒ DFA q s → DFA (Either () q) s
+min (DFA δ q₀ f) = DFA δ₁ (Right q₀) (Set.map Right f)
+  where
+    δ₁ ∷ (Either () q, s) → Either () q
+    δ₁ (Left (), _)         = Left ()          -- `Left ()` is a dead state with no way to transition out
+    δ₁ (Right q, _) | q ∈ f = Left ()          -- delete transitions out of final states by sending to the new dead state
+    δ₁ (Right q, σ)         = Right (δ (q, σ))
 
 -- max(ℒ(m)) = { w | w ∈ ℒ(m) ∧ ∀x ≠ ε, wx ∉ ℒ(m) }
 max ∷ (Finite q, Finite s) ⇒ DFA q s → DFA q s -- delete q because x cannot be ε
@@ -316,72 +315,60 @@ minimize = DFA.fromFA . FA.codeterminization . toFA
 -- FIXME see about necessarily starting with trim automaton, may have to return `Maybe (DFA q s)`
 -- FIXME or maybe something like trim the `DFA` as a `SomeDFA`
 quotient ∷ ∀ q s . (Finite q, Finite s) ⇒ DFA q s → DFA q s
-quotient m@(DFA δ q₀ f) = DFA { delta = representative equiv . δ
-                              , q0    = representative equiv q₀
-                              , fs    = Set.map (representative equiv) f
-                              } where equiv ∷ Equivalence q
-                                      equiv = indistinguishability m
+quotient m@(DFA δ q₀ f) = DFA (representative equiv . δ)
+                              (representative equiv q₀)
+                              (Set.map (representative equiv) f)
+  where
+    equiv ∷ Equivalence q
+    equiv = indistinguishability m
 
 -- The DFA, empty, which produces the empty language, such that
 -- ℒ(empty) = ∅
 empty ∷ DFA () s
-empty = DFA { delta = const ()
-            , q0    = ()
-            , fs    = (∅)
-            }
+empty = DFA (const ()) () (∅)
 
 -- The DFA, epsilon, which produces the language, such that
 -- ℒ(epsilon) = {ε}
 epsilon ∷ DFA Bool s
-epsilon = DFA { delta = const False
-              , q0    = True
-              , fs    = singleton True
-              }
+epsilon = DFA (const False) True (singleton True)
 
 -- Given a symbol of an alphabet, σ ∈ Σ, construct a DFA which recognizes only that symbol and nothing else, i.e.
 -- ℒ(m) = {σ}
-literal ∷ (Eq s) ⇒ s → DFA (Either () Bool) s
-literal σ = DFA { delta = Right . δ
-                , q0    = Left ()
-                , fs    = singleton (Right True)
-                } where δ (Left (), σ') = σ' == σ
-                        δ _             = False
+literal ∷ ∀ s . (Ord s) ⇒ s → DFA Ordering s
+literal σ = DFA δ LT (singleton EQ)
+  where
+    δ ∷ (Ordering, s) → Ordering
+    δ (LT, σ') | σ' == σ = EQ
+    δ _                  = GT
 
-fromSet ∷ (Ord s) ⇒ Set s → DFA (Either () Bool) s
-fromSet s = DFA { delta = Right . δ
-                , q0    = Left ()
-                , fs    = singleton (Right True)
-                } where δ (Left (), σ) = σ ∈ s
-                        δ _            = False
+fromSet ∷ ∀ s . (Ord s) ⇒ Set s → DFA Ordering s
+fromSet s = DFA δ LT (singleton EQ)
+  where
+    δ ∷ (Ordering, s) → Ordering
+    δ (LT, σ) | σ ∈ s = EQ
+    δ _               = GT
 
 -- TODO untested
 toSet ∷ (Finite q, Finite s) ⇒ DFA q s → Set s
 toSet m@(DFA δ _ _) = foldMap (\(q, σ) → if δ (q, σ) ∈ useful m then singleton σ else (∅)) (useful m × sigma m)
 
-dot ∷ (Finite s) ⇒ DFA (Either () Bool) s
+dot ∷ (Finite s) ⇒ DFA Ordering s
 dot = fromSet asSet
 
 -- Convert an NFA with multiple start states to a DFA (performs determinization)
 fromFA ∷ (Finite q) ⇒ FA.FA q s → DFA (Set q) s
-fromFA m@(FA.FA δ i f) = DFA { delta = \(states, σ) → foldMap (\q → δ (q, σ)) states
-                             , q0    = i
-                             , fs    = Set.filter (Common.intersects f) (powerSet (qs m))
-                             }
+fromFA m@(FA.FA δ i f) = DFA (\(states, σ) → foldMap (\q → δ (q, σ)) states) i (Set.filter (Common.intersects f) (powerSet (qs m)))
 
 fromCDFA ∷ (Finite q, Finite s) ⇒ FA.FA q s → Maybe (DFA q s)
-fromCDFA m@(FA.FA δ i f) | complete m && deterministic m = Just (DFA { delta = \(q, σ) → elemAt 0 (δ (q, σ))
-                                                                     , q0 = elemAt 0 i
-                                                                     , fs = f
-                                                                     }
-                                                                )
-fromCDFA _                                               = Nothing
+fromCDFA m@(FA.FA δ i f) | complete      m
+                         ∧ deterministic m = Just (DFA (\(q, σ) → elemAt 0 (δ (q, σ))) (elemAt 0 i) f)
+fromCDFA _                                 = Nothing
 
 -- Take an NFA, and use subset construction to convert it to an equivalent DFA (performs determinization)
 fromNFA ∷ (Finite q) ⇒ NFA.NFA q s → DFA (Set q) s
-fromNFA m@(NFA.NFA δ q₀ f) = DFA { delta = \(states, σ) → foldMap (\q → δ (q, σ)) states
-                                 , q0    = singleton q₀
-                                 , fs    = Set.filter (Common.intersects f) (powerSet (qs m))
-                                 }
+fromNFA m@(NFA.NFA δ q₀ f) = DFA (\(states, σ) → foldMap (\q → δ (q, σ)) states)
+                                 (singleton q₀)
+                                 (Set.filter (Common.intersects f) (powerSet (qs m)))
 
 -- Take an EFA and use (slightly modded (See (2.) page 77, HMU)) subset construction
 -- to generate an equivalent DFA by "eliminating" epsilon transitions
@@ -390,17 +377,16 @@ fromEFA = fromNFA . NFA.fromEFA
 
 -- Take a DFA, d, and convert it to an NFA, n, such that ℒ(d) = ℒ(n)
 toNFA ∷ DFA q s → NFA.NFA q s
-toNFA (DFA δ q₀ f) = NFA.NFA { NFA.delta = singleton . δ
-                             , NFA.q0    = q₀
-                             , NFA.fs    = f
-                             }
+toNFA (DFA δ q₀ f) = NFA.NFA (singleton . δ) q₀ f
 
 -- min(ℒ(m)) = ℒ(m) - ℒ(m)·Σ⁺ = { w | w ∈ ℒ(m) ∧ no proper prefix of w is in ℒ(m) }
 -- a proper prefix of a string is a prefix of the string not empty and not equal to itself
-toNFAMin ∷ (Ord q) ⇒ DFA q s → NFA.NFA q s
+toNFAMin ∷ ∀ q s . (Ord q) ⇒ DFA q s → NFA.NFA q s
 toNFAMin m@(DFA δ _ f) = (toNFA m) { NFA.delta = δ₁ }
-                   where δ₁ (q, _) | q ∈ f = (∅)  -- delete transitions out of final states
-                         δ₁ (q, σ)         = singleton (δ (q, σ))
+  where
+    δ₁ ∷ (q, s) → Set q
+    δ₁ (q, _) | q ∈ f = (∅)  -- delete transitions out of final states
+    δ₁ (q, σ)         = singleton (δ (q, σ))
 
 -- Take a DFA, d, and convert it to an EFA, e, such that ℒ(d) = ℒ(e)
 toEFA ∷ DFA q s → EFA.EFA q s
@@ -409,44 +395,46 @@ toEFA = NFA.toEFA . toNFA
 -- cycle(ℒ) = { xy | yx ∈ ℒ }
 -- A Second Course in Formal Languages and Automata Theory pg. 60
 -- string conjugations
-toEFACycle ∷ (Finite q) ⇒ DFA q s → EFA.EFA (Either () (q, q, Bool)) s
-toEFACycle m@(DFA δ q₀ f) = EFA.EFA { EFA.delta = δ₁
-                                    , EFA.q0    = Left ()
-                                    , EFA.fs    = Set.map (\q → Right (q, q, True)) (qs m)
-                                    } where δ₁ (Left             (), Nothing)         = Set.map (\q → Right (q, q, False)) (qs m)
-                                            δ₁ (Right (q, p, False), Nothing) | q ∈ f = singleton (Right (q₀      , p, True))
-                                            δ₁ (Right (q, p,     b), Just  σ)         = singleton (Right (δ (q, σ), p, b   )) -- Simulation
-                                            δ₁ _                                      = (∅)
+toEFACycle ∷ ∀ q s . (Finite q) ⇒ DFA q s → EFA.EFA (Either () (q, q, Bool)) s
+toEFACycle m@(DFA δ q₀ f) = EFA.EFA δ₁ (Left ()) (Set.map (\q → Right (q, q, True)) (qs m))
+  where
+    δ₁ ∷ (Either () (q, q, Bool), Maybe s) → Set (Either () (q, q, Bool))
+    δ₁ (Left             (), Nothing)         = Set.map (\q → Right (q, q, False)) (qs m)
+    δ₁ (Right (q, p, False), Nothing) | q ∈ f = singleton (Right (q₀      , p, True))
+    δ₁ (Right (q, p,     b), Just  σ)         = singleton (Right (δ (q, σ), p, b   )) -- Simulation
+    δ₁ _                                      = (∅)
 
 -- ½ℒ = { x ∈ Σ★ : there exists y ∈ Σ★ with |y| = |x| such that xy ∈ ℒ }.
 -- A Second Course in Formal Languages and Automata Theory pg. 59
 -- for all even length strings w ∈ ℒ, take the first half of w, producing ½ℒ
-toEFAHalf ∷ forall q s . (Finite q, Finite s) ⇒ DFA q s → EFA.EFA (Either () (q, q, q)) s
-toEFAHalf m@(DFA δ q₀ f) = EFA.EFA { EFA.delta = δ₁
-                                   , EFA.q0    = Left ()
-                                   , EFA.fs    = Set.map (\(q, qᶠ) → Right (q, q, qᶠ)) (qs m × f)
-                                   } where δ₁ (Left         (), Nothing) = Set.map (\q  → Right (q,       q₀,         q)) (qs m)
-                                           δ₁ (Right (q, p, r), Just  σ) = Set.map (\σ' → Right (q, δ (p, σ), δ (r, σ'))) (sigma m)
-                                           δ₁ _                          = (∅)
+toEFAHalf ∷ ∀ q s . (Finite q, Finite s) ⇒ DFA q s → EFA.EFA (Either () (q, q, q)) s
+toEFAHalf m@(DFA δ q₀ f) = EFA.EFA δ₁ (Left ()) (Set.map (\(q, qᶠ) → Right (q, q, qᶠ)) (qs m × f))
+  where
+    δ₁ ∷ (Either () (q, q, q), Maybe s) → Set (Either () (q, q, q))
+    δ₁ (Left         (), Nothing) = Set.map (\q  → Right (q,       q₀,         q)) (qs m)
+    δ₁ (Right (q, p, r), Just  σ) = Set.map (\σ' → Right (q, δ (p, σ), δ (r, σ'))) (sigma m)
+    δ₁ _                          = (∅)
 
 toFA ∷ (Finite q) ⇒ DFA q s → FA.FA q s
 toFA = NFA.toFA . toNFA
 
 -- Convert a DFA to a Generalized Nondeterministic Finite Automaton with ε-transitions
 -- δ(q₁, σ) = q₂ ⟺ δ'(q₁, q₂) = σ
-toGNFA ∷ (Finite s, Ord q) ⇒ DFA q s → GNFA.GNFA q s
-toGNFA m@(DFA δ q₀ f) = GNFA.GNFA { GNFA.delta = δ' }
-     where -- Connect the new (forced) GNFA start state to q₀ with an ε.
-           δ' (Left  (Init _), Right        q₂) | q₂ == q₀ = RE.one
-           -- Connect the new (forced) GNFA final state to each element of f with an ε.
-           δ' (Right       q₁, Left  (Final _)) | q₁ ∈ f   = RE.one
-           -- If q₁ and q₂ were connected (often via multiple transitions) in the DFA,
-           -- lift all symbols into RE.Lit, and let multiple transitions be represented
-           -- by the union of said literals. If no transitions between q₁ and q₂ in DFA then, RE.zero.
-           δ' (Right       q₁, Right        q₂)            = sumWith RE.Lit (Set.filter (\σ → δ (q₁, σ) == q₂) (sigma m))
-           -- Besides the explicitly given epsilon connections, no connections
-           -- to the new final state nor from the new start state should exist.
-           δ' _                                            = RE.zero
+toGNFA ∷ ∀ q s . (Finite s, Ord q) ⇒ DFA q s → GNFA.GNFA q s
+toGNFA m@(DFA δ q₀ f) = GNFA.GNFA δ'
+  where
+    δ' ∷ (Either Init q, Either Final q) → RE.RegExp s
+    -- Connect the new (forced) GNFA start state to q₀ with an ε.
+    δ' (Left  (Init _), Right        q₂) | q₂ == q₀ = RE.one
+    -- Connect the new (forced) GNFA final state to each element of f with an ε.
+    δ' (Right       q₁, Left  (Final _)) | q₁ ∈ f   = RE.one
+    -- If q₁ and q₂ were connected (often via multiple transitions) in the DFA,
+    -- lift all symbols into RE.Lit, and let multiple transitions be represented
+    -- by the union of said literals. If no transitions between q₁ and q₂ in DFA then, RE.zero.
+    δ' (Right       q₁, Right        q₂)            = sumWith RE.Lit (Set.filter (\σ → δ (q₁, σ) == q₂) (sigma m))
+    -- Besides the explicitly given epsilon connections, no connections
+    -- to the new final state nor from the new start state should exist.
+    δ' _                                            = RE.zero
 
 toRE ∷ (Finite q, Finite s) ⇒ DFA q s → RE.RegExp s
 toRE = GNFA.toRE . toGNFA
