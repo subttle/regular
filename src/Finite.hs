@@ -670,6 +670,12 @@ fromEquivalence (Equivalence r) = unfoldr go asList
 toPredicate ∷ (Foldable t, Eq a) ⇒ t a → Predicate a
 toPredicate = Predicate . (∋)
 
+predicateToList ∷ (Finite a) ⇒ Predicate a → [a]
+predicateToList (Predicate p) = List.filter p asList
+
+predicateToSet  ∷ (Finite a) ⇒ Predicate a → Set a
+predicateToSet (Predicate p) = Set.filter p asSet
+
 -- TODO better name?
 -- fromPredicate (Predicate (> 2) ∷ Predicate Fin₁₀) == [[0,1,2],[3,4,5,6,7,8,9]]
 -- N.B. information is lost here, we can't distinguish `p` from `(not . p)` anymore
@@ -1117,7 +1123,7 @@ instance RenameMe Equivalence where
       eqbc (This  b₁   ) (This  b₂   ) = b₁ ⮀ b₂
       eqbc (This  _    ) (That     _ ) =                   False
       eqbc (This  b₁   ) (These b₂ _ ) = b₁ ⮀ b₂
-      eqbc (That     c₁) (This  b₂   ) =                   False
+      eqbc (That     _ ) (This  _    ) =                   False
       eqbc (That     c₁) (That     c₂) =           c₁ ⮂ c₂
       eqbc (That     c₁) (These _  c₂) =           c₁ ⮂ c₂
       eqbc (These b₁ _ ) (This  b₂   ) = b₁ ⮀ b₂
