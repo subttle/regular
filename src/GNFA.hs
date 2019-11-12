@@ -14,8 +14,7 @@ import qualified Data.List as List
 import           Data.Set as Set
 import           Data.Bool.Unicode ((∨))
 import qualified Data.Map as Map (fromList)
--- import           Data.Either
--- import           Control.Selective
+import           Control.Selective (Selective, select, (<*?))
 import           Data.Void (Void, absurd)
 import           Data.Pointed (Pointed, point)
 import           Data.Profunctor as Profunctor
@@ -49,7 +48,11 @@ instance Applicative (GNFA q) where
   pure = point
 
   (<*>) ∷ GNFA q (s → g) → GNFA q s → GNFA q g
-  (<*>) (GNFA δ₁) (GNFA δ₂) = GNFA (\(q, p) → δ₁ (q, p) <*> δ₂ (q, p))
+  (<*>) (GNFA δ₁) (GNFA δ₂) = GNFA (\(q₁, q₂) → δ₁ (q₁, q₂) <*> δ₂ (q₁, q₂))
+
+instance Selective (GNFA q) where
+  select ∷ GNFA q (Either s g) → GNFA q (s → g) → GNFA q g
+  select (GNFA δ₁) (GNFA δ₂) = GNFA (\(q₁, q₂) → δ₁ (q₁, q₂) <*? δ₂ (q₁, q₂))
 
 instance Profunctor.Profunctor GNFA where
   rmap ∷ (s → g) → GNFA q s → GNFA q g
