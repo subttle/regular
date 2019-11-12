@@ -36,40 +36,43 @@ suite = tests [ testFizzBuzz
 -- Test that ordinary FizzBuzz has the same output as the FizzBuzz which uses DFA
 testFizzBuzz ∷ Test ()
 testFizzBuzz = scope "main.FizzBuzz" . expect $ woDFA == wDFA
-        where -- FizzBuzz (without DFA)
-              woDFA ∷ [String]
-              woDFA = fmap fizzbuzz [1 .. 100]
-                  where fizz ∷ ℕ → Bool
-                        fizz n = n `mod` 3 == 0
-                        buzz ∷ ℕ → Bool
-                        buzz n = n `mod` 5 == 0
-                        fbzz ∷ ℕ → Bool
-                        fbzz n = fizz n && buzz n
-                        fizzbuzz ∷ ℕ → String
-                        fizzbuzz n | fbzz n    = "FizzBuzz"
-                                   | fizz n    = "Fizz"
-                                   | buzz n    = "Buzz"
-                                   | otherwise = show n
-              -- FizzBuzz (with DFA)
-              wDFA ∷ [String]
-              wDFA = fmap fizzbuzz [1 .. 100]
-                  where fizz ∷ ℕ → Bool
-                        fizz n = accepts  by3                         (toDigits n)
-                        buzz ∷ ℕ → Bool
-                        buzz n = accepts                         by5  (toDigits n)
-                        fbzz ∷ ℕ → Bool
-                        fbzz n = accepts (by3 `DFA.intersection` by5) (toDigits n)
-                        fizzbuzz ∷ ℕ → String
-                        fizzbuzz n | fbzz n    = "FizzBuzz"
-                                   | fizz n    = "Fizz"
-                                   | buzz n    = "Buzz"
-                                   | otherwise = show n
+  where
+    -- FizzBuzz (without DFA)
+    woDFA ∷ [String]
+    woDFA = fmap fizzbuzz [1 .. 100]
+      where
+        fizz ∷ ℕ → Bool
+        fizz n = n `mod` 3 == 0
+        buzz ∷ ℕ → Bool
+        buzz n = n `mod` 5 == 0
+        fbzz ∷ ℕ → Bool
+        fbzz n = fizz n && buzz n
+        fizzbuzz ∷ ℕ → String
+        fizzbuzz n | fbzz n    = "FizzBuzz"
+                   | fizz n    = "Fizz"
+                   | buzz n    = "Buzz"
+                   | otherwise = show n
+    -- FizzBuzz (with DFA)
+    wDFA ∷ [String]
+    wDFA = fmap fizzbuzz [1 .. 100]
+      where
+        fizz ∷ ℕ → Bool
+        fizz n = accepts  by3                         (toDigits n)
+        buzz ∷ ℕ → Bool
+        buzz n = accepts                         by5  (toDigits n)
+        fbzz ∷ ℕ → Bool
+        fbzz n = accepts (by3 `DFA.intersection` by5) (toDigits n)
+        fizzbuzz ∷ ℕ → String
+        fizzbuzz n | fbzz n    = "FizzBuzz"
+                   | fizz n    = "Fizz"
+                   | buzz n    = "Buzz"
+                   | otherwise = show n
  
 -- https://math.stackexchange.com/questions/871662/finding-right-quotient-of-languages
 testDFArquotient ∷ Test ()
-testDFArquotient = scope "DFA.rquotient" . expect $ and [ Config.accepts e3L1 [C, A, R, R, O, T]
-                                                        , Config.accepts e3L2 [T]
-                                                        , Config.accepts e3L2 [O, T]
+testDFArquotient = scope "DFA.rquotient" . expect $ and [ Config.accepts e3L1   [C, A, R, R, O, T]
+                                                        , Config.accepts e3L2   [T]
+                                                        , Config.accepts e3L2   [O, T]
                                                         , Config.accepts e3L1L2 [C, A, R, R, O]
                                                         , Config.accepts e3L1L2 [C, A, R, R]
                                                         , Prelude.take 2 (Config.language e3L1L2) == [[C, A, R, R], [C, A, R, R, O]]
@@ -78,6 +81,7 @@ testDFArquotient = scope "DFA.rquotient" . expect $ and [ Config.accepts e3L1 [C
     e3L1 ∷ DFA Fin₈ Alpha
     e3L1   = DFA δ 0 (singleton 6)
       where
+        δ ∷ (Fin₈, Alpha) → Fin₈
         δ (0, C) = 1
         δ (1, A) = 2
         δ (2, R) = 3
@@ -85,8 +89,10 @@ testDFArquotient = scope "DFA.rquotient" . expect $ and [ Config.accepts e3L1 [C
         δ (4, O) = 5
         δ (5, T) = 6
         δ _      = 7
+    e3L2 ∷ DFA (Fin₈, Ordering) Alpha
     e3L2   = DFA.union (right e3L1 4) (DFA.literal T)
     -- e3L2 = DFA.union (right e3L1 4) (right e3L1 5)
+    e3L1L2 ∷ DFA Fin₈ Alpha
     e3L1L2 = DFA.rquotient e3L1 e3L2
 
 testDFAinvhomimage ∷ Test ()
@@ -136,5 +142,4 @@ testRESubstitution = scope "RE.>>=" . expect $ result == expected -- N.B. the us
     expected =  Star (RE.fromList [2,3])
             :. (Star (Lit 0 :| RE.fromList [0, 1])
             :.  Star (RE.fromList [2,3]))
-
 
