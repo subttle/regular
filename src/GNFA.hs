@@ -9,6 +9,7 @@ module GNFA where
 import           Prelude hiding ((*), (+))
 import           Common
 import           Finite
+import           Language (ℒ)
 import           RegExp as RE
 import qualified Data.List as List
 import           Data.Set as Set
@@ -17,7 +18,7 @@ import qualified Data.Map as Map (fromList)
 import           Control.Selective (Selective, select, (<*?))
 import           Data.Void (Void, absurd)
 import           Data.Pointed (Pointed, point)
-import           Data.Profunctor as Profunctor
+import           Data.Profunctor (Profunctor, lmap, rmap)
 
 -- Generalization of Nondeterministic Finite Automaton with ε-transitions
 
@@ -54,7 +55,7 @@ instance Selective (GNFA q) where
   select ∷ GNFA q (Either s g) → GNFA q (s → g) → GNFA q g
   select (GNFA δ₁) (GNFA δ₂) = GNFA (\(q₁, q₂) → δ₁ (q₁, q₂) <*? δ₂ (q₁, q₂))
 
-instance Profunctor.Profunctor GNFA where
+instance Profunctor GNFA where
   rmap ∷ (s → g) → GNFA q s → GNFA q g
   rmap = fmap
   lmap ∷ (p → q) → GNFA q s → GNFA p s
@@ -73,6 +74,12 @@ instance (Show q, Finite q, Show s, Finite s)
 
 accepts ∷ (Finite q, Ord s) ⇒ GNFA q s → [s] → Bool
 accepts = RE.matches . toRE
+
+language ∷ (Finite q, Finite s) ⇒ GNFA q s → [[s]]
+language = RE.language . toRE
+
+toLanguage ∷ (Finite q, Finite s) ⇒ GNFA q s → ℒ s
+toLanguage = RE.toLanguage . toRE
 
 table ∷ ∀ q s . (Finite q) ⇒ GNFA q s → [((Either Init q, Either Final q), RE.RegExp s)]
 table (GNFA δ) = zip domain image
