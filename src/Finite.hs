@@ -8,6 +8,8 @@ module Finite where
 
 import           Data.Set as Set
 import           Data.Set.Unicode ((∅))
+import           Data.Set.Ordered (OSet)
+import qualified Data.Set.Ordered as OSet
 import           Data.Foldable.Unicode ((∈), (∋))
 import           Data.Eq.Unicode ((≠))
 import           Data.Bool.Unicode ((∧), (∨))
@@ -104,6 +106,36 @@ instance (Finite a)
   asList = Set.toList (powerSet asSet)
   asSet ∷ Set (Set a)
   asSet  = powerSet asSet
+
+-- FIXME The built-in Ord instance for `OSet` doesn't agree with the current implementation
+-- FIXME So a decision will have to be made for that, and that decision
+-- FIXME may influence the `Finite` `Comparison` implementation as well.
+instance (Finite a)
+       ⇒ Enum (OSet a) where
+  toEnum ∷ Int → OSet a
+  toEnum     =                       (asList !!)
+  fromEnum ∷ OSet a → Int
+  fromEnum t = fromJust (elemIndex t  asList)
+  enumFrom ∷ OSet a → [OSet a]
+  enumFrom t = dropWhile (≠ t)        asList -- TODO `boundedEnumFrom`?
+
+instance (Finite a)
+       ⇒ Bounded (OSet a) where
+  minBound ∷ OSet a
+  minBound = OSet.empty
+  maxBound ∷ OSet a
+  maxBound = OSet.fromList (comparisonToList maxBound)
+instance (Finite a, U.Universe a)
+       ⇒ U.Universe (OSet a) where
+instance (Finite a)
+       ⇒ U.Finite (OSet a) where
+-- Generate all subsets then do permutations of each subset
+-- AKA "sequences without repetition" or "k-permutations of n"
+instance (Finite a)
+       ⇒ Finite (OSet a) where
+  -- TODO should I just use custom `perms` fn instead of `sort . List.permutations`?
+  asList ∷ (Finite a) ⇒ [OSet a]
+  asList = fmap OSet.fromList (concatMap (sort . List.permutations) (List.subsequences (asList ∷ [a])))
 
 -- If `a` is bounded, then just move the lower bound to `Nothing`, and wrap the upper bound in a `Just`
 -- This is one arbitrary possible instance
