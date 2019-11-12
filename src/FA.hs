@@ -7,9 +7,9 @@ module FA where
 
 import qualified Data.List as List
 import           Data.Set as Set
-import           Data.Set.Unicode
-import           Data.Bool.Unicode
-import           Data.Ord.Unicode
+import           Data.Set.Unicode ((∅), (∈))
+import           Data.Bool.Unicode ((∧))
+import           Data.Ord.Unicode ((≤), (≥))
 import           Data.Map (Map)
 import qualified Data.Map as Map
 import           Data.Functor.Contravariant
@@ -77,70 +77,59 @@ instance (Finite q, Finite s) ⇒ Configuration FA q s (Set q) where
 -- The FA, empty, such that
 -- ℒ(empty) = ∅
 empty ∷ FA q s
-empty = FA { delta   = const (∅)
-           , initial = (∅)
-           , final   = (∅)
-           }
+empty = FA (const (∅)) (∅) (∅)
 
 -- FIXME change this to fit according to whatever constraints will be needed
 -- The FA, epsilon, such that
 -- ℒ(epsilon) = {ε}
 epsilon ∷ FA () s
-epsilon = FA { delta   = const (∅)
-             , initial = singleton ()
-             , final   = singleton ()
-             }
+epsilon = FA (const (∅)) (singleton ()) (singleton ())
+
 
 -- Given a symbol, construct an FA which recognizes exactly that symbol and nothing else
-literal ∷ (Eq s) ⇒ s → FA Bool s
-literal σ' = FA { delta   = δ
-                , initial = singleton False
-                , final   = singleton True
-                } where δ (False, σ) | σ == σ' = singleton True
-                        δ _                    = (∅)
+literal ∷ forall s . (Eq s) ⇒ s → FA Bool s
+literal σ' = FA δ (singleton False) (singleton True)
+  where
+    δ ∷ (Bool, s) → Set Bool
+    δ (False, σ) | σ == σ' = singleton True
+    δ _                    = (∅)
 
 -- Given a set of symbols, construct an FA which recognizes exactly those set of literals and nothing else
 -- Much like a character class of a regular expression.
-fromSet ∷ (Ord s) ⇒ Set s → FA Bool s
-fromSet s = FA { delta   = δ
-               , initial = singleton False
-               , final   = singleton True
-               } where δ (False, σ) | σ ∈ s = singleton True
-                       δ _                  = (∅)
+fromSet ∷ forall s . (Ord s) ⇒ Set s → FA Bool s
+fromSet s = FA δ (singleton False) (singleton True)
+  where
+    δ ∷ (Bool, s) → Set Bool
+    δ (False, σ) | σ ∈ s = singleton True
+    δ _                  = (∅)
 
 -- Given two FAs m₁ and m₂, return an FA which recognizes any string from
 -- m₁ immediately followed by any string from m₂
-concatenate ∷ (Ord q, Ord p) ⇒ FA q s → FA p s → FA (Either q p) s
-concatenate (FA δ₁ i₁ f₁) (FA δ₂ i₂ f₂) = FA { delta   = δ
-                                             , initial = Set.map Left  i₁
-                                             , final   = Set.map Right f₂
-                                             -- if this state, q, is a final state, merge q's transitions with p0's transitions
-                                             } where δ (Left  q, σ) | q ∈ f₁ =               δ₁ (q, σ) ⊎ foldMap (\p₀ → δ₂ (p₀, σ)) i₂  -- merge any last state of m₁ with p₀
-                                                     δ (Left  q, σ)          = Set.map Left (δ₁ (q, σ))
-                                                     δ (Right p, σ)          =                           Set.map Right (δ₂ (p,  σ))
+concatenate ∷ forall q p s . (Ord q, Ord p) ⇒ FA q s → FA p s → FA (Either q p) s
+concatenate (FA δ₁ i₁ f₁) (FA δ₂ i₂ f₂) = FA δ (Set.map Left  i₁) (Set.map Right f₂)
+  where
+    δ ∷ (Either q p, s) → Set (Either q p)
+    -- if this state, q, is a final state, merge q's transitions with p₀'s transitions
+    δ (Left  q, σ) | q ∈ f₁ =               δ₁ (q, σ) ⊎ foldMap (\p₀ → δ₂ (p₀, σ)) i₂  -- merge any last state of m₁ with p₀
+    δ (Left  q, σ)          = Set.map Left (δ₁ (q, σ))
+    δ (Right p, σ)          =                           Set.map Right (δ₂ (p,  σ))
 
 -- The product construction
 synchronous ∷ (Ord q, Ord p) ⇒ FA q s → FA p s → FA (q, p) s
-synchronous (FA δ₁ i₁ f₁) (FA δ₂ i₂ f₂) = FA { delta   = \((q, p), σ) → δ₁ (q, σ) × δ₂ (p, σ)
-                                             , initial = i₁ × i₂
-                                             , final   = f₁ × f₂
-                                             }
+synchronous (FA δ₁ i₁ f₁) (FA δ₂ i₂ f₂) = FA (\((q, p), σ) → δ₁ (q, σ) × δ₂ (p, σ)) (i₁ × i₂) (f₁ × f₂)
 
-asynchronous ∷ (Ord q, Ord p) ⇒ FA q s → FA p g → FA (q, p) (Either s g)
-asynchronous (FA δ₁ i₁ f₁) (FA δ₂ i₂ f₂) = FA { delta   = δ
-                                              , initial = i₁ × i₂
-                                              , final   = f₁ × f₂
-                                              } where δ ((q, p), Left  σ) = δ₁ (q, σ)   × singleton p
-                                                      δ ((q, p), Right γ) = singleton q × δ₂ (p, γ)
+asynchronous ∷ forall q p s g . (Ord q, Ord p) ⇒ FA q s → FA p g → FA (q, p) (Either s g)
+asynchronous (FA δ₁ i₁ f₁) (FA δ₂ i₂ f₂) = FA δ (i₁ × i₂) (f₁ × f₂)
+  where
+    δ ∷ ((q, p), Either s g) → Set (q, p)
+    δ ((q, p), Left  σ) = δ₁ (q, σ)   × singleton p
+    δ ((q, p), Right γ) = singleton q × δ₂ (p, γ)
 
 reversal ∷ (Finite q, Finite s) ⇒ FA q s → FA q s
 reversal m@(FA.FA _ i f) = fromGraph (TG.reverse (toGraph m)) f i
 
 fromGraph ∷ (Finite s, Finite q) ⇒ TG.TG q s → Set q → Set q → FA q s
-fromGraph (TG.TG t) i f = FA { delta   = \(q, s) → postSet q (t s)
-                             , initial = i
-                             , final   = f
-                             }
+fromGraph (TG.TG t) = FA (\(q, s) → postSet q (t s))
 
 instance (Show q, Finite q, Show s, Finite s) ⇒ Show (FA q s) where
   show ∷ FA q s → String
@@ -154,10 +143,9 @@ instance (Show q, Finite q, Show s, Finite s) ⇒ Show (FA q s) where
 
 -- Determinize the FA without transforming it to a DFA type
 determinization ∷ (Finite q) ⇒ FA q s → FA (Set q) s
-determinization m@(FA δ i f) = FA { delta   = \(states, σ) → Set.map (\q → δ (q, σ)) states
-                                  , initial = Set.map singleton i
-                                  , final   = Set.filter (intersects f) (powerSet (qs m))
-                                  }
+determinization m@(FA δ i f) = FA (\(states, σ) → Set.map (\q → δ (q, σ)) states)
+                                  (Set.map singleton i)
+                                  (Set.filter (intersects f) (powerSet (qs m)))
 
 -- Pg 32 http://www.dcc.fc.up.pt/~nam/web/resources/rafaelamsc.pdf
 codeterminization ∷ (Finite q, Finite s) ⇒ FA q s → FA (Set q) s
