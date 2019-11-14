@@ -18,7 +18,6 @@ import           Examples
 import           Data.Set (singleton)
 import           Config
 import           Numeric.Natural.Unicode (ℕ)
-import           Data.Eq.Unicode ((≠))
 import           EasyTest
 import qualified Data.List as List
 
@@ -172,7 +171,7 @@ testByBisim n (m, l) = scope "bisim" . expect $ bisimulates
         c ∷ [([s], [s])] → Maybe ((([s], [s]), Bool), [([s], [s])])
         c []                = Nothing
         c ((w₁, w₂) : todo) = Just (((w₁, w₂), w₁ == w₂), todo)
-    -- FIXME I should check to make sure 
+    -- FIXME I should check to make sure uneven zipping does not produce false positive
     bisimulate ∷ [([s], [s])]
     bisimulate = List.genericTake n (zip (Config.language m) (Language.language l))
 
