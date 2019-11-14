@@ -8,8 +8,8 @@ import           Data.Maybe as Maybe
 import           Data.Map as Map
 import           Data.Set (Set)
 import qualified Data.Set as Set
-import           Data.Set.Unicode
-import           Data.Bool.Unicode
+import           Data.Set.Unicode ((∪))
+import           Data.Bool.Unicode ((∧))
 import           Data.List as List
 import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)), (<|))
 import qualified Data.List.NonEmpty as NE
@@ -20,7 +20,7 @@ import           Data.Either (lefts, rights, partitionEithers, fromLeft, fromRig
 import           Data.Foldable as Foldable
 import           Data.Functor.Foldable (Fix (..), unfix, ListF (..))
 import           Control.Applicative (liftA2, getZipList, ZipList (..))
-import           Control.Monad
+import           Control.Monad (replicateM)
 import           Control.Arrow ((|||), (&&&))
 import           Numeric.Natural.Unicode (ℕ)
 
@@ -165,7 +165,7 @@ unionRights = Set.mapMonotonic (fromRight undefined) . Set.filter isLeft  -- Set
 --                     , [[0,1],[2]]
 --                     , [[0,1,2]]
 --                     ]
-partitions ∷ ∀ a . [a] → [[NonEmpty a]]
+partitions ∷ [a] → [[NonEmpty a]]
 partitions []      = [[]]
 partitions (h : t) = partitionsNE (h :| t)
 
@@ -287,7 +287,7 @@ windowed n = getZipList . traverse ZipList . genericTake n . tails . Foldable.to
 
 -- Slide a two-element-wide window over a list, one element at a time,
 -- generating a list of pairs
-windowed' ∷ forall t a . (Foldable t) ⇒ t a → [(a, a)]
+windowed' ∷ ∀ t a . (Foldable t) ⇒ t a → [(a, a)]
 windowed' = List.unfoldr pairs . Foldable.toList
   where
     pairs ∷ [a] → Maybe ((a, a), [a])
