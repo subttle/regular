@@ -36,7 +36,7 @@ suite = tests [ testFizzBuzz
               , testDFArquotient
               , testDFAinvhomimage
               , testRESubstitution
-              , testByBisim 101 (by5, DFA.toLanguage by5)
+              , testBisimSubset (by5, DFA.toLanguage by5) (List.take 101 (freeMonoid asList))
               ]
 
 -- Test that ordinary FizzBuzz has the same output as the FizzBuzz which uses DFA
@@ -102,31 +102,34 @@ testDFArquotient = scope "DFA.rquotient" . expect $ and [ Config.accepts e₃L�
     e₃L₁L₂ = DFA.rquotient e₃L₁ e₃L₂
 
 testDFAinvhomimage ∷ Test ()
-testDFAinvhomimage = scope "DFA.invhomimage" . expect $ DFA.invhomimage h slide22 `DFA.equal` expected
+testDFAinvhomimage = scope "DFA.invhomimage" . expect $ same
   where
-    -- slide 22 http://infolab.stanford.edu/~ullman/ialc/spr10/slides/rs2.pdf
-    slide22 ∷ DFA Fin₃ Fin₂
-    slide22 = DFA δ 0 (singleton 2)
+    same ∷ Bool
+    same = DFA.invhomimage h slide22 `DFA.equal` expected
       where
-        δ (0, 0) = 1
-        δ (0, 1) = 2
-        δ (1, 0) = 0
-        δ (1, 1) = 2
-        δ (2, 0) = 0
-        δ (2, 1) = 1        
-    h ∷ Bool → [Fin₂]
-    h False = [0,1]
-    h True  = []
-    expected ∷ DFA Fin₃ Bool 
-    expected = DFA δ 0 (singleton 2)
-      where
-        δ ∷ (Fin₃, Bool) → Fin₃
-        δ (0, False) = 2
-        δ (0, True ) = 0
-        δ (1, False) = 2
-        δ (1, True ) = 1
-        δ (2, False) = 2
-        δ (2, True ) = 2
+        -- slide 22 http://infolab.stanford.edu/~ullman/ialc/spr10/slides/rs2.pdf
+        slide22 ∷ DFA Fin₃ Fin₂
+        slide22 = DFA δ 0 (singleton 2)
+          where
+            δ (0, 0) = 1
+            δ (0, 1) = 2
+            δ (1, 0) = 0
+            δ (1, 1) = 2
+            δ (2, 0) = 0
+            δ (2, 1) = 1        
+        h ∷ Bool → [Fin₂]
+        h False = [0,1]
+        h True  = []
+        expected ∷ DFA Fin₃ Bool 
+        expected = DFA δ 0 (singleton 2)
+          where
+            δ ∷ (Fin₃, Bool) → Fin₃
+            δ (0, False) = 2
+            δ (0, True ) = 0
+            δ (1, False) = 2
+            δ (1, True ) = 1
+            δ (2, False) = 2
+            δ (2, True ) = 2
 
 -- Substitution
 -- A Second Course in Formal Languages and Automata Theory (Pg 55, Example 3.3.4)
@@ -150,26 +153,24 @@ testRESubstitution = scope "RE.>>=" . expect $ result == expected -- N.B. the us
             :.  Star (         RE.fromList [2, 3]))
 
 -- Coinductive bisimulation (partial)
--- Think "observational equality"
--- Either the bisimulation will succeed (up to `n` steps) or
+-- Either the bisimulation will succeed (on the given subset) or
 -- it will produce a counter-example to the bisimulation
 -- (i.e. a witness to the proof of its negation)
--- basically we take advantage of the fact that both `m` and `l` utilize
--- the same alphabet and we lazily generate the free monoid to be
--- sampled for the first `n` values to be fed in synch
--- to both `m` and `l` to check for acceptance.
-testByBisim ∷ forall q s automaton p
-            . (Finite q, Finite s, Configuration automaton q s p)
-            ⇒ ℕ
-            → (automaton q s, ℒ s)
-            → Test ()
-testByBisim n (m, ℓ) = scope "bisim" . expect $ isBisim
+-- basically we take some subset of Σ⋆ to be sampled for
+-- "observational equality", here meaning both `m` and `ℓ`
+-- are in agreeance of which words to accept and reject.
+testBisimSubset ∷ forall q s automaton p
+                . (Finite q, Finite s, Configuration automaton q s p)
+                ⇒ (automaton q s, ℒ s)
+                → [[s]]
+                → Test ()
+testBisimSubset (m, ℓ) subset = scope "bisim" . expect $ isBisim
   where
     -- try to partition, into two parts, (a subset/sample of) Σ⋆:
     -- words tagged with `Right` (ℒ₁ ≡ ℒ₂)
     -- words tagged with `Left`  (ℒ₁ ≢ ℒ₂)
     witnesses ∷ [Either [s] [s]]
-    witnesses = List.unfoldr bisim (List.genericTake n (freeMonoid asList))
+    witnesses = List.unfoldr bisim subset
       where
         accepts₁ ∷ [s] → Bool
         accepts₁ = Config.accepts   m
