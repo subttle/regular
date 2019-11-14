@@ -18,8 +18,10 @@ import           Examples
 import           Data.Set (singleton)
 import           Config
 import           Numeric.Natural.Unicode (ℕ)
+import           Data.Eq.Unicode ((≠))
 import           EasyTest
 import qualified Data.List as List
+import           Data.Either (isRight, isLeft, lefts)
 
 main ∷ IO ()
 main = run suite
@@ -161,17 +163,28 @@ testByBisim ∷ forall q s automaton p
             ⇒ ℕ
             → (automaton q s, ℒ s)
             → Test ()
-testByBisim n (m, l) = scope "bisim" . expect $ bisimulates
+testByBisim n (m, ℓ) = scope "bisim" . expect $ isBisim
   where
-    bisimulates ∷ Bool
-    bisimulates = all snd bisimulation
-    bisimulation ∷ [(([s], [s]), Bool)]
-    bisimulation = List.unfoldr c bisimulate
+    -- try to partition, into two parts, (a subset/sample of) Σ⋆:
+    -- words tagged with `Right` (ℒ₁ ≡ ℒ₂)
+    -- words tagged with `Left`  (ℒ₁ ≢ ℒ₂)
+    witnesses ∷ [Either [s] [s]]
+    witnesses = List.unfoldr bisim (List.genericTake n (freeMonoid asList))
       where
-        c ∷ [([s], [s])] → Maybe ((([s], [s]), Bool), [([s], [s])])
-        c []                = Nothing
-        c ((w₁, w₂) : todo) = Just (((w₁, w₂), w₁ == w₂), todo)
-    -- FIXME I should check to make sure uneven zipping does not produce false positive
-    bisimulate ∷ [([s], [s])]
-    bisimulate = List.genericTake n (zip (Config.language m) (Language.language l))
+        accepts₁ ∷ [s] → Bool
+        accepts₁ = Config.accepts   m
+        accepts₂ ∷ [s] → Bool
+        accepts₂ = Language.accepts ℓ
+        bisim ∷ [[s]] → Maybe (Either [s] [s], [[s]])
+        bisim []                                    = Nothing
+        bisim (w : todo) | accepts₁ w == accepts₂ w = Just (Right w, todo)
+        bisim (w : todo) | accepts₁ w ≠  accepts₂ w = Just (Left  w, todo)
+    isBisim ∷ Bool
+    isBisim = all isRight witnesses
+    _isNotBisim ∷ Bool
+    _isNotBisim = any isLeft witnesses
+    -- The list of words on which `m` and `ℓ` did not agree
+    -- i.e. a list of counter examples
+    _negationProof ∷ [[s]]
+    _negationProof = lefts witnesses
 
