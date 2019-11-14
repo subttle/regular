@@ -2,13 +2,13 @@
 
 module Config where
 
-import           Common
-import           Finite
-import           Data.Set as Set
-import           Data.Set.Unicode
-import           Data.Eq.Unicode
-import           Data.Bool.Unicode
-import           Numeric.Natural.Unicode
+import           Common (fixedPoint, intersects, upToLength, size')
+import           Finite (Q, Σ, asList, qs, sigmaStar)
+import           Data.Set as Set (Set, filter, singleton, insert, disjoint)
+import           Data.Set.Unicode ((∩), (∖), (∋), (⊆))
+import           Data.Eq.Unicode ((≠))
+import           Data.Bool.Unicode ((∧))
+import           Numeric.Natural.Unicode (ℕ)
 import qualified TransitionGraph as TG
 
 -- When `occupy` is `q` the automaton is deterministic, and when `occupy` is `Set q` it enables nondeterminism
