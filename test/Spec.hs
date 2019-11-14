@@ -10,13 +10,17 @@ import           DFA
 -- import qualified GFA
 import           RegExp (RegExp (..))
 import qualified RegExp as RE hiding (RegExp (..))
+import           Language (ℒ)
+import qualified Language
 import           Common
 import           Finite
 import           Examples
-import           Data.Set
+import           Data.Set (singleton)
 import           Config
 import           Numeric.Natural.Unicode (ℕ)
+import           Data.Eq.Unicode ((≠))
 import           EasyTest
+import qualified Data.List as List
 
 main ∷ IO ()
 main = run suite
@@ -31,6 +35,7 @@ suite = tests [ testFizzBuzz
               , testDFArquotient
               , testDFAinvhomimage
               , testRESubstitution
+              , testByBisim 101 (by5, DFA.toLanguage by5)
               ]
 
 -- Test that ordinary FizzBuzz has the same output as the FizzBuzz which uses DFA
@@ -67,19 +72,19 @@ testFizzBuzz = scope "main.FizzBuzz" . expect $ woDFA == wDFA
                    | fizz n    = "Fizz"
                    | buzz n    = "Buzz"
                    | otherwise = show n
- 
+
 -- https://math.stackexchange.com/questions/871662/finding-right-quotient-of-languages
 testDFArquotient ∷ Test ()
-testDFArquotient = scope "DFA.rquotient" . expect $ and [ Config.accepts e3L1   [C, A, R, R, O, T]
-                                                        , Config.accepts e3L2   [T]
-                                                        , Config.accepts e3L2   [O, T]
-                                                        , Config.accepts e3L1L2 [C, A, R, R, O]
-                                                        , Config.accepts e3L1L2 [C, A, R, R]
-                                                        , Prelude.take 2 (Config.language e3L1L2) == [[C, A, R, R], [C, A, R, R, O]]
+testDFArquotient = scope "DFA.rquotient" . expect $ and [ Config.accepts e₃L₁   [C, A, R, R, O, T]
+                                                        , Config.accepts e₃L₂   [T]
+                                                        , Config.accepts e₃L₂   [O, T]
+                                                        , Config.accepts e₃L₁L₂ [C, A, R, R, O]
+                                                        , Config.accepts e₃L₁L₂ [C, A, R, R]
+                                                        , Prelude.take 2 (Config.language e₃L₁L₂) == [[C, A, R, R], [C, A, R, R, O]]
                                                         ]
   where
-    e3L1 ∷ DFA Fin₈ Alpha
-    e3L1   = DFA δ 0 (singleton 6)
+    e₃L₁ ∷ DFA Fin₈ Alpha
+    e₃L₁   = DFA δ 0 (singleton 6)
       where
         δ ∷ (Fin₈, Alpha) → Fin₈
         δ (0, C) = 1
@@ -89,11 +94,11 @@ testDFArquotient = scope "DFA.rquotient" . expect $ and [ Config.accepts e3L1   
         δ (4, O) = 5
         δ (5, T) = 6
         δ _      = 7
-    e3L2 ∷ DFA (Fin₈, Ordering) Alpha
-    e3L2   = DFA.union (right e3L1 4) (DFA.literal T)
-    -- e3L2 = DFA.union (right e3L1 4) (right e3L1 5)
-    e3L1L2 ∷ DFA Fin₈ Alpha
-    e3L1L2 = DFA.rquotient e3L1 e3L2
+    e₃L₂ ∷ DFA (Fin₈, Ordering) Alpha
+    e₃L₂   = DFA.union (right e₃L₁ 4) (DFA.literal T)
+    -- e₃L₂ = DFA.union (right e₃L₁ 4) (right e₃L₁ 5)
+    e₃L₁L₂ ∷ DFA Fin₈ Alpha
+    e₃L₁L₂ = DFA.rquotient e₃L₁ e₃L₂
 
 testDFAinvhomimage ∷ Test ()
 testDFAinvhomimage = scope "DFA.invhomimage" . expect $ DFA.invhomimage h slide22 `DFA.equal` expected
@@ -116,11 +121,11 @@ testDFAinvhomimage = scope "DFA.invhomimage" . expect $ DFA.invhomimage h slide2
       where
         δ ∷ (Fin₃, Bool) → Fin₃
         δ (0, False) = 2
-        δ (0, True)  = 0
+        δ (0, True ) = 0
         δ (1, False) = 2
-        δ (1, True)  = 1
+        δ (1, True ) = 1
         δ (2, False) = 2
-        δ (2, True)  = 2
+        δ (2, True ) = 2
 
 -- Substitution
 -- A Second Course in Formal Languages and Automata Theory (Pg 55, Example 3.3.4)
@@ -139,7 +144,35 @@ testRESubstitution = scope "RE.>>=" . expect $ result == expected -- N.B. the us
     result = original >>= h
     -- (cd)*(a+ab)*(cd)*
     expected ∷ RegExp Fin₄
-    expected =  Star (RE.fromList [2,3])
+    expected =  Star (         RE.fromList [2, 3])
             :. (Star (Lit 0 :| RE.fromList [0, 1])
-            :.  Star (RE.fromList [2,3]))
+            :.  Star (         RE.fromList [2, 3]))
+
+-- Coinductive bisimulation (partial)
+-- Think "observational equality"
+-- Either the bisimulation will succeed (up to `n` steps) or
+-- it will produce a counter-example to the bisimulation
+-- (i.e. a witness to the proof of its negation)
+-- basically we take advantage of the fact that both `m` and `l` utilize
+-- the same alphabet and we lazily generate the free monoid to be
+-- sampled for the first `n` values to be fed in synch
+-- to both `m` and `l` to check for acceptance.
+testByBisim ∷ forall q s automaton p
+            . (Finite q, Finite s, Configuration automaton q s p)
+            ⇒ ℕ
+            → (automaton q s, ℒ s)
+            → Test ()
+testByBisim n (m, l) = scope "bisim" . expect $ bisimulates
+  where
+    bisimulates ∷ Bool
+    bisimulates = all snd bisimulation
+    bisimulation ∷ [(([s], [s]), Bool)]
+    bisimulation = List.unfoldr c bisimulate
+      where
+        c ∷ [([s], [s])] → Maybe ((([s], [s]), Bool), [([s], [s])])
+        c []                = Nothing
+        c ((w₁, w₂) : todo) = Just (((w₁, w₂), w₁ == w₂), todo)
+    -- FIXME I should check to make sure 
+    bisimulate ∷ [([s], [s])]
+    bisimulate = List.genericTake n (zip (Config.language m) (Language.language l))
 
