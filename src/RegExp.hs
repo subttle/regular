@@ -28,27 +28,27 @@ import           Common
 import           Finite
 import qualified Language
 import           Prelude hiding ((+), (*), last, map)
-import           Data.Function
+import           Data.Function (on)
 import           Control.Selective (Selective, select, selectM)
-import           Control.Monad
+import           Control.Monad (ap)
 import           Data.List as List hiding (last, map)
 import           Data.Set as Set hiding ((\\))
-import           Data.Set.Unicode
-import           Data.Bool.Unicode
-import           Data.Ord.Unicode
+import           Data.Set.Unicode ((∅), (∉), (∪))
+import           Data.Bool.Unicode ((∧), (∨))
+import           Data.Ord.Unicode ((≥))
 import           Data.Foldable (toList)
 import           Data.Functor.Foldable (Fix (..))
-import           Data.Pointed
-import           Numeric.Natural.Unicode
+import           Data.Pointed (Pointed, point)
+import           Numeric.Natural.Unicode (ℕ)
 import           Numeric.Additive.Class (Additive, (+), Idempotent, Abelian)
-import           Numeric.Order.Class
+import           Numeric.Order.Class (Order, (<~))
 import           Numeric.Algebra.Class (Monoidal, Multiplicative, (*), zero, LeftModule, (.*), RightModule, (*.), Semiring, sumWith)
 import           Numeric.Algebra.Unital (Unital, one, pow, productWith)
-import           Numeric.Algebra.Involutive
+import           Numeric.Algebra.Involutive (InvolutiveMultiplication, adjoint)
 import           Numeric.Semiring.ZeroProduct (ZeroProductSemiring)
-import           Numeric.Decidable.Zero
-import           Numeric.Dioid.Class
-import           GHC.Generics
+import           Numeric.Decidable.Zero (DecidableZero, isZero)
+import           Numeric.Dioid.Class (Dioid)
+import           GHC.Generics (Generic1)
 
 -- α, β ⩴ ∅ | ε | σ | α∣β | α·β | α★  where σ ∈ Σ
 data RegExp s where
@@ -71,7 +71,7 @@ data RegExpF s a where
   StarF   ∷     a → RegExpF s a
   deriving (Eq, Functor)
 
-instance (Finite s) ⇒ Σ (RegExp s) s
+instance (Finite s) ⇒ Σ (RegExp  s  ) s
 instance (Finite s) ⇒ Σ (RegExpF s a) s
 
 -- Added for consistency
@@ -136,12 +136,15 @@ instance (Ord s) ⇒ Abelian (RegExp s) where
 instance (Ord s) ⇒ Semiring (RegExp s) where
 
 instance (Ord s) ⇒ LeftModule  ℕ (RegExp s) where
+  (.*) ∷ ℕ → RegExp s → RegExp s
   (.*) = flip pow
 instance (Ord s) ⇒ RightModule ℕ (RegExp s) where
+  (*.) ∷ RegExp s → ℕ → RegExp s
   (*.) = pow
 
 -- An additive semigroup with an identity element
 instance (Ord s) ⇒ Monoidal (RegExp s) where
+  zero ∷ RegExp s
   zero = Zero
 
 instance (Ord s) ⇒ DecidableZero (RegExp s) where
@@ -149,12 +152,14 @@ instance (Ord s) ⇒ DecidableZero (RegExp s) where
   -- ℒ(r) ≟ ∅
   isZero ∷ RegExp s → Bool
   isZero = isZero' . normalize
-     where isZero' Zero     = True
-           isZero' One      = False
-           isZero' (Lit  _) = False
-           isZero' (α :| β) = isZero' α ∧ isZero' β
-           isZero' (α :. β) = isZero' α ∨ isZero' β
-           isZero' (Star _) = False
+    where
+      isZero' ∷ RegExp s → Bool
+      isZero' Zero     = True
+      isZero' One      = False
+      isZero' (Lit  _) = False
+      isZero' (α :| β) = isZero' α ∧ isZero' β
+      isZero' (α :. β) = isZero' α ∨ isZero' β
+      isZero' (Star _) = False
 
 -- A zero-product semiring has no zero divisors
 -- a * b = 0 implies a == 0 || b == 0
@@ -288,13 +293,14 @@ height (Star α) = 1 + height α
 
 heightAlgebra ∷ Algebra (RegExpF s) ℕ
 heightAlgebra = Algebra φ
-        where φ ∷ RegExpF s ℕ → ℕ
-              φ ZeroF         = 0
-              φ OneF          = 0
-              φ (LitF  _)     = 0
-              φ (UnionF  α β) = max α β
-              φ (ConcatF α β) = max α β
-              φ (StarF   α)   = 1 + α
+  where
+    φ ∷ RegExpF s ℕ → ℕ
+    φ ZeroF         = 0
+    φ OneF          = 0
+    φ (LitF  _)     = 0
+    φ (UnionF  α β) = max α β
+    φ (ConcatF α β) = max α β
+    φ (StarF   α)   = 1 + α
 
 -- https://arxiv.org/pdf/0802.2869.pdf
 -- "We define the size of an extended regular expression r over Σ, denoted by |r|, as
@@ -310,13 +316,14 @@ size (Star α) = 1 + RegExp.size α
 
 sizeAlgebra ∷ Algebra (RegExpF s) ℕ
 sizeAlgebra = Algebra φ
-        where φ ∷ RegExpF s ℕ → ℕ
-              φ ZeroF         = 1
-              φ OneF          = 1
-              φ (LitF _)      = 1
-              φ (UnionF  α β) = 1 + α + β
-              φ (ConcatF α β) = 1 + α + β
-              φ (StarF   α)   = 1 + α
+  where
+    φ ∷ RegExpF s ℕ → ℕ
+    φ ZeroF         = 1
+    φ OneF          = 1
+    φ (LitF _)      = 1
+    φ (UnionF  α β) = 1 + α + β
+    φ (ConcatF α β) = 1 + α + β
+    φ (StarF   α)   = 1 + α
 
 -- Associativity, commutativity and idempotency (ACI) properties normalized
 -- Note:  ℒ(γ) ≡ ℒ(normalize γ)
@@ -337,31 +344,38 @@ dissimilar a b = not (similar a b)
 
 equivalent ∷ ∀ s . (Finite s) ⇒ RegExp s → RegExp s → Bool
 equivalent a b = and (unfoldr bisim seed)
-      where seed = ([(normalize a, normalize b)], [])
-            bisim ∷ (Finite s)
-                  ⇒ ([(RegExp s, RegExp s)], [(RegExp s, RegExp s)])
-                  → Maybe (Bool, ([(RegExp s, RegExp s)], [(RegExp s, RegExp s)]))
-            bisim ([],            _      ) = Nothing
-            bisim ((α, β) : todo, history) = Just (nullable α == nullable β, (todo', history'))
-                                      where derivatives' = fmap (\σ → (derivative α σ, derivative β σ)) asList
-                                            todo'        = (todo `mappend` derivatives') \\ history
-                                            history'     = (α, β) : history
+  where
+    seed ∷ ([(RegExp s, RegExp s)], [(RegExp s, RegExp s)])
+    seed = ([(normalize a, normalize b)], [])
+    bisim ∷ (Finite s)
+          ⇒ ([(RegExp s, RegExp s)], [(RegExp s, RegExp s)])
+          → Maybe (Bool, ([(RegExp s, RegExp s)], [(RegExp s, RegExp s)]))
+    bisim ([],            _      ) = Nothing
+    bisim ((α, β) : todo, history) = Just (nullable α == nullable β, (todo', history'))
+      where
+        derivatives' ∷ [(RegExp s, RegExp s)]
+        derivatives' = fmap (\σ → (derivative α σ, derivative β σ)) asList
+        todo'        ∷ [(RegExp s, RegExp s)]
+        todo'        = (todo `mappend` derivatives') \\ history
+        history'     ∷ [(RegExp s, RegExp s)]
+        history'     = (α, β) : history
 
 -- Return true iff every symbol σ ∈ Σ is seen as a literal at most once
 -- TODO test property that for any RE, r, `linear (mark r)` should evaluate to `true`
 linear ∷ (Ord s) ⇒ RegExp s → Bool
 linear = snd . linear' (∅)
-    where linear' ∷ (Ord s) ⇒ Set.Set s → RegExp s → (Set.Set s, Bool)
-          linear' s Zero     = (s,              True)
-          linear' s One      = (s,              True)
-          linear' s (Lit  σ) = (Set.insert σ s, σ ∉ s)
-          linear' s (α :| β) = (s'',            res' && res'')
-                         where (s',             res')          = linear' s  α
-                               (s'',            res'')         = linear' s' β
-          linear' s (α :. β) = (s'',            res' && res'')
-                         where (s',             res')          = linear' s  α
-                               (s'',            res'')         = linear' s' β
-          linear' s (Star α) = linear' s α
+  where
+    linear' ∷ (Ord s) ⇒ Set.Set s → RegExp s → (Set.Set s, Bool)
+    linear' s Zero     = (             s , True )
+    linear' s One      = (             s , True )
+    linear' s (Lit  σ) = (Set.insert σ s , σ ∉ s)
+    linear' s (α :| β) = (             s₂, l ∧ r)
+                   where (             s₁, l    ) = linear' s  α
+                         (             s₂,     r) = linear' s₁ β
+    linear' s (α :. β) = (             s₂, l ∧ r)
+                   where (             s₁, l    ) = linear' s  α
+                         (             s₂,     r) = linear' s₁ β
+    linear' s (Star α) = linear' s α
 
 -- first(E) = { a | av ∈ ℒ(E) }
 first ∷ (Ord s) ⇒ RegExp s → Set.Set s
@@ -386,23 +400,25 @@ last (Star α)              = last α
 -- Lazily generate the entire language of the given Regular Expression.
 -- Mathematically, this is defined as a Set,
 -- however, Data.Set does not support lazy infinite sets.
-language ∷ (Finite s) ⇒ RegExp s → [[s]]
+language ∷ ∀ s . (Finite s) ⇒ RegExp s → [[s]]
 language γ | RegExp.finite γ' = Set.toList (language' γ')
            | otherwise        = Prelude.filter (matches γ') (sigmaStar γ')
-     where γ' = normalize γ
-           language'  ∷ (Finite s) ⇒ RegExp s → Set [s]
-           -- The empty language
-           language' Zero     = (∅)
-           -- The language consisting of the empty string,     {ε}
-           language' One      = Set.singleton []
-           -- The language consisting of a literal symbol,     {σ}, for σ ∈ Σ
-           language' (Lit  σ) = Set.singleton [σ]
-           -- ℒ(E ∣ F) = ℒ(E) ∪ ℒ(F)
-           language' (α :| β) = language' α ∪ language' β
-           -- ℒ(E · F) = ℒ(E) · ℒ(F) = { w₁ · w₂ | w₁ ∈ ℒ(E) ∧ w₂ ∈ ℒ(F) }
-           language' (α :. β) = foldMap (\w₁ → Set.map (\w₂ → w₁ ++ w₂) (language' β)) (language' α)
-           -- ℒ(E★)  = (ℒ(E))★  -- Providing this comment for completeness but this case is impossible
-           language' (Star _) = impossible -- if the RegExp is normalized and finite then this case is impossible!
+  where
+    γ' ∷ RegExp s
+    γ' = normalize γ
+    language'  ∷ (Finite s) ⇒ RegExp s → Set [s]
+    -- The empty language
+    language' Zero     = (∅)
+    -- The language consisting of the empty string,     {ε}
+    language' One      = Set.singleton []
+    -- The language consisting of a literal symbol,     {σ}, for σ ∈ Σ
+    language' (Lit  σ) = Set.singleton [σ]
+    -- ℒ(E ∣ F) = ℒ(E) ∪ ℒ(F)
+    language' (α :| β) = language' α ∪ language' β
+    -- ℒ(E · F) = ℒ(E) · ℒ(F) = { w₁ · w₂ | w₁ ∈ ℒ(E) ∧ w₂ ∈ ℒ(F) }
+    language' (α :. β) = foldMap (\w₁ → Set.map (\w₂ → w₁ ++ w₂) (language' β)) (language' α)
+    -- ℒ(E★)  = (ℒ(E))★  -- Providing this comment for completeness but this case is impossible
+    language' (Star _) = impossible -- if the RegExp is normalized and finite then this case is impossible!
 
 toLanguage ∷ (Finite s) ⇒ RegExp s → Language.ℒ s
 toLanguage Zero     = Language.empty
@@ -414,13 +430,14 @@ toLanguage (Star α) = Language.star        (toLanguage α)
 
 languageAlg ∷ (Eq s) ⇒ Algebra (RegExpF s) (Language.ℒ s)
 languageAlg = Algebra φ
-      where φ ∷ (Eq s) ⇒ RegExpF s (Language.ℒ s) → Language.ℒ s
-            φ ZeroF         = Language.empty
-            φ OneF          = Language.epsilon
-            φ (LitF σ)      = Language.lit σ
-            φ (UnionF  α β) = Language.union α β
-            φ (ConcatF α β) = Language.concatenate α β
-            φ (StarF α)     = Language.star α
+  where
+    φ ∷ (Eq s) ⇒ RegExpF s (Language.ℒ s) → Language.ℒ s
+    φ ZeroF         = Language.empty
+    φ OneF          = Language.epsilon
+    φ (LitF σ)      = Language.lit σ
+    φ (UnionF  α β) = Language.union α β
+    φ (ConcatF α β) = Language.concatenate α β
+    φ (StarF α)     = Language.star α
 
 convert ∷ (Ord s) ⇒ RegExp s → Fix (RegExpF s)
 convert Zero     = Fix ZeroF
@@ -432,12 +449,14 @@ convert (Star α) = Fix (StarF   (convert α))
 
 finite ∷ (Ord s) ⇒ RegExp s → Bool
 finite = finite' . normalize
-   where finite' Zero     = True
-         finite' One      = True
-         finite' (Lit  _) = True
-         finite' (α :| β) = finite' α ∧ finite' β
-         finite' (α :. β) = finite' α ∧ finite' β
-         finite' (Star _) = False
+  where
+    finite' ∷ RegExp s → Bool
+    finite' Zero     = True
+    finite' One      = True
+    finite' (Lit  _) = True
+    finite' (α :| β) = finite' α ∧ finite' β
+    finite' (α :. β) = finite' α ∧ finite' β
+    finite' (Star _) = False
 
 infinite ∷ (Ord s) ⇒ RegExp s → Bool
 infinite = not . finite
@@ -445,14 +464,17 @@ infinite = not . finite
 -- decide if the language defined by r contains ε, i.e.
 -- nullable (r) ⇔ ε ∈ ℒ(r)
 -- Also know as Salomaa's Empty Word Property (EWP)
-nullable ∷ (Ord s) ⇒ RegExp s → Bool
+nullable ∷ ∀ s . (Ord s)
+         ⇒ RegExp s → Bool
 nullable = nullable' . normalize
-  where nullable' Zero     = False
-        nullable' One      = True
-        nullable' (Lit  _) = False
-        nullable' (α :| β) = nullable' α ∨ nullable' β
-        nullable' (α :. β) = nullable' α ∧ nullable' β
-        nullable' (Star _) = True
+  where
+    nullable' ∷ RegExp s → Bool
+    nullable' Zero     = False
+    nullable' One      = True
+    nullable' (Lit  _) = False
+    nullable' (α :| β) = nullable' α ∨ nullable' β
+    nullable' (α :. β) = nullable' α ∧ nullable' β
+    nullable' (Star _) = True
 
 -- https://people.mpi-sws.org/~turon/re-deriv.pdf
 -- Theorem 3.1, helper function, "v(r)".
@@ -501,7 +523,7 @@ partial' = List.foldl (foldMap partial) . singleton
 matches ∷ (Ord s) ⇒ RegExp s → [s] → Bool
 matches α = nullable . derivative' α
 
--- automorphism -- http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.50.7458&rep=rep1&type=pdf
+-- ℒʳ
 reversal ∷ RegExp s → RegExp s
 reversal Zero     = Zero
 reversal One      = One
