@@ -16,7 +16,7 @@ similar, dissimilar, equivalent,
 fromSet, RegExp.fromList, RegExp.toSet, RegExp.toList,
 fromWords, toLanguage,
 partial, partial',
-linear,
+linear, affine,
 first, last,
 awidth, height, RegExp.size,
 heightAlgebra, sizeAlgebra, languageAlg,
@@ -32,8 +32,9 @@ import           Data.Function (on)
 import           Control.Selective (Selective, select, selectM)
 import           Control.Monad (ap)
 import           Data.List as List hiding (last, map)
+import           Data.Set (Set)
 import           Data.Set as Set hiding ((\\))
-import           Data.Set.Unicode ((∅), (∉), (∪))
+import           Data.Set.Unicode ((∅), (∉), (∪)) -- (∈)
 import           Data.Bool.Unicode ((∧), (∨))
 import           Data.Ord.Unicode ((≥))
 import           Data.Foldable (toList)
@@ -227,6 +228,8 @@ instance Applicative RegExp where
   (<*>) ∷ RegExp (s → g) → RegExp s → RegExp g
   (<*>) = ap
 
+-- instance Alternative RegExp where
+
 instance Selective RegExp where
   select ∷ RegExp (Either s g) → RegExp (s → g) → RegExp g
   select = selectM
@@ -360,12 +363,34 @@ equivalent a b = and (unfoldr bisim seed)
         history'     ∷ [(RegExp s, RegExp s)]
         history'     = (α, β) : history
 
+-- Check if each symbol is used exactly once
+-- (i.e. at most once and at least once)
+affine ∷ forall s . (Finite s) ⇒ RegExp s → Bool
+affine re = atMostUnit ∧ atLeastUnit
+  where
+    (used, atMostUnit) = linear' re (∅)
+    atLeastUnit ∷ Bool
+    atLeastUnit        = used == asSet
+    -- TODO can dedup with below (arguments are flipped)
+    -- TODO but keep this way for now
+    linear' ∷ RegExp s → Set s → (Set s, Bool)
+    linear' Zero     s = (             s , True )
+    linear' One      s = (             s , True )
+    linear' (Lit  σ) s = (Set.insert σ s , σ ∉ s)
+    linear' (α :| β) s = (             s₂, l ∧ r)
+                   where (             s₁, l    ) = linear' α s
+                         (             s₂,     r) = linear' β s₁
+    linear' (α :. β) s = (             s₂, l ∧ r)
+                   where (             s₁, l    ) = linear' α s
+                         (             s₂,     r) = linear' β s₁
+    linear' (Star α) s =                            linear' α s
+
 -- Return true iff every symbol σ ∈ Σ is seen as a literal at most once
 -- TODO test property that for any RE, r, `linear (mark r)` should evaluate to `true`
-linear ∷ (Ord s) ⇒ RegExp s → Bool
+linear ∷ forall s . (Ord s) ⇒ RegExp s → Bool
 linear = snd . linear' (∅)
   where
-    linear' ∷ (Ord s) ⇒ Set.Set s → RegExp s → (Set.Set s, Bool)
+    linear' ∷ Set s → RegExp s → (Set s, Bool)
     linear' s Zero     = (             s , True )
     linear' s One      = (             s , True )
     linear' s (Lit  σ) = (Set.insert σ s , σ ∉ s)
@@ -375,10 +400,10 @@ linear = snd . linear' (∅)
     linear' s (α :. β) = (             s₂, l ∧ r)
                    where (             s₁, l    ) = linear' s  α
                          (             s₂,     r) = linear' s₁ β
-    linear' s (Star α) = linear' s α
+    linear' s (Star α) =                            linear' s  α
 
 -- first(E) = { a | av ∈ ℒ(E) }
-first ∷ (Ord s) ⇒ RegExp s → Set.Set s
+first ∷ (Ord s) ⇒ RegExp s → Set s
 first Zero                  = (∅)
 first One                   = (∅)
 first (Lit  σ)              = Set.singleton σ
@@ -388,7 +413,7 @@ first (α :. β) | nullable α = first α ∪ first β
 first (Star α)              = first α
 
 -- last(E) = { a | va ∈ ℒ(E) }
-last ∷ (Ord s) ⇒ RegExp s → Set.Set s
+last ∷ (Ord s) ⇒ RegExp s → Set s
 last Zero                  = (∅)
 last One                   = (∅)
 last (Lit  σ)              = Set.singleton σ
