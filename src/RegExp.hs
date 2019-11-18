@@ -363,9 +363,9 @@ equivalent a b = and (unfoldr bisim seed)
         history'     ∷ [(RegExp s, RegExp s)]
         history'     = (α, β) : history
 
--- Check if each symbol is used exactly once
+-- Check if each symbol is used exactly once in the expression
 -- (i.e. at most once and at least once)
-affine ∷ forall s . (Finite s) ⇒ RegExp s → Bool
+affine ∷ ∀ s . (Finite s) ⇒ RegExp s → Bool
 affine re = atMostUnit ∧ atLeastUnit
   where
     (used, atMostUnit) = linear' re (∅)
@@ -387,7 +387,7 @@ affine re = atMostUnit ∧ atLeastUnit
 
 -- Return true iff every symbol σ ∈ Σ is seen as a literal at most once
 -- TODO test property that for any RE, r, `linear (mark r)` should evaluate to `true`
-linear ∷ forall s . (Ord s) ⇒ RegExp s → Bool
+linear ∷ ∀ s . (Ord s) ⇒ RegExp s → Bool
 linear = snd . linear' (∅)
   where
     linear' ∷ Set s → RegExp s → (Set s, Bool)
