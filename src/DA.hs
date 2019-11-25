@@ -29,7 +29,7 @@ data DA q s =                 -- q is the set of states, Q
         }
 
 instance Contravariant (DA q) where
-    contramap ∷ (b → a) → DA q a → DA q b
+    contramap ∷ (g → s) → DA q s → DA q g
     contramap h (DA o t) = DA o (\q → t q . h)
 
 -- FIXME: these instances (`Divisible` and `Decidable`) are just experimental for now
@@ -53,6 +53,9 @@ language (DA o t) q = contramap (foldl t q) o
 
 accepts ∷ DA q s → q → [s] → Bool
 accepts m = getPredicate . language m
+
+nullable ∷ DA q s → q → Bool
+nullable m q = accepts m q []
 
 -- "automaton of languages" or "the final automaton of languages"
 -- "This automaton has the pleasing property that the language accepted by a state L in ℒ [the set of all languages] is precisely L itself."
