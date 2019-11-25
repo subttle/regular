@@ -83,11 +83,11 @@ invhom = contramap
 
 -- inverse homomorphic image of ℓ under h
 invhomimage ∷ (s → [g]) → ℒ g → ℒ s
-invhomimage h = contramap (concatMap h)
+invhomimage = contramap . concatMap
 
 -- ε-free inverse homomorphic image of ℓ under h
 invhomimageEpsFree ∷ (s → NE.NonEmpty g) → ℒ g → ℒ s
-invhomimageEpsFree h = contramap (concatMap (NE.toList . h))
+invhomimageEpsFree h = invhomimage (NE.toList . h)
 
 invhomimagew ∷ (Eq g) ⇒ (s → [g]) → [g] → ℒ s
 invhomimagew h w = Predicate ((w ==) . concatMap h)
