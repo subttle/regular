@@ -13,7 +13,9 @@ import           Data.Set (Set, singleton, fromList)
 import           Data.Set.Unicode ((∅))
 import           Data.Bool.Unicode ((∨), (∧))
 import           Data.Eq.Unicode ((≠))
+import           Data.Ord.Unicode ((≤)) -- , (≥))
 import           Data.Either (fromRight)
+import           Data.Functor.Contravariant (Predicate(..))
 import qualified Data.Universe as U (Universe, Finite)
 
 -- A DFA which accepts all binary strings ending in 1
@@ -423,3 +425,19 @@ digitsNFA = NFA.NFA δ 0 (singleton 9)
     δ (8, 9) = singleton 9
     δ _      = (∅)
 
+-- Some handy predicates
+-- 1000
+lteq0 ∷ Predicate Fin₄
+lteq0 = Predicate (≤ 0)
+
+-- 1100
+lteq1 ∷ Predicate Fin₄
+lteq1 = Predicate (≤ 1)
+
+-- 1110
+lteq2 ∷ Predicate Fin₄
+lteq2 = Predicate (≤ 2)
+
+-- 1111
+lteq3 ∷ Predicate Fin₄
+lteq3 = Predicate (≤ 3)
