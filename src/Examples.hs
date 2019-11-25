@@ -13,7 +13,7 @@ import           Data.Set (Set, singleton, fromList)
 import           Data.Set.Unicode ((∅))
 import           Data.Bool.Unicode ((∨), (∧))
 import           Data.Eq.Unicode ((≠))
-import           Data.Ord.Unicode ((≤)) -- , (≥))
+import           Data.Ord.Unicode ((≤), (≥))
 import           Data.Either (fromRight)
 import           Data.Functor.Contravariant (Predicate(..))
 import qualified Data.Universe as U (Universe, Finite)
@@ -441,3 +441,19 @@ lteq2 = Predicate (≤ 2)
 -- 1111
 lteq3 ∷ Predicate Fin₄
 lteq3 = Predicate (≤ 3)
+
+-- 1111
+gteq0 ∷ Predicate Fin₄
+gteq0 = Predicate (≥ 0)
+
+-- 0111
+gteq1 ∷ Predicate Fin₄
+gteq1 = Predicate (≥ 1)
+
+-- 0011
+gteq2 ∷ Predicate Fin₄
+gteq2 = Predicate (≥ 2)
+
+-- 0001
+gteq3 ∷ Predicate Fin₄
+gteq3 = Predicate (≥ 3)
