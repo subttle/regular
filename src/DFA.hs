@@ -6,7 +6,7 @@
 
 module DFA where
 
-import           Data.Functor.Contravariant (Contravariant, contramap, Equivalence, Equivalence (..))
+import           Data.Functor.Contravariant (Contravariant, contramap, Equivalence (..), Predicate(..))
 import           Prelude             hiding (map)
 import           Data.Function (on)
 import qualified Data.List           as List
@@ -24,6 +24,7 @@ import qualified NFA
 import qualified EFA
 import qualified GNFA
 import qualified FA
+import qualified DA
 import qualified RegExp as RE
 import           Language (ℒ)
 import           Numeric.Natural.Unicode (ℕ)
@@ -417,6 +418,12 @@ toEFAHalf m@(DFA δ q₀ f) = EFA.EFA δ₁ (Left ()) (Set.map (\(q, qᶠ) → R
 
 toFA ∷ (Finite q) ⇒ DFA q s → FA.FA q s
 toFA = NFA.toFA . toNFA
+
+toDA ∷ (Ord q) ⇒ DFA q s → (DA.DA q s, q)
+toDA (DFA δ q₀ f) = (DA.DA (Predicate (∈ f)) (curry δ), q₀)
+
+fromDA ∷ (Finite q) ⇒ (DA.DA q s, q) → DFA q s
+fromDA (DA.DA o t, q₀) = DFA (uncurry t) q₀ (predicateToSet o)
 
 -- Convert a DFA to a Generalized Nondeterministic Finite Automaton with ε-transitions
 -- δ(q₁, σ) = q₂ ⟺ δ'(q₁, q₂) = σ
