@@ -20,7 +20,6 @@ import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)))
 import qualified Data.List.NonEmpty as NE
 import           Data.Maybe (fromJust)
 import           Data.These (These, These (..), these)
-import           Data.Either (lefts, rights)
 import           Data.Void (Void, absurd)
 import qualified Data.Foldable as F
 import           Data.Function (on)
@@ -561,13 +560,9 @@ byEither = Equivalence eq
     eq (Right _) (Left  _) = False
     eq (Right _) (Right _) = True
 
--- byLefts ∷ (Eq a) ⇒ Equivalence [Either a b]
--- byLefts = Equivalence ((==) `on` lefts)
 byLefts ∷ (Foldable t, Eq a) ⇒ Equivalence (t (Either a b))
 byLefts = Equivalence ((==) `on` lefts')
 
--- byRights ∷ (Eq b) ⇒ Equivalence [Either a b]
--- byRights = Equivalence ((==) `on` rights)
 byRights ∷ (Foldable t, Eq b) ⇒ Equivalence (t (Either a b))
 byRights = Equivalence ((==) `on` rights')
 
