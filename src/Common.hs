@@ -205,6 +205,9 @@ stirling₂ (0, _) = 0
 stirling₂ (_, 0) = 0
 stirling₂ (n, k) = stirling₂ (n - 1, k - 1) + stirling₂ (n - 1, k) * k
 
+factorial ∷ ℕ → ℕ
+factorial = product . enumFromTo 1
+
 -- Bell number
 -- Count the possible partitions of a set of the given cardinality
 -- bell ∷ ℕ → ℕ
