@@ -714,11 +714,13 @@ toEquivalence ∷ (Finite a, Foldable t) ⇒ t (NonEmpty a) → Equivalence a
 toEquivalence parts = Equivalence (\a₁ a₂ → any (\xs → (a₁ ∈ xs) ∧ (a₂ ∈ xs)) parts)
 
 fromEquivalence ∷ ∀ a . (Finite a) ⇒ Equivalence a → [NonEmpty a]
-fromEquivalence (Equivalence r) = unfoldr go asList
-      where go ∷ [a] → Maybe (NonEmpty a, [a])
-            go []       = Nothing
-            go (x : xs) = Just (x :| p, np)
-                    where (p, np) = List.partition (r x) xs
+fromEquivalence (Equivalence (≡)) = unfoldr c asList
+  where
+    c ∷ [a] → Maybe (NonEmpty a, [a])
+    c []       = Nothing
+    c (a : as) = Just (a :| p, np)
+      where
+        (p, np) = List.partition (≡ a) as
 
 toPredicate ∷ (Foldable t, Eq a) ⇒ t a → Predicate a
 toPredicate = Predicate . (∋)
