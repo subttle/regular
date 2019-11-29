@@ -643,6 +643,13 @@ reverseC (Comparison c) = Comparison (\a₁ a₂ → reverse (c a₁ a₂))
     reverse EQ = EQ
     reverse GT = LT
 
+-- Counts the number of possible total orders over a finite set
+cardinalityC ∷ forall a . (Finite a) ⇒ Comparison a → ℕ
+cardinalityC _ = factorial cardinality_a
+  where
+    cardinality_a ∷ ℕ
+    cardinality_a = List.genericLength (asList ∷ [a])
+
 instance (Show a, Finite a)
        ⇒ Show (Comparison a) where
   show ∷ Comparison a → String
