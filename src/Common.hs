@@ -227,10 +227,8 @@ findIndex' p = fmap fromIntegral . List.findIndex p
 fromEnum' ∷ (Enum a) ⇒ a → ℕ
 fromEnum' = fromIntegral . fromEnum
 
-indexed ∷ [a] → [(a, ℕ)]
-indexed = indexed' 0 -- To use an index starting at 1, change this `0` to `1`
-    where indexed' _ []       = []
-          indexed' n (x : xs) = (x, n) : indexed' (n + 1) xs
+indexed ∷ (Traversable t) ⇒ t a → t (a, ℕ)
+indexed = snd . mapAccumL (\n a → (n + 1, (a, n))) 0 -- To use an index starting at 1, change this `0` to `1`
 
 -- impossible ∷ forall (r ∷ RuntimeRep). forall (a ∷ TYPE r). HasCallStack ⇒ [Char] → a
 impossible ∷ a
