@@ -634,6 +634,9 @@ listToComparison as = Comparison (\a₁ a₂ → let as' = F.toList as
                                                i₁  = fromJust (List.elemIndex a₁ as') -- FIXME will have to think about Void case
                                                i₂  = fromJust (List.elemIndex a₂ as') 
                                            in  compare i₁ i₂)
+-- Reverse a total order
+reverseC ∷ (Finite a) ⇒ Comparison a → Comparison a
+reverseC = listToComparison . reverse . comparisonToList
 
 instance (Show a, Finite a)
        ⇒ Show (Comparison a) where
@@ -664,7 +667,7 @@ instance (Finite a)
   minBound ∷ Comparison a
   minBound = defaultComparison
   maxBound ∷ Comparison a
-  maxBound = listToComparison (reverse (comparisonToList defaultComparison))
+  maxBound = reverseC defaultComparison
 instance (Finite a, U.Universe a)
        ⇒ U.Universe (Comparison a) where
 instance (Finite a)
