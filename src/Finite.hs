@@ -636,7 +636,12 @@ listToComparison as = Comparison (\a₁ a₂ → let as' = F.toList as
                                            in  compare i₁ i₂)
 -- Reverse a total order
 reverseC ∷ (Finite a) ⇒ Comparison a → Comparison a
-reverseC = listToComparison . reverse . comparisonToList
+reverseC (Comparison c) = Comparison (\a₁ a₂ → reverse (c a₁ a₂))
+  where
+    reverse ∷ Ordering → Ordering
+    reverse LT = GT
+    reverse EQ = EQ
+    reverse GT = LT
 
 instance (Show a, Finite a)
        ⇒ Show (Comparison a) where
@@ -667,7 +672,7 @@ instance (Finite a)
   minBound ∷ Comparison a
   minBound = defaultComparison
   maxBound ∷ Comparison a
-  maxBound = reverseC defaultComparison
+  maxBound = reverseC minBound
 instance (Finite a, U.Universe a)
        ⇒ U.Universe (Comparison a) where
 instance (Finite a)
