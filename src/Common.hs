@@ -230,6 +230,9 @@ fromEnum' = fromIntegral . fromEnum
 indexed ∷ (Traversable t) ⇒ t a → t (a, ℕ)
 indexed = snd . mapAccumL (\n a → (n + 1, (a, n))) 0 -- To use an index starting at 1, change this `0` to `1`
 
+skeleton ∷ (Traversable t) ⇒ t a → t ℕ
+skeleton = fmap snd . indexed
+
 -- impossible ∷ forall (r ∷ RuntimeRep). forall (a ∷ TYPE r). HasCallStack ⇒ [Char] → a
 impossible ∷ a
 impossible = error "Why, sometimes I've believed as many as six impossible things before breakfast."
