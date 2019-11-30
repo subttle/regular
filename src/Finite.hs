@@ -585,7 +585,7 @@ lawful = refl
       <> trans
 
 -- TODO clean this up, factor for modularity
-lawfulComparison ∷ ∀ a . (Finite a) ⇒ Predicate (Comparison a)
+lawfulComparison ∷ (Finite a) ⇒ Predicate (Comparison a)
 lawfulComparison = connexityC
                 <> antisymC
                 <> transC
