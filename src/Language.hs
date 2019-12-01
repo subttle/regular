@@ -102,7 +102,7 @@ derivative' (Predicate ℓ) w₁ = Predicate (\w₂ → ℓ (w₁ ++ w₂))
 
 -- FIXME untested, need to check
 antiderivative' ∷ ℒ s → [s] → ℒ s
-antiderivative' l w₁ = contramap (\w₂ → w₁ ++ w₂) (reversed l)
+antiderivative' l w = contramap (w ++) (reversed l)
 
 -- some useful instances are defined over this type
 -- predicate ∷ ℒ s → Predicate [s]
