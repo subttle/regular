@@ -6,7 +6,7 @@ module DA where
 -- import           Common
 import qualified Language
 import           Language (ℒ)
--- import           Finite
+import           Finite
 import           Data.Bool.Unicode
 import           Data.Functor.Contravariant
 import           Data.Functor.Contravariant.Divisible
@@ -27,6 +27,9 @@ data DA q s =                 -- q is the set of states, Q
      DA { output     ∷ Predicate q
         , transition ∷ q → (s → q)
         }
+
+instance (Finite q) ⇒ Q (DA q s) q
+instance (Finite s) ⇒ Σ (DA q s) s
 
 instance Contravariant (DA q) where
     contramap ∷ (g → s) → DA q s → DA q g
