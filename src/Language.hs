@@ -100,6 +100,10 @@ derivative (Predicate ℓ) a = Predicate (\w → ℓ (a : w))
 derivative' ∷ ℒ s → [s] → ℒ s
 derivative' (Predicate ℓ) w₁ = Predicate (\w₂ → ℓ (w₁ ++ w₂))
 
+-- FIXME untested, need to check
+antiderivative' ∷ ℒ s → [s] → ℒ s
+antiderivative' l w₁ = contramap (\w₂ → w₁ ++ w₂) (reversed l)
+
 -- some useful instances are defined over this type
 -- predicate ∷ ℒ s → Predicate [s]
 -- predicate = Predicate
