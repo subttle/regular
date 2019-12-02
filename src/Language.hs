@@ -104,6 +104,19 @@ derivative' (Predicate ℓ) w₁ = Predicate (\w₂ → ℓ (w₁ ++ w₂))
 antiderivative' ∷ ℒ s → [s] → ℒ s
 antiderivative' l w = contramap (w ++) (reversed l)
 
+-- TODO experimental, probably has a more meaningful name too
+drop₁ ∷ ℒ s → ℒ s
+drop₁ = contramap (drop 1) -- `tail` without the error
+
+drop₂ ∷ ℒ s → ℒ s
+drop₂ = contramap (drop 2)
+
+take₁ ∷ ℒ s → ℒ s
+take₁ = contramap (take 1) -- `init` without the error
+
+take₂ ∷ ℒ s → ℒ s
+take₂ = contramap (take 2)
+
 -- some useful instances are defined over this type
 -- predicate ∷ ℒ s → Predicate [s]
 -- predicate = Predicate
