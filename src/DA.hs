@@ -82,3 +82,6 @@ union (DA (Predicate o₁) t₁) (DA (Predicate o₂) t₂) = DA (Predicate (\(q
 
 difference ∷ DA q s → DA p s → DA (q, p) s
 difference m₁ m₂ = intersection m₁ (complement m₂)
+
+ot ∷ DA q s → q → (Bool, s → q)
+ot (DA (Predicate o) t) q = (o q, t q)
