@@ -269,7 +269,7 @@ toList = Data.Foldable.toList
 
 -- typically written α? for some regular expression α
 optional ∷ (Ord s) ⇒    RegExp s → RegExp s
-optional α = α + One
+optional = (One +)
 
 -- The positive star of α, α⁺
 atLeastOnce ∷ (Ord s) ⇒ RegExp s → RegExp s
