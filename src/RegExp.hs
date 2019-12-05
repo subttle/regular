@@ -7,22 +7,55 @@
 {-# LANGUAGE DeriveGeneric             #-}
 {-# OPTIONS_GHC -Wall                  #-}
 
-module RegExp (RegExp (..), one, zero, literal, (*), (+), star, (*.), (.*),
-language, finite, infinite, nullable,
-derivative, derivative', derivatives,
-matches, constant, reversal,
-normalize,
-similar, dissimilar, equivalent,
-fromSet, RegExp.fromList, RegExp.toSet, RegExp.toList,
-fromWords, toLanguage,
-partial, partial',
-linear, affine,
-first, last,
-awidth, height, RegExp.size,
-heightAlgebra, sizeAlgebra, languageAlg,
-convert,
-RegExp.optional, atLeastOnce, dot,
-isZero, KleeneAlgebra) where
+module RegExp
+  ( RegExp (..)
+  , one
+  , zero
+  , literal
+  , (*)
+  , (+)
+  , star
+  , (*.)
+  , (.*)
+  , language
+  , finite
+  , infinite
+  , nullable
+  , derivative
+  , derivative'
+  , derivatives
+  , matches
+  , constant
+  , reversal
+  , normalize
+  , similar
+  , dissimilar
+  , equivalent
+  , fromSet
+  , RegExp.fromList
+  , RegExp.toSet
+  , RegExp.toList
+  , fromWords
+  , toLanguage
+  , partial
+  , partial'
+  , linear
+  , affine
+  , first
+  , last
+  , awidth
+  , height
+  , RegExp.size
+  , heightAlgebra
+  , sizeAlgebra
+  , languageAlg
+  , convert
+  , RegExp.optional
+  , atLeastOnce
+  , dot
+  , isZero
+  , KleeneAlgebra
+  ) where
 
 import           Common
 import           Finite
