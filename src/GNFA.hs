@@ -10,6 +10,7 @@ import           Prelude hiding ((*), (+))
 import           Common
 import           Finite
 import           Language (ℒ)
+import           RegExp (RegExp)
 import           RegExp as RE
 import qualified Data.List as List
 import           Data.Set as Set
@@ -28,7 +29,7 @@ import           Data.Profunctor (Profunctor, lmap, rmap)
 -- (e.g. qᵢ can have no incoming arrows, qᶠ can have no outgoing arrows)
 data GNFA q s where
   -- δ : (Q \ {qᶠ}) × (Q \ {qᵢ}) → Regular Expression
-  GNFA ∷ { delta ∷ (Either Init q, Either Final q) → RE.RegExp s } → GNFA q s
+  GNFA ∷ { delta ∷ (Either Init q, Either Final q) → RegExp s } → GNFA q s
 
 instance (Finite q) ⇒ Q (GNFA q s) (Either (Either Init Final) q)
 instance (Finite s) ⇒ Σ (GNFA q s) s
@@ -81,7 +82,7 @@ language = RE.language . toRE
 toLanguage ∷ (Finite q, Finite s) ⇒ GNFA q s → ℒ s
 toLanguage = RE.toLanguage . toRE
 
-table ∷ ∀ q s . (Finite q) ⇒ GNFA q s → [((Either Init q, Either Final q), RE.RegExp s)]
+table ∷ ∀ q s . (Finite q) ⇒ GNFA q s → [((Either Init q, Either Final q), RegExp s)]
 table (GNFA δ) = zip domain image
     where
       domain ∷ [(Either Init q, Either Final q)]
@@ -100,14 +101,14 @@ rip (GNFA δ) qᵣ' = GNFA δ₁
         qᵣ = Right qᵣ'
         δ₁ ∷ (Either Init q, Either Final q) → RegExp s
         δ₁ (q₁, q₂) | (q₁ == qᵣ) ∨ (q₂ == qᵣ) = zero -- We are ripping qᵣ out, so if qᵣ is an arg to δ₁, return Zero
-        δ₁ (q₁, q₂)                          = δ (q₁, qᵣ) * (star (δ (qᵣ, qᵣ)) * δ (qᵣ, q₂)) + δ (q₁, q₂)
+        δ₁ (q₁, q₂)                           = δ (q₁, qᵣ) * (star (δ (qᵣ, qᵣ)) * δ (qᵣ, q₂)) + δ (q₁, q₂)
         -- or
-        -- δ₁ (q₁, q₂)                         = δ (q₁, q₂) + (δ (q₁, qᵣ) * (star (δ (qᵣ, qᵣ)) * δ (qᵣ, q₂)))
+        -- δ₁ (q₁, q₂)                           = δ (q₁, q₂) + (δ (q₁, qᵣ) * (star (δ (qᵣ, qᵣ)) * δ (qᵣ, q₂)))
 
-extract ∷ GNFA Void s → RE.RegExp s
+extract ∷ GNFA Void s → RegExp s
 extract (GNFA δ) = δ (Left (Init ()), Left (Final ()))
 
-toRE ∷ (Finite q, Ord s) ⇒ GNFA q s → RE.RegExp s
+toRE ∷ (Finite q, Ord s) ⇒ GNFA q s → RegExp s
 toRE = extract . reduce
 
 fromRE ∷         RegExp s → GNFA Void s
