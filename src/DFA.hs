@@ -6,8 +6,8 @@
 
 module DFA where
 
-import           Data.Functor.Contravariant (Contravariant, contramap, Equivalence (..), Predicate(..))
 import           Prelude             hiding (map)
+import           Data.Functor.Contravariant (Contravariant, contramap, Equivalence (..), Predicate (..))
 import           Data.Function (on)
 import qualified Data.List           as List
 import           Data.Set            as Set hiding (foldl, intersection)
@@ -27,7 +27,6 @@ import qualified FA
 import qualified DA
 import qualified RegExp as RE
 import           Language (ℒ)
-import           Numeric.Natural.Unicode (ℕ)
 
 -- Deterministic Finite Automaton
 data DFA q s =                 -- q is the set of states, Q
@@ -46,11 +45,11 @@ instance (Finite s) ⇒ Σ (DFA q s) s
 instance (Finite s) ⇒ Σ (SomeDFA s) s
 
 instance Contravariant (DFA q) where
-  contramap ∷ (g → s) → DFA q s → DFA q g
-  contramap h (DFA δ q₀ f) = DFA (\(q, γ) → δ (q, h γ)) q₀ f
+  contramap ∷ (s → g) → DFA q g → DFA q s
+  contramap h (DFA δ q₀ f) = DFA (\(q, σ) → δ (q, h σ)) q₀ f
 
-invhomimage ∷ (g → [s]) → DFA q s → DFA q g
-invhomimage h (DFA δ q₀ f) = DFA (\(q, γ) → foldl (curry δ) q (h γ)) q₀ f
+invhomimage ∷ (s → [g]) → DFA q g → DFA q s
+invhomimage h (DFA δ q₀ f) = DFA (\(q, σ) → foldl (curry δ) q (h σ)) q₀ f
 
 instance Contravariant SomeDFA where
   contramap ∷ (g → s) → SomeDFA s → SomeDFA g
@@ -160,14 +159,11 @@ right m q = m { q0 = q }
 left ∷ DFA q s → q → DFA q s
 left m q = m { fs = singleton q }
 
+-- The equivalence relation formed on Q by indistinguishable states for m
 -- Two states having the same right language are indistinguishable
 -- they both lead to the same words being accepted.
-indistinguishable ∷ (Finite q, Finite s) ⇒ DFA q s → q → q → Bool
-indistinguishable = (DFA.equal `on`) . right
-
--- The equivalence relation formed on Q by indistinguishable states for m
 indistinguishability ∷ (Finite q, Finite s) ⇒ DFA q s → Equivalence q
-indistinguishability = Equivalence . indistinguishable
+indistinguishability = Equivalence . (DFA.equal `on`) . right
 
 domain ∷ (Finite q, Finite s) ⇒ DFA q s → Set (q, s)
 domain m = qs m × sigma m
@@ -180,14 +176,14 @@ table ∷ (Finite q, Finite s) ⇒ DFA q s → [((q, s), q)]
 table = Map.toAscList . deltaToMap
 
 -- ℒ(m) is cofinite in Σ★ iff the complement of ℒ(m) (in Σ★) is finite.
-cofinite ∷ (Finite q, Finite s) ⇒                       DFA q s → Bool
-cofinite = finite . complement
+cofinite ∷ (Finite q, Finite s) ⇒ Predicate (DFA q s)
+cofinite = Predicate (finite . complement)
 
 -- Theorem (Cerny, 1964): A DFA M is (directable) synchronizing iff ∀q ∈ Q, ∃p ∈ Q, ∃w ∈ Σ★: δ(q,w) = δ(p, w)
 -- That is, there exists a word w, such that evaluation of w from from any state, q, always ends up in the same state, p.
 -- "A DFA is synchronizing if there exists a word that sends all states of the automaton to the same state." - https://arxiv.org/abs/1507.06070
-synchronizing ∷ (Finite q, Finite s) ⇒                  DFA q s → Bool
-synchronizing = not . isZero . power
+synchronizing ∷ (Finite q, Finite s) ⇒ Predicate (DFA q s)
+synchronizing = Predicate (not . isZero . power)
   where
     -- FIXME supposed to be a non-empty set
     power ∷ (Finite q) ⇒ DFA q s → DFA (Set q) s -- TODO alter this to check for shortest path to get shortest reset word?
@@ -198,23 +194,18 @@ synchronizing = not . isZero . power
 -- ℒ(M) is palindromic if and only if { x ∈ ℒ(M) : |x| < 3n } is
 -- palindromic, where n is the number of states of M.
 -- TODO this is the (untested) naive implementation
-palindromic ∷ (Finite q, Finite s) ⇒                    DFA q s → Bool
-palindromic m = all palindrome (upToLength (3 * n) (language m))
-  where
-    n ∷ ℕ
-    n = size' (qs m)
+palindromic ∷ (Finite q, Finite s) ⇒ Predicate (DFA q s)
+palindromic = Predicate (\m → all palindrome (upToLength (3 * size' (qs m)) (language m)))
 
 -- An automaton M = (S, I, δ, s₀, F) is said to be a permutation
 -- automaton, or more simply a p-automaton, if and only if δ(sᵢ, a) = δ(sⱼ, a), where sᵢ, sⱼ ∈ S, a ∈ I, implies that sᵢ = sⱼ.
 -- Permutation Automata by G. THIERRIN
 -- TODO untested
 -- TODO better to place in src/FA.hs?
-permutation ∷ (Finite q, Finite s) ⇒ DFA q s → Bool
-permutation m@(DFA δ _ _) = all (\(qᵢ, qⱼ) → 
-                                             all (\σ → 
-                                                       (δ (qᵢ, σ) == δ (qⱼ, σ)) `implies` (qᵢ == qⱼ)
-                                                 ) (sigma m)
-                                ) (qs m × qs m)
+permutation ∷ (Finite q, Finite s) ⇒ Predicate (DFA q s)
+permutation = Predicate (\m@(DFA δ _ _) → all (\(qᵢ, qⱼ) →
+                                                all (\σ → (δ (qᵢ, σ) == δ (qⱼ, σ)) `implies` (qᵢ == qⱼ)) (sigma m)
+                                              ) (qs m × qs m))
 
 -- Given two DFAs, decide if they produce the exact same language, i.e.
 -- ℒ(m₁) ≟ ℒ(m₂)
@@ -367,7 +358,9 @@ fromCDFA _                                 = Nothing
 
 -- Take an NFA, and use subset construction to convert it to an equivalent DFA (performs determinization)
 fromNFA ∷ (Finite q) ⇒ NFA.NFA q s → DFA (Set q) s
-fromNFA m@(NFA.NFA δ q₀ f) = DFA (\(states, σ) → foldMap (\q → δ (q, σ)) states)
+fromNFA m@(NFA.NFA δ q₀ f) = DFA (\(states, σ) → foldMap (\q → δ (q, σ)) states) -- for each occupied state,
+                                                                                 -- transition to next state,
+                                                                                 -- then union all the results
                                  (singleton q₀)
                                  (Set.filter (Common.intersects f) (powerSet (qs m)))
 
