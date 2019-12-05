@@ -69,7 +69,7 @@ concatenate ∷ ℒ s → ℒ s → ℒ s
 concatenate  (Predicate ℓ₁) (Predicate ℓ₂) = Predicate (\w → any (\(w₁ , w₂) → ℓ₁ w₁ ∧ ℓ₂ w₂) (zip (inits w) (tails w)))
 
 -- Kleene star
-star ∷ forall s . ℒ s → ℒ s
+star ∷ ∀ s . ℒ s → ℒ s
 star (Predicate ℓ) = Predicate p
   where
     -- TODO express in terms of `epsilon + any ...`?
