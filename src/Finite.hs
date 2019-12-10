@@ -1164,23 +1164,40 @@ instance RenameMe Predicate where
   renameme h (Predicate pᵇ) (Predicate pᶜ) = h >$< Predicate (these pᵇ pᶜ (\b c → pᵇ b ∧ pᶜ c))
 
 instance RenameMe Equivalence where
-  renameme ∷ forall a b c . (a → These b c) → Equivalence b → Equivalence c → Equivalence a
+  renameme ∷ ∀ a b c . (a → These b c) → Equivalence b → Equivalence c → Equivalence a
   renameme h (Equivalence (⮀)) (Equivalence (⮂)) = h >$< Equivalence (≡)
     where
+      {-
       (≡) ∷ These b c → These b c → Bool
       (≡) (This  b₁   ) (This  b₂   ) = b₁ ⮀ b₂
       (≡) (That     c₁) (That     c₂) =           c₁ ⮂ c₂
       (≡) (These b₁ c₁) (These b₂ c₂) = b₁ ⮀ b₂ ∧ c₁ ⮂ c₂
       (≡) _             _             = False
-
-      eqbc ∷ These b c → These b c → Bool
+      -}
+      (≡) ∷ These b c → These b c → Bool
       -- This version proved True in all cases tested (still want to do proof tho)
-      eqbc (This  b₁   ) (This  b₂   ) = b₁ ⮀ b₂
-      eqbc (This  _    ) (That     _ ) =                   False
-      eqbc (This  b₁   ) (These b₂ _ ) = b₁ ⮀ b₂
-      eqbc (That     _ ) (This  _    ) =                   False
-      eqbc (That     c₁) (That     c₂) =           c₁ ⮂ c₂
-      eqbc (That     c₁) (These _  c₂) =           c₁ ⮂ c₂
-      eqbc (These b₁ _ ) (This  b₂   ) = b₁ ⮀ b₂
-      eqbc (These _  c₁) (That     c₂) =           c₁ ⮂ c₂
-      eqbc (These b₁ c₁) (These b₂ c₂) = b₁ ⮀ b₂ ∧ c₁ ⮂ c₂
+      (≡) (This  b₁   ) (This  b₂   ) = b₁ ⮀ b₂
+      (≡) (This  _    ) (That     _ ) =                   False
+      (≡) (This  b₁   ) (These b₂ _ ) = b₁ ⮀ b₂
+      (≡) (That     _ ) (This  _    ) =                   False
+      (≡) (That     c₁) (That     c₂) =           c₁ ⮂ c₂
+      (≡) (That     c₁) (These _  c₂) =           c₁ ⮂ c₂
+      (≡) (These b₁ _ ) (This  b₂   ) = b₁ ⮀ b₂
+      (≡) (These _  c₁) (That     c₂) =           c₁ ⮂ c₂
+      (≡) (These b₁ c₁) (These b₂ c₂) = b₁ ⮀ b₂ ∧ c₁ ⮂ c₂
+
+instance RenameMe Comparison where
+  renameme ∷ ∀ a b c . (a → These b c) → Comparison b → Comparison c → Comparison a
+  renameme h (Comparison (⪋)) (Comparison (⪌)) = h >$< Comparison (⪥)
+    where
+      (⪥) ∷ These b c → These b c → Ordering
+      (⪥) (This  b₁   ) (This  b₂   ) =  b₁ ⪋ b₂
+      (⪥) (This  _    ) (That     _ ) =           LT
+      (⪥) (This  b₁   ) (These b₂ _ ) =  b₁ ⪋ b₂
+      (⪥) (That     _ ) (This  _    ) =           GT
+      (⪥) (That     c₁) (That     c₂) =               c₁ ⪌ c₂
+      (⪥) (That     c₁) (These _  c₂) =               c₁ ⪌ c₂
+      (⪥) (These b₁ _ ) (This  b₂   ) =  b₁ ⪋ b₂
+      (⪥) (These _  c₁) (That     c₂) =               c₁ ⪌ c₂
+      (⪥) (These b₁ c₁) (These b₂ c₂) = (b₁ ⪋ b₂) <> (c₁ ⪌ c₂)
+
