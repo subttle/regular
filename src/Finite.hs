@@ -1167,37 +1167,24 @@ instance RenameMe Equivalence where
   renameme ∷ ∀ a b c . (a → These b c) → Equivalence b → Equivalence c → Equivalence a
   renameme h (Equivalence (⮀)) (Equivalence (⮂)) = h >$< Equivalence (≡)
     where
-      {-
       (≡) ∷ These b c → These b c → Bool
       (≡) (This  b₁   ) (This  b₂   ) = b₁ ⮀ b₂
       (≡) (That     c₁) (That     c₂) =           c₁ ⮂ c₂
       (≡) (These b₁ c₁) (These b₂ c₂) = b₁ ⮀ b₂ ∧ c₁ ⮂ c₂
       (≡) _             _             = False
-      -}
-      (≡) ∷ These b c → These b c → Bool
-      -- This version proved True in all cases tested (still want to do proof tho)
-      (≡) (This  b₁   ) (This  b₂   ) = b₁ ⮀ b₂
-      (≡) (This  _    ) (That     _ ) =                   False
-      (≡) (This  b₁   ) (These b₂ _ ) = b₁ ⮀ b₂
-      (≡) (That     _ ) (This  _    ) =                   False
-      (≡) (That     c₁) (That     c₂) =           c₁ ⮂ c₂
-      (≡) (That     c₁) (These _  c₂) =           c₁ ⮂ c₂
-      (≡) (These b₁ _ ) (This  b₂   ) = b₁ ⮀ b₂
-      (≡) (These _  c₁) (That     c₂) =           c₁ ⮂ c₂
-      (≡) (These b₁ c₁) (These b₂ c₂) = b₁ ⮀ b₂ ∧ c₁ ⮂ c₂
 
 instance RenameMe Comparison where
   renameme ∷ ∀ a b c . (a → These b c) → Comparison b → Comparison c → Comparison a
   renameme h (Comparison (⪋)) (Comparison (⪌)) = h >$< Comparison (⪥)
     where
       (⪥) ∷ These b c → These b c → Ordering
-      (⪥) (This  b₁   ) (This  b₂   ) =  b₁ ⪋ b₂
-      (⪥) (This  _    ) (That     _ ) =           LT
-      (⪥) (This  b₁   ) (These b₂ _ ) =  b₁ ⪋ b₂
-      (⪥) (That     _ ) (This  _    ) =           GT
-      (⪥) (That     c₁) (That     c₂) =               c₁ ⪌ c₂
-      (⪥) (That     c₁) (These _  c₂) =               c₁ ⪌ c₂
-      (⪥) (These b₁ _ ) (This  b₂   ) =  b₁ ⪋ b₂
-      (⪥) (These _  c₁) (That     c₂) =               c₁ ⪌ c₂
+      (⪥) (This  b₁   ) (This  b₂   ) = b₁ ⪋ b₂
+      (⪥) (This  _    ) (That     _ ) = LT
+      (⪥) (This  _    ) (These _  _ ) = LT
+      (⪥) (That     _ ) (This  _    ) = GT
+      (⪥) (That     c₁) (That     c₂) = c₁ ⪌ c₂
+      (⪥) (That     _ ) (These _  _ ) = LT
+      (⪥) (These _  _ ) (This  _    ) = GT
+      (⪥) (These _  _ ) (That     _ ) = GT
       (⪥) (These b₁ c₁) (These b₂ c₂) = (b₁ ⪋ b₂) <> (c₁ ⪌ c₂)
 
