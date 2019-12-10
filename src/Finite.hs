@@ -846,6 +846,63 @@ instance Show Final where
   show ∷ Final → String
   show (Final ()) = "qᶠ"
 
+-- A six-sided die -- TODO -- 🎲  U+1F3B2
+data D₆ where
+  Side₁ ∷ D₆
+  Side₂ ∷ D₆
+  Side₃ ∷ D₆
+  Side₄ ∷ D₆
+  Side₅ ∷ D₆
+  Side₆ ∷ D₆
+  deriving (Eq, Enum, Ord, Bounded)
+
+instance Show D₆ where
+  show ∷ D₆ → String
+  show Side₁ = "⚀"
+  show Side₂ = "⚁"
+  show Side₃ = "⚂"
+  show Side₄ = "⚃"
+  show Side₅ = "⚄"
+  show Side₆ = "⚅"
+
+instance U.Universe D₆
+instance U.Finite   D₆
+instance Finite     D₆
+
+instance Fancy D₆ where
+  unicode  ∷ D₆ → Char
+  unicode Side₁ = '⚀'
+  unicode Side₂ = '⚁'
+  unicode Side₃ = '⚂'
+  unicode Side₄ = '⚃'
+  unicode Side₅ = '⚄'
+  unicode Side₆ = '⚅'
+  plain ∷ D₆ → String
+  plain Side₁ = "Side₁"
+  plain Side₂ = "Side₂"
+  plain Side₃ = "Side₃"
+  plain Side₄ = "Side₄"
+  plain Side₅ = "Side₅"
+  plain Side₆ = "Side₆"
+
+(⚀) ∷ D₆
+(⚀) = Side₁
+
+(⚁) ∷ D₆
+(⚁) = Side₂
+
+(⚂) ∷ D₆
+(⚂) = Side₃
+
+(⚃) ∷ D₆
+(⚃) = Side₄
+
+(⚄) ∷ D₆
+(⚄) = Side₅
+
+(⚅) ∷ D₆
+(⚅) = Side₆
+
 data Suit where
   Spade   ∷ Suit
   Heart   ∷ Suit
