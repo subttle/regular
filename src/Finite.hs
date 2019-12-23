@@ -1249,3 +1249,57 @@ instance RenameMe Comparison where
       (⪥) (These _  _ ) (That     _ ) = GT
       (⪥) (These b₁ c₁) (These b₂ c₂) = (b₁ ⪋ b₂) <> (c₁ ⪌ c₂)
 
+-- newtype Op₁ b a = Op₁ { getOp₁ ∷     a → b }
+newtype Op₂ b a = Op₂ { getOp₂ ∷ a → a → b }
+-- interesting observation:
+-- on ∷ (b → b → c) → (a → b) → (a → a → c)
+-- or when flipped:
+-- flipOn ∷ (a → b) → (b → b → c) → (a → a → c)
+
+instance Contravariant (Op₂ c) where
+  contramap ∷ (a → b) → Op₂ c b → Op₂ c a
+  contramap h (Op₂ oᵇ) = Op₂ (oᵇ `on` h)
+
+-- FIXME: warning, this is still experimental
+instance (Monoid m) ⇒ Divisible (Op₂ m) where
+  divide ∷ ∀ a b c . (a → (b, c)) → Op₂ m b → Op₂ m c → Op₂ m a
+  divide h (Op₂ opᵇ) (Op₂ opᶜ) = Op₂ ((\(b₁, c₁) (b₂, c₂) → opᵇ b₁ b₂ <> opᶜ c₁ c₂) `on` h) -- TODO consider reverse order , i.e. `opᶜ c₁ c₂ <> opᵇ b₁ b₂`
+  conquer ∷ Op₂ m a
+  conquer = Op₂ (const (const mempty))
+
+instance (Monoid m) ⇒ Decidable (Op₂ m) where
+  choose ∷ ∀ a b c . (a → Either b c) → Op₂ m b → Op₂ m c → Op₂ m a
+  choose h (Op₂ opᵇ) (Op₂ opᶜ) = Op₂ (opᵇᶜ `on` h)
+    where
+      opᵇᶜ ∷ Either b c → Either b c → m
+      opᵇᶜ (Left  b₁) (Left  b₂) = opᵇ b₁ b₂
+      opᵇᶜ (Left  _ ) (Right _ ) = mempty
+      opᵇᶜ (Right _ ) (Left  _ ) = mempty
+      opᵇᶜ (Right c₁) (Right c₂) = opᶜ c₁ c₂
+  lose ∷ (a → Void) → Op₂ m a
+  lose h = Op₂ (absurd `on` h)
+
+instance (Monoid m) ⇒ RenameMe (Op₂ m) where
+  renameme ∷ ∀ a b c . (a → These b c) → Op₂ m b → Op₂ m c → Op₂ m a
+  renameme h (Op₂ opᵇ) (Op₂ opᶜ) = Op₂ (opᵇᶜ `on` h)
+    where
+      opᵇᶜ ∷ These b c → These b c → m
+      opᵇᶜ (This  b₁   ) (This  b₂   ) = opᵇ b₁ b₂
+      opᵇᶜ (That     c₁) (That     c₂) =              opᶜ c₁ c₂
+      opᵇᶜ (These b₁ c₁) (These b₂ c₂) = opᵇ b₁ b₂ <> opᶜ c₁ c₂ -- TODO consider reverse order
+      opᵇᶜ _             _             = mempty
+      {-
+      -- TODO compare with above
+      opᵇᶜ ∷ These b c → These b c → m
+      opᵇᶜ (This  b₁   ) (This  b₂   ) = opᵇ b₁ b₂
+      opᵇᶜ (This  _    ) (That     _ ) = mempty
+      opᵇᶜ (This  b₁   ) (These b₂ _ ) = opᵇ b₁ b₂
+      opᵇᶜ (That     _ ) (This  _    ) = mempty
+      opᵇᶜ (That     c₁) (That     c₂) =             opᶜ c₁ c₂
+      opᵇᶜ (That     c₁) (These _  c₂) =             opᶜ c₁ c₂
+      opᵇᶜ (These b₁ _ ) (This  b₂   ) = opᵇ b₁ b₂
+      opᵇᶜ (These _  c₁) (That     c₂) =             opᶜ c₁ c₂
+      opᵇᶜ (These b₁ c₁) (These b₂ c₂) = opᵇ b₁ b₂ ⋄ opᶜ c₁ c₂ -- TODO consider reverse order as above
+      -}
+
+
