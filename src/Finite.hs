@@ -1218,7 +1218,7 @@ renamed' = renameme (\s → These s s)
 
 instance (Monoid m) ⇒ RenameMe (Op m) where
   renameme ∷ ∀ a b c . (a → These b c) → Op m b → Op m c → Op m a
-  renameme h (Op opᵇ) (Op opᶜ) = Op (these opᵇ opᶜ (\b c → opᵇ b <> opᶜ c) . h)
+  renameme h (Op opᵇ) (Op opᶜ) = h >$< Op (these opᵇ opᶜ (\b c → opᵇ b <> opᶜ c))
 
 instance RenameMe Predicate where
   renameme ∷ (a → These b c) → Predicate b → Predicate c → Predicate a
