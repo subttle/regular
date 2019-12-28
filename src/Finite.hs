@@ -756,8 +756,9 @@ eq' = ((==) `on`) . representative
 -- TODO deleteme
 instance (Show a, Finite a) ⇒ Show (Equivalence a) where
   show ∷ Equivalence a → String
-  show equivalence = show (fmap NE.toList (fromEquivalence equivalence))
+  show = show . fmap NE.toList . fromEquivalence
   {-
+  -- show equivalence = -- show (fmap NE.toList (fromEquivalence equivalence))
                      unlines (fmap show' graph)
                where domain          = liftA2 (,) asList asList
                      graph           = fmap (\(a, y) → (a, y, (getEquivalence equivalence) a y)) domain
