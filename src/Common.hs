@@ -10,6 +10,7 @@ import           Data.Set (Set)
 import qualified Data.Set as Set
 import           Data.Set.Unicode ((∪))
 import           Data.Bool.Unicode ((∧))
+import           Data.Ord.Unicode ((≤))
 import           Data.List as List
 import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)), (<|))
 import qualified Data.List.NonEmpty as NE
@@ -91,6 +92,9 @@ andAlg = Algebra φ
 infixl 5 <<-
 (<<-) ∷ (Ord a) ⇒ a → Set a → Set a
 (<<-) = Set.insert
+
+(≰) ∷ (Ord a) ⇒ a → a → Bool
+(≰) a₁ a₂ = not (a₁ ≤ a₂)
 
 while ∷ (a → Bool) → (a → a) → a → a
 while p = until (not . p)
