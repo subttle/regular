@@ -426,6 +426,23 @@ digitsNFA = NFA.NFA δ 0 (singleton 9)
     δ _      = (∅)
 
 -- Some handy predicates
+
+-- 1000
+eq0 ∷ Predicate Fin₄
+eq0 = Predicate (== 0)
+
+-- 0100
+eq1 ∷ Predicate Fin₄
+eq1 = Predicate (== 1)
+
+-- 0010
+eq2 ∷ Predicate Fin₄
+eq2 = Predicate (== 2)
+
+-- 0001
+eq3 ∷ Predicate Fin₄
+eq3 = Predicate (== 3)
+
 -- 1000
 lteq0 ∷ Predicate Fin₄
 lteq0 = Predicate (≤ 0)
@@ -457,3 +474,19 @@ gteq2 = Predicate (≥ 2)
 -- 0001
 gteq3 ∷ Predicate Fin₄
 gteq3 = Predicate (≥ 3)
+
+-- 0111
+nlteq0 ∷ Predicate Fin₄
+nlteq0 = Predicate (≰ 0)
+
+-- 0011
+nlteq1 ∷ Predicate Fin₄
+nlteq1 = Predicate (≰ 1)
+
+-- 0001
+nlteq2 ∷ Predicate Fin₄
+nlteq2 = Predicate (≰ 2)
+
+-- 0000
+nlteq3 ∷ Predicate Fin₄
+nlteq3 = Predicate (≰ 3)
