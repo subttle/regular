@@ -237,6 +237,11 @@ indexed = snd . mapAccumL (\n a → (n + 1, (a, n))) 0 -- To use an index starti
 skeleton ∷ (Traversable t) ⇒ t a → t ℕ
 skeleton = fmap snd . indexed
 
+-- If using this, may want to consider using uniform-pair
+-- https://github.com/conal/uniform-pair
+both ∷ (a → b) → (a, a) → (b, b)
+both f (a₁, a₂) = (f a₁, f a₂)
+
 -- impossible ∷ forall (r ∷ RuntimeRep). forall (a ∷ TYPE r). HasCallStack ⇒ [Char] → a
 impossible ∷ a
 impossible = error "Why, sometimes I've believed as many as six impossible things before breakfast."
