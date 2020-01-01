@@ -42,7 +42,7 @@ epsilon = Predicate null
 
 -- the language which accepts only a single literal
 -- want version of `null` for NE? `isSingleton`?
-lit ∷ forall s . (Eq s) ⇒ s → ℒ s
+lit ∷ ∀ s . (Eq s) ⇒ s → ℒ s
 lit σ = Predicate p
   where p ∷ [s] → Bool
         p [σ'] = σ == σ'

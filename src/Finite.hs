@@ -24,7 +24,7 @@ import           Data.Void (Void, absurd)
 import qualified Data.Foldable as F
 import           Data.Function (on)
 import           Data.Functor.Contravariant
-import           Data.Functor.Contravariant.Divisible (Decidable, Divisible, conquer)
+import           Data.Functor.Contravariant.Divisible (Decidable, Divisible, divide, conquer, choose, lose)
 import           Common
 import           GHC.Enum (boundedEnumFrom)
 import           Data.Fin (Fin)
