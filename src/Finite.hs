@@ -24,7 +24,7 @@ import           Data.Void (Void, absurd)
 import qualified Data.Foldable as F
 import           Data.Function (on)
 import           Data.Functor.Contravariant
-import           Data.Functor.Contravariant.Divisible (Decidable, conquer)
+import           Data.Functor.Contravariant.Divisible (Decidable, Divisible, conquer)
 import           Common
 import           GHC.Enum (boundedEnumFrom)
 import           Data.Fin (Fin)
@@ -211,16 +211,8 @@ instance (Finite a, Finite b)
   asList ∷ [These a b]
   asList = toList asSet
   asSet ∷ Set (These a b)
-  asSet = Set.map to (products ⊎ sums)
+  asSet = Set.map toThese (products ⊎ sums)
     where
-      to   ∷ Either (a, b) (Either a b) → These a b
-      to   (Left  (a, b)  )             = These a b
-      to   (Right (Right b))            = That    b
-      to   (Right (Left  a))            = This  a
-      from ∷ These a b                  → Either (a, b) (Either a b)
-      from (These a b)                  = Left  (a, b)
-      from (That    b)                  = Right (Right b)
-      from (This  a  )                  = Right (Left  a)
       products ∷ Set (a, b) 
       products = asSet
       sums ∷ Set (Either a b)
