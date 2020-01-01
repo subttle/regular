@@ -5,7 +5,7 @@
 module Common where
 
 import           Data.Maybe as Maybe
-import           Data.Map as Map
+import           Data.Map as Map (Map, null, empty, unionsWith, singleton, insert, mapWithKey, foldlWithKey, insertWith, foldrWithKey)
 import           Data.Set (Set)
 import qualified Data.Set as Set
 import           Data.Set.Unicode ((∪))
@@ -14,6 +14,7 @@ import           Data.Ord.Unicode ((≤))
 import           Data.List as List
 import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)), (<|))
 import qualified Data.List.NonEmpty as NE
+import           Data.These
 import qualified Data.Type.Nat as Nat
 import           Data.Fin (Fin)
 import           Data.Char (digitToInt)
@@ -36,7 +37,7 @@ newtype RCoAlgebra f t = RCoAlgebra (          t  → f (Either (Fix f) t))
 newtype   MAlgebra f t =   MAlgebra (∀ a. (a → t) → (f a → t))
 
 -- Mendler-style Catamorphism
-mcata :: MAlgebra f c → Fix f → c
+mcata ∷ MAlgebra f c → Fix f → c
 mcata (MAlgebra φ) = φ (mcata (MAlgebra φ)) . unfix
 
 -- Catamorphism
@@ -145,6 +146,25 @@ freeMonoidFrom n = ([n..] >>=) . flip replicateM'
 freeSemigroup ∷ [a] → [[a]]
 freeSemigroup = freeMonoidFrom 1
 
+toThese   ∷ Either (a, b) (Either a b) → These a b
+toThese   (Left  (a, b)  )             = These a b
+toThese   (Right (Right b))            = That    b
+toThese   (Right (Left  a))            = This  a
+
+fromThese ∷ These a b                  → Either (a, b) (Either a b)
+fromThese (These a b)                  = Left  (a, b)
+fromThese (That    b)                  = Right (Right b)
+fromThese (This  a  )                  = Right (Left  a)
+
+partitionWith ∷ (a → Either b c) → [a] → ([b], [c])
+partitionWith  f = partitionEithers . fmap f
+
+partitionWith' ∷ (a → These b c) → [a] → ([b], [c], [(b, c)])
+partitionWith' f = partitionThese   . fmap f
+
+unzipWith ∷ (a → (b, c)) → [a] → ([b], [c])
+unzipWith      f = unzip            . fmap f
+
 -- A more general version of `partitionEithers` from `Data.Either`
 partitionEithers' ∷ (Foldable t) ⇒ t (Either a b) → ([a], [b])
 partitionEithers' = partitionEithers . Foldable.toList
@@ -242,7 +262,7 @@ skeleton = fmap snd . indexed
 both ∷ (a → b) → (a, a) → (b, b)
 both f (a₁, a₂) = (f a₁, f a₂)
 
--- impossible ∷ forall (r ∷ RuntimeRep). forall (a ∷ TYPE r). HasCallStack ⇒ [Char] → a
+-- impossible ∷ ∀ (r ∷ RuntimeRep). ∀ (a ∷ TYPE r). HasCallStack ⇒ [Char] → a
 impossible ∷ a
 impossible = error "Why, sometimes I've believed as many as six impossible things before breakfast."
 
