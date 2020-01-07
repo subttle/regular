@@ -559,11 +559,11 @@ refl = Predicate (\(Equivalence (≡)) → all (\a → a ≡ a) asSet)
 
 -- Symmetric
 sym ∷ (Finite a) ⇒  Predicate (Equivalence a)
-sym = Predicate (\(Equivalence (≡)) → all (\(a₁, a₂) → (a₁ ≡ a₂) == (a₂ ≡ a₁)) (asSet × asSet))
+sym = Predicate (\(Equivalence (≡)) → all (\(a₁, a₂) → (a₁ ≡ a₂) == (a₂ ≡ a₁)) asSet)
 
 -- Transitivity
 trans ∷ (Finite a) ⇒ Predicate (Equivalence a)
-trans = Predicate (\(Equivalence (≡)) → all (\(a₁, a₂, a₃) → ((a₁ ≡ a₂) ∧ (a₂ ≡ a₃)) `implies` (a₁ ≡ a₃)) (liftA3 (,,) asList asList asList)) -- TODO may be some redundant checks here I can eliminate
+trans = Predicate (\(Equivalence (≡)) → all (\(a₁, a₂, a₃) → ((a₁ ≡ a₂) ∧ (a₂ ≡ a₃)) `implies` (a₁ ≡ a₃)) asSet) -- TODO may be some redundant checks here I can eliminate
 
 -- Check that the equivalence relation is lawful
 lawful ∷ (Finite a) ⇒ Predicate (Equivalence a)
@@ -572,6 +572,7 @@ lawful = refl
       <> trans
 
 -- TODO clean this up, factor for modularity
+-- test if the Comparison is actually a total ordering
 lawfulComparison ∷ (Finite a) ⇒ Predicate (Comparison a)
 lawfulComparison = connexityC
                 <> antisymC
@@ -581,6 +582,7 @@ tolteq ∷ Comparison a → a → a → Bool
 tolteq (Comparison c) a₁ a₂ = a₁ `c` a₂ == LT
                             ∨ a₁ `c` a₂ == EQ
 -- TODO move to seperate module (and remove "C" from the name) or just think of better name?
+-- "The connex property also implies reflexivity, i.e., a ≤ a."
 connexityC ∷ ∀ a . (Finite a) ⇒ Predicate (Comparison a)
 connexityC = Predicate p
   where
