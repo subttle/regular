@@ -589,21 +589,23 @@ connexityC = Predicate p
       where
         (≤) ∷ a → a → Bool
         (≤) = tolteq c
+
 -- TODO move to seperate module (and remove "C" from the name) or just think of better name?
 antisymC ∷ ∀ a . (Finite a) ⇒ Predicate (Comparison a)
 antisymC  = Predicate p
   where
     p ∷ Comparison a → Bool
-    p c = all (\(a₁, a₂) → ((a₁ ≤ a₂) ∧ (a₂ ≤ a₁)) `implies` (a₁ == a₂)) (asSet × asSet)
+    p c = all (\(a₁, a₂) → ((a₁ ≤ a₂) ∧ (a₂ ≤ a₁)) `implies` (a₁ == a₂)) asSet
       where
         (≤) ∷ a → a → Bool
         (≤) = tolteq c
+
 -- TODO move to seperate module (and remove "C" from the name) or just think of better name?
 transC ∷ ∀ a . (Finite a) ⇒ Predicate (Comparison a)
 transC = Predicate p
   where
     p ∷ Comparison a → Bool
-    p c = all (\(a₁, a₂, a₃) → ((a₁ ≤ a₂) ∧ (a₂ ≤ a₃)) `implies` (a₁ ≤ a₃)) (liftA3 (,,) asList asList asList)
+    p c = all (\(a₁, a₂, a₃) → ((a₁ ≤ a₂) ∧ (a₂ ≤ a₃)) `implies` (a₁ ≤ a₃)) asSet
       where
         (≤) ∷ a → a → Bool
         (≤) = tolteq c
