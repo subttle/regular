@@ -530,18 +530,13 @@ byLength ∷ (Foldable t) ⇒ Equivalence (t a)
 byLength = Equivalence ((==) `on` length)
 
 byThese ∷ Equivalence (These a b)
-byThese = Equivalence eq
+byThese = Equivalence (≡)
   where
-    eq ∷ These a b → These a b → Bool
-    eq (This  _  ) (This  _  ) = True
-    eq (This  _  ) (That    _) = False
-    eq (This  _  ) (These _ _) = False
-    eq (That    _) (This  _  ) = False
-    eq (That    _) (That    _) = True
-    eq (That    _) (These _ _) = False
-    eq (These _ _) (This  _  ) = False
-    eq (These _ _) (That    _) = False
-    eq (These _ _) (These _ _) = True
+    (≡) ∷ These a b → These a b → Bool
+    (≡) (This  _  ) (This  _  ) = True
+    (≡) (That    _) (That    _) = True
+    (≡) (These _ _) (These _ _) = True
+    (≡) _           _           = False
 
 byEither ∷ Equivalence (Either a b)
 byEither = Equivalence eq
