@@ -39,7 +39,7 @@ instance Pointed (GNFA Void) where
 
 instance Pointed (GNFA q) where
   point ∷ s → GNFA q s
-  point σ = GNFA (const (point σ))
+  point = GNFA . const . point
 
 instance Functor (GNFA q) where
   fmap ∷ (s → g) → GNFA q s → GNFA q g
@@ -112,7 +112,7 @@ toRE ∷ (Finite q, Ord s) ⇒ GNFA q s → RegExp s
 toRE = extract . reduce
 
 fromRE ∷         RegExp s → GNFA Void s
-fromRE α = GNFA (const α)
+fromRE = GNFA . const
 
 empty   ∷                   GNFA Void s
 empty   =  fromRE RE.Zero
