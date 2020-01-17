@@ -20,6 +20,7 @@ import           Data.Fin (Fin)
 import           Data.Char (digitToInt)
 import           Data.Either (lefts, rights, partitionEithers, fromLeft, fromRight, isLeft, isRight)
 import           Data.Foldable as Foldable
+import           Data.Functor.Contravariant (Equivalence (..))
 import           Data.Functor.Foldable (Fix (..), unfix, ListF (..))
 import           Control.Applicative (liftA2, getZipList, ZipList (..))
 import           Control.Monad (replicateM)
@@ -255,6 +256,11 @@ elemIndex' a = fmap fromIntegral . List.elemIndex a
 
 elemIndices' ∷ (Eq a) ⇒ a → [a] → [ℕ]
 elemIndices' a = fmap fromIntegral . List.elemIndices a
+
+-- Intuitively this is just like `elem` from `Data.List` but with
+-- user supplied equivalence relation.
+elemBy ∷ (Foldable t) ⇒ Equivalence a → a → t a → Bool
+elemBy (Equivalence (≡)) a = any (≡ a)
 
 -- A version of `fromEnum` which returns a Natural rather than an `Int`
 fromEnum' ∷ (Enum a) ⇒ a → ℕ
