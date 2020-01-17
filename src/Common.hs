@@ -247,6 +247,15 @@ nth n = Foldable.foldr (.) id . genericReplicate n
 findIndex' ∷ (a → Bool) → [a] → Maybe ℕ
 findIndex' p = fmap fromIntegral . List.findIndex p
 
+findIndices' ∷ (a → Bool) → [a] → [ℕ]
+findIndices' p = fmap fromIntegral . List.findIndices p
+
+elemIndex' ∷ (Eq a) ⇒ a → [a] → Maybe ℕ
+elemIndex' a = fmap fromIntegral . List.elemIndex a
+
+elemIndices' ∷ (Eq a) ⇒ a → [a] → [ℕ]
+elemIndices' a = fmap fromIntegral . List.elemIndices a
+
 -- A version of `fromEnum` which returns a Natural rather than an `Int`
 fromEnum' ∷ (Enum a) ⇒ a → ℕ
 fromEnum' = fromIntegral . fromEnum
