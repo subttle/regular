@@ -19,6 +19,7 @@ import           Data.Set (singleton)
 import           Config
 import           Numeric.Natural.Unicode (ℕ)
 import           Data.Eq.Unicode ((≠))
+import           Data.Functor.Contravariant (Equivalence (..))
 import           EasyTest
 import qualified Data.List as List
 import           Data.Either (isRight, isLeft, lefts)
@@ -37,6 +38,7 @@ suite = tests [ testFizzBuzz
               , testDFAinvhomimage
               , testRESubstitution
               , testBisimSubset (by5, DFA.toLanguage by5) (List.take 101 (freeMonoid asList))
+              , scope "RGS"           . expect $ retraction (toRGS ∷ Equivalence Suit → [ℕ]) (fromRGS ∷ [ℕ] → Equivalence Suit) -- FIXME: if using a newtype for `RGS` instead of `[ℕ]` type, then this can be strengthened to `bijection`
               ]
 
 -- Test that ordinary FizzBuzz has the same output as the FizzBuzz which uses DFA
@@ -151,6 +153,38 @@ testRESubstitution = scope "RE.>>=" . expect $ result == expected -- N.B. the us
     expected =  Star (         RE.fromList [2, 3])
             :. (Star (Lit 0 :| RE.fromList [0, 1])
             :.  Star (         RE.fromList [2, 3]))
+
+-- An involution is a mapping, f, that coincides with its own inverse, i.e.,
+-- f x == f⁻¹ x
+-- or, equivalently,
+-- f (f x) == x
+involution
+  ∷ ∀ a b . (Eq a, Eq b)
+  ⇒ [Either a b] → (a → b) → (b → a) → Bool
+involution x ab ba = fmap (f . f) x == x
+  where
+    -- Turn an `a` into a `b` or
+    -- turn a `b` into an `a`
+    f ∷ Either a b → Either a b
+    f = either (Right . ab) (Left . ba)
+
+-- https://en.wikipedia.org/wiki/Inverse_function#Left_and_right_inverses
+-- A retraction, aka "left inverse", 
+retraction
+  ∷ ∀ a b . (Finite a, Eq b)
+  ⇒ (a → b) → (b → a) → Bool
+retraction = involution (fmap Left (asList ∷ [a]))
+
+-- A section, aka "right inverse"
+section
+  ∷ ∀ a b . (Eq a, Finite b)
+  ⇒ (a → b) → (b → a) → Bool
+section = involution (fmap Right (asList ∷ [b]))
+
+bijection
+  ∷ ∀ a b . (Finite a, Finite b)
+  ⇒ (a → b) → (b → a) → Bool
+bijection = involution (asList ∷ [Either a b])
 
 -- Coinductive bisimulation (partial)
 -- Either the bisimulation will succeed (on the given subset) or
