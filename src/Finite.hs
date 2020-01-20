@@ -689,9 +689,8 @@ instance (Finite a)
 
 instance (Finite a)
        ⇒ Ord (Comparison a) where
-  -- FIXME untested
   compare ∷ Comparison a → Comparison a → Ordering
-  compare c₁ c₂ = mconcat (zipWith compare (comparisonToList c₁) (comparisonToList c₂))
+  compare = compare `on` comparisonToList
 
 instance (Finite a)
        ⇒ Bounded (Comparison a) where
