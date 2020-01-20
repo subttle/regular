@@ -643,6 +643,16 @@ fromEnumBy = elemIndexTotal . comparisonToList
 toEnumBy ∷ (Finite a) ⇒ Comparison a → ℕ → a
 toEnumBy = genericIndex . comparisonToList
 
+-- TODO better name
+fromEnumBy' ∷ (Finite a) ⇒ Equivalence a → a → ℕ
+fromEnumBy' = elemIndexTotal . representatives
+
+-- TODO better name
+-- FIXME also decide on how to handle partial results (for `toEnumBy` too)
+-- FIXME if this is to be used outside of RGS code (or make it private to RGS context)
+toEnumBy' ∷ (Finite a) ⇒ Equivalence a → ℕ → a
+toEnumBy' = genericIndex . representatives
+
 -- Reverse a total order
 reverseC ∷ (Finite a) ⇒ Comparison a → Comparison a
 reverseC (Comparison c) = Comparison (\a₁ a₂ → reverse (c a₁ a₂))
