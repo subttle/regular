@@ -713,7 +713,7 @@ instance (Finite a)
 -- a union of some of the equivalence classes of r₁.
 -- The finer-than relation reflexive, transitive, and antisymmetric (a partial order)
 finer ∷ (Finite a) ⇒ Equivalence a → Equivalence a → Bool
-finer (Equivalence (⮀)) (Equivalence (⮂)) = all (\(x, y) → (x ⮀ y) `implies` (x ⮂ y)) (liftA2 (,) asList asList)
+finer (Equivalence (⮀)) (Equivalence (⮂)) = all (\(x, y) → (x ⮀ y) `implies` (x ⮂ y)) asList
 
 coarser ∷ (Finite a) ⇒ Equivalence a → Equivalence a → Bool
 coarser = flip finer
@@ -729,7 +729,7 @@ coarser = flip finer
 -- for each list (which represents an equivalence class), check if both a₁ and a₂ are in it
 -- if they are in the same list return true, otherwise false
 toEquivalence ∷ (Finite a, Foldable t) ⇒ t (NonEmpty a) → Equivalence a
-toEquivalence parts = Equivalence (\a₁ a₂ → any (\xs → (a₁ ∈ xs) ∧ (a₂ ∈ xs)) parts)
+toEquivalence parts = Equivalence (\a₁ a₂ → any (\part → (a₁ ∈ part) ∧ (a₂ ∈ part)) parts)
 
 fromEquivalence ∷ ∀ a . (Finite a) ⇒ Equivalence a → [NonEmpty a]
 fromEquivalence (Equivalence (≡)) = unfoldr c asList
