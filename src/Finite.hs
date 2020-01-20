@@ -621,10 +621,28 @@ comparisonToList (Comparison c) = sortBy c asList
 -- TODO this works for now but think if it is possible to do this but without throwing away information every time, by which I mean an implementation
 -- TODO which could search a smaller list after each find (i.e. delete the elements from the list as we find results for them)
 listToComparison ∷ (Finite a, Foldable t) ⇒ t a → Comparison a
-listToComparison as = Comparison (\a₁ a₂ → let as' = F.toList as
-                                               i₁  = fromJust (List.elemIndex a₁ as') -- FIXME will have to think about Void case
-                                               i₂  = fromJust (List.elemIndex a₂ as') 
-                                           in  compare i₁ i₂)
+listToComparison = comparing' . elemIndexTotal  -- FIXME will have to think about Void case
+
+-- FIXME may want to `newtype` this list to guarantee by type it is actually a total permutation
+-- FIXME (so perhaps something like "PermutationList" with `Finite` constraint?)
+-- N.B. the `fromJust` here is justified in that, if `permutation` is genuinely
+-- total for type `a` then any given `a` will be found in the list!
+-- TODO better name?
+-- TODO To be more accurate, this should probably use `NonEmpty`/`Finite1`?
+elemIndexTotal ∷ (Finite a, Foldable t) ⇒ t a → a → ℕ
+elemIndexTotal permutation a = fromJust (elemIndex' a (F.toList permutation))
+
+comparing' ∷ (Ord b) ⇒ (a → b) → Comparison a
+comparing' = (>$$<) defaultComparison
+
+-- TODO add test that `fromEnumBy defaultComparison` is same as `fromEnum`
+fromEnumBy ∷ (Finite a) ⇒ Comparison a → a → ℕ
+fromEnumBy = elemIndexTotal . comparisonToList
+
+-- TODO add test that `toEnumBy defaultComparison` is same as `toEnum`
+toEnumBy ∷ (Finite a) ⇒ Comparison a → ℕ → a
+toEnumBy = genericIndex . comparisonToList
+
 -- Reverse a total order
 reverseC ∷ (Finite a) ⇒ Comparison a → Comparison a
 reverseC (Comparison c) = Comparison (\a₁ a₂ → reverse (c a₁ a₂))
@@ -644,12 +662,12 @@ cardinalityC _ = factorial cardinality_a
 instance (Show a, Finite a)
        ⇒ Show (Comparison a) where
   show ∷ Comparison a → String
-  show c = show (comparisonToList c)
+  show = show . comparisonToList
 -- instance (Eq a)
 instance (Finite a)
        ⇒ Eq (Comparison a) where
   (==) ∷ Comparison a → Comparison a → Bool
-  (==) c₁ c₂ = comparisonToList c₁ == comparisonToList c₂
+  (==) = (==) `on` comparisonToList
 instance (Finite a)
        ⇒ Enum (Comparison a) where
   toEnum ∷ Int → Comparison a
@@ -1293,5 +1311,4 @@ instance (Monoid m) ⇒ RenameMe (Op₂ m) where
       opᵇᶜ (These _  c₁) (That     c₂) =             opᶜ c₁ c₂
       opᵇᶜ (These b₁ c₁) (These b₂ c₂) = opᵇ b₁ b₂ ⋄ opᶜ c₁ c₂ -- TODO consider reverse order as above
       -}
-
 
