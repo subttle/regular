@@ -20,9 +20,11 @@ import           Data.Fin (Fin)
 import           Data.Char (digitToInt)
 import           Data.Either (lefts, rights, partitionEithers, fromLeft, fromRight, isLeft, isRight)
 import           Data.Foldable as Foldable
-import           Data.Functor.Contravariant (Comparison (..), Equivalence (..), defaultComparison, defaultEquivalence, (>$$<))
+import           Data.Functor.Contravariant.Divisible (Divisible, Decidable, divide, conquer, choose, lose)
+import           Data.Functor.Contravariant (Contravariant, Op (..), Predicate (..), Comparison (..), Equivalence (..), defaultComparison, defaultEquivalence, contramap, (>$<), (>$$<))
 import           Data.Functor.Foldable (Fix (..), unfix, ListF (..))
 import           Data.Function (on)
+import           Data.Void
 import           Control.Applicative (liftA2, getZipList, ZipList (..))
 import           Control.Monad (replicateM)
 import           Control.Arrow ((|||), (&&&))
@@ -310,22 +312,27 @@ quotations = ("\"" ++) . (++ "\"")
 
 -- DFA q s → [((q, s), q)]
 format ∷ (Show c, Show r) ⇒ Map c r → String
-format m = foldl1 (\a b → a ++ "\n" ++ b )  -- manually intercalate the Map with newlines.
+format m = foldl1 (\a b → a ++ "\n" ++ b)  -- manually intercalate the Map with newlines.
            (mapWithKey (\k v → "  δ " ++ show k ++ " ↦ " ++ show v) m)
 
-format' ∷ (Show c, Show r) ⇒ Map c (Set r) → String
+format' ∷ ∀ c r . (Show c, Show r) ⇒ Map c (Set r) → String
 format' = go -- .  Map.filter (not . Set.null)
-    where go m | Map.null m = "  δ _ ↦ ∅"
-          go m              = foldl1 (\a b → a ++ "\n" ++ b )  -- manually intercalate the Map with newlines.
-                              (mapWithKey (\k v → "  δ " ++ show k ++ " ↦ " ++ show (Set' v)) m)
+  where
+    go ∷ Map c (Set r) → String
+    go m | Map.null m = "  δ _ ↦ ∅"
+    go m              = foldl1 (\a b → a ++ "\n" ++ b)  -- manually intercalate the Map with newlines.
+                        (mapWithKey (\k v → "  δ " ++ show k ++ " ↦ " ++ show (Set' v)) m)
 
-format'' ∷ (Show q, Show s, Show r) ⇒ Map (q, Maybe s) (Set r) → String
+format'' ∷ ∀ q s r . (Show q, Show s, Show r) ⇒ Map (q, Maybe s) (Set r) → String
 format'' = go -- .  Map.filter (not . Set.null)
-    where go m | Map.null m = "  δ _ ↦ ∅"
-          go m              = foldl1 (\a b → a ++ "\n" ++ b )  -- manually intercalate the Map with newlines.
-                              (mapWithKey (\k v → "  δ " ++ show'' k ++ " ↦ " ++ show (Set' v)) m)
-          show'' (q, Just  σ) = "(" ++ show q ++ "," ++ show σ ++ ")"
-          show'' (q, Nothing) = "(" ++ show q ++ ",ε)"
+  where
+    go ∷ Map (q, Maybe s) (Set r) → String
+    go m | Map.null m = "  δ _ ↦ ∅"
+    go m              = foldl1 (\a b → a ++ "\n" ++ b )  -- manually intercalate the Map with newlines.
+                        (mapWithKey (\k v → "  δ " ++ show'' k ++ " ↦ " ++ show (Set' v)) m)
+    show'' ∷ (q, Maybe s) -> String
+    show'' (q, Just  σ) = "(" ++ show q ++ "," ++ show σ ++ ")"
+    show'' (q, Nothing) = "(" ++ show q ++ ",ε)"
 
 -- Some helper functions for nicely displaying languages
 toStrings ∷ (Show s) ⇒ [[s]] → [String]
@@ -420,14 +427,110 @@ toColor string color = (fgcolor color ++) ((++ reset) string)
     -- colorToCode = fromEnum
 
 class (Show a) ⇒ Fancy a where
-      -- assign a unicode character
-      unicode  ∷ a → Char
-      -- assign an alternative unicode character
-      unicode' ∷ a → Char
-      unicode' = unicode
-      -- the plain version
-      plain    ∷ a → String
-      show'    ∷ a → String
-      show'    = charToString . unicode
-      colored ∷ (a, DisplayColor) → String
-      colored (s, color) = show' s `toColor` color
+  -- assign a unicode character
+  unicode  ∷ a → Char
+  -- assign an alternative unicode character
+  unicode' ∷ a → Char
+  unicode' = unicode
+  -- the plain version
+  plain    ∷ a → String
+  show'    ∷ a → String
+  show'    = charToString . unicode
+  colored ∷ (a, DisplayColor) → String
+  colored (s, color) = show' s `toColor` color
+
+-- TODO change the name :)
+class (Decidable f) ⇒ RenameMe f where
+  renameme ∷ (a → These b c) → f b → f c → f a
+
+renamed ∷ (RenameMe f) ⇒ f b → f c → f (These b c)
+renamed = renameme id
+
+renamed' ∷ (RenameMe f) ⇒ f a → f a → f a
+renamed' = renameme (\s → These s s)
+
+instance (Monoid m) ⇒ RenameMe (Op m) where
+  renameme ∷ ∀ a b c . (a → These b c) → Op m b → Op m c → Op m a
+  renameme h (Op opᵇ) (Op opᶜ) = h >$< Op (these opᵇ opᶜ (\b c → opᵇ b <> opᶜ c))
+
+instance RenameMe Predicate where
+  renameme ∷ (a → These b c) → Predicate b → Predicate c → Predicate a
+  renameme h (Predicate pᵇ) (Predicate pᶜ) = h >$< Predicate (these pᵇ pᶜ (\b c → pᵇ b ∧ pᶜ c))
+
+instance RenameMe Equivalence where
+  renameme ∷ ∀ a b c . (a → These b c) → Equivalence b → Equivalence c → Equivalence a
+  renameme h (Equivalence (⮀)) (Equivalence (⮂)) = h >$< Equivalence (≡)
+    where
+      (≡) ∷ These b c → These b c → Bool
+      (≡) (This  b₁   ) (This  b₂   ) = b₁ ⮀ b₂
+      (≡) (That     c₁) (That     c₂) =           c₁ ⮂ c₂
+      (≡) (These b₁ c₁) (These b₂ c₂) = b₁ ⮀ b₂ ∧ c₁ ⮂ c₂
+      (≡) _             _             = False
+
+instance RenameMe Comparison where
+  renameme ∷ ∀ a b c . (a → These b c) → Comparison b → Comparison c → Comparison a
+  renameme h (Comparison (⪋)) (Comparison (⪌)) = h >$< Comparison (⪥)
+    where
+      (⪥) ∷ These b c → These b c → Ordering
+      (⪥) (This  b₁   ) (This  b₂   ) = b₁ ⪋ b₂
+      (⪥) (This  _    ) (That     _ ) = LT
+      (⪥) (This  _    ) (These _  _ ) = LT
+      (⪥) (That     _ ) (This  _    ) = GT
+      (⪥) (That     c₁) (That     c₂) = c₁ ⪌ c₂
+      (⪥) (That     _ ) (These _  _ ) = LT
+      (⪥) (These _  _ ) (This  _    ) = GT
+      (⪥) (These _  _ ) (That     _ ) = GT
+      (⪥) (These b₁ c₁) (These b₂ c₂) = (b₁ ⪋ b₂) <> (c₁ ⪌ c₂)
+
+-- newtype Op₁ b a = Op₁ { getOp₁ ∷     a → b }
+newtype Op₂ b a = Op₂ { getOp₂ ∷ a → a → b }
+-- interesting observation:
+-- on ∷ (b → b → c) → (a → b) → (a → a → c)
+-- or when flipped:
+-- flipOn ∷ (a → b) → (b → b → c) → (a → a → c)
+
+instance Contravariant (Op₂ c) where
+  contramap ∷ (a → b) → Op₂ c b → Op₂ c a
+  contramap h (Op₂ oᵇ) = Op₂ (oᵇ `on` h)
+
+-- FIXME: warning, this is still experimental
+instance (Monoid m) ⇒ Divisible (Op₂ m) where
+  divide ∷ ∀ a b c . (a → (b, c)) → Op₂ m b → Op₂ m c → Op₂ m a
+  divide h (Op₂ opᵇ) (Op₂ opᶜ) = Op₂ ((\(b₁, c₁) (b₂, c₂) → opᵇ b₁ b₂ <> opᶜ c₁ c₂) `on` h) -- TODO consider reverse order , i.e. `opᶜ c₁ c₂ <> opᵇ b₁ b₂`
+  conquer ∷ Op₂ m a
+  conquer = Op₂ (const (const mempty))
+
+instance (Monoid m) ⇒ Decidable (Op₂ m) where
+  choose ∷ ∀ a b c . (a → Either b c) → Op₂ m b → Op₂ m c → Op₂ m a
+  choose h (Op₂ opᵇ) (Op₂ opᶜ) = Op₂ (opᵇᶜ `on` h)
+    where
+      opᵇᶜ ∷ Either b c → Either b c → m
+      opᵇᶜ (Left  b₁) (Left  b₂) = opᵇ b₁ b₂
+      opᵇᶜ (Left  _ ) (Right _ ) = mempty
+      opᵇᶜ (Right _ ) (Left  _ ) = mempty
+      opᵇᶜ (Right c₁) (Right c₂) = opᶜ c₁ c₂
+  lose ∷ (a → Void) → Op₂ m a
+  lose h = Op₂ (absurd `on` h)
+
+instance (Monoid m) ⇒ RenameMe (Op₂ m) where
+  renameme ∷ ∀ a b c . (a → These b c) → Op₂ m b → Op₂ m c → Op₂ m a
+  renameme h (Op₂ opᵇ) (Op₂ opᶜ) = Op₂ (opᵇᶜ `on` h)
+    where
+      opᵇᶜ ∷ These b c → These b c → m
+      opᵇᶜ (This  b₁   ) (This  b₂   ) = opᵇ b₁ b₂
+      opᵇᶜ (That     c₁) (That     c₂) =              opᶜ c₁ c₂
+      opᵇᶜ (These b₁ c₁) (These b₂ c₂) = opᵇ b₁ b₂ <> opᶜ c₁ c₂ -- TODO consider reverse order
+      opᵇᶜ _             _             = mempty
+      {-
+      -- TODO compare with above
+      opᵇᶜ ∷ These b c → These b c → m
+      opᵇᶜ (This  b₁   ) (This  b₂   ) = opᵇ b₁ b₂
+      opᵇᶜ (This  _    ) (That     _ ) = mempty
+      opᵇᶜ (This  b₁   ) (These b₂ _ ) = opᵇ b₁ b₂
+      opᵇᶜ (That     _ ) (This  _    ) = mempty
+      opᵇᶜ (That     c₁) (That     c₂) =             opᶜ c₁ c₂
+      opᵇᶜ (That     c₁) (These _  c₂) =             opᶜ c₁ c₂
+      opᵇᶜ (These b₁ _ ) (This  b₂   ) = opᵇ b₁ b₂
+      opᵇᶜ (These _  c₁) (That     c₂) =             opᶜ c₁ c₂
+      opᵇᶜ (These b₁ c₁) (These b₂ c₂) = opᵇ b₁ b₂ ⋄ opᶜ c₁ c₂ -- TODO consider reverse order as above
+      -}

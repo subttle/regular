@@ -93,7 +93,8 @@ instance (Finite a)
   maxBound ∷ Set a
   maxBound = singleton maxBound
 -- For `Set a` where `a` is enumerable, enumerate the set as the powerset.
-instance (Finite a) ⇒ Enum (Set a) where
+instance (Finite a)
+       ⇒ Enum (Set a) where
   toEnum ∷ Int → Set a
   toEnum     =                       (asList !!)
   fromEnum ∷ Set a → Int
@@ -201,7 +202,8 @@ instance (Finite a, Finite b)
   fromEnum t = fromJust (elemIndex t  asList)
   enumFrom ∷ These a b → [These a b]
   enumFrom t = dropWhile (≠ t)        asList
-instance (Finite a, Finite b) ⇒ U.Finite (These a b) where
+instance (Finite a, Finite b)
+       ⇒ U.Finite (These a b)
 
 -- TODO wait why do I need Finite constraints here??
 instance (Finite a, Finite b, U.Universe a, U.Universe b)
@@ -476,10 +478,11 @@ instance Finite     Fin₁₅
 instance (Show a, Finite a) ⇒ Show (Predicate a) where
   show ∷ Predicate a → String
   show (Predicate p) = unlines (fmap show' graph)
-                 where domain = asList ∷ [a]
-                       image  = fmap p domain
-                       graph  = zip domain image
-                       show' (a, b) = show a ++ " ↦ " ++ show b
+    where
+      domain = asList ∷ [a]
+      image  = fmap p domain
+      graph  = zip domain image
+      show' (a, b) = show a ++ " ↦ " ++ show b
 
 instance (Finite a)
        ⇒ Eq (Predicate a) where
@@ -506,16 +509,16 @@ instance (Finite a)
        ⇒ Finite (Predicate a) where
   asList ∷ [Predicate a]
   asList = fmap (Predicate . toFunction . zip as) bits
-        where
-           as ∷ [a]
-           as = asList
-           bs ∷ [Bool]
-           bs = asList
-           bits ∷ [[Bool]]
-           bits = replicateM (length as) bs
-           toFunction ∷ [(a, Bool)] → a → Bool
-           -- toFunction list = \a → fromJust (lookup a list) -- TODO I like this better but need to get rid of hlint warning -- {-# ANN asList "HLint: warn Redundant lambda" #-}
-           toFunction list a = fromJust (lookup a list)
+    where
+      as ∷ [a]
+      as = asList
+      bs ∷ [Bool]
+      bs = asList
+      bits ∷ [[Bool]]
+      bits = replicateM (length as) bs
+      toFunction ∷ [(a, Bool)] → a → Bool
+      -- toFunction list = \a → fromJust (lookup a list) -- TODO I like this better but need to get rid of hlint warning -- {-# ANN asList "HLint: warn Redundant lambda" #-}
+      toFunction list a = fromJust (lookup a list)
 
 -- TODO may want to move this code (if keeping it) to testing folder when done implementing `Finite` instance for `Equivalence`.
 
@@ -594,13 +597,12 @@ byThese = Equivalence (≡)
     (≡) _           _           = False
 
 byEither ∷ Equivalence (Either a b)
-byEither = Equivalence eq
+byEither = Equivalence (≡)
   where
-    eq ∷ Either a b → Either a b → Bool
-    eq (Left  _) (Left  _) = True
-    eq (Left  _) (Right _) = False
-    eq (Right _) (Left  _) = False
-    eq (Right _) (Right _) = True
+    (≡) ∷ Either a b → Either a b → Bool
+    (≡) (Left  _) (Left  _) = True
+    (≡) (Right _) (Right _) = True
+    (≡) _         _         = False
 
 byLefts ∷ (Foldable t, Eq a) ⇒ Equivalence (t (Either a b))
 byLefts = Equivalence ((==) `on` lefts')
@@ -636,6 +638,7 @@ lawfulComparison = connexityC
 tolteq ∷ Comparison a → a → a → Bool
 tolteq (Comparison c) a₁ a₂ = a₁ `c` a₂ == LT
                             ∨ a₁ `c` a₂ == EQ
+
 -- TODO move to seperate module (and remove "C" from the name) or just think of better name?
 -- "The connex property also implies reflexivity, i.e., a ≤ a."
 connexityC ∷ ∀ a . (Finite a) ⇒ Predicate (Comparison a)
@@ -683,7 +686,7 @@ listToComparison = comparing' . elemIndexTotal  -- FIXME will have to think abou
 -- N.B. the `fromJust` here is justified in that, if `permutation` is genuinely
 -- total for type `a` then any given `a` will be found in the list!
 -- TODO better name?
--- TODO To be more accurate, this should probably use `NonEmpty`/`Finite1`?
+-- TODO To be more accurate, this should probably use `NonEmpty`/`Foldable1`/`Finite1`?
 elemIndexTotal ∷ (Finite a, Foldable t) ⇒ t a → a → ℕ
 elemIndexTotal permutation a = fromJust (elemIndex' a (F.toList permutation))
 
@@ -715,7 +718,7 @@ reverseC (Comparison c) = Comparison (\a₁ a₂ → reverse (c a₁ a₂))
     reverse GT = LT
 
 -- Counts the number of possible total orders over a finite set
-cardinalityC ∷ forall a . (Finite a) ⇒ Comparison a → ℕ
+cardinalityC ∷ ∀ a . (Finite a) ⇒ Comparison a → ℕ
 cardinalityC _ = factorial cardinality_a
   where
     cardinality_a ∷ ℕ
@@ -725,7 +728,7 @@ instance (Show a, Finite a)
        ⇒ Show (Comparison a) where
   show ∷ Comparison a → String
   show = show . comparisonToList
--- instance (Eq a)
+
 instance (Finite a)
        ⇒ Eq (Comparison a) where
   (==) ∷ Comparison a → Comparison a → Bool
@@ -758,7 +761,6 @@ instance (Finite a)
        ⇒ Finite (Comparison a) where
   asList ∷ [Comparison a]
   asList = sort (fmap listToComparison (List.permutations (asList ∷ [a])))
-
 
 -- r₁ is "finer" r₂ iff r₁ ⊆ r₂   i.e. r₁ is a refinement of r₂
 -- if r₁ is a refinement of r₂ then each equivalence class of r₂ is
@@ -820,9 +822,6 @@ representative (Equivalence (≡)) a = head (List.filter (≡ a) asList)
 representatives ∷ (Finite a) ⇒ Equivalence a → [a]
 representatives (Equivalence (≡)) = nubBy (≡) asList
 
-eq' ∷ (Finite a) ⇒ Equivalence a → a → a → Bool
-eq' = ((==) `on`) . representative
-
 -- TODO deleteme
 instance (Show a, Finite a) ⇒ Show (Equivalence a) where
   show ∷ Equivalence a → String
@@ -830,10 +829,11 @@ instance (Show a, Finite a) ⇒ Show (Equivalence a) where
   {-
   -- show equivalence = -- show (fmap NE.toList (fromEquivalence equivalence))
                      unlines (fmap show' graph)
-               where domain          = liftA2 (,) asList asList
-                     graph           = fmap (\(a, y) → (a, y, (getEquivalence equivalence) a y)) domain
-                     show' (a, b, c) = show a ++ ", " ++ show b ++ " ↦ " ++ show c
-                     -}
+               where
+                 domain          = liftA2 (,) asList asList
+                 graph           = fmap (\(a, y) → (a, y, (getEquivalence equivalence) a y)) domain
+                 show' (a, b, c) = show a ++ ", " ++ show b ++ " ↦ " ++ show c
+  -}
 
 -- TODO probably going to be lots of room for optimization in these instance defs, but for now I want to focus on correctness
 instance (Finite a)
@@ -854,7 +854,7 @@ instance (Finite a)
        ⇒ Ord (Equivalence a) where
   -- N.B. that `⮀` and `⮂` swap order of appearence so that `compare minBound maxBound` is `LT` (for types of cardinality `> 1` [: )
   compare ∷ Equivalence a → Equivalence a → Ordering
-  compare (Equivalence (⮀)) (Equivalence (⮂)) = foldMap (\(a₁, a₂) → (a₁ ⮂ a₂) `compare` (a₁ ⮀ a₂)) (liftA2 (,) asList asList)
+  compare (Equivalence (⮀)) (Equivalence (⮂)) = foldMap (\(a₁, a₂) → (a₁ ⮂ a₂) `compare` (a₁ ⮀ a₂)) asList
 instance (Finite a)
        ⇒ Enum (Equivalence a) where
   toEnum   ∷ Int         → Equivalence a
@@ -1276,100 +1276,4 @@ cardsByColor = Equivalence ((==) `on` color)
 
 suitsByColor ∷ Equivalence Suit
 suitsByColor = Equivalence ((==) `on` colorOf)
-
--- TODO change the name :)
-class (Decidable f) ⇒ RenameMe f where
-  renameme ∷ (a → These b c) → f b → f c → f a
-
-renamed ∷ (RenameMe f) ⇒ f b → f c → f (These b c)
-renamed = renameme id
-
-renamed' ∷ (RenameMe f) ⇒ f a → f a → f a
-renamed' = renameme (\s → These s s)
-
-instance (Monoid m) ⇒ RenameMe (Op m) where
-  renameme ∷ ∀ a b c . (a → These b c) → Op m b → Op m c → Op m a
-  renameme h (Op opᵇ) (Op opᶜ) = h >$< Op (these opᵇ opᶜ (\b c → opᵇ b <> opᶜ c))
-
-instance RenameMe Predicate where
-  renameme ∷ (a → These b c) → Predicate b → Predicate c → Predicate a
-  renameme h (Predicate pᵇ) (Predicate pᶜ) = h >$< Predicate (these pᵇ pᶜ (\b c → pᵇ b ∧ pᶜ c))
-
-instance RenameMe Equivalence where
-  renameme ∷ ∀ a b c . (a → These b c) → Equivalence b → Equivalence c → Equivalence a
-  renameme h (Equivalence (⮀)) (Equivalence (⮂)) = h >$< Equivalence (≡)
-    where
-      (≡) ∷ These b c → These b c → Bool
-      (≡) (This  b₁   ) (This  b₂   ) = b₁ ⮀ b₂
-      (≡) (That     c₁) (That     c₂) =           c₁ ⮂ c₂
-      (≡) (These b₁ c₁) (These b₂ c₂) = b₁ ⮀ b₂ ∧ c₁ ⮂ c₂
-      (≡) _             _             = False
-
-instance RenameMe Comparison where
-  renameme ∷ ∀ a b c . (a → These b c) → Comparison b → Comparison c → Comparison a
-  renameme h (Comparison (⪋)) (Comparison (⪌)) = h >$< Comparison (⪥)
-    where
-      (⪥) ∷ These b c → These b c → Ordering
-      (⪥) (This  b₁   ) (This  b₂   ) = b₁ ⪋ b₂
-      (⪥) (This  _    ) (That     _ ) = LT
-      (⪥) (This  _    ) (These _  _ ) = LT
-      (⪥) (That     _ ) (This  _    ) = GT
-      (⪥) (That     c₁) (That     c₂) = c₁ ⪌ c₂
-      (⪥) (That     _ ) (These _  _ ) = LT
-      (⪥) (These _  _ ) (This  _    ) = GT
-      (⪥) (These _  _ ) (That     _ ) = GT
-      (⪥) (These b₁ c₁) (These b₂ c₂) = (b₁ ⪋ b₂) <> (c₁ ⪌ c₂)
-
--- newtype Op₁ b a = Op₁ { getOp₁ ∷     a → b }
-newtype Op₂ b a = Op₂ { getOp₂ ∷ a → a → b }
--- interesting observation:
--- on ∷ (b → b → c) → (a → b) → (a → a → c)
--- or when flipped:
--- flipOn ∷ (a → b) → (b → b → c) → (a → a → c)
-
-instance Contravariant (Op₂ c) where
-  contramap ∷ (a → b) → Op₂ c b → Op₂ c a
-  contramap h (Op₂ oᵇ) = Op₂ (oᵇ `on` h)
-
--- FIXME: warning, this is still experimental
-instance (Monoid m) ⇒ Divisible (Op₂ m) where
-  divide ∷ ∀ a b c . (a → (b, c)) → Op₂ m b → Op₂ m c → Op₂ m a
-  divide h (Op₂ opᵇ) (Op₂ opᶜ) = Op₂ ((\(b₁, c₁) (b₂, c₂) → opᵇ b₁ b₂ <> opᶜ c₁ c₂) `on` h) -- TODO consider reverse order , i.e. `opᶜ c₁ c₂ <> opᵇ b₁ b₂`
-  conquer ∷ Op₂ m a
-  conquer = Op₂ (const (const mempty))
-
-instance (Monoid m) ⇒ Decidable (Op₂ m) where
-  choose ∷ ∀ a b c . (a → Either b c) → Op₂ m b → Op₂ m c → Op₂ m a
-  choose h (Op₂ opᵇ) (Op₂ opᶜ) = Op₂ (opᵇᶜ `on` h)
-    where
-      opᵇᶜ ∷ Either b c → Either b c → m
-      opᵇᶜ (Left  b₁) (Left  b₂) = opᵇ b₁ b₂
-      opᵇᶜ (Left  _ ) (Right _ ) = mempty
-      opᵇᶜ (Right _ ) (Left  _ ) = mempty
-      opᵇᶜ (Right c₁) (Right c₂) = opᶜ c₁ c₂
-  lose ∷ (a → Void) → Op₂ m a
-  lose h = Op₂ (absurd `on` h)
-
-instance (Monoid m) ⇒ RenameMe (Op₂ m) where
-  renameme ∷ ∀ a b c . (a → These b c) → Op₂ m b → Op₂ m c → Op₂ m a
-  renameme h (Op₂ opᵇ) (Op₂ opᶜ) = Op₂ (opᵇᶜ `on` h)
-    where
-      opᵇᶜ ∷ These b c → These b c → m
-      opᵇᶜ (This  b₁   ) (This  b₂   ) = opᵇ b₁ b₂
-      opᵇᶜ (That     c₁) (That     c₂) =              opᶜ c₁ c₂
-      opᵇᶜ (These b₁ c₁) (These b₂ c₂) = opᵇ b₁ b₂ <> opᶜ c₁ c₂ -- TODO consider reverse order
-      opᵇᶜ _             _             = mempty
-      {-
-      -- TODO compare with above
-      opᵇᶜ ∷ These b c → These b c → m
-      opᵇᶜ (This  b₁   ) (This  b₂   ) = opᵇ b₁ b₂
-      opᵇᶜ (This  _    ) (That     _ ) = mempty
-      opᵇᶜ (This  b₁   ) (These b₂ _ ) = opᵇ b₁ b₂
-      opᵇᶜ (That     _ ) (This  _    ) = mempty
-      opᵇᶜ (That     c₁) (That     c₂) =             opᶜ c₁ c₂
-      opᵇᶜ (That     c₁) (These _  c₂) =             opᶜ c₁ c₂
-      opᵇᶜ (These b₁ _ ) (This  b₂   ) = opᵇ b₁ b₂
-      opᵇᶜ (These _  c₁) (That     c₂) =             opᶜ c₁ c₂
-      opᵇᶜ (These b₁ c₁) (These b₂ c₂) = opᵇ b₁ b₂ ⋄ opᶜ c₁ c₂ -- TODO consider reverse order as above
-      -}
 
