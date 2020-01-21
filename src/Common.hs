@@ -22,6 +22,7 @@ import           Data.Either (lefts, rights, partitionEithers, fromLeft, fromRig
 import           Data.Foldable as Foldable
 import           Data.Functor.Contravariant (Equivalence (..))
 import           Data.Functor.Foldable (Fix (..), unfix, ListF (..))
+import           Data.Function (on)
 import           Control.Applicative (liftA2, getZipList, ZipList (..))
 import           Control.Monad (replicateM)
 import           Control.Arrow ((|||), (&&&))
@@ -257,9 +258,21 @@ elemIndex' a = fmap fromIntegral . List.elemIndex a
 elemIndices' ∷ (Eq a) ⇒ a → [a] → [ℕ]
 elemIndices' a = fmap fromIntegral . List.elemIndices a
 
+-- A wrapper for `deleteBy` which uses `Equivalence` type.
+deleteBy' ∷ (Foldable f) ⇒ Equivalence a → a → f a → [a]
+deleteBy' (Equivalence (≡)) a = deleteBy (≡) a . toList
+
+-- A wrapper for `intersectBy` which uses `Equivalence` type.
+intersectBy' ∷ (Foldable f) ⇒ Equivalence a → f a → f a → [a]
+intersectBy' (Equivalence (≡)) = intersectBy (≡) `on` toList
+
+-- A wrapper for `deleteFirstsBy` which uses `Equivalence` type.
+deleteFirstsBy' ∷ (Foldable f) ⇒ Equivalence a → f a → f a → [a]
+deleteFirstsBy' (Equivalence (≡)) = deleteFirstsBy (≡) `on` toList
+
 -- Intuitively this is just like `elem` from `Data.List` but with
 -- user supplied equivalence relation.
-elemBy ∷ (Foldable t) ⇒ Equivalence a → a → t a → Bool
+elemBy ∷ (Foldable f) ⇒ Equivalence a → a → f a → Bool
 elemBy (Equivalence (≡)) = any . (≡)
 
 -- A version of `fromEnum` which returns a Natural rather than an `Int`
