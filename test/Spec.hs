@@ -155,9 +155,9 @@ testRESubstitution = scope "RE.>>=" . expect $ result == expected -- N.B. the us
             :.  Star (         RE.fromList [2, 3]))
 
 -- An involution is a mapping, f, that coincides with its own inverse, i.e.,
--- f x == f⁻¹ x
+-- f x ≡ f⁻¹ x
 -- or, equivalently,
--- f (f x) == x
+-- f (f x) ≡ x
 involution
   ∷ ∀ a b . (Eq a, Eq b)
   ⇒ [Either a b] → (a → b) → (b → a) → Bool

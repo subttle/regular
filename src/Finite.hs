@@ -519,6 +519,16 @@ instance (Finite a)
 
 -- TODO may want to move this code (if keeping it) to testing folder when done implementing `Finite` instance for `Equivalence`.
 
+-- TODO better name?
+equality ∷ (Eq b) ⇒ (a → b) → Equivalence a
+equality = (>$$<) defaultEquivalence
+
+toRGS ∷ (Finite a) ⇒ Equivalence a → [ℕ]
+toRGS (≡) = fmap (fromEnumBy' (≡) . representative (≡)) asList
+
+fromRGS ∷ (Finite a) ⇒ [ℕ] → Equivalence a
+fromRGS rgs = equality (genericIndex rgs . elemIndexTotal asList)
+
 -- Count the parts of an equivalence
 count ∷ (Finite a) ⇒ Equivalence a → ℕ
 count = genericLength . fromEquivalence
