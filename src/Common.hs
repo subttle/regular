@@ -20,7 +20,7 @@ import           Data.Fin (Fin)
 import           Data.Char (digitToInt)
 import           Data.Either (lefts, rights, partitionEithers, fromLeft, fromRight, isLeft, isRight)
 import           Data.Foldable as Foldable
-import           Data.Functor.Contravariant (Equivalence (..))
+import           Data.Functor.Contravariant (Comparison (..), Equivalence (..), defaultComparison, defaultEquivalence, (>$$<))
 import           Data.Functor.Foldable (Fix (..), unfix, ListF (..))
 import           Data.Function (on)
 import           Control.Applicative (liftA2, getZipList, ZipList (..))
@@ -101,6 +101,13 @@ infixl 5 <<-
 
 while ∷ (a → Bool) → (a → a) → a → a
 while p = until (not . p)
+
+comparing' ∷ (Ord b) ⇒ (a → b) → Comparison a
+comparing' = (>$$<) defaultComparison
+
+-- TODO better name?
+equality ∷ (Eq b) ⇒ (a → b) → Equivalence a
+equality = (>$$<) defaultEquivalence
 
 -- Boolean implication.
 implies ∷ Bool → Bool → Bool

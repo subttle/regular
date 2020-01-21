@@ -519,10 +519,6 @@ instance (Finite a)
 
 -- TODO may want to move this code (if keeping it) to testing folder when done implementing `Finite` instance for `Equivalence`.
 
--- TODO better name?
-equality ∷ (Eq b) ⇒ (a → b) → Equivalence a
-equality = (>$$<) defaultEquivalence
-
 -- Restricted Growth String type, where `a` is the
 -- underlying `Finite` type.
 -- TODO this might be better as `NonEmpty ℕ → RGS a`?
@@ -533,7 +529,6 @@ instance Show (RGS a) where
   show ∷ RGS a → String
   show (RGS rgs) = show rgs
 
--- Enum a, Bounded a, Ord a, U.Finite a
 instance (Finite a)
        ⇒ Bounded (RGS a) where
   minBound ∷ RGS a
@@ -556,9 +551,6 @@ instance (Finite a) ⇒ Ord (RGS a) where
   -- TODO this is correct but I will have to think if there is more efficient way to do this directly
   compare ∷ RGS a → RGS a → Ordering
   compare = compare `on` fromRGS
-    where
-      cardinality ∷ ℕ
-      cardinality = unTagged (U.cardinality ∷ Tagged a ℕ)
 
 instance (Finite a)
        ⇒ Enum (RGS a) where
@@ -694,9 +686,6 @@ listToComparison = comparing' . elemIndexTotal  -- FIXME will have to think abou
 -- TODO To be more accurate, this should probably use `NonEmpty`/`Finite1`?
 elemIndexTotal ∷ (Finite a, Foldable t) ⇒ t a → a → ℕ
 elemIndexTotal permutation a = fromJust (elemIndex' a (F.toList permutation))
-
-comparing' ∷ (Ord b) ⇒ (a → b) → Comparison a
-comparing' = (>$$<) defaultComparison
 
 -- TODO add test that `fromEnumBy defaultComparison` is same as `fromEnum`
 fromEnumBy ∷ (Finite a) ⇒ Comparison a → a → ℕ
