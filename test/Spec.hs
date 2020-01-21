@@ -41,9 +41,8 @@ suite = tests [ testFizzBuzz
               , testBisimSubset (by5, DFA.toLanguage by5) (List.take 101 (freeMonoid asList))
               -- "For example, the restricted growth function 0,1,1,2,0,3,1 defines the set partition {{1,5}, {2,3,7}, {4}, {6}}"
               -- https://www8.cs.umu.se/kurser/TDBAfl/VT06/algorithms/BOOK/BOOK4/NODE153.HTM
-              , scope "toRGS"         . expect $ (toRGS ∷ Equivalence Fin₇ → [ℕ]) (toEquivalence ([0 NE.:| [4], 1 NE.:| [2, 6], 3 NE.:| [], 5 NE.:| []])) == [0, 1, 1, 2, 0, 3, 1]
-              -- FIXME: if using a newtype for `RGS` instead of `[ℕ]` type, then this can be strengthened to `bijection`
-              , scope "RGS"           . expect $ retraction (toRGS ∷ Equivalence Suit → [ℕ]) (fromRGS ∷ [ℕ] → Equivalence Suit)
+              , scope "toRGS"         . expect $ toRGS (toEquivalence [0 NE.:| [4], 1 NE.:| [2, 6], 3 NE.:| [], 5 NE.:| []]) == (RGS [0, 1, 1, 2, 0, 3, 1] ∷ RGS Fin₇)
+              , scope "RGS"           . expect $ bijection (toRGS ∷ Equivalence Suit → RGS Suit) (fromRGS ∷ RGS Suit → Equivalence Suit)
               ]
 
 -- Test that ordinary FizzBuzz has the same output as the FizzBuzz which uses DFA

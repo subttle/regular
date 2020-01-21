@@ -523,11 +523,64 @@ instance (Finite a)
 equality ∷ (Eq b) ⇒ (a → b) → Equivalence a
 equality = (>$$<) defaultEquivalence
 
-toRGS ∷ (Finite a) ⇒ Equivalence a → [ℕ]
-toRGS (≡) = fmap (fromEnumBy' (≡) . representative (≡)) asList
+-- Restricted Growth String type, where `a` is the
+-- underlying `Finite` type.
+-- TODO this might be better as `NonEmpty ℕ → RGS a`?
+data RGS a where
+  RGS ∷ (Finite a) ⇒ [ℕ] → RGS a
 
-fromRGS ∷ (Finite a) ⇒ [ℕ] → Equivalence a
-fromRGS rgs = equality (genericIndex rgs . elemIndexTotal asList)
+instance Show (RGS a) where
+  show ∷ RGS a → String
+  show (RGS rgs) = show rgs
+
+-- Enum a, Bounded a, Ord a, U.Finite a
+instance (Finite a)
+       ⇒ Bounded (RGS a) where
+  minBound ∷ RGS a
+  minBound = RGS (genericReplicate cardinality 0)
+    where
+      cardinality ∷ ℕ
+      cardinality = unTagged (U.cardinality ∷ Tagged a ℕ)
+  maxBound ∷ RGS a
+  maxBound = RGS (genericTake cardinality [0 ..])
+    where
+      cardinality ∷ ℕ
+      cardinality = unTagged (U.cardinality ∷ Tagged a ℕ)
+
+instance (Finite a)
+       ⇒ Eq (RGS a) where
+  (==) ∷ RGS a → RGS a → Bool
+  (==) (RGS rgs₁) (RGS rgs₂) = rgs₁ == rgs₂
+
+instance (Finite a) ⇒ Ord (RGS a) where
+  -- TODO this is correct but I will have to think if there is more efficient way to do this directly
+  compare ∷ RGS a → RGS a → Ordering
+  compare = compare `on` fromRGS
+    where
+      cardinality ∷ ℕ
+      cardinality = unTagged (U.cardinality ∷ Tagged a ℕ)
+
+instance (Finite a)
+       ⇒ Enum (RGS a) where
+  toEnum   ∷ Int   → RGS a
+  toEnum     =                       (asList !!)
+  fromEnum ∷ RGS a → Int
+  fromEnum t = fromJust (elemIndex t  asList)
+  enumFrom ∷ RGS a → [RGS a]
+  enumFrom t = dropWhile (≠ t)        asList
+
+instance (Finite a) ⇒ U.Universe (RGS a)
+instance (Finite a) ⇒ U.Finite (RGS a)
+instance (Finite a)
+       ⇒ Finite (RGS a) where
+  asList ∷ [RGS a]
+  asList = fmap toRGS (asList ∷ [Equivalence a])
+
+toRGS ∷ (Finite a) ⇒ Equivalence a → RGS a
+toRGS (≡) = RGS (fmap (fromEnumBy' (≡) . representative (≡)) asList)
+
+fromRGS ∷ (Finite a) ⇒ RGS a → Equivalence a
+fromRGS (RGS rgs) = equality (genericIndex rgs . elemIndexTotal asList)
 
 -- Count the parts of an equivalence
 count ∷ (Finite a) ⇒ Equivalence a → ℕ
