@@ -19,7 +19,8 @@ import           Data.List as List
 import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)))
 import qualified Data.List.NonEmpty as NE
 import           Data.Maybe (fromJust)
-import           Data.These (These, These (..), these)
+import           Data.These (These, These(..), these)
+import           Data.These.Combinators (catThese)
 import           Data.Void (Void, absurd)
 import qualified Data.Foldable as F
 import           Data.Function (on)
@@ -822,17 +823,28 @@ representative (Equivalence (≡)) a = head (List.filter (≡ a) asList)
 representatives ∷ (Finite a) ⇒ Equivalence a → [a]
 representatives (Equivalence (≡)) = nubBy (≡) asList
 
+-- TODO explore other options to do this?
+equivalenceClass ∷ ∀ a . (Finite a) ⇒ Equivalence a → a → NonEmpty a
+equivalenceClass (Equivalence (≡)) a₁ = NE.insert a₁ (fmap snd (catThese (partitionedBy (Equivalence (≡)) a₁)))
+  where
+    partitionedBy ∷ ∀ a . (Finite a) ⇒ Equivalence a → a → [These a a]
+    partitionedBy (Equivalence (≡)) a₁ = fmap f (asList ∷ [a])
+      where
+        f ∷ a → These a a
+        f a₂ | a₁ == a₂ = This  a₁    -- equal by `==`
+        f a₂ | a₁ ≡ a₂  = These a₁ a₂ -- equal by `≡` but not `==`
+        f a₂            = That     a₂ -- not equal
+
 -- TODO deleteme
 instance (Show a, Finite a) ⇒ Show (Equivalence a) where
   show ∷ Equivalence a → String
   show = show . fmap NE.toList . fromEquivalence
   {-
-  -- show equivalence = -- show (fmap NE.toList (fromEquivalence equivalence))
-                     unlines (fmap show' graph)
-               where
-                 domain          = liftA2 (,) asList asList
-                 graph           = fmap (\(a, y) → (a, y, (getEquivalence equivalence) a y)) domain
-                 show' (a, b, c) = show a ++ ", " ++ show b ++ " ↦ " ++ show c
+  show equivalence = -- show (fmap NE.toList (fromEquivalence equivalence)) -- unlines (fmap show' graph)
+    where
+      domain          = liftA2 (,) asList asList
+      graph           = fmap (\(a, y) → (a, y, (getEquivalence equivalence) a y)) domain
+      show' (a, b, c) = show a ++ ", " ++ show b ++ " ↦ " ++ show c
   -}
 
 -- TODO probably going to be lots of room for optimization in these instance defs, but for now I want to focus on correctness
