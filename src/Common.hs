@@ -11,6 +11,7 @@ import qualified Data.Set as Set
 import           Data.Set.Unicode ((∪))
 import           Data.Bool.Unicode ((∧))
 import           Data.Ord.Unicode ((≤))
+import           Data.Eq.Unicode ((≠))
 import           Data.List as List
 import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)), (<|))
 import qualified Data.List.NonEmpty as NE
@@ -167,6 +168,14 @@ fromThese (These a b)                  = Left  (a, b)
 fromThese (That    b)                  = Right (Right b)
 fromThese (This  a  )                  = Right (Left  a)
 
+-- Equivalence ((==) `on` (not . (==) GT))
+lteq ∷ Equivalence Ordering
+lteq = equality (≠ GT)
+
+-- Equivalence ((==) `on` (not . (==) LT))
+gteq ∷ Equivalence Ordering
+gteq = equality (≠ LT)
+
 partitionWith ∷ (a → Either b c) → [a] → ([b], [c])
 partitionWith  f = partitionEithers . fmap f
 
@@ -239,6 +248,21 @@ stirling₂ (0, 0) = 1
 stirling₂ (0, _) = 0
 stirling₂ (_, 0) = 0
 stirling₂ (n, k) = stirling₂ (n - 1, k - 1) + stirling₂ (n - 1, k) * k
+
+-- https://oeis.org/A000108
+-- Catalan numbers
+catalan ∷ NonEmpty ℕ
+catalan = 1 <| NE.unfoldr c (1 :| [])
+  where
+    c ∷ NonEmpty ℕ → (ℕ, Maybe (NonEmpty ℕ))
+    c ns = (n, Just (n <| ns))
+      where
+        n ∷ ℕ
+        n = sum (NE.zipWith (*) ns (NE.reverse ns))
+
+-- Natural numbers
+naturals ∷ NonEmpty ℕ
+naturals = NE.iterate (+1) 0
 
 factorial ∷ ℕ → ℕ
 factorial = product . enumFromTo 1
@@ -481,6 +505,10 @@ instance RenameMe Comparison where
       (⪥) (These _  _ ) (This  _    ) = GT
       (⪥) (These _  _ ) (That     _ ) = GT
       (⪥) (These b₁ c₁) (These b₂ c₂) = (b₁ ⪋ b₂) <> (c₁ ⪌ c₂)
+
+-- Partial Equivalence Relation
+newtype PER a = PER { getPER ∷ a → a → Maybe Bool }
+newtype POR a = POR { getPOR ∷ a → a → Maybe Ordering }
 
 -- newtype Op₁ b a = Op₁ { getOp₁ ∷     a → b }
 newtype Op₂ b a = Op₂ { getOp₂ ∷ a → a → b }
