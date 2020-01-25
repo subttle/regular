@@ -517,6 +517,20 @@ newtype Op₂ b a = Op₂ { getOp₂ ∷ a → a → b }
 -- or when flipped:
 -- flipOn ∷ (a → b) → (b → b → c) → (a → a → c)
 
+equivalenceToPER ∷ Equivalence a → PER a
+equivalenceToPER (Equivalence (≡)) = PER (\a₁ a₂ → Just (a₁ ≡ a₂))
+
+comparisonToPOR ∷ Comparison a → POR a
+comparisonToPOR (Comparison c) = POR (\a₁ a₂ → Just (a₁ `c` a₂))
+
+instance Contravariant PER where
+  contramap ∷ (a → b) → PER b → PER a
+  contramap h (PER p) = PER (p `on` h)
+
+instance Contravariant POR where
+  contramap ∷ (a → b) → POR b → POR a
+  contramap h (POR p) = POR (p `on` h)
+
 instance Contravariant (Op₂ c) where
   contramap ∷ (a → b) → Op₂ c b → Op₂ c a
   contramap h (Op₂ oᵇ) = Op₂ (oᵇ `on` h)
