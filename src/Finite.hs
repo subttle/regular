@@ -325,7 +325,6 @@ instance (Finite a, Finite b, Finite c, Finite d)
   asList ∷ [(a, b, c, d)]
   asList = liftM4 (,,,)  asList asList asList asList
 
-
 -- For tuples where types `a`, `b`, `c` and `d` are enumerable, allow the tuple to be enumerated as `a` × `b` × `c` × `d`
 instance (Finite a, Finite b, Finite c, Finite d, Finite e)
        ⇒ Enum (a, b, c, d, e) where
@@ -670,9 +669,6 @@ transC = Predicate p
       where
         (≤) ∷ a → a → Bool
         (≤) = tolteq c
-
--- TODO partial equivalence relation type
--- data PER a where
 
 comparisonToList ∷ (Finite a) ⇒ Comparison a → [a]
 comparisonToList (Comparison c) = sortBy c asList
