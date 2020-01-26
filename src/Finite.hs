@@ -710,8 +710,15 @@ representativeC ∷ ∀ a . (Finite a) ⇒ Comparison a → a → a
 representativeC c = genericIndex (comparisonToList c) . fromEnum'
 
 -- I mean technically you could :P lol
-representativesC ∷ ∀ a . (Finite a) ⇒ Comparison a → a → NonEmpty a
-representativesC c a = (representativeC c a) :| []
+equivalenceClassC ∷ ∀ a . (Finite a) ⇒ Comparison a → a → NonEmpty a
+equivalenceClassC c a = (representativeC c a) :| []
+
+-- TODO
+composeC ∷ ∀ a . (Finite a) ⇒ Comparison a → Comparison a → Comparison a
+composeC c₁ c₂ = comparing' (representativeC c₁ . representativeC c₂)
+ -- TODO
+composeC' ∷ ∀ a . (Finite a) ⇒ Comparison a → Comparison a → Comparison a
+composeC' c₁ c₂ = divide (\a → (representativeC c₂ a, representativeC c₁ a)) c₁ c₂ -- N.B. the swap of c₁ c₂
 
 -- Counts the number of possible total orders over a finite set
 cardinalityC ∷ ∀ a . (Finite a) ⇒ Comparison a → ℕ
@@ -729,14 +736,6 @@ instance Group (Comparison a) where
   -- Reverse a total order
   invert ∷ Comparison a → Comparison a
   invert (Comparison c) = Comparison (flip c)
-  {-
-  invert (Comparison c) = Comparison (\a₁ a₂ → reverse (c a₁ a₂))
-    where
-      reverse ∷ Ordering → Ordering
-      reverse LT = GT
-      reverse EQ = EQ
-      reverse GT = LT
-      -}
 
 instance (Finite a)
        ⇒ Eq (Comparison a) where
