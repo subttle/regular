@@ -15,6 +15,7 @@ import           Data.Eq.Unicode ((≠))
 import           Data.Bool.Unicode ((∧), (∨))
 import           Control.Monad
 import           Control.Applicative
+import           Data.Group (Group, invert)
 import           Data.List as List
 import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)))
 import qualified Data.List.NonEmpty as NE
@@ -26,7 +27,7 @@ import qualified Data.Foldable as F
 import           Data.Function (on)
 import           Data.Functor.Contravariant
 import           Data.Functor.Contravariant.Divisible (Decidable, Divisible, divide, conquer, choose, lose)
-import           Common
+import           Common hiding (invert)
 import           GHC.Enum (boundedEnumFrom)
 import           Data.Fin (Fin)
 import qualified Data.Type.Nat as Nat
@@ -575,7 +576,7 @@ toRGS ∷ (Finite a) ⇒ Equivalence a → RGS a
 toRGS (≡) = RGS (fmap (fromEnumBy' (≡) . representative (≡)) asList)
 
 fromRGS ∷ (Finite a) ⇒ RGS a → Equivalence a
-fromRGS (RGS rgs) = equality (genericIndex rgs . elemIndexTotal asList)
+fromRGS (RGS rgs) = equating' (genericIndex rgs . fromEnum')
 
 -- Count the parts of an equivalence
 count ∷ (Finite a) ⇒ Equivalence a → ℕ
@@ -705,14 +706,12 @@ fromEnumBy' = elemIndexTotal . representatives
 toEnumBy' ∷ (Finite a) ⇒ Equivalence a → ℕ → a
 toEnumBy' = genericIndex . representatives
 
--- Reverse a total order
-reverseC ∷ (Finite a) ⇒ Comparison a → Comparison a
-reverseC (Comparison c) = Comparison (\a₁ a₂ → reverse (c a₁ a₂))
-  where
-    reverse ∷ Ordering → Ordering
-    reverse LT = GT
-    reverse EQ = EQ
-    reverse GT = LT
+representativeC ∷ ∀ a . (Finite a) ⇒ Comparison a → a → a
+representativeC c = genericIndex (comparisonToList c) . fromEnum'
+
+-- I mean technically you could :P lol
+representativesC ∷ ∀ a . (Finite a) ⇒ Comparison a → a → NonEmpty a
+representativesC c a = (representativeC c a) :| []
 
 -- Counts the number of possible total orders over a finite set
 cardinalityC ∷ ∀ a . (Finite a) ⇒ Comparison a → ℕ
@@ -725,6 +724,19 @@ instance (Show a, Finite a)
        ⇒ Show (Comparison a) where
   show ∷ Comparison a → String
   show = show . comparisonToList
+
+instance Group (Comparison a) where
+  -- Reverse a total order
+  invert ∷ Comparison a → Comparison a
+  invert (Comparison c) = Comparison (flip c)
+  {-
+  invert (Comparison c) = Comparison (\a₁ a₂ → reverse (c a₁ a₂))
+    where
+      reverse ∷ Ordering → Ordering
+      reverse LT = GT
+      reverse EQ = EQ
+      reverse GT = LT
+      -}
 
 instance (Finite a)
        ⇒ Eq (Comparison a) where
@@ -749,7 +761,7 @@ instance (Finite a)
   minBound ∷ Comparison a
   minBound = defaultComparison
   maxBound ∷ Comparison a
-  maxBound = reverseC minBound
+  maxBound = invert minBound
 instance (Finite a, U.Universe a)
        ⇒ U.Universe (Comparison a) where
 instance (Finite a)

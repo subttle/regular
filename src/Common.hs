@@ -108,9 +108,8 @@ while p = until (not . p)
 comparing' ∷ (Ord b) ⇒ (a → b) → Comparison a
 comparing' = (>$$<) defaultComparison
 
--- TODO better name?
-equality ∷ (Eq b) ⇒ (a → b) → Equivalence a
-equality = (>$$<) defaultEquivalence
+equating' ∷ (Eq b) ⇒ (a → b) → Equivalence a
+equating' = (>$$<) defaultEquivalence
 
 -- Boolean implication.
 implies ∷ Bool → Bool → Bool
@@ -170,11 +169,11 @@ fromThese (This  a  )                  = Right (Left  a)
 
 -- Equivalence ((==) `on` (not . (==) GT))
 lteq ∷ Equivalence Ordering
-lteq = equality (≠ GT)
+lteq = equating' (≠ GT)
 
 -- Equivalence ((==) `on` (not . (==) LT))
 gteq ∷ Equivalence Ordering
-gteq = equality (≠ LT)
+gteq = equating' (≠ LT)
 
 partitionWith ∷ (a → Either b c) → [a] → ([b], [c])
 partitionWith  f = partitionEithers . fmap f
