@@ -415,6 +415,23 @@ type Fin₁₃ = Fin Nat13
 type Fin₁₄ = Fin Nat14
 type Fin₁₅ = Fin Nat15
 
+type Fin0  = Fin₀
+type Fin1  = Fin₁
+type Fin2  = Fin₂
+type Fin3  = Fin₃
+type Fin4  = Fin₄
+type Fin5  = Fin₅
+type Fin6  = Fin₆
+type Fin7  = Fin₇
+type Fin8  = Fin₈
+type Fin9  = Fin₉
+type Fin10 = Fin₁₀
+type Fin11 = Fin₁₁
+type Fin12 = Fin₁₂
+type Fin13 = Fin₁₃
+type Fin14 = Fin₁₄
+type Fin15 = Fin₁₅
+
 instance U.Universe Fin₁
 instance U.Finite   Fin₁
 instance Finite     Fin₁
@@ -478,12 +495,28 @@ instance Finite     Fin₁₅
 -- TODO deleteme
 instance (Show a, Finite a) ⇒ Show (Predicate a) where
   show ∷ Predicate a → String
-  show (Predicate p) = unlines (fmap show' graph)
+  show = showpredset
     where
-      domain = asList ∷ [a]
-      image  = fmap p domain
-      graph  = zip domain image
-      show' (a, b) = show a ++ " ↦ " ++ show b
+      -- show predicate as a bitstring
+      showpredbits ∷ ∀ a. (Finite a) ⇒ Predicate a → String
+      showpredbits (Predicate p) = fmap (toBit . p) (asList ∷ [a])
+        where
+          toBit ∷ Bool → Char
+          toBit False = '0'
+          toBit True  = '1'
+      -- show predicate as a function
+      showpredf ∷ ∀ a. (Show a, Finite a) ⇒ Predicate a → String
+      showpredf (Predicate p) = unlines (fmap (\(a, b) → show a <> " ↦ " <> show b) graph)
+        where
+          domain ∷ [a]
+          domain = asList
+          image_ ∷ [Bool]
+          image_  = fmap p domain
+          graph ∷ [(a, Bool)]
+          graph  = zip domain image_
+      -- show predicate as a set
+      showpredset ∷ ∀ a. (Show a, Finite a) ⇒ Predicate a → String
+      showpredset (Predicate p) = show $ Set' (Set.filter p asSet)
 
 instance (Finite a)
        ⇒ Eq (Predicate a) where
