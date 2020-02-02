@@ -401,6 +401,10 @@ def = NFA.NFA δ 0 (singleton 3)
     δ (2, F) = singleton 3
     δ _      = (∅)
 
+-- accepts the language {"ABCDEF"}
+abcdef ∷ NFA.NFA (Either Fin₄ Fin₄) Alpha
+abcdef = NFA.concatenate abc def
+
 -- http://i.stack.imgur.com/AD6WJ.png
 exactly20s ∷ DFA Fin₄ Fin₂
 exactly20s = DFA δ 0 (singleton 2)
