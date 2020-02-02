@@ -148,7 +148,7 @@ instance Finite Objects where
 -- The states are the locations of the person, the fox, the hen, and the bag. Each one may be either left of the river or right of the river.
 -- The symbols are transitions, either the person by themself, or one of animals, accompanied by the person
 farmer ∷ DFA (Bool, Bool, Bool, Bool) Objects
-farmer = DFA δ q₀ f
+farmer = DFA δ q₀ final
   where
     δ ∷ ((Bool, Bool, Bool, Bool), Objects) → (Bool, Bool, Bool, Bool)
     -- foxEatsHen = p ≠ f ∧ f == h -- If the fox and the hen are on the same side and the person isn't watching the fox, then the hen gets eaten.
@@ -158,10 +158,10 @@ farmer = DFA δ q₀ f
     δ ((p, f, h, b), Fox) = if p ≠ f ∨                    (p ≠ h ∧ h == b) then (p, f, h, b) else (not p, not f,     h,     b)
     δ ((p, f, h, b), Hen) = if p ≠ h ∨ (p ≠ f ∧ f == h)                    then (p, f, h, b) else (not p,     f, not h,     b)
     δ ((p, f, h, b), Bag) = if p ≠ b ∨ (p ≠ f ∧ f == h) ∨ (p ≠ h ∧ h == b) then (p, f, h, b) else (not p,     f,     h, not b)
-    q₀ ∷     (Bool, Bool, Bool, Bool)
-    q₀ =           (False, False, False, False)  -- Everything starts not across the river
-    f  ∷ Set (Bool, Bool, Bool, Bool)
-    f  = singleton (True,  True,  True,  True )  -- We are finished when everything is safely across the river
+    q₀    ∷     (Bool, Bool, Bool, Bool)
+    q₀    =           (False, False, False, False)  -- Everything starts not across the river
+    final ∷ Set (Bool, Bool, Bool, Bool)
+    final = singleton (True,  True,  True,  True )  -- We are finished when everything is safely across the river
 
 -- Wikipedia version of the riddle
 -- https://en.wikipedia.org/wiki/Fox,_goose_and_bag_of_beans_puzzle
