@@ -4,7 +4,7 @@
 
 module DA where
 
--- import           Common
+import           Common (RenameMe, renameme)
 import qualified Language
 import           Language (ℒ)
 import           Finite
@@ -38,24 +38,24 @@ instance (Finite q) ⇒ Q (DA q s) q
 instance (Finite s) ⇒ Σ (DA q s) s
 
 instance Contravariant (DA q) where
-    contramap ∷ (g → s) → DA q s → DA q g
-    contramap h (DA o t) = DA o (\q → t q . h)
+  contramap ∷ (g → s) → DA q s → DA q g
+  contramap h (DA o t) = DA o (\q → t q . h)
 
 -- FIXME: these instances (`Divisible`, `Decidable`, and `RenameMe`) are just experimental for now
 instance Divisible (DA q) where
-    divide ∷ (s → (g₁, g₂)) → DA q g₁ → DA q g₂ → DA q s
-    divide h (DA o₁ t₁) (DA o₂ t₂) = DA (o₁ <> o₂) (\q → uncurry (t₂ . t₁ q) . h)
+  divide ∷ (s → (g₁, g₂)) → DA q g₁ → DA q g₂ → DA q s
+  divide h (DA o₁ t₁) (DA o₂ t₂) = DA (o₁ <> o₂) (\q → uncurry (t₂ . t₁ q) . h)
 
-    conquer ∷ DA q a
-    conquer = DA conquer const
+  conquer ∷ DA q a
+  conquer = DA conquer const
 
 instance Decidable (DA q) where
-    lose ∷ (a → Void) → DA q a
-    lose _ = empty
+  lose ∷ (a → Void) → DA q a
+  lose _ = empty
 
-    choose ∷ (s → Either g₁ g₂) → DA q g₁ → DA q g₂ → DA q s
-    choose h (DA (Predicate o₁) t₁) (DA (Predicate o₂) t₂) = DA (Predicate (\q →         o₁ q ∨ o₂ q    )) 
-                                                                           (\q → either (t₁ q) (t₂ q) . h)
+  choose ∷ (s → Either g₁ g₂) → DA q g₁ → DA q g₂ → DA q s
+  choose h (DA (Predicate o₁) t₁) (DA (Predicate o₂) t₂) = DA (Predicate (\q →         o₁ q ∨ o₂ q    )) 
+                                                                          (\q → either (t₁ q) (t₂ q) . h)
 
 instance RenameMe (DA q) where
   renameme ∷ (s → These g₁ g₂) → DA q g₁ → DA q g₂ → DA q s
