@@ -307,12 +307,10 @@ minimize = DFA.fromFA . FA.codeterminization . toFA
 -- FIXME see about necessarily starting with trim automaton, may have to return `Maybe (DFA q s)`
 -- FIXME or maybe something like trim the `DFA` as a `SomeDFA`
 quotient ∷ ∀ q s . (Finite q, Finite s) ⇒ DFA q s → DFA q s
-quotient m@(DFA δ q₀ f) = DFA (representative equiv . δ)
-                              (representative equiv q₀)
-                              (Set.map (representative equiv) f)
+quotient m@(DFA δ q₀ f) = DFA (rep . δ) (rep q₀) (Set.map rep f)
   where
-    equiv ∷ Equivalence q
-    equiv = indistinguishability m
+    rep ∷ q → q
+    rep = representative (indistinguishability m)
 
 -- The DFA, empty, which produces the empty language, such that
 -- ℒ(empty) = ∅
