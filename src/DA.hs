@@ -29,6 +29,10 @@ data DA q s =                 -- q is the set of states, Q
         , transition ∷ q → (s → q)
         }
 
+-- A DA constructor where the `q` type parameter is an existential
+data SomeDA s where
+  SomeDFA ∷ (Show q, Finite q) ⇒ DA q s → SomeDA s
+
 instance (Finite q) ⇒ Q (DA q s) q
 instance (Finite s) ⇒ Σ (DA q s) s
 
