@@ -616,10 +616,10 @@ count ∷ (Finite a) ⇒ Equivalence a → ℕ
 count = genericLength . fromEquivalence
 
 byCount ∷ (Finite a) ⇒ Equivalence (Equivalence a)
-byCount = Equivalence ((==) `on` count)
+byCount = equating' count
 
 byLength ∷ (Foldable t) ⇒ Equivalence (t a)
-byLength = Equivalence ((==) `on` length)
+byLength = equating' length
 
 byThese ∷ Equivalence (These a b)
 byThese = Equivalence (≡)
@@ -639,10 +639,10 @@ byEither = Equivalence (≡)
     (≡) _         _         = False
 
 byLefts ∷ (Foldable t, Eq a) ⇒ Equivalence (t (Either a b))
-byLefts = Equivalence ((==) `on` lefts')
+byLefts = equating' lefts'
 
 byRights ∷ (Foldable t, Eq b) ⇒ Equivalence (t (Either a b))
-byRights = Equivalence ((==) `on` rights')
+byRights = equating' rights'
 
 -- Reflexivity
 refl ∷ (Finite a) ⇒ Predicate (Equivalence a)
@@ -1337,14 +1337,14 @@ color ∷ Card → DisplayColor
 color = colorOf . suit
 
 cardsBySuit ∷ Equivalence Card
-cardsBySuit = Equivalence ((==) `on` suit)
+cardsBySuit = equating' suit
 
 cardsByRank ∷ Equivalence Card
-cardsByRank = Equivalence ((==) `on` rank)
+cardsByRank = equating' rank
 
 cardsByColor ∷ Equivalence Card
-cardsByColor = Equivalence ((==) `on` color)
+cardsByColor = equating' color
 
 suitsByColor ∷ Equivalence Suit
-suitsByColor = Equivalence ((==) `on` colorOf)
+suitsByColor = equating' colorOf
 
