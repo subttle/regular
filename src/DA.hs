@@ -11,6 +11,7 @@ import           Finite
 import           Data.Bool.Unicode
 import           Data.Functor.Contravariant
 import           Data.Functor.Contravariant.Divisible
+import           Data.These (These, These(..), these)
 import           Data.Void
 
 -- Experiment based on:
@@ -63,6 +64,13 @@ instance RenameMe (DA q) where
   renameme h (DA (Predicate o₁) t₁) (DA (Predicate o₂) t₂) = DA (Predicate (\q →        o₁ q ∨ o₂ q                 ))
                                                                            (\q → these (t₁ q) (t₂ q) (t₂ . t₁ q) . h)
   -}
+
+literal ∷ ∀ s . (Finite s) ⇒ s → (DA.DA Ordering s, Ordering)
+literal σ = (DA (Predicate (== EQ)) t, LT)
+  where
+    t ∷ Ordering → s → Ordering
+    t LT s | s == σ = EQ
+    t _  _          = GT
 
 language ∷ DA q s → q → ℒ s
 language (DA o t) q = contramap (foldl t q) o
