@@ -1026,6 +1026,25 @@ instance Fancy D₆ where
 (⚅) ∷ D₆
 (⚅) = Side₆
 
+data Month where
+  January   ∷ Month
+  February  ∷ Month
+  March     ∷ Month
+  April     ∷ Month
+  May       ∷ Month
+  June      ∷ Month
+  July      ∷ Month
+  August    ∷ Month
+  September ∷ Month
+  October   ∷ Month
+  November  ∷ Month
+  December  ∷ Month
+  deriving (Eq, Enum, Ord, Bounded)
+
+instance U.Universe Month
+instance U.Finite   Month
+instance Finite     Month
+
 data Suit where
   Spade   ∷ Suit
   Heart   ∷ Suit
