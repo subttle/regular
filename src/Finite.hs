@@ -136,6 +136,7 @@ instance (Finite a)
   minBound = OSet.empty
   maxBound ∷ OSet a
   maxBound = OSet.fromList (comparisonToList maxBound)
+
 instance (Finite a, U.Universe a)
        ⇒ U.Universe (OSet a) where
 instance (Finite a)
@@ -506,14 +507,14 @@ instance (Show a, Finite a) ⇒ Show (Predicate a) where
   show = showpredset
     where
       -- show predicate as a bitstring
-      showpredbits ∷ ∀ a. (Finite a) ⇒ Predicate a → String
+      showpredbits ∷ ∀ a . (Finite a) ⇒ Predicate a → String
       showpredbits (Predicate p) = fmap (toBit . p) (asList ∷ [a])
         where
           toBit ∷ Bool → Char
           toBit False = '0'
           toBit True  = '1'
       -- show predicate as a function
-      showpredf ∷ ∀ a. (Show a, Finite a) ⇒ Predicate a → String
+      showpredf ∷ ∀ a . (Show a, Finite a) ⇒ Predicate a → String
       showpredf (Predicate p) = unlines (fmap (\(a, b) → show a <> " ↦ " <> show b) graph)
         where
           domain ∷ [a]
@@ -523,7 +524,7 @@ instance (Show a, Finite a) ⇒ Show (Predicate a) where
           graph ∷ [(a, Bool)]
           graph  = zip domain image_
       -- show predicate as a set
-      showpredset ∷ ∀ a. (Show a, Finite a) ⇒ Predicate a → String
+      showpredset ∷ ∀ a . (Show a, Finite a) ⇒ Predicate a → String
       showpredset (Predicate p) = show $ Set' (Set.filter p asSet)
 
 instance (Finite a)
@@ -715,6 +716,10 @@ transC = Predicate p
 comparisonToList ∷ (Finite a) ⇒ Comparison a → [a]
 comparisonToList (Comparison c) = sortBy c asList
 
+-- Reverse a total order
+reverseC ∷ Comparison a → Comparison a
+reverseC (Comparison c) = Comparison (flip c)
+
 -- TODO this works for now but think if it is possible to do this but without throwing away information every time, by which I mean an implementation
 -- TODO which could search a smaller list after each find (i.e. delete the elements from the list as we find results for them)
 listToComparison ∷ (Finite a, Foldable t) ⇒ t a → Comparison a
@@ -752,14 +757,11 @@ representativeC c = genericIndex (comparisonToList c) . fromEnum'
 
 -- I mean technically you could :P lol
 equivalenceClassC ∷ ∀ a . (Finite a) ⇒ Comparison a → a → NonEmpty a
-equivalenceClassC c a = (representativeC c a) :| []
+equivalenceClassC c a = representativeC c a :| []
 
 -- TODO
 composeC ∷ ∀ a . (Finite a) ⇒ Comparison a → Comparison a → Comparison a
-composeC c₁ c₂ = comparing' (representativeC c₁ . representativeC c₂)
- -- TODO
-composeC' ∷ ∀ a . (Finite a) ⇒ Comparison a → Comparison a → Comparison a
-composeC' c₁ c₂ = divide (\a → (representativeC c₂ a, representativeC c₁ a)) c₁ c₂ -- N.B. the swap of c₁ c₂
+composeC c₁ c₂ = listToComparison (fmap (representativeC c₂ . representativeC c₁) asList)
 
 -- Counts the number of possible total orders over a finite set
 cardinalityC ∷ ∀ a . (Finite a) ⇒ Comparison a → ℕ
@@ -771,17 +773,31 @@ cardinalityC _ = factorial cardinality_a
 instance (Show a, Finite a)
        ⇒ Show (Comparison a) where
   show ∷ Comparison a → String
-  show = show . comparisonToList
+  show = showl
+    where
+      -- show Comparison as a sorted list
+      showl ∷ ∀ a . (Show a, Finite a) ⇒ Comparison a → String
+      showl = show . comparisonToList
+      -- show Comparison as a function
+      showf ∷ ∀ a. (Show a, Finite a) ⇒ Comparison a → String
+      showf comparison = unlines (fmap show' graph)
+        where
+          domain ∷ [(a, a)]
+          domain          = liftA2 (,) asList asList
+          graph  ∷ [(a, a, Ordering)]
+          graph           = fmap (\(a, y) → (a, y, (getComparison comparison) a y)) domain
+          show' (a, b, c) = show a ++ ", " ++ show b ++ " ↦ " ++ show c
 
-instance Group (Comparison a) where
-  -- Reverse a total order
+instance (Finite a)
+       ⇒ Group (Comparison a) where
   invert ∷ Comparison a → Comparison a
-  invert (Comparison c) = Comparison (flip c)
+  invert c = contramap (representativeC c) defaultComparison
 
 instance (Finite a)
        ⇒ Eq (Comparison a) where
   (==) ∷ Comparison a → Comparison a → Bool
   (==) = (==) `on` comparisonToList
+
 instance (Finite a)
        ⇒ Enum (Comparison a) where
   toEnum ∷ Int → Comparison a
@@ -801,7 +817,8 @@ instance (Finite a)
   minBound ∷ Comparison a
   minBound = defaultComparison
   maxBound ∷ Comparison a
-  maxBound = invert minBound
+  maxBound = reverseC minBound
+
 instance (Finite a, U.Universe a)
        ⇒ U.Universe (Comparison a) where
 instance (Finite a)
@@ -898,14 +915,20 @@ equivalenceClass (Equivalence (≡)) a₁ = NE.insert a₁ (fmap snd (catThese (
 -- TODO deleteme
 instance (Show a, Finite a) ⇒ Show (Equivalence a) where
   show ∷ Equivalence a → String
-  show = show . fmap NE.toList . fromEquivalence
-  {-
-  show equivalence = -- show (fmap NE.toList (fromEquivalence equivalence)) -- unlines (fmap show' graph)
+  show = showl
     where
-      domain          = liftA2 (,) asList asList
-      graph           = fmap (\(a, y) → (a, y, (getEquivalence equivalence) a y)) domain
-      show' (a, b, c) = show a ++ ", " ++ show b ++ " ↦ " ++ show c
-  -}
+      -- show an Equivalence as a list of disjoint lists of elements
+      showl ∷ ∀ a. (Show a, Finite a) ⇒ Equivalence a → String
+      showl = show . fmap NE.toList . fromEquivalence
+      -- show an Equivalence as a function
+      showf ∷ ∀ a. (Show a, Finite a) ⇒ Equivalence a → String
+      showf equivalence = unlines (fmap show' graph)
+        where
+          domain ∷ [(a, a)]
+          domain          = liftA2 (,) asList asList
+          graph  ∷ [(a, a, Bool)]
+          graph           = fmap (\(a, y) → (a, y, (getEquivalence equivalence) a y)) domain
+          show' (a, b, c) = show a ++ ", " ++ show b ++ " ↦ " ++ show c
 
 -- TODO probably going to be lots of room for optimization in these instance defs, but for now I want to focus on correctness
 instance (Finite a)
@@ -999,14 +1022,18 @@ data D₆ where
   Side₆ ∷ D₆
   deriving (Eq, Enum, Ord, Bounded)
 
+-- non unicode aliases for convenience
+type D6 = D₆
+side1 = Side₁ ∷ D₆
+side2 = Side₂ ∷ D₆
+side3 = Side₃ ∷ D₆
+side4 = Side₄ ∷ D₆
+side5 = Side₅ ∷ D₆
+side6 = Side₆ ∷ D₆
+
 instance Show D₆ where
   show ∷ D₆ → String
-  show Side₁ = "⚀"
-  show Side₂ = "⚁"
-  show Side₃ = "⚂"
-  show Side₄ = "⚃"
-  show Side₅ = "⚄"
-  show Side₆ = "⚅"
+  show = show'
 
 instance U.Universe D₆
 instance U.Finite   D₆
@@ -1027,6 +1054,17 @@ instance Fancy D₆ where
   plain Side₄ = "Side₄"
   plain Side₅ = "Side₅"
   plain Side₆ = "Side₆"
+  show' ∷ D₆ → String
+  show' d = charToString (unicode d) `toColor` colorOf' d
+    where
+      -- TODO almost have the six colors of Rubik's cube, maybe try to update?
+      colorOf' ∷ D₆ → DisplayColor
+      colorOf' Side₁ = Red'    -- "⚀"
+      colorOf' Side₂ = Magenta -- "⚁" -- Orange
+      colorOf' Side₃ = Yellow  -- "⚂"
+      colorOf' Side₄ = Green   -- "⚃"
+      colorOf' Side₅ = Blue    -- "⚄"
+      colorOf' Side₆ = White   -- "⚅"
 
 (⚀) ∷ D₆
 (⚀) = Side₁
