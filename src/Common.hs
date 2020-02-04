@@ -307,6 +307,10 @@ deleteFirstsBy' (Equivalence (≡)) = deleteFirstsBy (≡) `on` toList
 elemBy ∷ (Foldable f) ⇒ Equivalence a → a → f a → Bool
 elemBy (Equivalence (≡)) = any . (≡)
 
+-- A wrapper for `sortBy` which uses `Comparison` type.
+sortBy' ∷ Comparison a → [a] → [a]
+sortBy' (Comparison c) = sortBy c
+
 -- A version of `fromEnum` which returns a Natural rather than an `Int`
 fromEnum' ∷ (Enum a) ⇒ a → ℕ
 fromEnum' = fromIntegral . fromEnum
