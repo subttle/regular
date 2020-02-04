@@ -19,7 +19,7 @@ import           Data.Either (fromRight)
 import           Data.Functor.Contravariant (Predicate(..))
 import qualified Data.Universe as U (Universe, Finite)
 
--- A DFA which accepts all binary strings ending in 1
+-- A DFA which accepts all binary strings ending in "1"
 endsWith1 ∷ DFA Bool Fin₂
 endsWith1 = DFA δ False (singleton True)
   where
@@ -29,7 +29,7 @@ endsWith1 = DFA δ False (singleton True)
     δ (True,  0) = False
     δ (True,  1) = True
 
--- The set of strings which end in [0, 1]
+-- The set of strings which end in "01"
 endsWith01 ∷ NFA.NFA Fin₄ Fin₂
 endsWith01 = NFA.NFA δ 0 (singleton 2)
   where
@@ -40,7 +40,7 @@ endsWith01 = NFA.NFA δ 0 (singleton 2)
     δ _      = (∅)
 
 -- https://en.wikipedia.org/wiki/File:NFAexample.svg
--- Generates the language where w has an even number of 0s or an even number of 1s
+-- Generates the language where w has an even number of "0"s or an even number of "1"s
 even0or1 ∷ EFA.EFA Fin₅ Fin₂
 even0or1 = EFA.EFA δ 0 (fromList [1, 3])
   where
@@ -219,7 +219,7 @@ figure2 = NFA.NFA δ 0 (singleton 7)
     δ (6, _)        = fromList  [6, 7]
     δ (7, _)        = (∅)
 
--- Generates the language [[1], [2], [3]]
+-- Generates the language {"1", "2", "3"}
 oneTwoThree ∷ EFA.EFA Bool Fin₄
 oneTwoThree = EFA.EFA δ False (singleton True)
   where
@@ -249,6 +249,7 @@ startsWith0endsWith1 = EFA.EFA δ 0 (singleton 2)
     δ (_, Nothing) = (∅)
 
 -- A DFA which accepts all binary strings starting with 0
+-- {"0", "00", "01", "000", "001", "010", "011", ...}
 startsWith0 ∷ DFA Fin₃ Fin₂
 startsWith0 = DFA δ 0 (singleton 1)
   where
@@ -315,7 +316,7 @@ hmu218 = EFA.EFA δ 0 (singleton 5)
     δ (4, Just (Left Period)) = singleton 3
     δ  _                      = (∅)
 
--- [[0],[1],[0,1],[0,0,0],[0,1,1],[1,1,1]
+-- {"0", "1", "01", "000", "011", "111", ...}
 ex144 ∷ EFA.EFA Fin₆ Fin₂
 ex144 = EFA.EFA δ 0 (singleton 3)
   where
@@ -406,6 +407,8 @@ abcdef ∷ NFA.NFA (Either Fin₄ Fin₄) Alpha
 abcdef = NFA.concatenate abc def
 
 -- http://i.stack.imgur.com/AD6WJ.png
+-- only accepts binary strings with exactly two "0"s
+-- {"00", "001', "010", "100", "0011", ...}
 exactly20s ∷ DFA Fin₄ Fin₂
 exactly20s = DFA δ 0 (singleton 2)
   where
@@ -420,6 +423,8 @@ exactly20s = DFA δ 0 (singleton 2)
     δ (3, 1) = 3
 
 -- http://i.stack.imgur.com/AD6WJ.png
+-- only accepts binary strings with at least two "1"s
+-- {"11", "011', "101", "110", "111", ...}
 atleast21s ∷ DFA Fin₃ Fin₂
 atleast21s = DFA δ 0 (singleton 2)
   where
@@ -434,7 +439,7 @@ atleast21s = DFA δ 0 (singleton 2)
 exactly20sANDatleast21s ∷ DFA (Fin₄, Fin₃) Fin₂
 exactly20sANDatleast21s  = exactly20s `DFA.intersection` atleast21s
 
--- The language ["123456789"]
+-- The language {"123456789"}
 digitsNFA ∷ NFA.NFA Fin₁₀ Fin₁₀
 digitsNFA = NFA.NFA δ 0 (singleton 9)
   where
