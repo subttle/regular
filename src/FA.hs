@@ -23,18 +23,18 @@ import           Algebra.Graph.Relation (postSet, stars)
 -- This is essentially an NFA with multiple start states
 -- Having this type simplifies some algorithms (such as Brzozowski minimization)
 data FA q s where
-     FA ∷ { delta ∷ (q, s) → Set q, initial ∷ Set q, final ∷ Set q } → FA q s
+  FA ∷ { delta ∷ (q, s) → Set q, initial ∷ Set q, final ∷ Set q } → FA q s
 
 data SomeFA s where
-     SomeFA ∷ (Finite q, Show q) ⇒ FA q s → SomeFA s
+  SomeFA ∷ (Finite q, Show q) ⇒ FA q s → SomeFA s
 
 instance (Finite q) ⇒ Q (FA q s) q
 instance (Finite s) ⇒ Σ (FA q s) s
 instance (Finite s) ⇒ Σ (SomeFA s) s
 
 instance Contravariant (FA q) where
-    contramap ∷ (g → s) → FA q s → FA q g
-    contramap h (FA δ i f) = FA (\(q, γ) → δ (q, h γ)) i f
+  contramap ∷ (g → s) → FA q s → FA q g
+  contramap h (FA δ i f) = FA (\(q, γ) → δ (q, h γ)) i f
 
 instance (Finite q, Finite s) ⇒ Configuration FA q s (Set q) where
   deterministic ∷ FA q s → Bool
