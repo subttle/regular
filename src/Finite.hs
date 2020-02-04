@@ -791,7 +791,7 @@ instance (Show a, Finite a)
 instance (Finite a)
        ⇒ Group (Comparison a) where
   invert ∷ Comparison a → Comparison a
-  invert c = contramap (representativeC c) defaultComparison
+  invert = comparing' . representativeC
 
 instance (Finite a)
        ⇒ Eq (Comparison a) where
