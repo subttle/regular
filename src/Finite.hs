@@ -846,6 +846,18 @@ fromEquivalence (Equivalence (≡)) = unfoldr c asList
 toPredicate ∷ (Foldable t, Eq a) ⇒ t a → Predicate a
 toPredicate = Predicate . (∋)
 
+singletonP ∷ (Eq a) ⇒ a → Predicate a
+singletonP = Predicate . (==)
+
+singletonPBy ∷ Equivalence a → a → Predicate a
+singletonPBy (Equivalence (≡)) = Predicate . (≡)
+
+disjointP ∷ (Finite a) ⇒ Predicate a → Predicate a → Bool
+disjointP = Set.disjoint `on` predicateToSet
+
+intersectingP ∷ (Finite a) ⇒ Predicate a → Predicate a → Bool
+intersectingP p = not . disjointP p
+
 predicateToList ∷ (Finite a) ⇒ Predicate a → [a]
 predicateToList (Predicate p) = List.filter p asList
 
