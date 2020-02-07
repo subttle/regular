@@ -638,7 +638,7 @@ orbit (Comparison c) a = a :| undefined
 -- https://en.wikipedia.org/wiki/Permutation#Permutation_order
 -- "It is the least common multiple of its cycles lengths. For example, the order of (1 3 2)(4 5) is 2 * 3 = 6."
 order ∷ (Finite a) ⇒ Comparison a → ℕ
-order c = F.foldl lcm 1 (fmap (fromIntegral . length) (cycles c))
+order = F.foldl lcm 1 . fmap (fromIntegral . length) . cycles
 
 byOrder ∷ (Finite a) ⇒ Equivalence (Comparison a)
 byOrder = equating' order
