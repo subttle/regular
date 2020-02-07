@@ -259,8 +259,10 @@ testComposeC = scope "Comparison.Compose" . expect $ and [test₁, test₂, test
 testGroupInvert ∷ Test ()
 testGroupInvert = scope "Comparison.Invert" . expect $ and [test₁, test₂]
   where
+    comparisons ∷ [Comparison Fin₅]
+    comparisons = asList
     test₁ ∷ Bool
-    test₁ = and (fmap (\c → (         c) `composeC` (G.invert c) == (mempty ∷ Comparison Fin₅)) (asList ∷ [Comparison Fin₅]))
+    test₁ = all (\c → (         c) `composeC` (G.invert c) == mempty) comparisons
     test₂ ∷ Bool
-    test₂ = and (fmap (\c → (G.invert c) `composeC` (         c) == (mempty ∷ Comparison Fin₅)) (asList ∷ [Comparison Fin₅]))
+    test₂ = all (\c → (G.invert c) `composeC` (         c) == mempty) comparisons
 
