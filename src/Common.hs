@@ -271,11 +271,11 @@ factorial = product . enumFromTo 1
 -- bell ∷ ℕ → ℕ
 -- bell n = sum (fmap (\k → stirling₂ (n, k)) [0 .. n])
 bell ∷ ℕ → ℕ
-bell n = NE.head (nth n (\ns → NE.scanl1 (+) (NE.last ns :| Foldable.toList ns)) (1 :| []))
+bell n = NE.head (applyN n (\ns → NE.scanl1 (+) (NE.last ns :| Foldable.toList ns)) (1 :| []))
 
 -- Apply a function `n` times
-nth ∷ ℕ → (a → a) → a → a
-nth n = Foldable.foldr (.) id . genericReplicate n
+applyN ∷ ℕ → (a → a) → a → a
+applyN n = Foldable.foldr (.) id . genericReplicate n
 
 -- A version of List.findIndex which returns `Maybe ℕ` instead of `Maybe Int`
 findIndex' ∷ (a → Bool) → [a] → Maybe ℕ
@@ -309,7 +309,15 @@ elemBy (Equivalence (≡)) = any . (≡)
 
 -- A wrapper for `sortBy` which uses `Comparison` type.
 sortBy' ∷ Comparison a → [a] → [a]
-sortBy' (Comparison c) = sortBy c
+sortBy' (Comparison cmp) = sortBy cmp
+
+-- A wrapper for `minimumBy` which uses `Comparison` type. -- FIXME: should be `Foldable1`
+minimumBy' ∷ (Foldable t) ⇒ Comparison a → t a → a
+minimumBy' (Comparison cmp) = Foldable.minimumBy cmp
+
+-- A wrapper for `maximumBy` which uses `Comparison` type. -- FIXME: should be `Foldable1`
+maximumBy' ∷ (Foldable t) ⇒ Comparison a → t a → a
+maximumBy' (Comparison cmp) = Foldable.maximumBy cmp
 
 -- A version of `fromEnum` which returns a Natural rather than an `Int`
 fromEnum' ∷ (Enum a) ⇒ a → ℕ
@@ -357,7 +365,7 @@ format'' = go -- .  Map.filter (not . Set.null)
     go m | Map.null m = "  δ _ ↦ ∅"
     go m              = foldl1 (\a b → a ++ "\n" ++ b )  -- manually intercalate the Map with newlines.
                         (mapWithKey (\k v → "  δ " ++ show'' k ++ " ↦ " ++ show (Set' v)) m)
-    show'' ∷ (q, Maybe s) -> String
+    show'' ∷ (q, Maybe s) → String
     show'' (q, Just  σ) = "(" ++ show q ++ "," ++ show σ ++ ")"
     show'' (q, Nothing) = "(" ++ show q ++ ",ε)"
 
