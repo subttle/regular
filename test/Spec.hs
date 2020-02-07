@@ -19,7 +19,7 @@ import           Data.Set (singleton)
 import           Config
 import           Numeric.Natural.Unicode (ℕ)
 import           Data.Eq.Unicode ((≠))
-import           Data.Functor.Contravariant (Equivalence (..))
+import           Data.Functor.Contravariant (Equivalence (..), Comparison (..))
 import           EasyTest
 import qualified Data.List as List
 import qualified Data.List.NonEmpty as NE (NonEmpty(..))
@@ -43,6 +43,7 @@ suite = tests [ testFizzBuzz
               -- https://www8.cs.umu.se/kurser/TDBAfl/VT06/algorithms/BOOK/BOOK4/NODE153.HTM
               , scope "toRGS"         . expect $ toRGS (toEquivalence [0 NE.:| [4], 1 NE.:| [2, 6], 3 NE.:| [], 5 NE.:| []]) == (RGS [0, 1, 1, 2, 0, 3, 1] ∷ RGS Fin₇)
               , scope "RGS"           . expect $ bijection (toRGS ∷ Equivalence Suit → RGS Suit) (fromRGS ∷ RGS Suit → Equivalence Suit)
+              , testComposeC
               ]
 
 -- Test that ordinary FizzBuzz has the same output as the FizzBuzz which uses DFA
@@ -226,4 +227,28 @@ testBisimSubset (m, ℓ) subset = scope "bisim" . expect $ isBisim
     -- i.e. a list of counter examples
     _negationProof ∷ [[s]]
     _negationProof = lefts witnesses
+
+-- Composition of permutations
+testComposeC ∷ Test ()
+testComposeC = scope "Comparison.Compose" . expect $ tests
+  where
+    -- https://en.wikipedia.org/wiki/Permutation_group#Composition_of_permutations%E2%80%93the_group_product
+    (p, q) = (listToComparison [1, 3, 0, 2, 4], listToComparison [4, 3, 2, 1, 0]) ∷ (Comparison Fin₅, Comparison Fin₅)
+    test₁ ∷ Bool
+    test₁ = q `composeC` p == listToComparison [3, 1, 4, 2, 0] -- 4 2 5 3 1
+    -- https://youtu.be/3aNeCWRjh8I?t=211
+    c₁ ∷ Comparison Fin₄
+    c₁ = listToComparison [0, 2, 3, 1] -- 1 3 4 2
+    c₂ ∷ Comparison Fin₄
+    c₂ = listToComparison [3, 2, 1, 0] -- 4 3 2 1
+    c₃ ∷ Comparison Fin₄
+    c₃ = c₁ `composeC` c₂ -- 2 4 3 1
+    test₂ ∷ Bool
+    test₂ = comparisonToList c₃ == [1, 3, 2, 0]
+    c₄ ∷ Comparison Fin₄
+    c₄ = c₂ `composeC` c₁ -- 4 2 1 3
+    test₃ ∷ Bool
+    test₃ = comparisonToList c₄ == [3, 1, 0, 2]
+    tests ∷ Bool
+    tests = and [test₁, test₂, test₃]
 

@@ -568,6 +568,8 @@ instance (Finite a)
 -- Restricted Growth String type, where `a` is the
 -- underlying `Finite` type.
 -- TODO this might be better as `NonEmpty ℕ → RGS a`?
+--
+-- TODO Pg. 163 "RGS serves as the /digits/ of a number system, while the edge weights serve as the /coefficients/."
 data RGS a where
   RGS ∷ (Finite a) ⇒ [ℕ] → RGS a
 
@@ -619,6 +621,27 @@ toRGS (≡) = RGS (fmap (fromEnumBy' (≡) . representative (≡)) asList)
 
 fromRGS ∷ (Finite a) ⇒ RGS a → Equivalence a
 fromRGS (RGS rgs) = equating' (genericIndex rgs . fromEnum')
+
+-- TODO https://proofwiki.org/wiki/Definition:Cycle_Decomposition
+-- FIXME
+cycles ∷ (Finite a) ⇒ Comparison a → [NonEmpty a]
+cycles (Comparison c) = undefined
+
+-- FIXME
+orbit ∷ (Finite a) ⇒ Comparison a → a → NonEmpty a
+orbit (Comparison c) a = a :| undefined
+
+-- FIXME
+-- ~the least number of times the permutation has to be composed with itself
+-- such that it would "become" the identity function.
+--
+-- https://en.wikipedia.org/wiki/Permutation#Permutation_order
+-- "It is the least common multiple of its cycles lengths. For example, the order of (1 3 2)(4 5) is 2 * 3 = 6."
+order ∷ (Finite a) ⇒ Comparison a → ℕ
+order (Comparison c) = undefined
+
+byOrder ∷ (Finite a) ⇒ Equivalence (Comparison a)
+byOrder = equating' order
 
 -- Count the parts of an equivalence
 count ∷ (Finite a) ⇒ Equivalence a → ℕ
@@ -761,7 +784,7 @@ equivalenceClassC c a = representativeC c a :| []
 
 -- TODO
 composeC ∷ ∀ a . (Finite a) ⇒ Comparison a → Comparison a → Comparison a
-composeC c₁ c₂ = listToComparison (fmap (representativeC c₂ . representativeC c₁) asList)
+composeC c₁ c₂ = listToComparison (fmap (representativeC c₁ . representativeC c₂) asList)
 
 -- Counts the number of possible total orders over a finite set
 cardinalityC ∷ ∀ a . (Finite a) ⇒ Comparison a → ℕ
@@ -778,15 +801,33 @@ instance (Show a, Finite a)
       -- show Comparison as a sorted list
       showl ∷ ∀ a . (Show a, Finite a) ⇒ Comparison a → String
       showl = show . comparisonToList
+      -- show Comparison as a permutation (in two line notation)
+      -- 1 ↦ 3
+      -- 2 ↦ 2
+      -- 3 ↦ 1
+      -- ⦍ 1 2 3 ⦐
+      -- ⦏ 3 2 1 ⦎
+      -- TODO add cycle notation
+      showp ∷ ∀ a. (Show a, Finite a) ⇒ Comparison a → String
+      showp comparison = topline
+                      <> "\n"
+                      <> botline
+        where
+          top ∷ [a]
+          top = asList
+          bot ∷ [a]
+          bot = comparisonToList comparison
+          topline = "⦍" <> (top >>= show) <> "⦐"
+          botline = "⦏" <> (bot >>= show) <> "⦎"
       -- show Comparison as a function
       showf ∷ ∀ a. (Show a, Finite a) ⇒ Comparison a → String
-      showf comparison = unlines (fmap show' graph)
+      showf (Comparison cmp) = unlines (fmap show' graph)
         where
           domain ∷ [(a, a)]
-          domain          = liftA2 (,) asList asList
+          domain = asList
           graph  ∷ [(a, a, Ordering)]
-          graph           = fmap (\(a, y) → (a, y, (getComparison comparison) a y)) domain
-          show' (a, b, c) = show a ++ ", " ++ show b ++ " ↦ " ++ show c
+          graph  = fmap (\(a₁, a₂) → (a₁, a₂, a₁ `cmp` a₂)) domain
+          show' (a₁, a₂, o) = show a₁ ++ ", " ++ show a₂ ++ " ↦ " ++ show o
 
 instance (Finite a)
        ⇒ Group (Comparison a) where
@@ -885,7 +926,7 @@ predicateToSet (Predicate p) = Set.filter p asSet
 -- fromPredicate (Predicate (> 2) ∷ Predicate Fin₁₀) == [[0,1,2],[3,4,5,6,7,8,9]]
 -- N.B. information is lost here, we can't distinguish `p` from `(not . p)` anymore
 fromPredicate ∷ Predicate a → Equivalence a
-fromPredicate (Predicate p) = contramap p defaultEquivalence
+fromPredicate (Predicate p) = equating' p
 
 -- There is a way to do this safely by generating the NonEmpty list for the equivalence class
 -- and then using comonadic extract to guarantee the representative will always be there
@@ -904,6 +945,7 @@ representatives (Equivalence (≡)) = nubBy (≡) asList
 equivalenceClass ∷ ∀ a . (Finite a) ⇒ Equivalence a → a → NonEmpty a
 equivalenceClass (Equivalence (≡)) a₁ = NE.insert a₁ (fmap snd (catThese (partitionedBy (Equivalence (≡)) a₁)))
   where
+    -- TODO describe in terms of irreflexive kernel / anti-reflexive kernel?
     partitionedBy ∷ ∀ a . (Finite a) ⇒ Equivalence a → a → [These a a]
     partitionedBy (Equivalence (≡)) a₁ = fmap f (asList ∷ [a])
       where
@@ -922,13 +964,13 @@ instance (Show a, Finite a) ⇒ Show (Equivalence a) where
       showl = show . fmap NE.toList . fromEquivalence
       -- show an Equivalence as a function
       showf ∷ ∀ a. (Show a, Finite a) ⇒ Equivalence a → String
-      showf equivalence = unlines (fmap show' graph)
+      showf (Equivalence (≡)) = unlines (fmap show' graph)
         where
           domain ∷ [(a, a)]
-          domain          = liftA2 (,) asList asList
+          domain = asList
           graph  ∷ [(a, a, Bool)]
-          graph           = fmap (\(a, y) → (a, y, (getEquivalence equivalence) a y)) domain
-          show' (a, b, c) = show a ++ ", " ++ show b ++ " ↦ " ++ show c
+          graph  = fmap (\(a₁, a₂) → (a₁, a₂, a₁ ≡ a₂)) domain
+          show' (a₁, a₂, b) = show a₁ ++ ", " ++ show a₂ ++ " ↦ " ++ show b
 
 -- TODO probably going to be lots of room for optimization in these instance defs, but for now I want to focus on correctness
 instance (Finite a)
