@@ -19,7 +19,7 @@ import           Data.Set (singleton)
 import           Config
 import           Numeric.Natural.Unicode (ℕ)
 import           Data.Eq.Unicode ((≠))
-import           Data.Functor.Contravariant (Equivalence (..), Comparison (..))
+import           Data.Functor.Contravariant (Equivalence (..), Comparison (..), Predicate (..))
 import qualified Data.Group as G
 import           EasyTest
 import qualified Data.List as List
@@ -46,6 +46,7 @@ suite = tests [ testFizzBuzz
               , scope "RGS"           . expect $ bijection (toRGS ∷ Equivalence Suit → RGS Suit) (fromRGS ∷ RGS Suit → Equivalence Suit)
               , testComposeC
               , testGroupInvert
+              , testCycles
               ]
 
 -- Test that ordinary FizzBuzz has the same output as the FizzBuzz which uses DFA
@@ -266,3 +267,16 @@ testGroupInvert = scope "Comparison.Invert" . expect $ and [test₁, test₂]
     test₂ ∷ Bool
     test₂ = all (\c → (G.invert c) `composeC` (         c) == mempty) comparisons
 
+-- test to check that `cycles` function gives back a lawful equivalence relation
+testCycles ∷ Test ()
+testCycles = scope "Comparison.Cycles" . expect $ and [test₁, test₂, test₃]
+  where
+    -- https://www.youtube.com/watch?v=MpKG6FmcIHk
+    c₁ ∷ Comparison Fin₅ -- 3 5 4 1 2
+    c₁ = listToComparison [2, 4, 3, 0, 1]
+    test₁ ∷ Bool
+    test₁ = getPredicate lawfulComparison c₁
+    test₂ ∷ Bool
+    test₂ = getPredicate lawful (cycles c₁)
+    test₃ ∷ Bool
+    test₃ = (cycles c₁) == toEquivalence ([0 NE.:| [2, 3], 1 NE.:| [4]])
