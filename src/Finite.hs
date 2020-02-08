@@ -624,7 +624,7 @@ fromRGS (RGS rgs) = equating' (genericIndex rgs . fromEnum')
 
 -- TODO https://proofwiki.org/wiki/Definition:Cycle_Decomposition
 cycles ∷ (Finite a) ⇒ Comparison a → Equivalence a
-cycles c = Equivalence (\a → (∈ a) . orbit c)
+cycles c = Equivalence (\a → (a ∈) . orbit c)
 
 -- " the orbit of an element is all its possible destinations under the group action."
 -- https://proofwiki.org/wiki/Definition:Orbit_(Group_Theory)
