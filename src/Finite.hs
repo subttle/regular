@@ -623,13 +623,13 @@ fromRGS ∷ (Finite a) ⇒ RGS a → Equivalence a
 fromRGS (RGS rgs) = equating' (genericIndex rgs . fromEnum')
 
 -- TODO https://proofwiki.org/wiki/Definition:Cycle_Decomposition
--- FIXME
-cycles ∷ (Finite a) ⇒ Comparison a → [NonEmpty a]
-cycles (Comparison c) = undefined
+cycles ∷ (Finite a) ⇒ Comparison a → Equivalence a
+cycles c = Equivalence (\a₁ a₂ → (a₁ ∈) (orbit c a₂))
 
--- FIXME
+-- " the orbit of an element is all its possible destinations under the group action."
+-- https://proofwiki.org/wiki/Definition:Orbit_(Group_Theory)
 orbit ∷ (Finite a) ⇒ Comparison a → a → NonEmpty a
-orbit (Comparison c) a = a :| undefined
+orbit c a = a :| takeWhile (≠ a) (List.drop 1 (iterate (representativeC c) a))
 
 -- FIXME
 -- ~the least number of times the permutation has to be composed with itself
@@ -638,7 +638,7 @@ orbit (Comparison c) a = a :| undefined
 -- https://en.wikipedia.org/wiki/Permutation#Permutation_order
 -- "It is the least common multiple of its cycles lengths. For example, the order of (1 3 2)(4 5) is 2 * 3 = 6."
 order ∷ (Finite a) ⇒ Comparison a → ℕ
-order = F.foldl lcm 1 . fmap (fromIntegral . length) . cycles
+order = F.foldl lcm 1 . fmap length' . fromEquivalence . cycles
 
 byOrder ∷ (Finite a) ⇒ Equivalence (Comparison a)
 byOrder = equating' order
