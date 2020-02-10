@@ -477,6 +477,32 @@ class (Show a) ⇒ Fancy a where
   colored ∷ (a, DisplayColor) → String
   colored (s, color) = show' s `toColor` color
 
+class (Divisible f) ⇒ Divisible₃ f where
+  divide₃ ∷ (a → (b, c, d)) → f b → f c → f d → f a
+
+class (Divisible f) ⇒ Divisible₄ f where
+  divide₄ ∷ (a → (b, c, d, e)) → f b → f c → f d → f e → f a
+
+class (Divisible f) ⇒ Divisible₅ f where
+  divide₅ ∷ (a → (b, c, d, e, g)) → f b → f c → f d → f e → f g → f a
+
+class (Divisible f) ⇒ Divisible₆ f where
+  divide₆ ∷ (a → (b, c, d, e, g, h)) → f b → f c → f d → f e → f g → f h → f a
+
+-- Non-unicode aliases for convenience
+type Divisible3 = Divisible₃
+type Divisible4 = Divisible₄
+type Divisible5 = Divisible₅
+type Divisible6 = Divisible₆
+divide3 ∷ (Divisible₃ f) ⇒ (a → (b, c, d)) → f b → f c → f d → f a
+divide3 = divide₃
+divide4 ∷ (Divisible₄ f) ⇒ (a → (b, c, d, e)) → f b → f c → f d → f e → f a
+divide4 = divide₄
+divide5 ∷ (Divisible₅ f) ⇒ (a → (b, c, d, e, g)) → f b → f c → f d → f e → f g → f a
+divide5 = divide₅
+divide6 ∷ (Divisible₆ f) ⇒ (a → (b, c, d, e, g, h)) → f b → f c → f d → f e → f g → f h → f a
+divide6 = divide₆
+
 -- TODO change the name :)
 class (Decidable f) ⇒ RenameMe f where
   renameme ∷ (a → These b c) → f b → f c → f a
@@ -590,3 +616,89 @@ instance (Monoid m) ⇒ RenameMe (Op₂ m) where
       opᵇᶜ (These _  c₁) (That     c₂) =             opᶜ c₁ c₂
       opᵇᶜ (These b₁ c₁) (These b₂ c₂) = opᵇ b₁ b₂ ⋄ opᶜ c₁ c₂ -- TODO consider reverse order as above
       -}
+
+-- FIXME need to make sure associativity of `(∧)` matches the correct order here
+-- FIXME so as to preserve laziness correctly
+instance Divisible₃ Predicate where
+  divide₃ ∷ ∀ a b c d . (a → (b, c, d)) → Predicate b → Predicate c → Predicate d → Predicate a
+  divide₃ h (Predicate pᵇ) (Predicate pᶜ) (Predicate pᵈ) = Predicate (pᵇᶜᵈ . h)
+    where
+      pᵇᶜᵈ ∷ (b, c, d) → Bool
+      pᵇᶜᵈ   (b, c, d) = pᵇ b
+                       ∧ pᶜ c
+                       ∧ pᵈ d
+
+instance Divisible₄ Predicate where
+  divide₄ ∷ ∀ a b c d e . (a → (b, c, d, e)) → Predicate b → Predicate c → Predicate d → Predicate e → Predicate a
+  divide₄ h (Predicate pᵇ) (Predicate pᶜ) (Predicate pᵈ) (Predicate pᵉ) = Predicate (pᵇᶜᵈᵉ . h)
+    where
+      pᵇᶜᵈᵉ ∷ (b, c, d, e) → Bool
+      pᵇᶜᵈᵉ   (b, c, d, e) = pᵇ b
+                           ∧ pᶜ c
+                           ∧ pᵈ d
+                           ∧ pᵉ e
+
+instance Divisible₅ Predicate where
+  divide₅ ∷ ∀ a b c d e f . (a → (b, c, d, e, f)) → Predicate b → Predicate c → Predicate d → Predicate e → Predicate f → Predicate a
+  divide₅ h (Predicate pᵇ) (Predicate pᶜ) (Predicate pᵈ) (Predicate pᵉ) (Predicate pᶠ) = Predicate (pᵇᶜᵈᵉᶠ . h)
+    where
+      pᵇᶜᵈᵉᶠ ∷ (b, c, d, e, f) → Bool
+      pᵇᶜᵈᵉᶠ   (b, c, d, e, f) = pᵇ b
+                               ∧ pᶜ c
+                               ∧ pᵈ d
+                               ∧ pᵉ e
+                               ∧ pᶠ f
+
+instance Divisible₆ Predicate where
+  divide₆ ∷ ∀ a b c d e f g . (a → (b, c, d, e, f, g)) → Predicate b → Predicate c → Predicate d → Predicate e → Predicate f → Predicate g → Predicate a
+  divide₆ h (Predicate pᵇ) (Predicate pᶜ) (Predicate pᵈ) (Predicate pᵉ) (Predicate pᶠ) (Predicate pᵍ) = Predicate (pᵇᶜᵈᵉᶠᵍ . h)
+    where
+      pᵇᶜᵈᵉᶠᵍ ∷ (b, c, d, e, f, g) → Bool
+      pᵇᶜᵈᵉᶠᵍ   (b, c, d, e, f, g) = pᵇ b
+                                   ∧ pᶜ c
+                                   ∧ pᵈ d
+                                   ∧ pᵉ e
+                                   ∧ pᶠ f
+                                   ∧ pᵍ g
+
+instance Divisible₃ Equivalence where
+  divide₃ ∷ ∀ a b c d . (a → (b, c, d)) → Equivalence b → Equivalence c → Equivalence d → Equivalence a
+  divide₃ h (Equivalence eqᵇ) (Equivalence eqᶜ) (Equivalence eqᵈ) = Equivalence (eqᵇᶜᵈ `on` h)
+    where
+      eqᵇᶜᵈ ∷ (b, c, d) → (b, c, d) → Bool
+      eqᵇᶜᵈ (b₁, c₁, d₁) (b₂, c₂, d₂) = eqᵇ b₁ b₂
+                                      ∧ eqᶜ c₁ c₂
+                                      ∧ eqᵈ d₁ d₂
+
+instance Divisible₄ Equivalence where
+  divide₄ ∷ ∀ a b c d e . (a → (b, c, d, e)) → Equivalence b → Equivalence c → Equivalence d → Equivalence e → Equivalence a
+  divide₄ h (Equivalence eqᵇ) (Equivalence eqᶜ) (Equivalence eqᵈ) (Equivalence eqᵉ) = Equivalence (eqᵇᶜᵈᵉ `on` h)
+    where
+      eqᵇᶜᵈᵉ ∷ (b, c, d, e) → (b, c, d, e) → Bool
+      eqᵇᶜᵈᵉ (b₁, c₁, d₁, e₁) (b₂, c₂, d₂, e₂) = eqᵇ b₁ b₂
+                                               ∧ eqᶜ c₁ c₂
+                                               ∧ eqᵈ d₁ d₂
+                                               ∧ eqᵉ e₁ e₂
+
+instance Divisible₅ Equivalence where
+  divide₅ ∷ ∀ a b c d e f . (a → (b, c, d, e, f)) → Equivalence b → Equivalence c → Equivalence d → Equivalence e → Equivalence f → Equivalence a
+  divide₅ h (Equivalence eqᵇ) (Equivalence eqᶜ) (Equivalence eqᵈ) (Equivalence eqᵉ) (Equivalence eqᶠ) = Equivalence (eqᵇᶜᵈᵉᶠ `on` h)
+    where
+      eqᵇᶜᵈᵉᶠ ∷ (b, c, d, e, f) → (b, c, d, e, f) → Bool
+      eqᵇᶜᵈᵉᶠ (b₁, c₁, d₁, e₁, f₁) (b₂, c₂, d₂, e₂, f₂) = eqᵇ b₁ b₂
+                                                        ∧ eqᶜ c₁ c₂
+                                                        ∧ eqᵈ d₁ d₂
+                                                        ∧ eqᵉ e₁ e₂
+                                                        ∧ eqᶠ f₁ f₂
+
+instance Divisible₆ Equivalence where
+  divide₆ ∷ ∀ a b c d e f g . (a → (b, c, d, e, f, g)) → Equivalence b → Equivalence c → Equivalence d → Equivalence e → Equivalence f → Equivalence g → Equivalence a
+  divide₆ h (Equivalence eqᵇ) (Equivalence eqᶜ) (Equivalence eqᵈ) (Equivalence eqᵉ) (Equivalence eqᶠ) (Equivalence eqᵍ) = Equivalence (eqᵇᶜᵈᵉᶠᵍ `on` h)
+    where
+      eqᵇᶜᵈᵉᶠᵍ ∷ (b, c, d, e, f, g) → (b, c, d, e, f, g) → Bool
+      eqᵇᶜᵈᵉᶠᵍ (b₁, c₁, d₁, e₁, f₁, g₁) (b₂, c₂, d₂, e₂, f₂, g₂) = pᵇ b₁ b₂
+                                                                 ∧ pᶜ c₁ c₂
+                                                                 ∧ pᵈ d₁ d₂
+                                                                 ∧ pᵉ e₁ e₂
+                                                                 ∧ pᶠ f₁ f₂
+                                                                 ∧ pᵍ g₁ g₂
