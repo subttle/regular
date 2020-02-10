@@ -1,6 +1,7 @@
 {-# OPTIONS_GHC -Wall #-}
 {-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE RankNTypes                 #-}
+{-# LANGUAGE ConstraintKinds            #-}
 
 module Common where
 
@@ -81,6 +82,9 @@ andAlg = Algebra φ
         φ Nil        = True
         φ (Cons x y) = x ∧ y
 
+(⋄) ∷ (Semigroup m) ⇒ m → m → m
+(⋄) = (<>)
+
 -- requires containers-0.5.11 or newer
 -- TODO deleteme after this is closed: https://github.com/roelvandijk/containers-unicode-symbols/issues/6
 (×) ∷ (Ord a, Ord b) ⇒ Set a → Set b → Set (a, b)
@@ -108,6 +112,7 @@ while p = until (not . p)
 comparing' ∷ (Ord b) ⇒ (a → b) → Comparison a
 comparing' = (>$$<) defaultComparison
 
+-- ⭀
 equating' ∷ (Eq b) ⇒ (a → b) → Equivalence a
 equating' = (>$$<) defaultEquivalence
 
@@ -134,9 +139,8 @@ size' = fromIntegral . Set.size
 -- x, iterate f until two in a row are equal.
 -- Attempts to find the first fixed point not necessarily the least.
 fixedPoint ∷ (Eq a) ⇒ (a → a) → a → a
-fixedPoint f x
-  | f x == x  = x
-  | otherwise = fixedPoint f (f x)
+fixedPoint f a | f a == a = a
+fixedPoint f a            = fixedPoint f (f a)
 
 -- `replicateM` with parameter of type ℕ (instead of parameter of type ℤ)
 replicateM' ∷ (Applicative m) ⇒ ℕ → m a → m [a]
@@ -510,8 +514,14 @@ class (Decidable f) ⇒ RenameMe f where
 renamed ∷ (RenameMe f) ⇒ f b → f c → f (These b c)
 renamed = renameme id
 
-renamed' ∷ (RenameMe f) ⇒ f a → f a → f a
-renamed' = renameme (\s → These s s)
+renamedThese ∷ (RenameMe f) ⇒ f a → f a → f a
+renamedThese = renameme (\s → These s s)
+
+renamedThis ∷ (RenameMe f) ⇒ f a → f a → f a
+renamedThis = renameme This
+
+renamedThat ∷ (RenameMe f) ⇒ f a → f a → f a
+renamedThat = renameme That
 
 instance (Monoid m) ⇒ RenameMe (Op m) where
   renameme ∷ ∀ a b c . (a → These b c) → Op m b → Op m c → Op m a
@@ -619,6 +629,7 @@ instance (Monoid m) ⇒ RenameMe (Op₂ m) where
 
 -- FIXME need to make sure associativity of `(∧)` matches the correct order here
 -- FIXME so as to preserve laziness correctly
+-- TODO it may be better to generalize all these so they all just take use `(⋄)`?
 instance Divisible₃ Predicate where
   divide₃ ∷ ∀ a b c d . (a → (b, c, d)) → Predicate b → Predicate c → Predicate d → Predicate a
   divide₃ h (Predicate pᵇ) (Predicate pᶜ) (Predicate pᵈ) = Predicate (pᵇᶜᵈ . h)
@@ -702,3 +713,45 @@ instance Divisible₆ Equivalence where
                                                                  ∧ eqᵉ e₁ e₂
                                                                  ∧ eqᶠ f₁ f₂
                                                                  ∧ eqᵍ g₁ g₂
+
+instance Divisible₃ Comparison where
+  divide₃ ∷ ∀ a b c d . (a → (b, c, d)) → Comparison b → Comparison c → Comparison d → Comparison a
+  divide₃ h (Comparison cmpᵇ) (Comparison cmpᶜ) (Comparison cmpᵈ) = Comparison (cmpᵇᶜᵈ `on` h)
+    where
+      cmpᵇᶜᵈ ∷ (b, c, d) → (b, c, d) → Ordering
+      cmpᵇᶜᵈ (b₁, c₁, d₁) (b₂, c₂, d₂) = cmpᵇ b₁ b₂
+                                       ⋄ cmpᶜ c₁ c₂
+                                       ⋄ cmpᵈ d₁ d₂
+
+instance Divisible₄ Comparison where
+  divide₄ ∷ ∀ a b c d e . (a → (b, c, d, e)) → Comparison b → Comparison c → Comparison d → Comparison e → Comparison a
+  divide₄ h (Comparison cmpᵇ) (Comparison cmpᶜ) (Comparison cmpᵈ) (Comparison cmpᵉ) = Comparison (cmpᵇᶜᵈᵉ `on` h)
+    where
+      cmpᵇᶜᵈᵉ ∷ (b, c, d, e) → (b, c, d, e) → Ordering
+      cmpᵇᶜᵈᵉ (b₁, c₁, d₁, e₁) (b₂, c₂, d₂, e₂) = cmpᵇ b₁ b₂
+                                                ⋄ cmpᶜ c₁ c₂
+                                                ⋄ cmpᵈ d₁ d₂
+                                                ⋄ cmpᵉ e₁ e₂
+
+instance Divisible₅ Comparison where
+  divide₅ ∷ ∀ a b c d e f . (a → (b, c, d, e, f)) → Comparison b → Comparison c → Comparison d → Comparison e → Comparison f → Comparison a
+  divide₅ h (Comparison cmpᵇ) (Comparison cmpᶜ) (Comparison cmpᵈ) (Comparison cmpᵉ) (Comparison cmpᶠ) = Comparison (cmpᵇᶜᵈᵉᶠ `on` h)
+    where
+      cmpᵇᶜᵈᵉᶠ ∷ (b, c, d, e, f) → (b, c, d, e, f) → Ordering
+      cmpᵇᶜᵈᵉᶠ (b₁, c₁, d₁, e₁, f₁) (b₂, c₂, d₂, e₂, f₂) = cmpᵇ b₁ b₂
+                                                         ⋄ cmpᶜ c₁ c₂
+                                                         ⋄ cmpᵈ d₁ d₂
+                                                         ⋄ cmpᵉ e₁ e₂
+                                                         ⋄ cmpᶠ f₁ f₂
+
+instance Divisible₆ Comparison where
+  divide₆ ∷ ∀ a b c d e f g . (a → (b, c, d, e, f, g)) → Comparison b → Comparison c → Comparison d → Comparison e → Comparison f → Comparison g → Comparison a
+  divide₆ h (Comparison cmpᵇ) (Comparison cmpᶜ) (Comparison cmpᵈ) (Comparison cmpᵉ) (Comparison cmpᶠ) (Comparison cmpᵍ) = Comparison (cmpᵇᶜᵈᵉᶠᵍ `on` h)
+    where
+      cmpᵇᶜᵈᵉᶠᵍ ∷ (b, c, d, e, f, g) → (b, c, d, e, f, g) → Ordering
+      cmpᵇᶜᵈᵉᶠᵍ (b₁, c₁, d₁, e₁, f₁, g₁) (b₂, c₂, d₂, e₂, f₂, g₂) = cmpᵇ b₁ b₂
+                                                                  ⋄ cmpᶜ c₁ c₂
+                                                                  ⋄ cmpᵈ d₁ d₂
+                                                                  ⋄ cmpᵉ e₁ e₂
+                                                                  ⋄ cmpᶠ f₁ f₂
+                                                                  ⋄ cmpᵍ g₁ g₂
