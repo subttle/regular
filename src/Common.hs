@@ -135,12 +135,17 @@ intersects x y = not (Set.disjoint x y)
 size' ∷ Set a → ℕ
 size' = fromIntegral . Set.size
 
--- Given an endofunction, f, and a starting point,
--- x, iterate f until two in a row are equal.
+-- Given an endofunction, `f`, and a starting point,
+-- `a`, iterate `f` until two in a row are equal.
 -- Attempts to find the first fixed point not necessarily the least.
 fixedPoint ∷ (Eq a) ⇒ (a → a) → a → a
 fixedPoint f a | f a == a = a
 fixedPoint f a            = fixedPoint f (f a)
+
+-- pretty mind blowing but subtle observation: Church Nat has type: `∀ a . (a → a) → a → a`
+fixedPoint' ∷ Equivalence a → (a → a) → a → a
+fixedPoint' (Equivalence (≡)) f a | f a ≡ a = a
+fixedPoint' (Equivalence (≡)) f a           = fixedPoint' (Equivalence (≡)) f (f a)
 
 -- `replicateM` with parameter of type ℕ (instead of parameter of type ℤ)
 replicateM' ∷ (Applicative m) ⇒ ℕ → m a → m [a]
