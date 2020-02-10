@@ -696,9 +696,9 @@ instance Divisible₆ Equivalence where
   divide₆ h (Equivalence eqᵇ) (Equivalence eqᶜ) (Equivalence eqᵈ) (Equivalence eqᵉ) (Equivalence eqᶠ) (Equivalence eqᵍ) = Equivalence (eqᵇᶜᵈᵉᶠᵍ `on` h)
     where
       eqᵇᶜᵈᵉᶠᵍ ∷ (b, c, d, e, f, g) → (b, c, d, e, f, g) → Bool
-      eqᵇᶜᵈᵉᶠᵍ (b₁, c₁, d₁, e₁, f₁, g₁) (b₂, c₂, d₂, e₂, f₂, g₂) = pᵇ b₁ b₂
-                                                                 ∧ pᶜ c₁ c₂
-                                                                 ∧ pᵈ d₁ d₂
-                                                                 ∧ pᵉ e₁ e₂
-                                                                 ∧ pᶠ f₁ f₂
-                                                                 ∧ pᵍ g₁ g₂
+      eqᵇᶜᵈᵉᶠᵍ (b₁, c₁, d₁, e₁, f₁, g₁) (b₂, c₂, d₂, e₂, f₂, g₂) = eqᵇ b₁ b₂
+                                                                 ∧ eqᶜ c₁ c₂
+                                                                 ∧ eqᵈ d₁ d₂
+                                                                 ∧ eqᵉ e₁ e₂
+                                                                 ∧ eqᶠ f₁ f₂
+                                                                 ∧ eqᵍ g₁ g₂
