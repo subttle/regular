@@ -16,7 +16,7 @@ import           Data.Eq.Unicode ((≠))
 import           Data.Ord.Unicode ((≤), (≥))
 import           Common ((≰), equating')
 import           Data.Either (fromRight)
-import           Data.Functor.Contravariant (Predicate (..), Equivalence(..))
+import           Data.Functor.Contravariant (Predicate (..), Equivalence (..))
 import qualified Data.Universe as U (Universe, Finite)
 
 -- A DFA which accepts all binary strings ending in "1"
@@ -521,25 +521,43 @@ nlteq2 = Predicate (≰ 2)
 nlteq3 ∷ Predicate Fin₄
 nlteq3 = Predicate (≰ 3)
 
--- {..., -10, -5, 0, 5, 10, ...}
+-- TODO
+-- "we use the subgroup 5ℤ to partition the group ℤ into cosets"
+-- 0 + 5ℤ = {..., -10, -5, 0, 5, 10, ...} = 5ℤ
 mod5eq0 ∷ Predicate Integer
 mod5eq0 = Predicate (\i → i `mod` 5 == 0)
 
--- {..., -9, -4, 1, 6, ...}
+-- 1 + 5ℤ = {..., -9, -4, 1, 6, ...}
 mod5eq1 ∷ Predicate Integer
 mod5eq1 = Predicate (\i → i `mod` 5 == 1)
 
--- {..., -8, -3, 2, 7, ...}
+-- 2 + 5ℤ = {..., -8, -3, 2, 7, ...}
 mod5eq2 ∷ Predicate Integer
 mod5eq2 = Predicate (\i → i `mod` 5 == 2)
 
--- {..., -7, -2, 3, 8, ...}
+-- 3 + 5ℤ =  {..., -7, -2, 3, 8, ...}
 mod5eq3 ∷ Predicate Integer
 mod5eq3 = Predicate (\i → i `mod` 5 == 3)
 
--- {..., -6, -1, 4, 9, ...}
+-- 4 + 5ℤ = {..., -6, -1, 4, 9, ...}
 mod5eq4 ∷ Predicate Integer
 mod5eq4 = Predicate (\i → i `mod` 5 == 4)
 
 congruenceMod5 ∷ Equivalence Integer
 congruenceMod5 = equating' (`mod` 5)
+
+
+-- 0 + 3ℤ = {..., -9, -6, -3, 0, 3, 6, 9, ...} = 3ℤ
+mod3eq0 ∷ Predicate Integer
+mod3eq0 = Predicate (\i → i `mod` 3 == 0)
+
+-- 1 + 3ℤ = {..., -8, -5, -2, 1, 4, 7, 10, ...}
+mod3eq1 ∷ Predicate Integer
+mod3eq1 = Predicate (\i → i `mod` 3 == 1)
+
+-- 2 + 3ℤ = {..., -10, -7, -4, -1, 2, 5, 8, ...}
+mod3eq2 ∷ Predicate Integer
+mod3eq2 = Predicate (\i → i `mod` 3 == 2)
+
+congruenceMod3 ∷ Equivalence Integer
+congruenceMod3 = equating' (`mod` 3)
