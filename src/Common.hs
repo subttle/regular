@@ -427,8 +427,8 @@ windowed' = List.unfoldr pairs . Foldable.toList
 catMaybes ∷ (Ord a) ⇒ Set (Maybe a) → Set a
 catMaybes = Set.mapMonotonic fromJust . Set.dropWhileAntitone isNothing
 
-invert ∷ (Ord k, Ord v) ⇒ Map k v → Map v (Set k)
-invert = foldlWithKey (\acc k v → insertWith (∪) v (Set.singleton k) acc) Map.empty
+invertMap ∷ (Ord k, Ord v) ⇒ Map k v → Map v (Set k)
+invertMap = foldlWithKey (\acc k v → insertWith (∪) v (Set.singleton k) acc) Map.empty
 
 flattenKeys ∷ (Ord k, Ord v, Foldable t) ⇒ Map (t k) v → Map k (Set v)
 flattenKeys = foldlWithKey (\acc k v → Map.unionsWith Set.union (acc : fmap (`Map.singleton` Set.singleton v) (Foldable.toList k))) Map.empty
