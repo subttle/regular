@@ -5,6 +5,8 @@ module NatBase where
 
 import           Data.Function (on)
 import           Numeric.Natural (Natural)
+import           Data.Functor.Contravariant (Predicate (..))
+import           Prelude hiding (even, odd)
 
 -- N.B. this entire file is currently experimental/untested/WIP!
 
@@ -84,3 +86,8 @@ instance Ord ℕ where
   compare ∷ ℕ → ℕ → Ordering
   compare = compare `on` toNatural
 
+even ∷ Predicate ℕ
+even = Predicate (nat True not)
+
+odd ∷ Predicate ℕ
+odd = Predicate (nat False not)
