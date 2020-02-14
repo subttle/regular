@@ -72,12 +72,10 @@ instance Num ℤ where
 
 instance Real ℤ where
   toRational ∷ ℤ → Rational
-  toRational i = reduce (toInteger i) (toInteger (Next Zero))
+  toRational = (flip reduce `on` toInteger) (Next Zero)
 instance Integral ℤ where
   toInteger ∷ ℤ → Integer
-  toInteger Zero     = 0
-  toInteger (Next i) = 1 + (toInteger i)
-  toInteger (Prev i) =     (toInteger i) - 1
+  toInteger = int pred 0 succ
   quotRem ∷ ℤ → ℤ → (ℤ, ℤ)
   quotRem = undefined -- FIXME implement
 
