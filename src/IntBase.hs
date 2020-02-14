@@ -89,9 +89,7 @@ instance Monoid ℤ where
   mappend = (<>)
 instance Group ℤ where
   invert ∷ ℤ → ℤ
-  invert (Next i) = Prev (invert i)
-  invert Zero     = Zero
-  invert (Prev i) = Next (invert i)
+  invert = int Next Zero Prev
 
 instance Show ℤ where
   show ∷ ℤ → String
