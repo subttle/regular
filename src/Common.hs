@@ -184,6 +184,12 @@ lteq = equating' (≠ GT)
 gteq ∷ Equivalence Ordering
 gteq = equating' (≠ LT)
 
+-- case analysis for `Ordering` type
+ordering ∷ a → a → a → Ordering → a
+ordering lt _  _  LT = lt
+ordering _  eq _  EQ = eq
+ordering _  _  gt GT = gt
+
 partitionWith ∷ (a → Either b c) → [a] → ([b], [c])
 partitionWith  f = partitionEithers . fmap f
 
