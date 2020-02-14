@@ -15,27 +15,27 @@ import           GHC.Real (reduce)
 -- N.B. this entire file is currently experimental/untested/WIP!
 
 data ℤ where
-  Next ∷ ℤ → ℤ
-  Zero ∷     ℤ
   Prev ∷ ℤ → ℤ
+  Zero ∷     ℤ
+  Next ∷ ℤ → ℤ
 
 data IntegerF a where
-  NextF ∷ a → IntegerF a
-  ZeroF ∷     IntegerF a
   PrevF ∷ a → IntegerF a
+  ZeroF ∷     IntegerF a
+  NextF ∷ a → IntegerF a
 deriving instance Functor  IntegerF
 deriving instance Foldable IntegerF
 
 -- case analysis
 int ∷ (a → a) → a → (a → a) → ℤ → a
-int prev z next (Next i) = next (int prev z next i)
-int _    z _     Zero    = z
 int prev z next (Prev i) = prev (int prev z next i)
+int _    z _     Zero    = z
+int prev z next (Next i) = next (int prev z next i)
 
 intf ∷ (a → b) → b → (a → b) → IntegerF a → b
-intf _    _ next (NextF a) = next a
-intf _    z _     ZeroF    = z
 intf prev _ _    (PrevF a) = prev a
+intf _    z _     ZeroF    = z
+intf _    _ next (NextF a) = next a
 
 instance Num ℤ where
   (+) ∷ ℤ → ℤ → ℤ
@@ -56,15 +56,15 @@ instance Num ℤ where
   (-)       x   Zero    =             x
   (-)  Zero          y  =          negate y
   (-) (Next x) (Next y) =             x - y   -- (x + 1) - (y + 1) =  x - y       (monotonicity of addition)
-  (-) (Prev x) (Prev y) =             x - y   -- (x - 1) - (y - 1) =  x - y       (Monotonicity of subtraction)
+  (-) (Prev x) (Prev y) =             x - y   -- (x - 1) - (y - 1) =  x - y       (monotonicity of subtraction)
   (-) (Next x) (Prev y) = Next (Next (x - y)) -- (x + 1) - (y - 1) = (x - y) + 2
   (-) (Prev x) (Next y) = Prev (Prev (x - y)) -- (x - 1) - (y + 1) = (x - y) - 2
   negate ∷ ℤ → ℤ
   negate = invert
   fromInteger ∷ Integer → ℤ
+  fromInteger i | i < 0 = Prev (fromInteger (1 + i    ))
   fromInteger 0         = Zero
   fromInteger i | i > 0 = Next (fromInteger (    i - 1))
-  fromInteger i | i < 0 = Prev (fromInteger (1 + i    ))
   abs ∷ ℤ → ℤ
   abs = undefined    -- FIXME implement
   signum ∷ ℤ → ℤ
@@ -104,9 +104,10 @@ instance Ord ℤ where
 -- N.B. this is not a bijection!
 instance Enum ℤ where
   toEnum ∷ Int → ℤ
-  toEnum i | i == 0 = Zero
+  toEnum i | i <  0 = Prev (toEnum (i + 1))
+           | i == 0 = Zero
            | i >  0 = Next (toEnum (i - 1))
-           | i <  0 = Prev (toEnum (i + 1))
+
   fromEnum ∷ ℤ → Int
   fromEnum = int pred 0 succ
   succ ∷ ℤ → ℤ
@@ -116,33 +117,33 @@ instance Enum ℤ where
 
 instance Recursive Integer where
   project ∷ Integer → Base Integer Integer
-  project i | i == 0 = ZeroF
+  project i | i <  0 = PrevF (1 + i    )
+            | i == 0 = ZeroF
             | i >  0 = NextF (    i - 1)
-            | i <  0 = PrevF (1 + i    )
 
 instance Corecursive Integer where
   embed ∷ Base Integer Integer → Integer
-  embed  ZeroF    = 0
-  embed (NextF i) = 1 + i
   embed (PrevF i) =     i - 1
+  embed  ZeroF    =     0
+  embed (NextF i) = 1 + i
 
 type instance Base Integer = IntegerF
 -- type Integer' = Fix IntegerF
 
 
 toOrderings ∷ ℤ → NonEmpty Ordering
-toOrderings (Next i) = GT <| toOrderings i
-toOrderings Zero     = EQ :| []
 toOrderings (Prev i) = LT <| toOrderings i
+toOrderings Zero     = EQ :| []
+toOrderings (Next i) = GT <| toOrderings i
 
 toBits ∷ ℤ → [Bool]
-toBits (Next i) = True  : toBits i
-toBits Zero     = []
 toBits (Prev i) = False : toBits i
+toBits Zero     = []
+toBits (Next i) = True  : toBits i
 
 -- TODO better name
 toBits' ∷ ℤ → [Either ℤ ℤ]
-toBits' (Next i) = Left  i : toBits' i
-toBits' Zero     = []
 toBits' (Prev i) = Right i : toBits' i
+toBits' Zero     = []
+toBits' (Next i) = Left  i : toBits' i
 
