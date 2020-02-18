@@ -110,7 +110,7 @@ instance (Finite a)
   fromEnum ∷ Set a → Int
   fromEnum t = fromJust (elemIndex t  asList)
   enumFrom ∷ Set a → [Set a]
-  enumFrom t = dropWhile (≠ t)        asList
+  enumFrom = boundedEnumFrom
 instance (Finite a)
        ⇒ Finite (Set a) where
   asList ∷ [Set a]
@@ -118,9 +118,6 @@ instance (Finite a)
   asSet ∷ Set (Set a)
   asSet  = powerSet asSet
 
--- FIXME The built-in Ord instance for `OSet` doesn't agree with the current implementation
--- FIXME So a decision will have to be made for that, and that decision
--- FIXME may influence the `Finite` `Comparison` implementation as well.
 instance (Finite a)
        ⇒ Enum (OSet a) where
   toEnum ∷ Int → OSet a
@@ -128,14 +125,15 @@ instance (Finite a)
   fromEnum ∷ OSet a → Int
   fromEnum t = fromJust (elemIndex t  asList)
   enumFrom ∷ OSet a → [OSet a]
-  enumFrom t = dropWhile (≠ t)        asList -- TODO `boundedEnumFrom`?
+  enumFrom = boundedEnumFrom
 
 instance (Finite a)
        ⇒ Bounded (OSet a) where
   minBound ∷ OSet a
   minBound = OSet.empty
+  -- TODO test that `maxBound == OSet.fromList (comparisonToList maxBound)`
   maxBound ∷ OSet a
-  maxBound = OSet.fromList (comparisonToList maxBound)
+  maxBound = OSet.fromList (reverse (asList ∷ [a]))
 
 instance (Finite a, U.Universe a)
        ⇒ U.Universe (OSet a) where
@@ -145,9 +143,9 @@ instance (Finite a)
 -- AKA "sequences without repetition" or "k-permutations of n"
 instance (Finite a)
        ⇒ Finite (OSet a) where
-  -- TODO should I just use custom `perms` fn instead of `sort . List.permutations`?
   asList ∷ (Finite a) ⇒ [OSet a]
-  asList = fmap OSet.fromList (concatMap (sort . List.permutations) (List.subsequences (asList ∷ [a])))
+  -- FIXME, test that this ordering agrees with `Comparison` ordering
+  asList = sort (fmap OSet.fromList (concatMap permutations (subsequences (asList ∷ [a]))))
 
 -- If `a` is bounded, then just move the lower bound to `Nothing`, and wrap the upper bound in a `Just`
 -- This is one arbitrary possible instance
@@ -191,7 +189,7 @@ instance (Finite a, Finite b)
   fromEnum ∷ Either a b → Int
   fromEnum t = fromJust (elemIndex t  asList)
   enumFrom ∷ Either a b → [Either a b]
-  enumFrom t = dropWhile (≠ t)        asList
+  enumFrom = boundedEnumFrom
 instance (Finite a, Finite b)
        ⇒ Finite (Either a b) where
   asList ∷ [Either a b]
@@ -212,7 +210,7 @@ instance (Finite a, Finite b)
   fromEnum ∷ These a b → Int
   fromEnum t = fromJust (elemIndex t  asList)
   enumFrom ∷ These a b → [These a b]
-  enumFrom t = dropWhile (≠ t)        asList
+  enumFrom = boundedEnumFrom
 instance (Finite a, Finite b)
        ⇒ U.Finite (These a b)
 
@@ -251,7 +249,6 @@ instance (Finite a, Finite b)
       cardinality_b ∷ ℕ
       cardinality_b = unTagged (U.cardinality ∷ Tagged b ℕ)
   enumFrom ∷ (a, b) → [(a, b)]
-  -- enumFrom t = dropWhile (≠ t)        asList
   enumFrom = boundedEnumFrom
 
 instance (Finite a, Finite b)
@@ -287,7 +284,6 @@ instance (Finite a, Finite b, Finite c)
       cardinality_c ∷ ℕ
       cardinality_c = unTagged (U.cardinality ∷ Tagged c ℕ)
   enumFrom ∷ (a, b, c) → [(a, b, c)]
-  -- enumFrom t = dropWhile (≠ t)        asList
   enumFrom = boundedEnumFrom
 
 instance (Finite a, Finite b, Finite c)
@@ -327,7 +323,6 @@ instance (Finite a, Finite b, Finite c, Finite d)
       cardinality_d ∷ ℕ
       cardinality_d = unTagged (U.cardinality ∷ Tagged d ℕ)
   enumFrom ∷ (a, b, c, d) → [(a, b, c, d)]
-  -- enumFrom t = dropWhile (≠ t)        asList
   enumFrom = boundedEnumFrom
 
 instance (Finite a, Finite b, Finite c, Finite d)
@@ -373,7 +368,6 @@ instance (Finite a, Finite b, Finite c, Finite d, Finite e)
       cardinality_e ∷ ℕ
       cardinality_e = unTagged (U.cardinality ∷ Tagged e ℕ)
   enumFrom ∷ (a, b, c, d, e) → [(a, b, c, d, e)]
-  -- enumFrom t = dropWhile (≠ t)        asList
   enumFrom = boundedEnumFrom
 
 instance (Finite a, Finite b, Finite c, Finite d, Finite e)
@@ -547,7 +541,7 @@ instance (Finite a)
   fromEnum ∷ Predicate a → Int
   fromEnum t = fromJust (elemIndex t  asList)
   enumFrom ∷ Predicate a → [Predicate a]
-  enumFrom t = dropWhile (≠ t)        asList
+  enumFrom = boundedEnumFrom
 instance (Finite a)
        ⇒ Finite (Predicate a) where
   asList ∷ [Predicate a]
@@ -607,7 +601,7 @@ instance (Finite a)
   fromEnum ∷ RGS a → Int
   fromEnum t = fromJust (elemIndex t  asList)
   enumFrom ∷ RGS a → [RGS a]
-  enumFrom t = dropWhile (≠ t)        asList
+  enumFrom = boundedEnumFrom
 
 instance (Finite a) ⇒ U.Universe (RGS a)
 instance (Finite a) ⇒ U.Finite (RGS a)
@@ -846,7 +840,7 @@ instance (Finite a)
   fromEnum ∷ Comparison a → Int
   fromEnum t = fromJust (elemIndex t  asList)
   enumFrom ∷ Comparison a → [Comparison a]
-  enumFrom t = dropWhile (≠ t)        asList -- TODO `boundedEnumFrom` ?
+  enumFrom = boundedEnumFrom
 
 instance (Finite a)
        ⇒ Ord (Comparison a) where
@@ -867,7 +861,7 @@ instance (Finite a)
 instance (Finite a)
        ⇒ Finite (Comparison a) where
   asList ∷ [Comparison a]
-  asList = sort (fmap listToComparison (List.permutations (asList ∷ [a])))
+  asList = sort (fmap listToComparison (permutations (asList ∷ [a])))
 
 -- r₁ is "finer" r₂ iff r₁ ⊆ r₂   i.e. r₁ is a refinement of r₂
 -- if r₁ is a refinement of r₂ then each equivalence class of r₂ is
@@ -999,7 +993,7 @@ instance (Finite a)
   fromEnum ∷ Equivalence a → Int
   fromEnum t = fromJust (elemIndex t  asList)
   enumFrom ∷ Equivalence a → [Equivalence a]
-  enumFrom t = dropWhile (≠ t)        asList
+  enumFrom = boundedEnumFrom
 
 instance (Finite a)
        ⇒ U.Universe (Equivalence a)
