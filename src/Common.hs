@@ -342,10 +342,13 @@ fromEnum' ∷ (Enum a) ⇒ a → ℕ
 fromEnum' = fromIntegral . fromEnum
 
 indexed ∷ (Traversable t) ⇒ t a → t (a, ℕ)
-indexed = snd . mapAccumL (\n a → (n + 1, (a, n))) 0 -- To use an index starting at 1, change this `0` to `1`
+indexed = mapWithIndex (flip (,))
 
 skeleton ∷ (Traversable t) ⇒ t a → t ℕ
-skeleton = fmap snd . indexed
+skeleton = mapWithIndex const
+
+mapWithIndex ∷ (Traversable t) ⇒ (ℕ → a → b) → t a → t b
+mapWithIndex f = snd . mapAccumL (((.) . (,) . (1 +)) <*> f) 0
 
 -- If using this, may want to consider using uniform-pair
 -- https://github.com/conal/uniform-pair
