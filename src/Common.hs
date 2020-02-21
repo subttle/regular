@@ -85,6 +85,10 @@ andAlg = Algebra φ
 (⋄) ∷ (Semigroup m) ⇒ m → m → m
 (⋄) = (<>)
 
+-- TODO precedence
+(…) ∷ (c → d) → (a → b → c) → a → (b → d)
+(…) = (.) . (.)
+
 -- requires containers-0.5.11 or newer
 -- TODO deleteme after this is closed: https://github.com/roelvandijk/containers-unicode-symbols/issues/6
 (×) ∷ (Ord a, Ord b) ⇒ Set a → Set b → Set (a, b)
@@ -105,6 +109,7 @@ infixl 5 <<-
 
 (≰) ∷ (Ord a) ⇒ a → a → Bool
 (≰) a₁ a₂ = not (a₁ ≤ a₂)
+-- (≰) = not … (≤) -- TODO
 
 while ∷ (a → Bool) → (a → a) → a → a
 while p = until (not . p)
