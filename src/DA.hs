@@ -1,10 +1,11 @@
 {-# LANGUAGE MultiParamTypeClasses     #-}
 {-# LANGUAGE FlexibleInstances         #-}
 {-# OPTIONS_GHC -Wall                  #-}
+-- {-# OPTIONS_GHC -fno-warn-incomplete-patterns #-}
 
 module DA where
 
-import           Common (RenameMe, renameme)
+import           Common (RenameMe, renameme, (…))
 import qualified Language
 import           Language (ℒ)
 import           Finite
@@ -54,8 +55,8 @@ instance Decidable (DA q) where
   lose _ = empty
 
   choose ∷ (s → Either g₁ g₂) → DA q g₁ → DA q g₂ → DA q s
-  choose h (DA (Predicate o₁) t₁) (DA (Predicate o₂) t₂) = DA (Predicate (\q →         o₁ q ∨ o₂ q    )) 
-                                                                          (\q → either (t₁ q) (t₂ q) . h)
+  choose h (DA (Predicate o₁) t₁) (DA (Predicate o₂) t₂) = DA (Predicate (\q →         o₁ q ∨ o₂ q     ))
+                                                                         (\q → either (t₁ q) (t₂ q) . h)
 
 instance RenameMe (DA q) where
   renameme ∷ (s → These g₁ g₂) → DA q g₁ → DA q g₂ → DA q s
@@ -73,10 +74,10 @@ literal σ = (DA (Predicate (== EQ)) t, LT)
     t _  _          = GT
 
 language ∷ DA q s → q → ℒ s
-language (DA o t) q = contramap (foldl t q) o
+language (DA o t) = (>$$<) o . foldl t
 
 accepts ∷ DA q s → q → [s] → Bool
-accepts m = getPredicate . language m
+accepts = getPredicate … language
 
 nullable ∷ DA q s → q → Bool
 nullable m q = accepts m q []
@@ -102,7 +103,7 @@ union (DA (Predicate o₁) t₁) (DA (Predicate o₂) t₂) = DA (Predicate (\(q
                                                                     (\(q , p) σ → (t₁ q σ , t₂ p σ))
 
 difference ∷ DA q s → DA p s → DA (q, p) s
-difference m₁ m₂ = intersection m₁ (complement m₂)
+difference m = intersection m . complement
 
 ot ∷ DA q s → q → (Bool, s → q)
 ot (DA (Predicate o) t) q = (o q, t q)
