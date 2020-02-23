@@ -210,21 +210,21 @@ permutation = Predicate (\m@(DFA δ _ _) → all (\(qᵢ, qⱼ) →
 -- Given two DFAs, decide if they produce the exact same language, i.e.
 -- ℒ(m₁) ≟ ℒ(m₂)
 equal ∷ (Finite q, Finite p, Finite s) ⇒      DFA q s → DFA p s → Bool
-equal     m₁ m₂ = contained m₁ m₂ ∧ contained m₂ m₁
+equal m₁ m₂ = contained m₁ m₂ ∧ contained m₂ m₁
 
 -- Given two DFAs, m₁ and m₂, decide if ℒ(m₁) ⊆ ℒ(m₂)
 contained ∷ (Finite q, Finite p, Finite s) ⇒  DFA q s → DFA p s → Bool
-contained m₁ m₂ = isZero   (m₁ `intersection` complement m₂)
+contained m = isZero . intersection m . complement
 
 -- Given two DFAs, m₁ and m₂,
 -- ℒ(m₁) ∩ ℒ(m₂) ≟ ∅
 disjoint ∷ (Finite q, Finite p, Finite s) ⇒   DFA q s → DFA p s → Bool
-disjoint  m₁ m₂ = isZero   (m₁ `intersection` m₂)
+disjoint = isZero … intersection
 
 -- Given two DFAs, m₁ and m₂,
 -- ℒ(m₁) ∩ ℒ(m₂) ≠ ∅?
 intersects ∷ (Finite q, Finite p, Finite s) ⇒ DFA q s → DFA p s → Bool
-intersects m₁ m₂ = not (DFA.disjoint m₁ m₂)
+intersects = not … DFA.disjoint
 
 -- The difference of two DFAs, m₁ and m₂, produces a new DFA, m₃, such that
 -- ℒ(m₃) = ℒ(m₁) − ℒ(m₂)
