@@ -108,8 +108,7 @@ infixl 5 <<-
 (<<-) = Set.insert
 
 (≰) ∷ (Ord a) ⇒ a → a → Bool
-(≰) a₁ a₂ = not (a₁ ≤ a₂)
--- (≰) = not … (≤) -- TODO
+(≰) = not … (≤)
 
 while ∷ (a → Bool) → (a → a) → a → a
 while p = until (not . p)
@@ -134,7 +133,7 @@ xor' False = id
 
 -- Two sets intersect if A ∩ B ≠ ∅
 intersects ∷ (Ord a) ⇒ Set a → Set a → Bool
-intersects x y = not (Set.disjoint x y)
+intersects = not … Set.disjoint
 
 -- A version of `Set.size` which returns a `ℕ` instead of `Int`
 size' ∷ Set a → ℕ
@@ -196,13 +195,13 @@ ordering _  eq _  EQ = eq
 ordering _  _  gt GT = gt
 
 partitionWith ∷ (a → Either b c) → [a] → ([b], [c])
-partitionWith  f = partitionEithers . fmap f
+partitionWith  = partitionEithers … fmap
 
 partitionWith' ∷ (a → These b c) → [a] → ([b], [c], [(b, c)])
-partitionWith' f = partitionThese   . fmap f
+partitionWith' = partitionThese   … fmap
 
 unzipWith ∷ (a → (b, c)) → [a] → ([b], [c])
-unzipWith      f = unzip            . fmap f
+unzipWith      = unzip            … fmap
 
 -- A more general version of `partitionEithers` from `Data.Either`
 partitionEithers' ∷ (Foldable t) ⇒ t (Either a b) → ([a], [b])
@@ -295,23 +294,23 @@ bell n = NE.head (applyN n (\ns → NE.scanl1 (+) (NE.last ns :| Foldable.toList
 
 -- Apply a function `n` times
 applyN ∷ ℕ → (a → a) → a → a
-applyN n = Foldable.foldr (.) id . genericReplicate n
+applyN = Foldable.foldr (.) id … genericReplicate
 
 length' ∷ NonEmpty a → ℕ
 length' = fromIntegral . NE.length
 
 -- A version of List.findIndex which returns `Maybe ℕ` instead of `Maybe Int`
 findIndex' ∷ (a → Bool) → [a] → Maybe ℕ
-findIndex' p = fmap fromIntegral . List.findIndex p
+findIndex' = fmap fromIntegral … List.findIndex
 
 findIndices' ∷ (a → Bool) → [a] → [ℕ]
-findIndices' p = fmap fromIntegral . List.findIndices p
+findIndices' = fmap fromIntegral … List.findIndices
 
 elemIndex' ∷ (Eq a) ⇒ a → [a] → Maybe ℕ
-elemIndex' a = fmap fromIntegral . List.elemIndex a
+elemIndex' = fmap fromIntegral … List.elemIndex
 
 elemIndices' ∷ (Eq a) ⇒ a → [a] → [ℕ]
-elemIndices' a = fmap fromIntegral . List.elemIndices a
+elemIndices' = fmap fromIntegral … List.elemIndices
 
 -- A wrapper for `deleteBy` which uses `Equivalence` type.
 deleteBy' ∷ (Foldable f) ⇒ Equivalence a → a → f a → [a]
@@ -365,7 +364,7 @@ impossible ∷ a
 impossible = error "Why, sometimes I've believed as many as six impossible things before breakfast."
 
 hom ∷ (Monoid m) ⇒ (a → m) → [a] → m
-hom f = mconcat . fmap f
+hom = mconcat … fmap
 
 -- Prepend and append quotation marks to a given `String`.
 quotations ∷ String → String
