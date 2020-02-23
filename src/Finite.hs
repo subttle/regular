@@ -647,6 +647,10 @@ byCount = equating' count
 byLength ∷ (Foldable t) ⇒ Equivalence (t a)
 byLength = equating' length
 
+-- group "pieces of pie" (equivalence classes) which are the same size (length)
+byEqClassLength ∷ (Finite a) ⇒ Equivalence a → Equivalence a
+byEqClassLength = (>$$<) (byLength ∷ Equivalence (NonEmpty a)) . equivalenceClass
+
 byThese ∷ Equivalence (These a b)
 byThese = Equivalence (≡)
   where
