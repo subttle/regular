@@ -244,9 +244,10 @@ partitionsNE (a₁ :| (a₂ : as)) = [((a₁ :| []) :), \(h : t) → (a₁ <| h)
 --                      ]
 partitions' ∷ (Foldable t) ⇒ t a → [[NonEmpty a]]
 partitions' = Foldable.foldl (\xs → (xs >>=) . go) [[]]
-   where go ∷ a → [NonEmpty a] → [[NonEmpty a]]
-         go a []       = [[ a :| [] ]]
-         go a (y : ys) = [(a :| Foldable.toList y) : ys] <> fmap (y :) (go a ys)
+  where
+    go ∷ a → [NonEmpty a] → [[NonEmpty a]]
+    go a₁ []        = [[a₁ :| []]]
+    go a₁ (a₂ : as) = [(a₁ <| a₂) : as] <> fmap (a₂ :) (go a₁ as)
 
 -- Stirling numbers of the first kind
 -- "The Stirling numbers of the first kind s(n, k) count the number of ways to permute a list of `n` items into `k` cycles"
