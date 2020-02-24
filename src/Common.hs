@@ -11,6 +11,7 @@ import           Data.Set (Set)
 import qualified Data.Set as Set
 import           Data.Set.Unicode ((∪))
 import           Data.Bool.Unicode ((∧))
+import           Data.Bool (bool)
 import           Data.Ord.Unicode ((≤))
 import           Data.Eq.Unicode ((≠))
 import           Data.List as List
@@ -122,14 +123,12 @@ equating' = (>$$<) defaultEquivalence
 
 -- Boolean implication.
 implies ∷ Bool → Bool → Bool
-implies True  = id
-implies False = const True
+implies = bool (const True) id
 
 -- exclusive-or
 -- The name `xor` is already used by `Data.List.NonEmpty`
 xor' ∷ Bool → Bool → Bool
-xor' True  = not
-xor' False = id
+xor' = bool id not
 
 -- Two sets intersect if A ∩ B ≠ ∅
 intersects ∷ (Ord a) ⇒ Set a → Set a → Bool
@@ -250,7 +249,8 @@ partitions' = Foldable.foldl (\xs → (xs >>=) . go) [[]]
     go a₁ (a₂ : as) = [(a₁ <| a₂) : as] <> fmap (a₂ :) (go a₁ as)
 
 -- Stirling numbers of the first kind
--- "The Stirling numbers of the first kind s(n, k) count the number of ways to permute a list of `n` items into `k` cycles"
+-- "The Stirling numbers of the first kind s(n, k) count the number of
+-- ways to permute a list of `n` items into `k` cycles"
 -- http://mathforum.org/advanced/robertd/stirling1.html
 stirling₁ ∷ (ℕ, ℕ) → ℕ
 stirling₁ (0, 0) = 1
@@ -259,7 +259,8 @@ stirling₁ (_, 0) = 0
 stirling₁ (n, k) = stirling₁ (n - 1, k - 1) + stirling₁ (n - 1, k) * (n - 1)
 
 -- Stirling numbers of the second kind
--- "The Stirling numbers of the second kind describe the number of ways a set with `n` elements can be partitioned into `k` disjoint, non-empty subsets."
+-- "The Stirling numbers of the second kind describe the number of ways a set with
+-- `n` elements can be partitioned into `k` disjoint, non-empty subsets."
 -- http://mathforum.org/advanced/robertd/stirling2.html
 -- N.B. requires k ≤ n to ensure each part is nonempty
 stirling₂ ∷ (ℕ, ℕ) → ℕ
