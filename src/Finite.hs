@@ -45,30 +45,28 @@ class (Enum a, Bounded a, Ord a, U.Finite a) ⇒ Finite a where
   asSet ∷ Set a
   asSet = Set.fromDistinctAscList asList
 
-{-
 class BoundedBelow a where
   minimumBound ∷ a
 
 class BoundedAbove a where
   maximumBound ∷ a
--}
 
 class (Finite sigma) ⇒ Σ formalism sigma | formalism → sigma where
   -- Σ, The alphabet of the formalism
   sigma ∷ formalism → Set sigma
-  sigma _ = asSet
+  sigma = const asSet
 
   -- Σ⋆, Given a formalism, use its alphabet to lazily generate all possible strings
   sigmaStar ∷ formalism → [[sigma]]
-  sigmaStar _ = freeMonoid asList
+  sigmaStar = const (freeMonoid asList)
 
   -- Σ⁺ = Σ⋆ \ {ε}, the positive closure
   sigmaPlus ∷ formalism → [[sigma]]
-  sigmaPlus _ = freeSemigroup asList
+  sigmaPlus = const (freeSemigroup asList)
 
   -- (Σ ∪ {ε})
   sigma_ε ∷ formalism → Set (Maybe sigma)
-  sigma_ε m = Nothing `Set.insert` Set.mapMonotonic Just (sigma m)
+  sigma_ε = Set.insert Nothing . Set.mapMonotonic Just . sigma
 
 -- Note well: some classes such as `MYT` and `GFA` need to account for extra states when declaring an instance of `Q`!
 class (Finite q) ⇒ Q automaton q | automaton → q where
@@ -105,10 +103,10 @@ instance (Finite a)
 -- For `Set a` where `a` is enumerable, enumerate the set as the powerset.
 instance (Finite a)
        ⇒ Enum (Set a) where
-  toEnum ∷ Int → Set a
-  toEnum     =                       (asList !!)
+  toEnum   ∷ Int → Set a
+  toEnum   = (asList !!)
   fromEnum ∷ Set a → Int
-  fromEnum t = fromJust (elemIndex t  asList)
+  fromEnum = fromJust . flip elemIndex asList
   enumFrom ∷ Set a → [Set a]
   enumFrom = boundedEnumFrom
 instance (Finite a)
@@ -120,10 +118,10 @@ instance (Finite a)
 
 instance (Finite a)
        ⇒ Enum (OSet a) where
-  toEnum ∷ Int → OSet a
-  toEnum     =                       (asList !!)
+  toEnum   ∷ Int → OSet a
+  toEnum   = (asList !!)
   fromEnum ∷ OSet a → Int
-  fromEnum t = fromJust (elemIndex t  asList)
+  fromEnum = fromJust . flip elemIndex asList
   enumFrom ∷ OSet a → [OSet a]
   enumFrom = boundedEnumFrom
 
@@ -170,7 +168,7 @@ instance (Finite a)
 instance (Finite a)
        ⇒ Finite (Maybe a) where
   asList ∷ [Maybe a]
-  asList = Nothing : fmap Just asList
+  asList = U.universeF
   asSet ∷ Set (Maybe a)
   asSet  = Set.insert Nothing (Set.mapMonotonic Just asSet)
 
@@ -184,10 +182,10 @@ instance (Bounded a, Bounded b)
 -- enumerate as the concatenation of the enumerations of `Left` then `Right` types.
 instance (Finite a, Finite b)
        ⇒ Enum (Either a b) where
-  toEnum ∷ Int → Either a b
-  toEnum     =                       (asList !!)
+  toEnum   ∷ Int → Either a b
+  toEnum   = (asList !!)
   fromEnum ∷ Either a b → Int
-  fromEnum t = fromJust (elemIndex t  asList)
+  fromEnum = fromJust . flip elemIndex asList
   enumFrom ∷ Either a b → [Either a b]
   enumFrom = boundedEnumFrom
 instance (Finite a, Finite b)
@@ -537,9 +535,9 @@ instance (Finite a)
 instance (Finite a)
        ⇒ Enum (Predicate a) where
   toEnum   ∷ Int         → Predicate a
-  toEnum     =                       (asList !!)
+  toEnum   = (asList !!)
   fromEnum ∷ Predicate a → Int
-  fromEnum t = fromJust (elemIndex t  asList)
+  fromEnum = fromJust . flip elemIndex asList
   enumFrom ∷ Predicate a → [Predicate a]
   enumFrom = boundedEnumFrom
 instance (Finite a)
@@ -597,9 +595,9 @@ instance (Finite a) ⇒ Ord (RGS a) where
 instance (Finite a)
        ⇒ Enum (RGS a) where
   toEnum   ∷ Int   → RGS a
-  toEnum     =                       (asList !!)
+  toEnum   = (asList !!)
   fromEnum ∷ RGS a → Int
-  fromEnum t = fromJust (elemIndex t  asList)
+  fromEnum = fromJust . flip elemIndex asList
   enumFrom ∷ RGS a → [RGS a]
   enumFrom = boundedEnumFrom
 
