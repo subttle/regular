@@ -9,7 +9,7 @@ import           Data.Bool.Unicode
 import           Data.List
 import qualified Data.List.NonEmpty as NE
 import           Data.Functor.Contravariant
-import           Data.Foldable.Unicode ((∈))
+import           Data.Foldable.Unicode ((∋))
 
 -- N.B. This is /not/ the type for regular languages (but I am adding it to help test some properties)
 -- In Agda (with termination checking) this can be used as a type for decidable languages, and while this
@@ -50,7 +50,7 @@ lit σ = Predicate p
 
 -- TODO better name?
 fromLang ∷ (Eq s) ⇒ [[s]] → ℒ s
-fromLang l = Predicate (\w → w ∈ l)
+fromLang = Predicate . (∋)
 
 complement ∷ ℒ s → ℒ s
 complement (Predicate ℓ) = Predicate (not . ℓ)
