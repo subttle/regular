@@ -205,10 +205,10 @@ instance (Bounded a, Bounded b)
   maxBound = These  maxBound maxBound  -- maxBound = That  maxBound
 instance (Finite a, Finite b)
        ⇒ Enum (These a b) where
-  toEnum ∷ Int → These a b
-  toEnum     =                       (asList !!)
+  toEnum   ∷ Int → These a b
+  toEnum   = (asList !!)
   fromEnum ∷ These a b → Int
-  fromEnum t = fromJust (elemIndex t  asList)
+  fromEnum = fromJust . flip elemIndex asList
   enumFrom ∷ These a b → [These a b]
   enumFrom = boundedEnumFrom
 instance (Finite a, Finite b)
