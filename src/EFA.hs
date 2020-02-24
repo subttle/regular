@@ -173,7 +173,7 @@ fromList []      = SomeEFA epsilon
 fromList (σ : w) = fromNE (σ NE.:| w)
 
 fromNE ∷ (Eq s) ⇒ NE.NonEmpty s → SomeEFA s
-fromNE w = foldl1 (\(SomeEFA acc) (SomeEFA σ) → SomeEFA (concatenate acc σ)) (fmap (SomeEFA . literal) w)
+fromNE = foldl1 (\(SomeEFA acc) (SomeEFA σ) → SomeEFA (concatenate acc σ)) . fmap (SomeEFA . literal)
 
 -- TODO not really tested
 fromLang ∷ (Eq s) ⇒ [[s]] → SomeEFA s
