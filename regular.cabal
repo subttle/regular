@@ -33,6 +33,7 @@ library
                      , tagged
                      , ordered-containers
                      , groups
+                     , semigroupoids
   default-language:    Haskell2010
   default-extensions: UnicodeSyntax
                       ScopedTypeVariables
