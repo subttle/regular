@@ -519,7 +519,7 @@ instance (Show a, Finite a) ⇒ Show (Predicate a) where
           graph  = zip domain image_
       -- show predicate as a set
       showpredset ∷ ∀ a . (Show a, Finite a) ⇒ Predicate a → String
-      showpredset (Predicate p) = show $ Set' (Set.filter p asSet)
+      showpredset (Predicate p) = show (Set' (Set.filter p asSet))
 
 instance (Finite a)
        ⇒ Eq (Predicate a) where
@@ -773,11 +773,11 @@ fromEnumBy' = elemIndexTotal . representatives
 toEnumBy' ∷ (Finite a) ⇒ Equivalence a → ℕ → a
 toEnumBy' = genericIndex . representatives
 
-representativeC ∷ ∀ a . (Finite a) ⇒ Comparison a → a → a
+representativeC ∷ (Finite a) ⇒ Comparison a → a → a
 representativeC c = genericIndex (comparisonToList c) . fromEnum'
 
 -- I mean technically you could :P lol
-equivalenceClassC ∷ ∀ a . (Finite a) ⇒ Comparison a → a → NonEmpty a
+equivalenceClassC ∷ (Finite a) ⇒ Comparison a → a → NonEmpty a
 equivalenceClassC c a = representativeC c a :| []
 
 -- TODO
@@ -839,10 +839,10 @@ instance (Finite a)
 
 instance (Finite a)
        ⇒ Enum (Comparison a) where
-  toEnum ∷ Int → Comparison a
-  toEnum     =                       (asList !!)
+  toEnum   ∷ Int → Comparison a
+  toEnum   = (asList !!)
   fromEnum ∷ Comparison a → Int
-  fromEnum t = fromJust (elemIndex t  asList)
+  fromEnum = fromJust . flip elemIndex asList
   enumFrom ∷ Comparison a → [Comparison a]
   enumFrom = boundedEnumFrom
 
@@ -1009,11 +1009,9 @@ instance (Finite a)
   asList = fmap toEquivalence (partitions' asList)
 
 data Alpha = A | B | C | D | E | F | G | H | I | J | K | L | M | N | O | P | Q | R | S | T | U | V | W | X | Y | Z deriving (Eq, Ord, Enum, Bounded, Show, Read)
-instance U.Universe Alpha
+instance U.Universe Alpha where
 instance U.Finite   Alpha
-instance Finite Alpha where
-  asList ∷ [Alpha]
-  asList = [A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z]
+instance Finite Alpha
 
 data DNA = Adenine | Cytosine | Guanine | Thymine deriving (Eq, Ord, Bounded, Enum)
 instance Show DNA where
@@ -1024,9 +1022,7 @@ instance Show DNA where
   show Thymine  = "T"
 instance U.Universe DNA
 instance U.Finite   DNA
-instance Finite DNA where
-  asList ∷ [DNA]
-  asList = [Adenine, Cytosine, Guanine, Thymine]
+instance Finite DNA
 
 
 newtype Init = Init () deriving (Eq, Ord, Bounded, Enum)
