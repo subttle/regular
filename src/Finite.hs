@@ -998,10 +998,10 @@ instance (Finite a)
   compare (Equivalence (⮀)) (Equivalence (⮂)) = foldMap (\(a₁, a₂) → (a₁ ⮂ a₂) `compare` (a₁ ⮀ a₂)) asList
 instance (Finite a)
        ⇒ Enum (Equivalence a) where
-  toEnum   ∷ Int         → Equivalence a
-  toEnum     =                       (asList !!)
+  toEnum   ∷ Int → Equivalence a
+  toEnum   = (asList !!)
   fromEnum ∷ Equivalence a → Int
-  fromEnum t = fromJust (elemIndex t  asList)
+  fromEnum = fromJust . flip elemIndex asList
   enumFrom ∷ Equivalence a → [Equivalence a]
   enumFrom = boundedEnumFrom
 
