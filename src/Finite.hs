@@ -969,6 +969,12 @@ instance (Show a, Finite a) ⇒ Show (Equivalence a) where
           graph  ∷ [(a, a, Bool)]
           graph  = fmap (\(a₁, a₂) → (a₁, a₂, a₁ ≡ a₂)) domain
           show' (a₁, a₂, b) = show a₁ ++ ", " ++ show a₂ ++ " ↦ " ++ show b
+      -- show an Equivalence relation as a Ferrer's diagram -- TODO can improve this later, but this works
+      showferrers ∷ ∀ a. (Show a, Finite a) ⇒ Equivalence a → String
+      showferrers e = unlines (reverse (sortOn genericLength (fmap (fmap (const '*')) parts)))
+        where
+          parts ∷ [[a]]
+          parts = fmap NE.toList (fromEquivalence e)
 
 -- TODO probably going to be lots of room for optimization in these instance defs, but for now I want to focus on correctness
 instance (Finite a)
