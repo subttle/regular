@@ -87,8 +87,12 @@ andAlg = Algebra φ
 (⋄) = (<>)
 
 -- TODO precedence
-(…) ∷ (c → d) → (a → b → c) → a → (b → d)
-(…) = (.) . (.)
+-- TODO infixl 8 ‥
+(‥) ∷ (a → b) → (c → d     → a) → (c → d     → b)
+(‥) = (.)    .    (.)
+
+(…) ∷ (a → b) → (c → d → e → a) → (c → d → e → b)
+(…) = (.) . (.) . (.)
 
 -- requires containers-0.5.11 or newer
 -- TODO deleteme after this is closed: https://github.com/roelvandijk/containers-unicode-symbols/issues/6
@@ -109,7 +113,7 @@ infixl 5 <<-
 (<<-) = Set.insert
 
 (≰) ∷ (Ord a) ⇒ a → a → Bool
-(≰) = not … (≤)
+(≰) = not ‥ (≤)
 
 while ∷ (a → Bool) → (a → a) → a → a
 while p = until (not . p)
@@ -132,7 +136,7 @@ xor' = bool id not
 
 -- Two sets intersect if A ∩ B ≠ ∅
 intersects ∷ (Ord a) ⇒ Set a → Set a → Bool
-intersects = not … Set.disjoint
+intersects = not ‥ Set.disjoint
 
 -- A version of `Set.size` which returns a `ℕ` instead of `Int`
 size' ∷ Set a → ℕ
