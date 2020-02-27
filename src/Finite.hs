@@ -776,7 +776,7 @@ representativeC c = genericIndex (comparisonToList c) . fromEnum'
 
 -- I mean technically you could :P lol
 equivalenceClassC ∷ (Finite a) ⇒ Comparison a → a → NonEmpty a
-equivalenceClassC c a = representativeC c a :| []
+equivalenceClassC = pure ‥ representativeC
 
 -- TODO
 composeC ∷ ∀ a . (Finite a) ⇒ Comparison a → Comparison a → Comparison a

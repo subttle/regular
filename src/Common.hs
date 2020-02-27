@@ -161,7 +161,7 @@ replicateM' n f = liftA2 (:) f (replicateM' (n - 1) f)
 
 -- Something like free monoid. Lazily generate all possible finite sequences over the given alphabet.
 freeMonoid ∷ [a] → [[a]]
-freeMonoid []       = [[]]
+freeMonoid []       = pure []
 freeMonoid alphabet = concatMap (`replicateM` alphabet) [0 ..]
 
 -- FIXME test, comment etc.
@@ -231,12 +231,12 @@ unionRights = Set.mapMonotonic (fromRight undefined) . Set.filter isLeft  -- Set
 --                     , [[0,1,2]]
 --                     ]
 partitions ∷ [a] → [[NonEmpty a]]
-partitions []      = [[]]
+partitions []      = pure []
 partitions (h : t) = partitionsNE (h :| t)
 
 partitionsNE ∷ NonEmpty a → [[NonEmpty a]]
-partitionsNE (a₁ :| [])        = [[ a₁ :| []]]
-partitionsNE (a₁ :| (a₂ : as)) = [((a₁ :| []) :), \(h : t) → (a₁ <| h) : t] <*> partitionsNE (a₂ :| as)
+partitionsNE (a₁ :| [])        = pure (pure (pure a₁))
+partitionsNE (a₁ :| (a₂ : as)) = [(pure a₁ :), \(h : t) → (a₁ <| h) : t] <*> partitionsNE (a₂ :| as)
 
 -- partitions of a set
 -- partitions' {0..2} = [ [[2,1,0]]
@@ -249,8 +249,8 @@ partitions' ∷ (Foldable t) ⇒ t a → [[NonEmpty a]]
 partitions' = Foldable.foldl (\xs → (xs >>=) . go) [[]]
   where
     go ∷ a → [NonEmpty a] → [[NonEmpty a]]
-    go a₁ []        = [[a₁ :| []]]
-    go a₁ (a₂ : as) = [(a₁ <| a₂) : as] <> fmap (a₂ :) (go a₁ as)
+    go a []       = pure (pure (pure a))
+    go a (p : ps) = pure ((a <| p) : ps) <> fmap (p :) (go a ps)
 
 -- Stirling numbers of the first kind
 -- "The Stirling numbers of the first kind s(n, k) count the number of
@@ -296,7 +296,7 @@ factorial = product . enumFromTo 1
 -- bell ∷ ℕ → ℕ
 -- bell n = sum (fmap (\k → stirling₂ (n, k)) [0 .. n])
 bell ∷ ℕ → ℕ
-bell n = NE.head (applyN n (\ns → NE.scanl1 (+) (NE.last ns :| Foldable.toList ns)) (1 :| []))
+bell n = NE.head (applyN n (\ns → NE.scanl1 (+) (NE.last ns :| Foldable.toList ns)) (pure 1))
 
 -- Apply a function `n` times
 applyN ∷ ℕ → (a → a) → a → a
