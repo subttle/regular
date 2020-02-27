@@ -5,7 +5,7 @@
 
 module DA where
 
-import           Common (RenameMe, renameme, (…))
+import           Common (RenameMe, renameme, (‥))
 import qualified Language
 import           Language (ℒ)
 import           Finite
@@ -77,7 +77,7 @@ language ∷ DA q s → q → ℒ s
 language (DA o t) = (>$$<) o . foldl t
 
 accepts ∷ DA q s → q → [s] → Bool
-accepts = getPredicate … language
+accepts = getPredicate ‥ language
 
 nullable ∷ DA q s → q → Bool
 nullable m q = accepts m q []

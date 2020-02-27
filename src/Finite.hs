@@ -910,7 +910,7 @@ disjointP ∷ (Finite a) ⇒ Predicate a → Predicate a → Bool
 disjointP = Set.disjoint `on` predicateToSet
 
 intersectingP ∷ (Finite a) ⇒ Predicate a → Predicate a → Bool
-intersectingP = not … disjointP
+intersectingP = not ‥ disjointP
 
 predicateToList ∷ (Finite a) ⇒ Predicate a → [a]
 predicateToList (Predicate p) = List.filter p asList

@@ -2,7 +2,7 @@
 
 module Config where
 
-import           Common (fixedPoint, intersects, upToLength, size', (…))
+import           Common (fixedPoint, intersects, upToLength, size', (‥))
 import           Finite (Q, Σ, asList, qs, sigmaStar)
 import           Data.Set as Set (Set, filter, singleton, insert, disjoint)
 import           Data.Set.Unicode ((∩), (∖), (∋), (⊆))
@@ -85,7 +85,7 @@ class (Q (automaton q s) q, Σ (automaton q s) s, Eq occupy) ⇒ Configuration a
 
     -- Given two states, q₁ and q₂, determine if q₁ can reach q₂
     reaches ∷ automaton q s → q → q → Bool
-    reaches = (∋) … reachable
+    reaches = (∋) ‥ reachable
 
     -- A state is transient if it cannot reach itself, i.e.
     -- A state q ∈ Q is transient if ∀w ∈ Σ⁺, δ(q, w) ≠ q
@@ -94,7 +94,7 @@ class (Q (automaton q s) q, Σ (automaton q s) s, Eq occupy) ⇒ Configuration a
 
     -- not transient states are called recurrent
     recurrent ∷ automaton q s → q → Bool
-    recurrent = not … transient
+    recurrent = not ‥ transient
 
     -- Take all the states of the given automaton, subtract the accessible ones
     inaccessible ∷ automaton q s → Set q

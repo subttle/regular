@@ -219,12 +219,12 @@ contained m = isZero . intersection m . complement
 -- Given two DFAs, m₁ and m₂,
 -- ℒ(m₁) ∩ ℒ(m₂) ≟ ∅
 disjoint ∷ (Finite q, Finite p, Finite s) ⇒   DFA q s → DFA p s → Bool
-disjoint = isZero … intersection
+disjoint = isZero ‥ intersection
 
 -- Given two DFAs, m₁ and m₂,
 -- ℒ(m₁) ∩ ℒ(m₂) ≠ ∅?
 intersects ∷ (Finite q, Finite p, Finite s) ⇒ DFA q s → DFA p s → Bool
-intersects = not … DFA.disjoint
+intersects = not ‥ DFA.disjoint
 
 -- The difference of two DFAs, m₁ and m₂, produces a new DFA, m₃, such that
 -- ℒ(m₃) = ℒ(m₁) − ℒ(m₂)

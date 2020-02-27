@@ -198,13 +198,13 @@ ordering _  eq _  EQ = eq
 ordering _  _  gt GT = gt
 
 partitionWith ∷ (a → Either b c) → [a] → ([b], [c])
-partitionWith  = partitionEithers … fmap
+partitionWith  = partitionEithers ‥ fmap
 
 partitionWith' ∷ (a → These b c) → [a] → ([b], [c], [(b, c)])
-partitionWith' = partitionThese   … fmap
+partitionWith' = partitionThese   ‥ fmap
 
 unzipWith ∷ (a → (b, c)) → [a] → ([b], [c])
-unzipWith      = unzip            … fmap
+unzipWith      = unzip            ‥ fmap
 
 -- A more general version of `partitionEithers` from `Data.Either`
 partitionEithers' ∷ (Foldable t) ⇒ t (Either a b) → ([a], [b])
@@ -300,23 +300,23 @@ bell n = NE.head (applyN n (\ns → NE.scanl1 (+) (NE.last ns :| Foldable.toList
 
 -- Apply a function `n` times
 applyN ∷ ℕ → (a → a) → a → a
-applyN = Foldable.foldr (.) id … genericReplicate
+applyN = Foldable.foldr (.) id ‥ genericReplicate
 
 length' ∷ NonEmpty a → ℕ
 length' = fromIntegral . NE.length
 
 -- A version of List.findIndex which returns `Maybe ℕ` instead of `Maybe Int`
 findIndex' ∷ (a → Bool) → [a] → Maybe ℕ
-findIndex' = fmap fromIntegral … List.findIndex
+findIndex' = fmap fromIntegral ‥ List.findIndex
 
 findIndices' ∷ (a → Bool) → [a] → [ℕ]
-findIndices' = fmap fromIntegral … List.findIndices
+findIndices' = fmap fromIntegral ‥ List.findIndices
 
 elemIndex' ∷ (Eq a) ⇒ a → [a] → Maybe ℕ
-elemIndex' = fmap fromIntegral … List.elemIndex
+elemIndex' = fmap fromIntegral ‥ List.elemIndex
 
 elemIndices' ∷ (Eq a) ⇒ a → [a] → [ℕ]
-elemIndices' = fmap fromIntegral … List.elemIndices
+elemIndices' = fmap fromIntegral ‥ List.elemIndices
 
 -- A wrapper for `deleteBy` which uses `Equivalence` type.
 deleteBy' ∷ (Foldable f) ⇒ Equivalence a → a → f a → [a]
@@ -370,7 +370,7 @@ impossible ∷ a
 impossible = error "Why, sometimes I've believed as many as six impossible things before breakfast."
 
 hom ∷ (Monoid m) ⇒ (a → m) → [a] → m
-hom = mconcat … fmap
+hom = mconcat ‥ fmap
 
 -- Prepend and append quotation marks to a given `String`.
 quotations ∷ String → String
