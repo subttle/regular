@@ -44,9 +44,10 @@ epsilon = Predicate null
 -- want version of `null` for NE? `isSingleton`?
 lit ∷ ∀ s . (Eq s) ⇒ s → ℒ s
 lit σ = Predicate p
-  where p ∷ [s] → Bool
-        p [σ'] = σ == σ'
-        p _    = False
+  where
+    p ∷ [s] → Bool
+    p [σ'] = σ == σ'
+    p _    = False
 
 -- TODO better name?
 fromLang ∷ (Eq s) ⇒ [[s]] → ℒ s
@@ -92,17 +93,40 @@ invhomimageEpsFree h = invhomimage (NE.toList . h)
 invhomimagew ∷ (Eq g) ⇒ (s → [g]) → [g] → ℒ s
 invhomimagew h w = Predicate ((w ==) . concatMap h)
 
+-- TODO leaving in refactor as comments for now, will delete later
+
 -- derivative with respect to some symbol in Σ
 derivative ∷ ℒ s → s → ℒ s
-derivative (Predicate ℓ) a = Predicate (\w → ℓ (a : w))
+-- derivative (Predicate ℓ) a = Predicate (\w → ℓ (a : w))
+-- derivative (Predicate ℓ) a = Predicate (\w → ℓ ((:) a w))
+-- derivative (Predicate ℓ) a = Predicate (ℓ . ((:) a))
+-- derivative (Predicate ℓ) a = Predicate (ℓ . (:) a)
+-- derivative (Predicate ℓ) = Predicate . (ℓ ‥ (:))
+--
+-- derivative p s = contramap (s :) p
+-- derivative = flip (contramap . (:))
+-- derivative p s = (>$$<) p (s :)
+-- derivative p s = (>$$<) p ((:) s)
+-- derivative p = (>$$<) p . (:)
+derivative = (. (:)) . (>$$<)
 
 -- derivative with respect to some word ∈ Σ★
 derivative' ∷ ℒ s → [s] → ℒ s
-derivative' (Predicate ℓ) w₁ = Predicate (\w₂ → ℓ (w₁ ++ w₂))
+-- derivative' (Predicate ℓ) w₁ = Predicate (\w₂ → ℓ (w₁ ++ w₂))
+-- derivative' (Predicate ℓ) = Predicate . (ℓ ‥ (++))
+--
+-- derivative' p w = contramap (w ++) p
+-- derivative' = flip (contramap . (++))
+derivative' = (. (++)) . (>$$<)
 
 -- FIXME untested, need to check
 antiderivative' ∷ ℒ s → [s] → ℒ s
-antiderivative' l w = contramap (w ++) (reversed l)
+-- antiderivative' l w = contramap (w ++) (reversed l)
+-- antiderivative' = flip (contramap . (++)) . reversed
+-- antiderivative' l w = (>$$<) (reversed l) (w ++)
+-- antiderivative' l w = (>$$<) (reversed l) ((++) w)
+-- antiderivative' l = (>$$<) (reversed l) . (++)
+antiderivative' = (. (++)) . (>$$<) . reversed
 
 -- TODO experimental, probably has a more meaningful name too
 drop₁ ∷ ℒ s → ℒ s
