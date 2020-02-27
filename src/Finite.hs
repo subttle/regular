@@ -27,7 +27,7 @@ import qualified Data.Foldable as F
 import           Data.Function (on)
 import           Data.Functor.Contravariant
 import           Data.Functor.Contravariant.Divisible (Decidable, Divisible, divide, conquer, choose, lose)
-import           Common hiding (invert)
+import           Common
 import           GHC.Enum (boundedEnumFrom)
 import           Data.Fin (Fin)
 import qualified Data.Type.Nat as Nat
@@ -72,12 +72,12 @@ class (Finite sigma) ⇒ Σ formalism sigma | formalism → sigma where
 class (Finite q) ⇒ Q automaton q | automaton → q where
   -- Q, The states of the Automaton
   qs ∷ automaton → Set q
-  qs _ = asSet
+  qs = const asSet
 
 class (Finite g) ⇒ Γ automaton g | automaton → g where
   -- Γ, the external alphabet of the automaton
   gamma ∷ automaton → Set g
-  gamma _ = asSet
+  gamma = const asSet
 
 instance Finite () where
   asList ∷ [()]
@@ -1013,7 +1013,7 @@ instance (Finite a)
   asList = fmap toEquivalence (partitions' asList)
 
 data Alpha = A | B | C | D | E | F | G | H | I | J | K | L | M | N | O | P | Q | R | S | T | U | V | W | X | Y | Z deriving (Eq, Ord, Enum, Bounded, Show, Read)
-instance U.Universe Alpha where
+instance U.Universe Alpha
 instance U.Finite   Alpha
 instance Finite Alpha
 

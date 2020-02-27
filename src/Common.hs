@@ -162,12 +162,12 @@ replicateM' n f = liftA2 (:) f (replicateM' (n - 1) f)
 -- Something like free monoid. Lazily generate all possible finite sequences over the given alphabet.
 freeMonoid ∷ [a] → [[a]]
 freeMonoid []       = [[]]
-freeMonoid alphabet = concatMap (`replicateM` alphabet) [0..]
+freeMonoid alphabet = concatMap (`replicateM` alphabet) [0 ..]
 
 -- FIXME test, comment etc.
 freeMonoidFrom ∷ ℕ → [s] → [[s]]
 freeMonoidFrom 0 = freeMonoid
-freeMonoidFrom n = ([n..] >>=) . flip replicateM'
+freeMonoidFrom n = ([n ..] >>=) . flip replicateM'
 
 -- Something like free semigroup over the given alphabet
 freeSemigroup ∷ [a] → [[a]]
