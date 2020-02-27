@@ -276,7 +276,7 @@ stirling₂ (n, k) = stirling₂ (n - 1, k - 1) + stirling₂ (n - 1, k) * k
 -- https://oeis.org/A000108
 -- Catalan numbers
 catalan ∷ NonEmpty ℕ
-catalan = 1 <| NE.unfoldr c (1 :| [])
+catalan = 1 <| NE.unfoldr c (pure 1)
   where
     c ∷ NonEmpty ℕ → (ℕ, Maybe (NonEmpty ℕ))
     c ns = (n, Just (n <| ns))
@@ -296,7 +296,7 @@ factorial = product . enumFromTo 1
 -- bell ∷ ℕ → ℕ
 -- bell n = sum (fmap (\k → stirling₂ (n, k)) [0 .. n])
 bell ∷ ℕ → ℕ
-bell n = NE.head (applyN n (\ns → NE.scanl1 (+) (NE.last ns :| Foldable.toList ns)) (pure 1))
+bell n = NE.head (applyN n (\ns → NE.scanl1 (+) (NE.last ns <| ns)) (pure 1))
 
 -- Apply a function `n` times
 applyN ∷ ℕ → (a → a) → a → a
