@@ -592,10 +592,10 @@ newtype Op₂ b a = Op₂ { getOp₂ ∷ a → a → b }
 -- flipOn ∷ (a → b) → (b → b → c) → (a → a → c)
 
 equivalenceToPER ∷ Equivalence a → PER a
-equivalenceToPER (Equivalence (≡)) = PER (\a₁ a₂ → Just (a₁ ≡ a₂))
+equivalenceToPER (Equivalence (≡)) = PER (Just ‥ (≡))
 
 comparisonToPOR ∷ Comparison a → POR a
-comparisonToPOR (Comparison c) = POR (\a₁ a₂ → Just (a₁ `c` a₂))
+comparisonToPOR (Comparison c) = POR (Just ‥ c)
 
 instance Contravariant PER where
   contramap ∷ (a → b) → PER b → PER a
@@ -626,7 +626,7 @@ instance (Monoid m) ⇒ Decidable (Op₂ m) where
       opᵇᶜ (Right _ ) (Left  _ ) = mempty
       opᵇᶜ (Right c₁) (Right c₂) = opᶜ c₁ c₂
   lose ∷ (a → Void) → Op₂ m a
-  lose h = Op₂ (absurd `on` h)
+  lose = Op₂ . on absurd
 
 instance (Monoid m) ⇒ RenameMe (Op₂ m) where
   renameme ∷ ∀ a b c . (a → These b c) → Op₂ m b → Op₂ m c → Op₂ m a
