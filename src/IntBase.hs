@@ -11,6 +11,7 @@ import           Data.Group (Group, invert)
 import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)), (<|))
 import qualified Data.List.NonEmpty as NE
 import           GHC.Real (reduce)
+import           Common (ordering)
 
 -- N.B. this entire file is currently experimental/untested/WIP!
 
@@ -132,9 +133,15 @@ type instance Base Integer = IntegerF
 
 
 toOrderings ∷ ℤ → NonEmpty Ordering
-toOrderings (Prev i) = LT <| toOrderings i
-toOrderings Zero     = EQ :| []
-toOrderings (Next i) = GT <| toOrderings i
+toOrderings (Prev i) =      LT <| toOrderings i
+toOrderings Zero     = pure EQ
+toOrderings (Next i) =      GT <| toOrderings i
+
+toOrdering ∷ ℤ → Ordering
+toOrdering = int (const LT) EQ (const GT)
+
+fromOrdering ∷ Ordering → ℤ
+fromOrdering = ordering (Prev Zero) Zero (Next Zero)
 
 toBits ∷ ℤ → [Bool]
 toBits (Prev i) = False : toBits i
@@ -143,7 +150,7 @@ toBits (Next i) = True  : toBits i
 
 -- TODO better name
 toBits' ∷ ℤ → [Either ℤ ℤ]
-toBits' (Prev i) = Right i : toBits' i
+toBits' (Prev i) = Left  i : toBits' i
 toBits' Zero     = []
-toBits' (Next i) = Left  i : toBits' i
+toBits' (Next i) = Right i : toBits' i
 
