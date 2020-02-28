@@ -303,8 +303,8 @@ bell n = NE.head (applyN n (\ns → NE.scanl1 (+) (NE.last ns <| ns)) (pure 1))
 applyN ∷ ℕ → (a → a) → a → a
 applyN = Foldable.foldr (.) id ‥ genericReplicate
 
-length' ∷ NonEmpty a → ℕ
-length' = fromIntegral . NE.length
+length' ∷ (Foldable f) ⇒ f a → ℕ
+length' = fromIntegral . length
 
 -- A version of List.findIndex which returns `Maybe ℕ` instead of `Maybe Int`
 findIndex' ∷ (a → Bool) → [a] → Maybe ℕ
