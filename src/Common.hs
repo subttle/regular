@@ -27,6 +27,7 @@ import           Data.Functor.Contravariant.Divisible (Divisible, Decidable, div
 import           Data.Functor.Contravariant (Contravariant, Op (..), Predicate (..), Comparison (..), Equivalence (..), defaultComparison, defaultEquivalence, contramap, (>$<), (>$$<))
 import           Data.Functor.Foldable (Fix (..), unfix, ListF (..))
 import           Data.Function (on)
+import           Data.Semigroup.Traversable (Traversable1)
 import           Data.Void
 import           Control.Applicative (liftA2, getZipList, ZipList (..))
 import           Control.Monad (replicateM)
@@ -346,6 +347,13 @@ minimumBy' (Comparison cmp) = Foldable.minimumBy cmp
 -- A wrapper for `maximumBy` which uses `Comparison` type. -- FIXME: should be `Foldable1`
 maximumBy' ∷ (Foldable t) ⇒ Comparison a → t a → a
 maximumBy' (Comparison cmp) = Foldable.maximumBy cmp
+
+-- TODO still have improvements to be made here
+ascending ∷ (Traversable1 t, Ord a) ⇒ t a → t a
+ascending ta = snd (mapAccumL (\as _ → let mn = minimum as in (delete mn as, mn)) (toList ta) ta)
+
+descending ∷ (Traversable1 t, Ord a) ⇒ t a → t a
+descending ta = snd (mapAccumL (\as _ → let mx = maximum as in (delete mx as, mx)) (toList ta) ta)
 
 -- A version of `fromEnum` which returns a Natural rather than an `Int`
 fromEnum' ∷ (Enum a) ⇒ a → ℕ
