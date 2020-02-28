@@ -649,6 +649,12 @@ byLength = equating' length
 byEqClassLength ∷ (Finite a) ⇒ Equivalence a → Equivalence a
 byEqClassLength = (>$$<) (byLength ∷ Equivalence (NonEmpty a)) . equivalenceClass
 
+shape ∷ (Finite a) ⇒ Equivalence a → [ℕ]
+shape = sort . fmap length' . fromEquivalence
+
+byShape ∷ (Finite a) ⇒ Equivalence (Equivalence a)
+byShape = equating' shape
+
 byThese ∷ Equivalence (These a b)
 byThese = Equivalence (≡)
   where
