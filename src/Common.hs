@@ -357,13 +357,7 @@ descending ta = snd (mapAccumL (\as _ → let mx = maximum as in (delete mx as, 
 
 -- TODO
 rotate ∷ ℕ → [a] → [a]
-rotate n as = getOp f n as
-  where
-    f ∷ Op ([a] → [a]) ℕ
-    f = divide (\m → (mod m (genericLength as), mod m (genericLength as))) (Op genericDrop) (Op genericTake)
-      where
-        g ∷ ℕ → ℕ
-        g = flip mod (genericLength as)
+rotate n as = getOp (contramap (`mod` genericLength as) (Op (genericDrop <> genericTake))) n as
 
 -- A version of `fromEnum` which returns a Natural rather than an `Int`
 fromEnum' ∷ (Enum a) ⇒ a → ℕ
