@@ -86,14 +86,15 @@ testFizzBuzz = scope "main.FizzBuzz" . expect $ woDFA == wDFA
 
 -- https://math.stackexchange.com/questions/871662/finding-right-quotient-of-languages
 testDFArquotient ∷ Test ()
-testDFArquotient = scope "DFA.rquotient" . expect $ and [ Config.accepts e₃L₁   [C, A, R, R, O, T]
-                                                        , Config.accepts e₃L₂   [T]
-                                                        , Config.accepts e₃L₂   [O, T]
-                                                        , Config.accepts e₃L₁L₂ [C, A, R, R, O]
-                                                        , Config.accepts e₃L₁L₂ [C, A, R, R]
+testDFArquotient = scope "DFA.rquotient" . expect $ and [ Config.accepts e₃L₁   [C, A, R, R, O, T]                  -- test that "carrot" ∈ L₁
+                                                        , Config.accepts e₃L₂   [O, T]                              -- test that     "ot" ∈    L₂
+                                                        , Config.accepts e₃L₂   [T]                                 -- test that      "t" ∈    L₂
+                                                        , Config.accepts e₃L₁L₂ [C, A, R, R, O]                     -- test that "carro"  ∈ L₁/L₂
+                                                        , Config.accepts e₃L₁L₂ [C, A, R, R]                        -- test that "carr"   ∈ L₁/L₂
                                                         , Prelude.take 2 (Config.language e₃L₁L₂) == [[C, A, R, R], [C, A, R, R, O]]
                                                         ]
   where
+    -- L₁ = {"carrot"}
     e₃L₁ ∷ DFA Fin₈ Alpha
     e₃L₁   = DFA δ 0 (singleton 6)
       where
@@ -105,9 +106,10 @@ testDFArquotient = scope "DFA.rquotient" . expect $ and [ Config.accepts e₃L�
         δ (4, O) = 5
         δ (5, T) = 6
         δ _      = 7
-    e₃L₂ ∷ DFA (Fin₈, Ordering) Alpha
-    e₃L₂   = DFA.union (right e₃L₁ 4) (DFA.literal T)
-    -- e₃L₂ = DFA.union (right e₃L₁ 4) (right e₃L₁ 5)
+    -- L₂ = {"t"} ∪ {"ot"} = {"t", "ot"}
+    e₃L₂ ∷ DFA (Fin₈, Fin₈) Alpha
+    e₃L₂   = DFA.union (right e₃L₁ 5) (right e₃L₁ 4)
+    -- L₁/L₂ = {"carro", "carr"}
     e₃L₁L₂ ∷ DFA Fin₈ Alpha
     e₃L₁L₂ = DFA.rquotient e₃L₁ e₃L₂
 
