@@ -359,6 +359,10 @@ descending ta = snd (mapAccumL (\as _ → let mx = maximum as in (delete mx as, 
 rotate ∷ ℕ → [a] → [a]
 rotate n as = getOp (contramap (`mod` genericLength as) (Op (genericDrop <> genericTake))) n as
 
+-- TODO can probably be improved, but works for now
+rotations ∷ [a] → [[a]]
+rotations as = fmap (\n → rotate n as) (skeleton as)
+
 -- A version of `fromEnum` which returns a Natural rather than an `Int`
 fromEnum' ∷ (Enum a) ⇒ a → ℕ
 fromEnum' = fromIntegral . fromEnum
