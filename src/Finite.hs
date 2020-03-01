@@ -51,6 +51,49 @@ class BoundedBelow a where
 class BoundedAbove a where
   maximumBound ∷ a
 
+-- TODO experimental, may want to create seperate file for these classes
+class NotEmpty a where
+  wit ∷ a
+class (NotEmpty a, Finite a) ⇒ NEF a where
+  asNE ∷ NonEmpty a
+  -- asNE = wit :| _ -- TODO decide if default implemetation is at all useful
+
+-- TODO
+{-
+instance NotEmpty () where
+  wit  ∷ ()
+  wit  = ()
+instance NEF () where
+  asNE ∷ NonEmpty ()
+  asNE = () :| []
+instance NotEmpty Bool where
+  wit  ∷ Bool
+  wit  = False
+instance NEF Bool where
+  asNE ∷ NonEmpty Bool
+  asNE = False :| [True]
+instance NotEmpty Ordering where
+  wit  ∷ Ordering
+  wit  = LT
+instance NEF Ordering where
+  asNE ∷ NonEmpty Ordering
+  asNE = LT :| [EQ, GT]
+instance NotEmpty Fin₁ where
+  wit ∷ Fin₁
+  wit = 0
+instance NotEmpty Fin₂ where
+  wit ∷ Fin₂
+  wit = 0
+instance NotEmpty Fin₃ where
+  wit ∷ Fin₃
+  wit = 0
+instance NotEmpty (Set a) where
+  wit ∷ Set a
+  wit = (∅)
+instance NotEmpty (Maybe a) where
+  wit ∷ Maybe a
+  wit = Nothing
+-}
 class (Finite sigma) ⇒ Σ formalism sigma | formalism → sigma where
   -- Σ, The alphabet of the formalism
   sigma ∷ formalism → Set sigma
