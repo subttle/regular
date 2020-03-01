@@ -355,6 +355,10 @@ ascending ta = snd (mapAccumL (\as _ → let mn = minimum as in (delete mn as, m
 descending ∷ (Traversable1 t, Ord a) ⇒ t a → t a
 descending ta = snd (mapAccumL (\as _ → let mx = maximum as in (delete mx as, mx)) (toList ta) ta)
 
+-- TODO
+rotate ∷ ℕ → [a] → [a]
+rotate n as = getOp (contramap (`mod` genericLength as) (Op genericDrop <> Op genericTake)) n as
+
 -- A version of `fromEnum` which returns a Natural rather than an `Int`
 fromEnum' ∷ (Enum a) ⇒ a → ℕ
 fromEnum' = fromIntegral . fromEnum
