@@ -11,7 +11,7 @@ import           Data.Functor.Contravariant (Contravariant, contramap, Equivalen
 import           Data.Function (on)
 import qualified Data.List           as List
 import           Data.Set            as Set hiding (foldl, intersection)
-import           Data.Set.Unicode ((∅), (∈), (∉), (∖))
+import           Data.Set.Unicode ((∅), (∈), (∉), (∖), (∪))
 import           Data.Bool.Unicode ((∧), (∨))
 import qualified Data.Map            as Map
 import           Numeric.Algebra.Class (sumWith)
@@ -379,6 +379,14 @@ toNFAMin m@(DFA δ _ f) = (toNFA m) { NFA.delta = δ₁ }
     δ₁ ∷ (q, s) → Set q
     δ₁ (q, _) | q ∈ f = (∅)  -- delete transitions out of final states
     δ₁ (q, σ)         = singleton (δ (q, σ))
+
+-- TODO untested
+toNFAShuffle ∷ forall q p s . (Ord q, Ord p) ⇒ DFA q s → DFA p s → NFA.NFA (q, p) s
+toNFAShuffle (DFA δ₁ q₀ f₁) (DFA δ₂ p₀ f₂) = NFA.NFA δ (q₀, p₀) (f₁ × f₂)
+  where
+    δ ∷ ((q, p), s) → Set (q, p)
+    δ ((q, p), σ) = Set.singleton (δ₁ (q, σ),     p    )
+                  ∪ Set.singleton (    q    , δ₂ (p, σ))
 
 -- Take a DFA, d, and convert it to an EFA, e, such that ℒ(d) = ℒ(e)
 toEFA ∷ DFA q s → EFA.EFA q s
