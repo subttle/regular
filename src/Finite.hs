@@ -32,7 +32,7 @@ import           GHC.Enum (boundedEnumFrom)
 import           Data.Fin (Fin)
 import qualified Data.Type.Nat as Nat
 import           Numeric.Natural.Unicode (ℕ)
-import           Data.Tagged (Tagged, unTagged)
+import           Data.Tagged (Tagged, unTagged, retag)
 import qualified Data.Universe as U
 
 -- An imperfect, somewhat practical, representation of a Finite type constraint
@@ -833,10 +833,7 @@ composeC c₁ c₂ = listToComparison (fmap (representativeC c₁ . representati
 
 -- Counts the number of possible total orders over a finite set
 cardinalityC ∷ ∀ a . (Finite a) ⇒ Comparison a → ℕ
-cardinalityC _ = factorial cardinality_a
-  where
-    cardinality_a ∷ ℕ
-    cardinality_a = List.genericLength (asList ∷ [a])
+cardinalityC _ = unTagged (U.cardinality ∷ Tagged (Comparison a) ℕ)
 
 instance (Show a, Finite a)
        ⇒ Show (Comparison a) where
@@ -909,6 +906,9 @@ instance (Finite a, U.Universe a)
        ⇒ U.Universe (Comparison a) where
 instance (Finite a)
        ⇒ U.Finite (Comparison a) where
+  -- Counts the number of possible total orders over a finite set
+  cardinality ∷ Tagged (Comparison a) ℕ
+  cardinality = fmap factorial (retag (U.cardinality ∷ Tagged a ℕ))
 instance (Finite a)
        ⇒ Finite (Comparison a) where
   asList ∷ [Comparison a]
