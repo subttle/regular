@@ -382,6 +382,24 @@ minimal' = DFA δ 0 (fromList [5, 6])
     δ (7, 1) = 2
     δ _      = 9
 
+-- accepts the language {"AB"}
+ab ∷ NFA.NFA Fin₃ Alpha
+ab = NFA.NFA δ 0 (singleton 2)
+  where
+    δ ∷ (Fin₃, Alpha) → Set Fin₃
+    δ (0, A) = singleton 1
+    δ (1, B) = singleton 2
+    δ _      = (∅)
+
+-- accepts the language {"CD"}
+cd ∷ NFA.NFA Fin₃ Alpha
+cd = NFA.NFA δ 0 (singleton 2)
+  where
+    δ ∷ (Fin₃, Alpha) → Set Fin₃
+    δ (0, C) = singleton 1
+    δ (1, D) = singleton 2
+    δ _      = (∅)
+
 -- accepts the language {"ABC"}
 abc ∷ NFA.NFA Fin₄ Alpha
 abc = NFA.NFA δ 0 (singleton 3)
