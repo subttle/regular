@@ -86,13 +86,7 @@ testFizzBuzz = scope "main.FizzBuzz" . expect $ woDFA == wDFA
 
 -- https://math.stackexchange.com/questions/871662/finding-right-quotient-of-languages
 testDFArquotient ∷ Test ()
-testDFArquotient = scope "DFA.rquotient" . expect $ and [ Config.accepts e₃L₁   [C, A, R, R, O, T]                  -- test that "carrot" ∈ L₁
-                                                        , Config.accepts e₃L₂   [O, T]                              -- test that     "ot" ∈    L₂
-                                                        , Config.accepts e₃L₂   [T]                                 -- test that      "t" ∈    L₂
-                                                        , Config.accepts e₃L₁L₂ [C, A, R, R, O]                     -- test that "carro"  ∈ L₁/L₂
-                                                        , Config.accepts e₃L₁L₂ [C, A, R, R]                        -- test that "carr"   ∈ L₁/L₂
-                                                        , Prelude.take 2 (Config.language e₃L₁L₂) == [[C, A, R, R], [C, A, R, R, O]]
-                                                        ]
+testDFArquotient = scope "DFA.rquotient" . expect $ and e₃Tests
   where
     -- L₁ = {"carrot"}
     e₃L₁ ∷ DFA Fin₈ Alpha
@@ -112,6 +106,15 @@ testDFArquotient = scope "DFA.rquotient" . expect $ and [ Config.accepts e₃L�
     -- L₁/L₂ = {"carro", "carr"}
     e₃L₁L₂ ∷ DFA Fin₈ Alpha
     e₃L₁L₂ = DFA.rquotient e₃L₁ e₃L₂
+    -- {"carrot"} / {"t", "ot"} = {"carro", "carr"}
+    e₃Tests ∷ [Bool]
+    e₃Tests = [ Config.accepts e₃L₁   [C, A, R, R, O, T]                  -- test that "carrot" ∈ L₁
+              , Config.accepts e₃L₂   [O, T]                              -- test that     "ot" ∈    L₂
+              , Config.accepts e₃L₂   [T]                                 -- test that      "t" ∈    L₂
+              , Config.accepts e₃L₁L₂ [C, A, R, R, O]                     -- test that "carro"  ∈ L₁/L₂
+              , Config.accepts e₃L₁L₂ [C, A, R, R]                        -- test that "carr"   ∈ L₁/L₂
+              , Prelude.take 2 (Config.language e₃L₁L₂) == [[C, A, R, R], [C, A, R, R, O]]
+              ]
 
 testDFAinvhomimage ∷ Test ()
 testDFAinvhomimage = scope "DFA.invhomimage" . expect $ same
