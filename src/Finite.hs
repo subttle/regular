@@ -303,7 +303,10 @@ instance (Finite a, Finite b)
   enumFrom ∷ These a b → [These a b]
   enumFrom = boundedEnumFrom
 instance (Finite a, Finite b)
-       ⇒ U.Finite (These a b)
+       ⇒ U.Finite (These a b) where
+  -- a + b + ab
+  cardinality ∷ Tagged (These a b) ℕ
+  cardinality = liftA2 (\a b → a + b + a * b) (retag (U.cardinality ∷ Tagged a ℕ)) (retag (U.cardinality ∷ Tagged b ℕ))
 
 -- TODO wait why do I need Finite constraints here??
 instance (Finite a, Finite b, U.Universe a, U.Universe b)
