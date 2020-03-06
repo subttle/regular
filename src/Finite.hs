@@ -31,6 +31,7 @@ import           Common
 import           GHC.Enum (boundedEnumFrom)
 import           Data.Fin (Fin)
 import qualified Data.Type.Nat as Nat
+import           Prelude.Unicode (ℤ)
 import           Numeric.Natural.Unicode (ℕ)
 import           Data.Tagged (Tagged, unTagged, retag)
 import qualified Data.Universe as U
@@ -115,6 +116,9 @@ instance NotEmpty Fin₁₅ where
   wit = 0
 instance NotEmpty ℕ where
   wit ∷ ℕ
+  wit = 0
+instance NotEmpty ℤ where
+  wit ∷ ℤ
   wit = 0
 
 instance NotEmpty [a] where
