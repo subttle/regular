@@ -140,6 +140,10 @@ instance NEF Ordering where
   asNE ∷ NonEmpty Ordering
   asNE = LT :| [EQ, GT]
 
+instance (Finite a) ⇒ NEF (Maybe a) where
+  asNE ∷ NonEmpty (Maybe a)
+  asNE = Nothing :| asList
+
 class (Finite sigma) ⇒ Σ formalism sigma | formalism → sigma where
   -- Σ, The alphabet of the formalism
   sigma ∷ formalism → Set sigma
