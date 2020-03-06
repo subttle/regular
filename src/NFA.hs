@@ -144,7 +144,7 @@ fromSet s = NFA δ False (singleton True)
     δ _                  = (∅)
 
 -- Return an NFA whose language is all permutations of the given set
--- e.g. ℒ(permutations {0, 1, 2}) = {[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]}
+-- e.g. ℒ(permutations {0, 1, 2}) = {"012", "021", "102", "120", "201", "210"}
 permutations ∷ ∀ s . (Ord s) ⇒ Set s → NFA (Set s) s
 permutations s = NFA δ (∅) (singleton s)
   where
