@@ -179,9 +179,9 @@ testNFAshuffle = scope "NFA.shuffle" . expect $ and [test]
     ab_cd = fmap (fmap abcdh) (Config.language abcd')
       where
         abh ∷ Bool → Alpha
-        abh = either A B
+        abh = bool A B
         cdh ∷ Bool → Alpha
-        cdh = either C D
+        cdh = bool C D
         abcdh ∷ Either Bool Bool → Alpha
         abcdh = either abh cdh
         abcd' ∷ NFA.NFA (Fin₃, Fin₃) (Either Bool Bool)
