@@ -18,6 +18,7 @@ import           Examples
 import           Data.Set (singleton)
 import           Config
 import           Numeric.Natural.Unicode (ℕ)
+import           Data.Bool (bool)
 import           Data.Eq.Unicode ((≠))
 import           Data.Functor.Contravariant (contramap, Equivalence (..), Comparison (..), Predicate (..))
 import qualified Data.Group as G
@@ -39,6 +40,7 @@ suite = tests [ testFizzBuzz
               , testDFArquotient
               , testDFAinvhomimage
               , testRESubstitution
+              , testNFAshuffle
               , testBisimSubset (by5, DFA.toLanguage by5) (List.take 101 (freeMonoid asList))
               -- "For example, the restricted growth function 0,1,1,2,0,3,1 defines the set partition {{1,5}, {2,3,7}, {4}, {6}}"
               -- https://www8.cs.umu.se/kurser/TDBAfl/VT06/algorithms/BOOK/BOOK4/NODE153.HTM
@@ -177,11 +179,9 @@ testNFAshuffle = scope "NFA.shuffle" . expect $ and [test]
     ab_cd = fmap (fmap abcdh) (Config.language abcd')
       where
         abh ∷ Bool → Alpha
-        abh False = A
-        abh True  = B
+        abh = either A B
         cdh ∷ Bool → Alpha
-        cdh False = C
-        cdh True  = D
+        cdh = either C D
         abcdh ∷ Either Bool Bool → Alpha
         abcdh = either abh cdh
         abcd' ∷ NFA.NFA (Fin₃, Fin₃) (Either Bool Bool)
