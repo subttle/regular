@@ -59,25 +59,15 @@ class (NotEmpty a, Finite a) ⇒ NEF a where
   -- asNE = wit :| _ -- TODO decide if default implemetation is at all useful
 
 -- TODO
-{-
 instance NotEmpty () where
   wit  ∷ ()
   wit  = ()
-instance NEF () where
-  asNE ∷ NonEmpty ()
-  asNE = () :| []
 instance NotEmpty Bool where
   wit  ∷ Bool
   wit  = False
-instance NEF Bool where
-  asNE ∷ NonEmpty Bool
-  asNE = False :| [True]
 instance NotEmpty Ordering where
   wit  ∷ Ordering
   wit  = LT
-instance NEF Ordering where
-  asNE ∷ NonEmpty Ordering
-  asNE = LT :| [EQ, GT]
 instance NotEmpty Fin₁ where
   wit ∷ Fin₁
   wit = 0
@@ -87,13 +77,69 @@ instance NotEmpty Fin₂ where
 instance NotEmpty Fin₃ where
   wit ∷ Fin₃
   wit = 0
-instance NotEmpty (Set a) where
-  wit ∷ Set a
-  wit = (∅)
+instance NotEmpty Fin₄ where
+  wit ∷ Fin₄
+  wit = 0
+instance NotEmpty Fin₅ where
+  wit ∷ Fin₅
+  wit = 0
+instance NotEmpty Fin₆ where
+  wit ∷ Fin₆
+  wit = 0
+instance NotEmpty Fin₇ where
+  wit ∷ Fin₇
+  wit = 0
+instance NotEmpty Fin₈ where
+  wit ∷ Fin₈
+  wit = 0
+instance NotEmpty Fin₉ where
+  wit ∷ Fin₉
+  wit = 0
+instance NotEmpty Fin₁₀ where
+  wit ∷ Fin₁₀
+  wit = 0
+instance NotEmpty Fin₁₁ where
+  wit ∷ Fin₁₁
+  wit = 0
+instance NotEmpty Fin₁₂ where
+  wit ∷ Fin₁₂
+  wit = 0
+instance NotEmpty Fin₁₃ where
+  wit ∷ Fin₁₃
+  wit = 0
+instance NotEmpty Fin₁₄ where
+  wit ∷ Fin₁₄
+  wit = 0
+instance NotEmpty Fin₁₅ where
+  wit ∷ Fin₁₅
+  wit = 0
+instance NotEmpty ℕ where
+  wit ∷ ℕ
+  wit = 0
+
+instance NotEmpty [a] where
+  wit ∷ [a]
+  wit = []
 instance NotEmpty (Maybe a) where
   wit ∷ Maybe a
   wit = Nothing
--}
+instance NotEmpty (Set a) where
+  wit ∷ Set a
+  wit = (∅)
+instance NotEmpty (OSet a) where
+  wit ∷ OSet a
+  wit = OSet.empty
+
+instance NEF () where
+  asNE ∷ NonEmpty ()
+  asNE = () :| []
+instance NEF Bool where
+  asNE ∷ NonEmpty Bool
+  asNE = False :| [True]
+instance NEF Ordering where
+  asNE ∷ NonEmpty Ordering
+  asNE = LT :| [EQ, GT]
+
 class (Finite sigma) ⇒ Σ formalism sigma | formalism → sigma where
   -- Σ, The alphabet of the formalism
   sigma ∷ formalism → Set sigma
