@@ -19,9 +19,9 @@ import           Data.Set (singleton)
 import           Config
 import           Numeric.Natural.Unicode (ℕ)
 import           Data.Eq.Unicode ((≠))
-import           Data.Functor.Contravariant (Equivalence (..), Comparison (..), Predicate (..))
+import           Data.Functor.Contravariant (contramap, Equivalence (..), Comparison (..), Predicate (..))
 import qualified Data.Group as G
-import           EasyTest
+import           EasyTest (Test, tests, scope, expect, run)
 import qualified Data.List as List
 import qualified Data.List.NonEmpty as NE (NonEmpty(..))
 import           Data.Either (isRight, isLeft, lefts)
@@ -166,6 +166,41 @@ testRESubstitution = scope "RE.>>=" . expect $ result == expected -- N.B. the us
     expected =  Star (         RE.fromList [2, 3])
             :. (Star (Lit 0 :| RE.fromList [0, 1])
             :.  Star (         RE.fromList [2, 3]))
+
+-- TODO
+-- Shuffle
+-- A Second Course in Formal Languages and Automata Theory (Pg 57, Example 3.3.8)
+testNFAshuffle ∷ Test ()
+testNFAshuffle = scope "NFA.shuffle" . expect $ and [test]
+  where
+    ab_cd ∷ [[Alpha]]
+    ab_cd = fmap (fmap abcdh) (Config.language abcd')
+      where
+        abh ∷ Bool → Alpha
+        abh False = A
+        abh True  = B
+        cdh ∷ Bool → Alpha
+        cdh False = C
+        cdh True  = D
+        abcdh ∷ Either Bool Bool → Alpha
+        abcdh = either abh cdh
+        abcd' ∷ NFA.NFA (Fin₃, Fin₃) (Either Bool Bool)
+        abcd' = NFA.asynchronous ab' cd'
+          where
+            ab' ∷ NFA.NFA Fin₃ Bool
+            ab' = contramap abh ab
+            cd' ∷ NFA.NFA Fin₃ Bool
+            cd' = contramap cdh cd
+    shuffled ∷ [[Alpha]]
+    shuffled = [ [A, B, C, D]
+               , [A, C, B, D]
+               , [A, C, D, B]
+               , [C, A, B, D]
+               , [C, A, D, B]
+               , [C, D, A, B]
+               ]
+    test ∷ Bool
+    test = ab_cd == shuffled
 
 -- An involution is a mapping, f, that coincides with its own inverse, i.e.,
 -- f x ≡ f⁻¹ x
