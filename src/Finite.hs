@@ -53,6 +53,8 @@ class BoundedAbove a where
   maximumBound ∷ a
 
 -- TODO experimental, may want to create seperate file for these classes
+-- A wrapper for some type `a` which is known to be not empty (the proof of
+-- which is witnessed by `wit`).
 class NotEmpty a where
   wit ∷ a
 class (NotEmpty a, Finite a) ⇒ NEF a where
