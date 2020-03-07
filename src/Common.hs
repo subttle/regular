@@ -274,6 +274,13 @@ stirling₂ (0, _) = 0
 stirling₂ (_, 0) = 0
 stirling₂ (n, k) = stirling₂ (n - 1, k - 1) + stirling₂ (n - 1, k) * k
 
+-- combinations
+-- N.B. required precondition not checked
+choose' ∷ (ℕ, ℕ) → ℕ
+choose' (_, 0)          = 1
+choose' (n, k) | n == k = 1
+choose' (n, k)          = choose' (n - 1, k - 1) + choose' (n - 1, k)
+
 -- https://oeis.org/A000108
 -- Catalan numbers
 catalan ∷ NonEmpty ℕ
