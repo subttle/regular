@@ -123,6 +123,28 @@ instance NotEmpty ℤ where
   wit ∷ ℤ
   wit = 0
 
+instance NotEmpty Alpha where
+  wit ∷ Alpha
+  wit = A
+instance NotEmpty DNA where
+  wit ∷ DNA
+  wit = Adenine
+instance NotEmpty Suit where
+  wit ∷ Suit
+  wit = Spade
+instance NotEmpty Rank where
+  wit ∷ Rank
+  wit = Two
+instance NotEmpty Card where
+  wit ∷ Card
+  wit = Card wit wit
+instance NotEmpty D₆ where
+  wit ∷ D₆
+  wit = Side₁
+instance NotEmpty Month where
+  wit ∷ Month
+  wit = January
+
 instance NotEmpty [a] where
   wit ∷ [a]
   wit = []
