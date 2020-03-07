@@ -258,6 +258,10 @@ instance (Finite a, U.Universe a)
        ⇒ U.Universe (OSet a) where
 instance (Finite a)
        ⇒ U.Finite (OSet a) where
+  -- http://oeis.org/A000522
+  cardinality ∷ Tagged (OSet a) ℕ
+  cardinality = fmap (\n → sum (fmap (\k → choose' (n, k) * factorial k) [0 .. n])) (retag (U.cardinality ∷ Tagged a ℕ))
+
 -- Generate all subsets then do permutations of each subset
 -- AKA "sequences without repetition" or "k-permutations of n"
 instance (Finite a)
