@@ -5,7 +5,8 @@
 {-# LANGUAGE OverloadedStrings          #-}
 
 import           DFA
--- import qualified NFA
+import           NFA (NFA)
+import qualified NFA
 -- import qualified EFA
 -- import qualified GFA
 import           RegExp (RegExp (..))
@@ -184,12 +185,12 @@ testNFAshuffle = scope "NFA.shuffle" . expect $ and [test]
         cdh = bool C D
         abcdh ∷ Either Bool Bool → Alpha
         abcdh = either abh cdh
-        abcd' ∷ NFA.NFA (Fin₃, Fin₃) (Either Bool Bool)
+        abcd' ∷ NFA (Fin₃, Fin₃) (Either Bool Bool)
         abcd' = NFA.asynchronous ab' cd'
           where
-            ab' ∷ NFA.NFA Fin₃ Bool
+            ab' ∷ NFA Fin₃ Bool
             ab' = contramap abh ab
-            cd' ∷ NFA.NFA Fin₃ Bool
+            cd' ∷ NFA Fin₃ Bool
             cd' = contramap cdh cd
     shuffled ∷ [[Alpha]]
     shuffled = [ [A, B, C, D]
