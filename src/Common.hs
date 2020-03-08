@@ -275,7 +275,7 @@ stirling₂ (_, 0) = 0
 stirling₂ (n, k) = stirling₂ (n - 1, k - 1) + stirling₂ (n - 1, k) * k
 
 -- combinations
--- N.B. required precondition not checked
+-- N.B. required precondition, k ≤ n, is not checked
 choose' ∷ (ℕ, ℕ) → ℕ
 choose' (_, 0)          = 1
 choose' (n, k) | n == k = 1
