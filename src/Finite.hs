@@ -325,7 +325,7 @@ instance (Bounded a, Bounded b)
   minBound ∷ These a b
   minBound = This  minBound
   maxBound ∷ These a b
-  maxBound = These  maxBound maxBound  -- maxBound = That  maxBound
+  maxBound = These maxBound maxBound
 instance (Finite a, Finite b)
        ⇒ Enum (These a b) where
   toEnum   ∷ Int → These a b
