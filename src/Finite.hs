@@ -59,7 +59,8 @@ class NotEmpty a where
   wit ∷ a
 class (NotEmpty a, Finite a) ⇒ NEF a where
   asNE ∷ NonEmpty a
-  -- asNE = wit :| _ -- TODO decide if default implemetation is at all useful
+  -- FIXME I'm not entirely sold on this default definition being a good idea
+  asNE = NE.fromList asList
 
 -- TODO
 instance NotEmpty () where
@@ -744,7 +745,7 @@ fromRGS (RGS rgs) = equating' (genericIndex rgs . fromEnum')
 
 -- TODO https://proofwiki.org/wiki/Definition:Cycle_Decomposition
 cycles ∷ (Finite a) ⇒ Comparison a → Equivalence a
-cycles c = Equivalence (\a → (a ∈) . orbit c)
+cycles = Equivalence . ((∋) ‥ orbit)
 
 -- " the orbit of an element is all its possible destinations under the group action."
 -- https://proofwiki.org/wiki/Definition:Orbit_(Group_Theory)
