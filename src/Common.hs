@@ -32,6 +32,7 @@ import           Data.Void
 import           Control.Applicative (liftA2, getZipList, ZipList (..))
 import           Control.Monad (replicateM)
 import           Control.Arrow ((|||), (&&&))
+import           Prelude.Unicode (ℤ)
 import           Numeric.Natural.Unicode (ℕ)
 
 -- type level flip
@@ -253,7 +254,15 @@ partitions' = Foldable.foldl (\xs → (xs >>=) . go) [[]]
     go a []       = pure (pure (pure a))
     go a (p : ps) = pure ((a <| p) : ps) <> fmap (p :) (go a ps)
 
--- Stirling numbers of the first kind
+-- Stirling numbers of the first kind (signed)
+-- https://proofwiki.org/wiki/Definition:Stirling_Numbers_of_the_First_Kind/Signed
+stirling₀ ∷ (ℕ, ℕ) → ℤ
+stirling₀ (0, 0) = 1
+stirling₀ (0, _) = 0
+stirling₀ (_, 0) = 0
+stirling₀ (n, k) = stirling₀ (n - 1, k - 1) - stirling₀ (n - 1, k) * toInteger (n - 1)
+
+-- Stirling numbers of the first kind (unsigned)
 -- "The Stirling numbers of the first kind s(n, k) count the number of
 -- ways to permute a list of `n` items into `k` cycles"
 -- http://mathforum.org/advanced/robertd/stirling1.html
