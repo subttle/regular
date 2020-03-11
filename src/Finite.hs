@@ -27,6 +27,7 @@ import qualified Data.Foldable as F
 import           Data.Function (on)
 import           Data.Functor.Contravariant
 import           Data.Functor.Contravariant.Divisible (Decidable, Divisible, divide, conquer, choose, lose)
+import           Data.Ord (Down (..))
 import           Common
 import           GHC.Enum (boundedEnumFrom)
 import           Data.Fin (Fin)
@@ -1104,7 +1105,7 @@ instance (Show a, Finite a) ⇒ Show (Equivalence a) where
           show' (a₁, a₂, b) = show a₁ ++ ", " ++ show a₂ ++ " ↦ " ++ show b
       -- show an Equivalence relation as a Ferrer's diagram -- TODO can improve this later, but this works
       showferrers ∷ ∀ a. (Show a, Finite a) ⇒ Equivalence a → String
-      showferrers e = unlines (reverse (sortOn genericLength (fmap (fmap (const '*')) parts)))
+      showferrers e = unlines (sortOn (Down . genericLength) (fmap (fmap (const '*')) parts))
         where
           parts ∷ [[a]]
           parts = fmap NE.toList (fromEquivalence e)
