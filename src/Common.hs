@@ -100,7 +100,9 @@ andAlg = Algebra φ
 -- Coyoneda f a ~ (∀ b . Coyoneda (b → a) → f b)
 -- (lower . lift) == fmap id == id
 -- (lift . lower) == fmap id == id
-data Coyoneda f a = ∀ b . Coyoneda (b → a) (f b)
+data Coyoneda f a where
+  -- data Coyoneda f a = ∀ b . Coyoneda (b → a) (f b)
+  Coyoneda ∷ (b → a) → f b → Coyoneda f a
 
 instance Functor (Coyoneda f) where
   fmap ∷ (a → b) → Coyoneda f a → Coyoneda f b
