@@ -96,6 +96,26 @@ andAlg = Algebra φ
 (…) ∷ (a → b) → (c → d → e → a) → (c → d → e → b)
 (…) = (.) . (.) . (.)
 
+-- https://vimeo.com/122708005  ← excellent video!!!
+-- Coyoneda f a ~ (∀ b . Coyoneda (b → a) → f b)
+-- (lower . lift) == fmap id == id
+-- (lift . lower) == fmap id == id
+data Coyoneda f a = ∀ b . Coyoneda (b → a) (f b)
+
+instance Functor (Coyoneda f) where
+  fmap ∷ (a → b) → Coyoneda f a → Coyoneda f b
+  fmap f (Coyoneda g fa) = Coyoneda (f . g) fa
+
+lift ∷ f a → Coyoneda f a
+lift = Coyoneda id
+
+lower ∷ (Functor f) ⇒ Coyoneda f a → f a
+lower (Coyoneda f fa) = fmap f fa
+
+-- modify with natural transformation
+nt ∷ (∀ c . (f c → g c)) → Coyoneda f a → Coyoneda g a
+nt η (Coyoneda h fb) = Coyoneda h (η fb)
+
 -- requires containers-0.5.11 or newer
 -- TODO deleteme after this is closed: https://github.com/roelvandijk/containers-unicode-symbols/issues/6
 (×) ∷ (Ord a, Ord b) ⇒ Set a → Set b → Set (a, b)
