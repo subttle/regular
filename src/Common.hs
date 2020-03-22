@@ -104,13 +104,13 @@ data Coyoneda f a = ∀ b . Coyoneda (b → a) (f b)
 
 instance Functor (Coyoneda f) where
   fmap ∷ (a → b) → Coyoneda f a → Coyoneda f b
-  fmap f (Coyoneda g fa) = Coyoneda (f . g) fa
+  fmap f (Coyoneda h fb) = Coyoneda (f . h) fb
 
 lift ∷ f a → Coyoneda f a
 lift = Coyoneda id
 
 lower ∷ (Functor f) ⇒ Coyoneda f a → f a
-lower (Coyoneda f fa) = fmap f fa
+lower (Coyoneda h fb) = fmap h fb
 
 -- modify with natural transformation
 nt ∷ (∀ c . (f c → g c)) → Coyoneda f a → Coyoneda g a
