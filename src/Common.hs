@@ -118,6 +118,22 @@ lower (Coyoneda h fb) = fmap h fb
 nt ∷ (∀ c . (f c → g c)) → Coyoneda f a → Coyoneda g a
 nt η (Coyoneda h fb) = Coyoneda h (η fb)
 
+
+data ContraCoyoneda where
+  CCoyoneda ∷ (a → b) → f b → ContraCoyoneda f a
+
+instance Contravariant (ContraCoyoneda f) where
+  contramap ∷ (b → a) → ContraCoyoneda f a → ContraCoyoneda f b
+  contramap h (CCoyoneda f fb) = CCoyoneda (f . h) fb
+
+-- TODO liftContraCoyoneda?
+lift' ∷ f a → ContraCoyoneda f a
+lift' = CCoyoneda id
+
+-- TODO lowerContraCoyoneda?
+lower' ∷ (Contravariant f) ⇒ ContraCoyoneda f a → f a
+lower' (CCoyoneda h fb) = contramap h fb
+
 -- requires containers-0.5.11 or newer
 -- TODO deleteme after this is closed: https://github.com/roelvandijk/containers-unicode-symbols/issues/6
 (×) ∷ (Ord a, Ord b) ⇒ Set a → Set b → Set (a, b)
