@@ -24,7 +24,7 @@ deriving instance Traversable NatF
 
 -- case analysis
 nat ∷ a → (a → a) → ℕ → a
-nat z s Zero     = z
+nat z _ Zero     = z
 nat z s (Succ n) = s (nat z s n)
 
 -- N.B. `maybe ∷ b → (a → b) → Maybe a → b`
