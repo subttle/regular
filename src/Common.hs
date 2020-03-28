@@ -32,7 +32,7 @@ import           Data.Void
 import           Control.Applicative (liftA2, getZipList, ZipList (..))
 import           Control.Monad (replicateM)
 import           Control.Arrow ((|||), (&&&))
-import           Prelude.Unicode (ℤ)
+import           Prelude.Unicode (ℤ, ℚ)
 import           Numeric.Natural.Unicode (ℕ)
 
 -- type level flip
@@ -353,11 +353,21 @@ catalan = 1 <| NE.unfoldr c (pure 1)
         n ∷ ℕ
         n = sum (NE.zipWith (*) ns (NE.reverse ns))
 
+-- Rational numbers (as a non-empty list)
+-- inspired by:
+-- http://www.cs.ox.ac.uk/people/jeremy.gibbons/publications/rationals.pdf
+-- FIXME untested
+rationals ∷ NonEmpty ℚ
+rationals = fix ((<|) 1 . (=<<) (\q → pure (1 + q) <> pure (1 / (1 + q))))
+
 -- Natural numbers (as a non-empty list)
 -- http://oeis.org/A001477
 naturals ∷ NonEmpty ℕ
 -- naturals = NE.iterate (+1) 0
 naturals = fix ((<|) 0 . fmap (+ 1))
+
+powers ∷ ℕ → NonEmpty ℕ
+powers n = fix ((<|) 1 . fmap (* n))
 
 -- Fibonacci numbers (as a non-empty list)
 -- http://oeis.org/A000045
