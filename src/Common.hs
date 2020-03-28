@@ -342,8 +342,8 @@ choose' (_, 0)          = 1
 choose' (n, k) | n == k = 1
 choose' (n, k)          = choose' (n - 1, k - 1) + choose' (n - 1, k)
 
--- https://oeis.org/A000108
 -- Catalan numbers
+-- https://oeis.org/A000108
 catalan ∷ NonEmpty ℕ
 catalan = 1 <| NE.unfoldr c (pure 1)
   where
@@ -363,6 +363,11 @@ naturals = fix ((<|) 0 . fmap (+ 1))
 -- http://oeis.org/A000045
 fibonacci ∷ NonEmpty ℕ
 fibonacci = fix ((<|) 0 . NE.scanl (+) 1)
+
+-- Factorial numbers (as a non-empty list)
+-- http://oeis.org/A000142
+factorials ∷ NonEmpty ℕ
+factorials = fix ((<|) 1 . NE.zipWith (*) (enumFrom' 1))
 
 factorial ∷ ℕ → ℕ
 factorial = product . enumFromTo 1
