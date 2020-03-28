@@ -442,6 +442,10 @@ rotations as = fmap (\n → rotate n as) (skeleton as)
 fromEnum' ∷ (Enum a) ⇒ a → ℕ
 fromEnum' = fromIntegral . fromEnum
 
+-- A version of `enumFrom` which returns `NonEmpty a` rather than `[a]`
+enumFrom' ∷ (Enum a) ⇒ a → NonEmpty a
+enumFrom' a = a :| enumFrom (succ a)
+
 indexed ∷ (Traversable t) ⇒ t a → t (a, ℕ)
 indexed = mapWithIndex (flip (,))
 
