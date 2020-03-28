@@ -353,9 +353,16 @@ catalan = 1 <| NE.unfoldr c (pure 1)
         n ∷ ℕ
         n = sum (NE.zipWith (*) ns (NE.reverse ns))
 
--- Natural numbers
+-- Natural numbers (as a non-empty list)
+-- http://oeis.org/A001477
 naturals ∷ NonEmpty ℕ
-naturals = NE.iterate (+1) 0
+-- naturals = NE.iterate (+1) 0
+naturals = fix ((<|) 0 . fmap (+ 1))
+
+-- Fibonacci numbers (as a non-empty list)
+-- http://oeis.org/A000045
+fibonacci ∷ NonEmpty ℕ
+fibonacci = fix ((<|) 0 . NE.scanl (+) 1)
 
 factorial ∷ ℕ → ℕ
 factorial = product . enumFromTo 1
