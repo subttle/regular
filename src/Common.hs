@@ -27,6 +27,7 @@ import           Data.Functor.Contravariant.Divisible (Divisible, Decidable, div
 import           Data.Functor.Contravariant (Contravariant, Op (..), Predicate (..), Comparison (..), Equivalence (..), defaultComparison, defaultEquivalence, contramap, (>$<), (>$$<))
 import           Data.Functor.Foldable (Fix (..), unfix, ListF (..))
 import           Data.Function (on)
+import           Data.Semigroup.Foldable (Foldable1, toNonEmpty)
 import           Data.Semigroup.Traversable (Traversable1)
 import           Data.Void
 import           Control.Applicative (liftA2, getZipList, ZipList (..))
@@ -286,11 +287,14 @@ generate = NE.unfoldr c (pure 2)
 --                     ]
 partitions ∷ [a] → [[NonEmpty a]]
 partitions []      = pure []
-partitions (h : t) = partitionsNE (h :| t)
+partitions (h : t) = toList <$> toList (partitionsNE (h :| t))
 
-partitionsNE ∷ NonEmpty a → [[NonEmpty a]]
-partitionsNE (a₁ :| [])        = pure (pure (pure a₁))
-partitionsNE (a₁ :| (a₂ : as)) = [(pure a₁ :), \(h : t) → (a₁ <| h) : t] <*> partitionsNE (a₂ :| as)
+partitionsNE ∷ (Foldable1 t) ⇒ t a → NonEmpty (NonEmpty (NonEmpty a))
+partitionsNE = partitionsNE' . toNonEmpty
+  where
+    partitionsNE' ∷ NonEmpty a → NonEmpty (NonEmpty (NonEmpty a))
+    partitionsNE' (a₁ :| [])        = pure (pure (pure a₁))
+    partitionsNE' (a₁ :| (a₂ : as)) = ((pure a₁ <|) :| pure (\(h :| t) → (a₁ <| h) :| t)) <*> partitionsNE' (a₂ :| as)
 
 -- partitions of a set
 -- partitions' {0..2} = [ [[2,1,0]]
