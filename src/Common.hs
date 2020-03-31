@@ -1,5 +1,6 @@
 {-# OPTIONS_GHC -Wall #-}
 {-# LANGUAGE DataKinds                  #-}
+{-# LANGUAGE DerivingVia                #-}
 {-# LANGUAGE RankNTypes                 #-}
 {-# LANGUAGE ConstraintKinds            #-}
 
@@ -618,6 +619,24 @@ class (Show a) ⇒ Fancy a where
   show'    = charToString . unicode
   colored ∷ (a, DisplayColor) → String
   colored (s, color) = show' s `toColor` color
+
+newtype CCPredicate a where
+  CCPredicate ∷ ContraCoyoneda Predicate a → CCPredicate a
+  deriving Contravariant via (ContraCoyoneda Predicate)
+  deriving Divisible     via (ContraCoyoneda Predicate)
+  deriving Decidable     via (ContraCoyoneda Predicate)
+
+newtype CCEquivalence a where
+  CCEquivalence ∷ ContraCoyoneda Equivalence a → CCEquivalence a
+  deriving Contravariant via (ContraCoyoneda Equivalence)
+  deriving Divisible     via (ContraCoyoneda Equivalence)
+  deriving Decidable     via (ContraCoyoneda Equivalence)
+
+newtype CCComparison a where
+  CCComparison ∷ ContraCoyoneda Comparison a → CCComparison a
+  deriving Contravariant via (ContraCoyoneda Comparison)
+  deriving Divisible     via (ContraCoyoneda Comparison)
+  deriving Decidable     via (ContraCoyoneda Comparison)
 
 class (Divisible f) ⇒ Divisible₃ f where
   divide₃ ∷ (a → (b, c, d)) → f b → f c → f d → f a
