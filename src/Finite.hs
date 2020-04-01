@@ -1260,6 +1260,15 @@ instance Fancy D₆ where
 (⚅) ∷ D₆
 (⚅) = Side₆
 
+-- automorphism which computes the flip of the six-sided die to the opposite side
+flipped ∷ D₆ → D₆
+flipped Side₁ = Side₆
+flipped Side₂ = Side₅
+flipped Side₃ = Side₄
+flipped Side₄ = Side₃
+flipped Side₅ = Side₂
+flipped Side₆ = Side₁
+
 data Month where
   January   ∷ Month
   February  ∷ Month
