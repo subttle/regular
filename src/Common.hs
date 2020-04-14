@@ -19,6 +19,10 @@ import           Data.List as List
 import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)), (<|))
 import qualified Data.List.NonEmpty as NE
 import           Data.These
+import           Data.Can (Can, can)
+import qualified Data.Can as C
+import           Data.Smash
+import           Data.Wedge
 import qualified Data.Type.Nat as Nat
 import           Data.Fin (Fin)
 import           Data.Char (digitToInt)
@@ -679,7 +683,7 @@ contrathesedThat ∷ (ContraThese f) ⇒ f a → f a → f a
 contrathesedThat = contrathese That
 instance (Monoid m) ⇒ ContraThese (Op m) where
   contrathese ∷ ∀ a b c . (a → These b c) → Op m b → Op m c → Op m a
-  contrathese h (Op opᵇ) (Op opᶜ) = h >$< Op (these opᵇ opᶜ (\b c → opᵇ b <> opᶜ c))
+  contrathese h (Op opᵇ) (Op opᶜ) = h >$< Op (these opᵇ opᶜ (\b c → opᵇ b ⋄ opᶜ c))
 instance ContraThese Predicate where
   contrathese ∷ (a → These b c) → Predicate b → Predicate c → Predicate a
   contrathese h (Predicate pᵇ) (Predicate pᶜ) = h >$< Predicate (these pᵇ pᶜ (\b c → pᵇ b ∧ pᶜ c))
@@ -705,7 +709,34 @@ instance ContraThese Comparison where
       (⪥) (That     _ ) (These _  _ ) = LT
       (⪥) (These _  _ ) (This  _    ) = GT
       (⪥) (These _  _ ) (That     _ ) = GT
-      (⪥) (These b₁ c₁) (These b₂ c₂) = (b₁ ⪋ b₂) <> (c₁ ⪌ c₂)
+      (⪥) (These b₁ c₁) (These b₂ c₂) = (b₁ ⪋ b₂) ⋄ (c₁ ⪌ c₂)
+
+-- EXPERIMENTAL
+-- FIXME constraints need to be improved/corrected, this is just for a rough idea.
+
+-- Can
+-- 1 + a + b + ab
+class (Decidable f) ⇒ ContraCan f where
+  contracan ∷ (a → Can b c) → f b → f c → f a
+instance (Monoid m) ⇒ ContraCan (Op m) where
+  contracan ∷ ∀ a b c . (a → Can b c) → Op m b → Op m c → Op m a
+  contracan h (Op opᵇ) (Op opᶜ) = h >$< Op (can mempty opᵇ opᶜ (\b c → opᵇ b ⋄ opᶜ c))
+
+-- Wedge
+-- 1 + a + b
+class (Decidable f) ⇒ ContraWedge f where
+  contrawedge ∷ (a → Wedge b c) → f b → f c → f a
+instance (Monoid m) ⇒ ContraWedge (Op m) where
+  contrawedge ∷ ∀ a b c . (a → Wedge b c) → Op m b → Op m c → Op m a
+  contrawedge h (Op opᵇ) (Op opᶜ) = h >$< Op (wedge mempty opᵇ opᶜ)
+
+-- Smash
+-- 1 + ab
+class (Decidable f) ⇒ ContraSmash f where
+  contrasmash ∷ (a → Smash b c) → f b → f c → f a
+instance (Monoid m) ⇒ ContraSmash (Op m) where
+  contrasmash ∷ ∀ a b c . (a → Smash b c) → Op m b → Op m c → Op m a
+  contrasmash h (Op opᵇ) (Op opᶜ) = h >$< Op (smash mempty (\b c → opᵇ b ⋄ opᶜ c))
 
 -- Partial Equivalence Relation
 newtype PER a = PER { getPER ∷ a → a → Maybe Bool }
@@ -739,7 +770,7 @@ instance Contravariant (Op₂ c) where
 -- FIXME: warning, this is still experimental
 instance (Monoid m) ⇒ Divisible (Op₂ m) where
   divide ∷ ∀ a b c . (a → (b, c)) → Op₂ m b → Op₂ m c → Op₂ m a
-  divide h (Op₂ opᵇ) (Op₂ opᶜ) = Op₂ ((\(b₁, c₁) (b₂, c₂) → opᵇ b₁ b₂ <> opᶜ c₁ c₂) `on` h) -- TODO consider reverse order , i.e. `opᶜ c₁ c₂ <> opᵇ b₁ b₂`
+  divide h (Op₂ opᵇ) (Op₂ opᶜ) = Op₂ ((\(b₁, c₁) (b₂, c₂) → opᵇ b₁ b₂ ⋄ opᶜ c₁ c₂) `on` h) -- TODO consider reverse order , i.e. `opᶜ c₁ c₂ <> opᵇ b₁ b₂`
   conquer ∷ Op₂ m a
   conquer = Op₂ (const (const mempty))
 
