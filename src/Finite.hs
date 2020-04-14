@@ -28,6 +28,10 @@ import           Data.Function (on)
 import           Data.Functor.Contravariant
 import           Data.Functor.Contravariant.Divisible (Decidable, Divisible, divide, conquer, choose, lose)
 import           Data.Ord (Down (..))
+import           Data.Can (Can)
+import qualified Data.Can as C
+import           Data.Smash
+import           Data.Wedge
 import           Common
 import           GHC.Enum (boundedEnumFrom)
 import           Data.Fin (Fin)
@@ -341,8 +345,6 @@ instance (Finite a, Finite b)
   -- a + b + ab
   cardinality ∷ Tagged (These a b) ℕ
   cardinality = liftA2 (\a b → a + b + a * b) (retag (U.cardinality ∷ Tagged a ℕ)) (retag (U.cardinality ∷ Tagged b ℕ))
-
--- TODO wait why do I need Finite constraints here??
 instance (Finite a, Finite b, U.Universe a, U.Universe b)
        ⇒ U.Universe (These a b)
 instance (Finite a, Finite b)
@@ -355,7 +357,102 @@ instance (Finite a, Finite b)
       products ∷ Set (a, b) 
       products = asSet
       sums ∷ Set (Either a b)
-      sums = asSet -- asSet ⊎ asSet
+      sums = asSet
+
+-- EXPERIMENTAL
+-- Wedge
+instance (Bounded a, Bounded b)
+       ⇒ Bounded (Wedge a b) where
+  minBound ∷ Wedge a b
+  minBound = Nowhere
+  maxBound ∷ Wedge a b
+  maxBound = There maxBound
+instance (Finite a, Finite b)
+       ⇒ Enum (Wedge a b) where
+  toEnum   ∷ Int → Wedge a b
+  toEnum   = (asList !!)
+  fromEnum ∷ Wedge a b → Int
+  fromEnum = fromJust . flip elemIndex asList
+  enumFrom ∷ Wedge a b → [Wedge a b]
+  enumFrom = boundedEnumFrom
+instance (Finite a, Finite b)
+       ⇒ U.Finite (Wedge a b) where
+  -- 1 + a + b
+  cardinality ∷ Tagged (Wedge a b) ℕ
+  cardinality = liftA2 (\a b → 1 + a + b) (retag (U.cardinality ∷ Tagged a ℕ)) (retag (U.cardinality ∷ Tagged b ℕ))
+instance (Finite a, Finite b, U.Universe a, U.Universe b)
+       ⇒ U.Universe (Wedge a b)
+instance (Finite a, Finite b)
+       ⇒ Finite (Wedge a b) where
+  asList ∷ [Wedge a b]
+  asList = toList asSet
+  asSet ∷ Set (Wedge a b)
+  asSet = Set.map toWedge asSet
+
+-- Can
+instance (Bounded a, Bounded b)
+       ⇒ Bounded (Can a b) where
+  minBound ∷ Can a b
+  minBound = C.Non
+  maxBound ∷ Can a b
+  maxBound = C.Two maxBound maxBound
+instance (Finite a, Finite b)
+       ⇒ Enum (Can a b) where
+  toEnum   ∷ Int → Can a b
+  toEnum   = (asList !!)
+  fromEnum ∷ Can a b → Int
+  fromEnum = fromJust . flip elemIndex asList
+  enumFrom ∷ Can a b → [Can a b]
+  enumFrom = boundedEnumFrom
+instance (Finite a, Finite b)
+       ⇒ U.Finite (Can a b) where
+  -- 1 + a + b + ab
+  cardinality ∷ Tagged (Can a b) ℕ
+  cardinality = liftA2 (\a b → 1 + a + b + a * b) (retag (U.cardinality ∷ Tagged a ℕ)) (retag (U.cardinality ∷ Tagged b ℕ))
+instance (Finite a, Finite b, U.Universe a, U.Universe b)
+       ⇒ U.Universe (Can a b)
+instance (Finite a, Finite b)
+       ⇒ Finite (Can a b) where
+  asList ∷ [Can a b]
+  asList = toList asSet
+  asSet ∷ Set (Can a b)
+  asSet = Set.map toCan asSet
+    where
+      -- toCan ∷ Maybe (These a b) → Can a b
+      toCan ∷ Maybe (Either (Either a b) (a, b)) → Can a b
+      toCan Nothing                  = C.Non
+      toCan (Just (Left  (Left  a))) = C.One a
+      toCan (Just (Left  (Right b))) = C.Eno   b
+      toCan (Just (Right (a, b)   )) = C.Two a b
+
+-- Smash
+instance (Bounded a, Bounded b)
+       ⇒ Bounded (Smash a b) where
+  minBound ∷ Smash a b
+  minBound = Nada
+  maxBound ∷ Smash a b
+  maxBound = Smash maxBound maxBound
+instance (Finite a, Finite b)
+       ⇒ Enum (Smash a b) where
+  toEnum   ∷ Int → Smash a b
+  toEnum   = (asList !!)
+  fromEnum ∷ Smash a b → Int
+  fromEnum = fromJust . flip elemIndex asList
+  enumFrom ∷ Smash a b → [Smash a b]
+  enumFrom = boundedEnumFrom
+instance (Finite a, Finite b)
+       ⇒ U.Finite (Smash a b) where
+  -- 1 + ab
+  cardinality ∷ Tagged (Smash a b) ℕ
+  cardinality = liftA2 (\a b → 1 + a * b) (retag (U.cardinality ∷ Tagged a ℕ)) (retag (U.cardinality ∷ Tagged b ℕ))
+instance (Finite a, Finite b, U.Universe a, U.Universe b)
+       ⇒ U.Universe (Smash a b)
+instance (Finite a, Finite b)
+       ⇒ Finite (Smash a b) where
+  asList ∷ [Smash a b]
+  asList = toList asSet
+  asSet ∷ Set (Smash a b)
+  asSet = Set.map toSmash asSet
 
 -- For tuples where types `a` and `b` are enumerable, allow the tuple to be enumerated as `a` × `b`
 instance (Finite a, Finite b)
