@@ -664,43 +664,37 @@ divide5 = divide₅
 divide6 ∷ (Divisible₆ f) ⇒ (a → (b, c, d, e, g, h)) → f b → f c → f d → f e → f g → f h → f a
 divide6 = divide₆
 
--- TODO change the name :)
-class (Decidable f) ⇒ RenameMe f where
-  renameme ∷ (a → These b c) → f b → f c → f a
+-- TODO change the names
 
-renamed ∷ (RenameMe f) ⇒ f b → f c → f (These b c)
-renamed = renameme id
-
-renamedThese ∷ (RenameMe f) ⇒ f a → f a → f a
-renamedThese = renameme (\s → These s s)
-
-renamedThis ∷ (RenameMe f) ⇒ f a → f a → f a
-renamedThis = renameme This
-
-renamedThat ∷ (RenameMe f) ⇒ f a → f a → f a
-renamedThat = renameme That
-
-instance (Monoid m) ⇒ RenameMe (Op m) where
-  renameme ∷ ∀ a b c . (a → These b c) → Op m b → Op m c → Op m a
-  renameme h (Op opᵇ) (Op opᶜ) = h >$< Op (these opᵇ opᶜ (\b c → opᵇ b <> opᶜ c))
-
-instance RenameMe Predicate where
-  renameme ∷ (a → These b c) → Predicate b → Predicate c → Predicate a
-  renameme h (Predicate pᵇ) (Predicate pᶜ) = h >$< Predicate (these pᵇ pᶜ (\b c → pᵇ b ∧ pᶜ c))
-
-instance RenameMe Equivalence where
-  renameme ∷ ∀ a b c . (a → These b c) → Equivalence b → Equivalence c → Equivalence a
-  renameme h (Equivalence (⮀)) (Equivalence (⮂)) = h >$< Equivalence (≡)
+-- These
+class (Decidable f) ⇒ ContraThese f where
+  contrathese ∷ (a → These b c) → f b → f c → f a
+contrathesed ∷ (ContraThese f) ⇒ f b → f c → f (These b c)
+contrathesed = contrathese id
+contrathesedThese ∷ (ContraThese f) ⇒ f a → f a → f a
+contrathesedThese = contrathese (\s → These s s)
+contrathesedThis ∷ (ContraThese f) ⇒ f a → f a → f a
+contrathesedThis = contrathese This
+contrathesedThat ∷ (ContraThese f) ⇒ f a → f a → f a
+contrathesedThat = contrathese That
+instance (Monoid m) ⇒ ContraThese (Op m) where
+  contrathese ∷ ∀ a b c . (a → These b c) → Op m b → Op m c → Op m a
+  contrathese h (Op opᵇ) (Op opᶜ) = h >$< Op (these opᵇ opᶜ (\b c → opᵇ b <> opᶜ c))
+instance ContraThese Predicate where
+  contrathese ∷ (a → These b c) → Predicate b → Predicate c → Predicate a
+  contrathese h (Predicate pᵇ) (Predicate pᶜ) = h >$< Predicate (these pᵇ pᶜ (\b c → pᵇ b ∧ pᶜ c))
+instance ContraThese Equivalence where
+  contrathese ∷ ∀ a b c . (a → These b c) → Equivalence b → Equivalence c → Equivalence a
+  contrathese h (Equivalence (⮀)) (Equivalence (⮂)) = h >$< Equivalence (≡)
     where
       (≡) ∷ These b c → These b c → Bool
       (≡) (This  b₁   ) (This  b₂   ) = b₁ ⮀ b₂
       (≡) (That     c₁) (That     c₂) =           c₁ ⮂ c₂
       (≡) (These b₁ c₁) (These b₂ c₂) = b₁ ⮀ b₂ ∧ c₁ ⮂ c₂
       (≡) _             _             = False
-
-instance RenameMe Comparison where
-  renameme ∷ ∀ a b c . (a → These b c) → Comparison b → Comparison c → Comparison a
-  renameme h (Comparison (⪋)) (Comparison (⪌)) = h >$< Comparison (⪥)
+instance ContraThese Comparison where
+  contrathese ∷ ∀ a b c . (a → These b c) → Comparison b → Comparison c → Comparison a
+  contrathese h (Comparison (⪋)) (Comparison (⪌)) = h >$< Comparison (⪥)
     where
       (⪥) ∷ These b c → These b c → Ordering
       (⪥) (This  b₁   ) (This  b₂   ) = b₁ ⪋ b₂
