@@ -57,7 +57,7 @@ module RegExp
   , KleeneAlgebra
   ) where
 
-import           Common
+import           Common (Algebra (..), impossible, (‥))
 import           Finite
 import qualified Language
 import           Prelude hiding ((+), (*), last, map)
@@ -376,7 +376,7 @@ similar ∷ (Eq s, Ord s) ⇒    RegExp s → RegExp s → Bool
 similar = (==) `on` normalize
 
 dissimilar ∷ (Eq s, Ord s) ⇒ RegExp s → RegExp s → Bool
-dissimilar a b = not (similar a b)
+dissimilar = not ‥ similar
 
 equivalent ∷ ∀ s . (Finite s) ⇒ RegExp s → RegExp s → Bool
 equivalent a b = and (unfoldr bisim seed)
@@ -579,7 +579,7 @@ partial' = List.foldl (foldMap partial) . singleton
 -- Given a Regular Expression α, and a string w, determine if w matches α, i.e.
 -- w ∈ ℒ(α)
 matches ∷ (Ord s) ⇒ RegExp s → [s] → Bool
-matches α = nullable . derivative' α
+matches = nullable ‥ derivative'
 
 -- ℒʳ
 reversal ∷ RegExp s → RegExp s
