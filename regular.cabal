@@ -37,6 +37,7 @@ library
                      , comonad
                      , distributive
                      , adjunctions
+                     , smash
   default-language:    Haskell2010
   default-extensions: UnicodeSyntax
                       ScopedTypeVariables
