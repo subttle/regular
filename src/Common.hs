@@ -786,14 +786,14 @@ instance (Monoid m) ⇒ Decidable (Op₂ m) where
   lose ∷ (a → Void) → Op₂ m a
   lose = Op₂ . on absurd
 
-instance (Monoid m) ⇒ RenameMe (Op₂ m) where
-  renameme ∷ ∀ a b c . (a → These b c) → Op₂ m b → Op₂ m c → Op₂ m a
-  renameme h (Op₂ opᵇ) (Op₂ opᶜ) = Op₂ (opᵇᶜ `on` h)
+instance (Monoid m) ⇒ ContraThese (Op₂ m) where
+  contrathese ∷ ∀ a b c . (a → These b c) → Op₂ m b → Op₂ m c → Op₂ m a
+  contrathese h (Op₂ opᵇ) (Op₂ opᶜ) = Op₂ (opᵇᶜ `on` h)
     where
       opᵇᶜ ∷ These b c → These b c → m
       opᵇᶜ (This  b₁   ) (This  b₂   ) = opᵇ b₁ b₂
-      opᵇᶜ (That     c₁) (That     c₂) =              opᶜ c₁ c₂
-      opᵇᶜ (These b₁ c₁) (These b₂ c₂) = opᵇ b₁ b₂ <> opᶜ c₁ c₂ -- TODO consider reverse order
+      opᵇᶜ (That     c₁) (That     c₂) =             opᶜ c₁ c₂
+      opᵇᶜ (These b₁ c₁) (These b₂ c₂) = opᵇ b₁ b₂ ⋄ opᶜ c₁ c₂ -- TODO consider reverse order
       opᵇᶜ _             _             = mempty
       {-
       -- TODO compare with above
