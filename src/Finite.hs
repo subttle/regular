@@ -1366,6 +1366,15 @@ flipped Side₄ = Side₃
 flipped Side₅ = Side₂
 flipped Side₆ = Side₁
 
+-- non-deterministically knock over a die (rotate by 90 degrees)
+rotate90 ∷ D₆ → NonEmpty D₆
+rotate90 Side₁ = Side₂ :| [Side₃, Side₄, Side₅]
+rotate90 Side₂ = Side₁ :| [Side₃, Side₄, Side₆]
+rotate90 Side₃ = Side₁ :| [Side₂, Side₅, Side₆]
+rotate90 Side₄ = Side₁ :| [Side₂, Side₃, Side₆]
+rotate90 Side₅ = Side₁ :| [Side₃, Side₄, Side₆]
+rotate90 Side₆ = Side₂ :| [Side₃, Side₄, Side₅]
+
 data Month where
   January   ∷ Month
   February  ∷ Month
