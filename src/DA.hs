@@ -5,7 +5,7 @@
 
 module DA where
 
-import           Common (RenameMe, renameme, (‥))
+import           Common (ContraThese, contrathese, (‥))
 import qualified Language
 import           Language (ℒ)
 import           Finite
@@ -58,12 +58,12 @@ instance Decidable (DA q) where
   choose h (DA (Predicate o₁) t₁) (DA (Predicate o₂) t₂) = DA (Predicate (\q →         o₁ q ∨ o₂ q     ))
                                                                          (\q → either (t₁ q) (t₂ q) . h)
 
-instance RenameMe (DA q) where
-  renameme ∷ (s → These g₁ g₂) → DA q g₁ → DA q g₂ → DA q s
-  renameme h (DA o₁ t₁) (DA o₂ t₂) = DA (o₁ <> o₂) (\q → these (t₁ q) (t₂ q) (t₂ . t₁ q) . h)
+instance ContraThese (DA q) where
+  contrathese ∷ (s → These g₁ g₂) → DA q g₁ → DA q g₂ → DA q s
+  contrathese h (DA o₁ t₁) (DA o₂ t₂) = DA (o₁ <> o₂) (\q → these (t₁ q) (t₂ q) (t₂ . t₁ q) . h)
   {-
-  renameme h (DA (Predicate o₁) t₁) (DA (Predicate o₂) t₂) = DA (Predicate (\q →        o₁ q ∨ o₂ q                 ))
-                                                                           (\q → these (t₁ q) (t₂ q) (t₂ . t₁ q) . h)
+  contrathese h (DA (Predicate o₁) t₁) (DA (Predicate o₂) t₂) = DA (Predicate (\q →        o₁ q ∨ o₂ q                 ))
+                                                                              (\q → these (t₁ q) (t₂ q) (t₂ . t₁ q) . h)
   -}
 
 literal ∷ ∀ s . (Finite s) ⇒ s → (DA.DA Ordering s, Ordering)
