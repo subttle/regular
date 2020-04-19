@@ -28,13 +28,14 @@ import           Data.Fin (Fin)
 import           Data.Char (digitToInt)
 import           Data.Either (lefts, rights, partitionEithers, fromLeft, fromRight, isLeft, isRight)
 import           Data.Foldable as Foldable
-import           Data.Functor.Contravariant.Divisible (Divisible, Decidable, divide, conquer, choose, lose)
+import           Data.Functor.Contravariant.Divisible (Divisible, Decidable, divide, divided, conquer, choose, chosen, lose)
 import           Data.Functor.Contravariant (Contravariant, Op (..), Predicate (..), Comparison (..), Equivalence (..), defaultComparison, defaultEquivalence, contramap, (>$<), (>$$<))
 import           Data.Functor.Foldable (Fix (..), unfix, ListF (..))
-import           Data.Function (on)
+import           Data.Function (on, fix)
 import           Data.Semigroup.Foldable (Foldable1, toNonEmpty)
 import           Data.Semigroup.Traversable (Traversable1)
 import           Data.Void
+import           Data.Bifunctor (bimap)
 import           Control.Applicative (liftA2, getZipList, ZipList (..))
 import           Control.Monad (replicateM)
 import           Control.Arrow ((|||), (&&&))
@@ -124,21 +125,18 @@ lower (Coyoneda h fb) = fmap h fb
 nt ∷ (∀ c . (f c → g c)) → Coyoneda f a → Coyoneda g a
 nt η (Coyoneda h fb) = Coyoneda h (η fb)
 
-
-data ContraCoyoneda where
+data ContraCoyoneda f a where
   CCoyoneda ∷ (a → b) → f b → ContraCoyoneda f a
 
 instance Contravariant (ContraCoyoneda f) where
   contramap ∷ (b → a) → ContraCoyoneda f a → ContraCoyoneda f b
   contramap h (CCoyoneda f fb) = CCoyoneda (f . h) fb
 
--- TODO liftContraCoyoneda?
-lift' ∷ f a → ContraCoyoneda f a
-lift' = CCoyoneda id
+liftContraCoyoneda ∷ f a → ContraCoyoneda f a
+liftContraCoyoneda = CCoyoneda id
 
--- TODO lowerContraCoyoneda?
-lower' ∷ (Contravariant f) ⇒ ContraCoyoneda f a → f a
-lower' (CCoyoneda h fb) = contramap h fb
+lowerContraCoyoneda ∷ (Contravariant f) ⇒ ContraCoyoneda f a → f a
+lowerContraCoyoneda (CCoyoneda h fb) = contramap h fb
 
 -- requires containers-0.5.11 or newer
 -- TODO deleteme after this is closed: https://github.com/roelvandijk/containers-unicode-symbols/issues/6
@@ -623,6 +621,24 @@ class (Show a) ⇒ Fancy a where
   show'    = charToString . unicode
   colored ∷ (a, DisplayColor) → String
   colored (s, color) = show' s `toColor` color
+
+instance (Divisible f) ⇒ Divisible (ContraCoyoneda f) where
+  conquer ∷ ContraCoyoneda f a
+  conquer = liftContraCoyoneda conquer
+  -- FIXME I don't like shadowing `f` here..
+  -- divide ∷ (a → (b, c)) → ContraCoyoneda f b → ContraCoyoneda f c → ContraCoyoneda f a
+  -- divide h (CCoyoneda f fb) (CCoyoneda g fc) = CCoyoneda (bimap f g . h) (divided fb fc)
+  divide ∷ (x → (y, z)) → ContraCoyoneda f y → ContraCoyoneda f z → ContraCoyoneda f x
+  divide h (CCoyoneda yb fb₁) (CCoyoneda zb fb₂) = CCoyoneda (bimap yb zb . h) (divided fb₁ fb₂)
+
+instance (Decidable f) ⇒ Decidable (ContraCoyoneda f) where
+  lose ∷ (a → Void) → ContraCoyoneda f a
+  lose h = liftContraCoyoneda (lose h)
+  -- FIXME I don't like shadowing `f` here..
+  -- choose ∷ (a → Either b c) → ContraCoyoneda f b → ContraCoyoneda f c → ContraCoyoneda f a
+  -- choose h (CCoyoneda f fb) (CCoyoneda g fb1) = CCoyoneda (bimap f g . h) (chosen fb fb1)
+  choose ∷ (x → Either y z) → ContraCoyoneda f y → ContraCoyoneda f z → ContraCoyoneda f x
+  choose h (CCoyoneda yb fb₁) (CCoyoneda zb fb₂) = CCoyoneda (bimap yb zb . h) (chosen fb₁ fb₂)
 
 newtype CCPredicate a where
   CCPredicate ∷ ContraCoyoneda Predicate a → CCPredicate a
