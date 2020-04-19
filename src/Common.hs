@@ -105,8 +105,8 @@ andAlg = Algebra φ
 
 -- https://vimeo.com/122708005  ← excellent video!!!
 -- Coyoneda f a ~ (∀ b . Coyoneda (b → a) → f b)
--- (lower . lift) == fmap id == id
--- (lift . lower) == fmap id == id
+-- (lowerCoyoneda . liftCoyoneda) == fmap id == id
+-- (liftCoyoneda . lowerCoyoneda) == fmap id == id
 data Coyoneda f a where
   -- data Coyoneda f a = ∀ b . Coyoneda (b → a) (f b)
   Coyoneda ∷ (b → a) → f b → Coyoneda f a
@@ -115,15 +115,15 @@ instance Functor (Coyoneda f) where
   fmap ∷ (a → b) → Coyoneda f a → Coyoneda f b
   fmap f (Coyoneda h fb) = Coyoneda (f . h) fb
 
-lift ∷ f a → Coyoneda f a
-lift = Coyoneda id
+liftCoyoneda ∷ f a → Coyoneda f a
+liftCoyoneda = Coyoneda id
 
-lower ∷ (Functor f) ⇒ Coyoneda f a → f a
-lower (Coyoneda h fb) = fmap h fb
+lowerCoyoneda ∷ (Functor f) ⇒ Coyoneda f a → f a
+lowerCoyoneda (Coyoneda h fb) = fmap h fb
 
 -- modify with natural transformation
-nt ∷ (∀ c . (f c → g c)) → Coyoneda f a → Coyoneda g a
-nt η (Coyoneda h fb) = Coyoneda h (η fb)
+ntCoyoneda ∷ (∀ c . (f c → g c)) → Coyoneda f a → Coyoneda g a
+ntCoyoneda η (Coyoneda h fb) = Coyoneda h (η fb)
 
 data ContraCoyoneda f a where
   CCoyoneda ∷ (a → b) → f b → ContraCoyoneda f a
@@ -149,6 +149,10 @@ liftContraCoyoneda = CCoyoneda id
 
 lowerContraCoyoneda ∷ (Contravariant f) ⇒ ContraCoyoneda f a → f a
 lowerContraCoyoneda (CCoyoneda h fb) = contramap h fb
+
+-- natural transformation
+ntContraCoyoneda ∷ (∀ c . (f c → g c)) → ContraCoyoneda f a → ContraCoyoneda g a
+ntContraCoyoneda η (CCoyoneda h fb) = CCoyoneda h (η fb)
 
 -- requires containers-0.5.11 or newer
 -- TODO deleteme after this is closed: https://github.com/roelvandijk/containers-unicode-symbols/issues/6
@@ -747,6 +751,18 @@ class (Decidable f) ⇒ ContraSmash f where
 instance (Monoid m) ⇒ ContraSmash (Op m) where
   contrasmash ∷ ∀ a b c . (a → Smash b c) → Op m b → Op m c → Op m a
   contrasmash h (Op opᵇ) (Op opᶜ) = h >$< Op (smash mempty (\b c → opᵇ b ⋄ opᶜ c))
+{-
+-- TODO untested
+instance ContraSmash Comparison where
+  contrasmash ∷ ∀ a b c . (a → Smash b c) → Comparison b → Comparison c → Comparison a
+  contrasmash h (Comparison (⪋)) (Comparison (⪌)) = h >$< Comparison (⪥)
+    where
+      (⪥) ∷ Smash b c → Smash b c → Ordering
+      (⪥) Nada          Nada          = EQ
+      (⪥) Nada          (Smash _  _ ) = LT
+      (⪥) (Smash _  _ ) Nada          = GT
+      (⪥) (Smash b₁ c₁) (Smash b₂ c₂) = (b₁ ⪋ b₂) ⋄ (c₁ ⪌ c₂)
+-}
 
 -- Partial Equivalence Relation
 newtype PER a = PER { getPER ∷ a → a → Maybe Bool }
