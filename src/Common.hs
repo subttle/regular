@@ -623,14 +623,14 @@ class (Show a) ⇒ Fancy a where
   colored (s, color) = show' s `toColor` color
 
 instance (Divisible f) ⇒ Divisible (ContraCoyoneda f) where
-  conquer ∷ ContraCoyoneda f a
+  conquer ∷ ContraCoyoneda f x
   conquer = liftContraCoyoneda conquer
   divide ∷ (x → (y, z)) → ContraCoyoneda f y → ContraCoyoneda f z → ContraCoyoneda f x
   divide h (CCoyoneda yb fb₁) (CCoyoneda zb fb₂) = CCoyoneda (bimap yb zb . h) (divided fb₁ fb₂)
 
 instance (Decidable f) ⇒ Decidable (ContraCoyoneda f) where
-  lose ∷ (a → Void) → ContraCoyoneda f a
-  lose h = liftContraCoyoneda (lose h)
+  lose ∷ (x → Void) → ContraCoyoneda f x
+  lose = liftContraCoyoneda . lose
   choose ∷ (x → Either y z) → ContraCoyoneda f y → ContraCoyoneda f z → ContraCoyoneda f x
   choose h (CCoyoneda yb fb₁) (CCoyoneda zb fb₂) = CCoyoneda (bimap yb zb . h) (chosen fb₁ fb₂)
 
