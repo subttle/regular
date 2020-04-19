@@ -20,7 +20,7 @@ import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)), (<|))
 import qualified Data.List.NonEmpty as NE
 import           Data.These
 import           Data.Can (Can, can)
-import qualified Data.Can as C
+-- import qualified Data.Can as C
 import           Data.Smash
 import           Data.Wedge
 import qualified Data.Type.Nat as Nat
@@ -131,6 +131,18 @@ data ContraCoyoneda f a where
 instance Contravariant (ContraCoyoneda f) where
   contramap ∷ (b → a) → ContraCoyoneda f a → ContraCoyoneda f b
   contramap h (CCoyoneda f fb) = CCoyoneda (f . h) fb
+
+instance (Divisible f) ⇒ Divisible (ContraCoyoneda f) where
+  conquer ∷ ContraCoyoneda f x
+  conquer = liftContraCoyoneda conquer
+  divide ∷ (x → (y, z)) → ContraCoyoneda f y → ContraCoyoneda f z → ContraCoyoneda f x
+  divide h (CCoyoneda yb fb₁) (CCoyoneda zb fb₂) = CCoyoneda (bimap yb zb . h) (divided fb₁ fb₂)
+
+instance (Decidable f) ⇒ Decidable (ContraCoyoneda f) where
+  lose ∷ (x → Void) → ContraCoyoneda f x
+  lose = liftContraCoyoneda . lose
+  choose ∷ (x → Either y z) → ContraCoyoneda f y → ContraCoyoneda f z → ContraCoyoneda f x
+  choose h (CCoyoneda yb fb₁) (CCoyoneda zb fb₂) = CCoyoneda (bimap yb zb . h) (chosen fb₁ fb₂)
 
 liftContraCoyoneda ∷ f a → ContraCoyoneda f a
 liftContraCoyoneda = CCoyoneda id
@@ -621,18 +633,6 @@ class (Show a) ⇒ Fancy a where
   show'    = charToString . unicode
   colored ∷ (a, DisplayColor) → String
   colored (s, color) = show' s `toColor` color
-
-instance (Divisible f) ⇒ Divisible (ContraCoyoneda f) where
-  conquer ∷ ContraCoyoneda f x
-  conquer = liftContraCoyoneda conquer
-  divide ∷ (x → (y, z)) → ContraCoyoneda f y → ContraCoyoneda f z → ContraCoyoneda f x
-  divide h (CCoyoneda yb fb₁) (CCoyoneda zb fb₂) = CCoyoneda (bimap yb zb . h) (divided fb₁ fb₂)
-
-instance (Decidable f) ⇒ Decidable (ContraCoyoneda f) where
-  lose ∷ (x → Void) → ContraCoyoneda f x
-  lose = liftContraCoyoneda . lose
-  choose ∷ (x → Either y z) → ContraCoyoneda f y → ContraCoyoneda f z → ContraCoyoneda f x
-  choose h (CCoyoneda yb fb₁) (CCoyoneda zb fb₂) = CCoyoneda (bimap yb zb . h) (chosen fb₁ fb₂)
 
 newtype CCPredicate a where
   CCPredicate ∷ ContraCoyoneda Predicate a → CCPredicate a
