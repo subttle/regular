@@ -625,18 +625,12 @@ class (Show a) ⇒ Fancy a where
 instance (Divisible f) ⇒ Divisible (ContraCoyoneda f) where
   conquer ∷ ContraCoyoneda f a
   conquer = liftContraCoyoneda conquer
-  -- FIXME I don't like shadowing `f` here..
-  -- divide ∷ (a → (b, c)) → ContraCoyoneda f b → ContraCoyoneda f c → ContraCoyoneda f a
-  -- divide h (CCoyoneda f fb) (CCoyoneda g fc) = CCoyoneda (bimap f g . h) (divided fb fc)
   divide ∷ (x → (y, z)) → ContraCoyoneda f y → ContraCoyoneda f z → ContraCoyoneda f x
   divide h (CCoyoneda yb fb₁) (CCoyoneda zb fb₂) = CCoyoneda (bimap yb zb . h) (divided fb₁ fb₂)
 
 instance (Decidable f) ⇒ Decidable (ContraCoyoneda f) where
   lose ∷ (a → Void) → ContraCoyoneda f a
   lose h = liftContraCoyoneda (lose h)
-  -- FIXME I don't like shadowing `f` here..
-  -- choose ∷ (a → Either b c) → ContraCoyoneda f b → ContraCoyoneda f c → ContraCoyoneda f a
-  -- choose h (CCoyoneda f fb) (CCoyoneda g fb1) = CCoyoneda (bimap f g . h) (chosen fb fb1)
   choose ∷ (x → Either y z) → ContraCoyoneda f y → ContraCoyoneda f z → ContraCoyoneda f x
   choose h (CCoyoneda yb fb₁) (CCoyoneda zb fb₂) = CCoyoneda (bimap yb zb . h) (chosen fb₁ fb₂)
 
