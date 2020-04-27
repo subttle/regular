@@ -12,35 +12,43 @@ Here is a small example of what FizzBuzz looks like with DFA:
 -- they are evenly divisible by 5.
 -- Theorem: A number is divisible by 5 iff its last digit is 0 or 5.
 by5 ∷ DFA Bool Fin₁₀
-by5 = DFA { delta = δ
-          , q0    = False
-          , fs    = singleton True
-          } where δ (_, 0) = True
-                  δ (_, 5) = True
-                  δ _      = False
+by5 = DFA δ q₀ f
+  where
+    δ ∷ (Bool, Fin₁₀) → Bool
+    δ (_, 0) = True
+    δ (_, 5) = True
+    δ _      = False
+    q₀ ∷ Bool
+    q₀ = False
+    f  ∷ Set Bool
+    f = singleton True
 
 -- A DFA which accepts numbers (as a string of digits) only when
 -- they are evenly divisible by 3.
 -- Theorem: A number is divisible by 3 iff the sum of its digits is divisible by 3.
--- The transition function effectively keeps a running total modulo three by 
+-- The transition function effectively keeps a running total modulo three by
 -- totaling the numeric value of its current state and the numeric value of the
 -- incoming digit, performing the modulo, and then converting that value back to a state.
 -- There is a bit of overhead complexity added by the fact that an extra state, `Left ()`,
 -- is introduced only to avoid accepting the empty string.
 by3 ∷ DFA (Either () Fin₃) Fin₁₀
-by3 = DFA { delta = Right . toEnum . (`mod` 3) . \(q, digit) → fromEnum (fromRight 0 q) + fromEnum digit
-          , q0    = Left ()
-          , fs    = singleton (Right 0)
-          }
+by3 = DFA δ (Left ()) (singleton (Right 0))
+  where
+    δ ∷ (Either () Fin₃, Fin₁₀) → Either () Fin₃
+    δ = Right . toEnum . (`mod` 3) . \(q, digit) → fromEnum (fromRight 0 q) + fromEnum digit
 
 -- FizzBuzz using DFA
 main ∷ IO ()
 main = mapM_ (putStrLn . fizzbuzz . toDigits) [1 .. 100]
-       where fizz = accepts  by3
-             buzz = accepts                         by5
-             fbzz = accepts (by3 `DFA.intersection` by5)
-             fizzbuzz n
-               | fbzz n    = "FizzBuzz"
+  where
+    fizz ∷ [Fin₁₀] → Bool
+    fizz = accepts  by3
+    buzz ∷ [Fin₁₀] → Bool
+    buzz = accepts                         by5
+    fbzz ∷ [Fin₁₀] → Bool
+    fbzz = accepts (by3 `DFA.intersection` by5)
+    fizzbuzz ∷ [Fin₁₀] → String
+    fizzbuzz n | fbzz n    = "FizzBuzz"
                | fizz n    = "Fizz"
                | buzz n    = "Buzz"
                | otherwise = n >>= show
