@@ -10,15 +10,15 @@ import qualified Language
 import           Language (ℒ)
 import           Finite
 import           Data.Bool.Unicode
-import           Data.Functor.Contravariant
-import           Data.Functor.Contravariant.Divisible
+import           Data.Functor.Contravariant (Contravariant, contramap, (>$$<), Predicate, Predicate (..))
+import           Data.Functor.Contravariant.Divisible (Divisible, divide, conquer, Decidable, lose, choose)
 import           Data.Can (Can, can)
 import           Data.Smash (Smash, smash)
 
 import           Data.Wedge (Wedge, wedge)
 
 import           Data.These (These, These (..), these)
-import           Data.Void
+import           Data.Void (Void)
 
 -- Experiment based on:
 -- http://www.few.vu.nl/~cgr600/linkedfiles/swansea_slides.pdf
