@@ -14,7 +14,7 @@ cabal-version:       >=1.20
 
 library
   hs-source-dirs:      src
-  exposed-modules:     DFA, NFA, EFA, GNFA, RegExp, ERE, FA, DA, Language, Common, TransitionGraph, Finite, Examples, Config, IntBase, NatBase
+  exposed-modules:     DFA, NFA, EFA, GNFA, RegExp, ERE, FA, DA, NA, PA, Language, Common, TransitionGraph, Finite, Examples, Config, IntBase, NatBase
   build-depends:       base >= 4.8 && < 5
                      , base-unicode-symbols
                      , containers >= 0.5.11.0
