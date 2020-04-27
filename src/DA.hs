@@ -62,33 +62,24 @@ instance Decidable (DA q) where
   choose ∷ (s → Either g₁ g₂) → DA q g₁ → DA q g₂ → DA q s
   choose h (DA (Predicate o₁) t₁) (DA (Predicate o₂) t₂) = DA (Predicate (\q →         o₁ q ∨ o₂ q     ))
                                                                          (\q → either (t₁ q) (t₂ q) . h)
-
-instance ContraThese (DA q) where
-  contrathese ∷ (s → These g₁ g₂) → DA q g₁ → DA q g₂ → DA q s
-  contrathese h (DA o₁ t₁) (DA o₂ t₂) = DA (o₁ <> o₂) (\q → these (t₁ q) (t₂ q) (t₂ . t₁ q) . h)
-  {-
-  contrathese h (DA (Predicate o₁) t₁) (DA (Predicate o₂) t₂) = DA (Predicate (\q →        o₁ q ∨ o₂ q                 ))
-                                                                              (\q → these (t₁ q) (t₂ q) (t₂ . t₁ q) . h)
-  -}
-
 {-
 -- FIXME
 asdf h (DA (Predicate o₁) t₁) (DA (Predicate o₂) t₂) = DA (Predicate (\q →   _)) --      o₁ q ∨ o₂ q
                                                                      (\q → destructor _ _ _ . h)
 asdf h (DA o₁ t₁) (DA o₂ t₂) = DA (o₁ <> o₂) _
 -}
+instance ContraThese (DA q) where
+  contrathese ∷ (s → These g₁ g₂) → DA q g₁ → DA q g₂ → DA q s
+  contrathese h (DA o₁ t₁) (DA o₂ t₂) = DA (o₁ <> o₂) (\q → these (t₁ q) (t₂ q) (t₂ . t₁ q) . h)
+
 -- `Can` is basically `Maybe (Either (Either a b) (a, b))`
 instance ContraCan (DA q) where
   contracan ∷ (s → Can g₁ g₂) → DA q g₁ → DA q g₂ → DA q s
-  contracan h (DA o₁ t₁) (DA o₂ t₂) = DA undefined (\q → can q (t₁ q) (t₂ q) (\s₁ s₂ → t₂ (t₁ q s₁) s₂) . h)
+  contracan h (DA o₁ t₁) (DA o₂ t₂) = DA undefined (\q → can q (t₁ q) (t₂ q) (t₂ . t₁ q) . h)
 
 -- `Smash` is basically `Maybe (a, b)`
 instance ContraSmash (DA q) where
   contrasmash ∷ (s → Smash g₁ g₂) → DA q g₁ → DA q g₂ → DA q s
-  -- contrasmash h (DA o₁ t₁) (DA o₂ t₂) = DA undefined (\q → smash q (\s₁ s₂ → let first = t₁ q s₁; second = t₂ first s₂ in second) . h) -- (t₁ q) (t₂ q) (t₂ . t₁ q) . h)
-  -- contrasmash h (DA o₁ t₁) (DA o₂ t₂) = DA undefined (\q → smash q (\s₁ s₂ → t₂ (t₁ q s₁) s₂) . h)
-  -- contrasmash h (DA o₁ t₁) (DA o₂ t₂) = DA undefined (\q → smash q (\s₁ → t₂ (t₁ q s₁)) . h)
-  -- contrasmash h (DA o₁ t₁) (DA o₂ t₂) = DA undefined (\q → smash q (t₂ . t₁ q) . h)
   contrasmash h (DA o₁ t₁) (DA o₂ t₂) = DA undefined (\q → smash q (t₂ . t₁ q) . h)
 
 -- `Wedge` is basically `Maybe (Either a b)`
