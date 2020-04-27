@@ -25,6 +25,6 @@ data PA q s =
         }
 
 -- A PA constructor where the `q` type parameter is an existential
-data SomeNA s where
-  SomeNA ∷ (Show q, Finite q) ⇒ PA q s → SomeNA s
+data SomePA s where
+  SomePA ∷ (Show q, Finite q) ⇒ PA q s → SomePA s
 
