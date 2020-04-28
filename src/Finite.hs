@@ -25,8 +25,10 @@ import           Data.These.Combinators (catThese)
 import           Data.Void (Void, absurd)
 import qualified Data.Foldable as F
 import           Data.Function (on)
+import           Data.Functor.Const (Const (..))
 import           Data.Functor.Contravariant
 import           Data.Functor.Contravariant.Divisible (Decidable, Divisible, divide, conquer, choose, lose)
+import           Data.Functor.Identity (Identity (..))
 import           Data.Ord (Down (..))
 import           Data.Can (Can)
 import qualified Data.Can as C
@@ -218,6 +220,10 @@ instance Finite Ordering where
   asList ∷ [Ordering]
   asList = [LT, EQ, GT]
 instance Finite Char
+
+instance (Finite a) ⇒ Finite (Identity a)
+
+instance (Finite a) ⇒ Finite (Const a b)
 
 instance (Finite a)
        ⇒ Bounded (Set a) where
