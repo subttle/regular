@@ -15,7 +15,7 @@ import           Language (ℒ)
 import qualified Language
 import           Common
 import           Finite
-import           Examples
+import           Examples (by3, by5, by5', minimal, ab, cd)
 import           Data.Set (singleton)
 import           Config
 import           Numeric.Natural.Unicode (ℕ)
@@ -320,4 +320,4 @@ testCycles = scope "Comparison.Cycles" . expect $ and [test₁, test₂, test₃
     test₂ ∷ Bool
     test₂ = getPredicate lawful (cycles c₁)
     test₃ ∷ Bool
-    test₃ = (cycles c₁) == toEquivalence ([0 NE.:| [2, 3], 1 NE.:| [4]])
+    test₃ = cycles c₁ == toEquivalence [0 NE.:| [2, 3], 1 NE.:| [4]]
