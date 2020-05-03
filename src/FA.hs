@@ -147,7 +147,7 @@ determinization m@(FA δ i f) = FA (\(states, σ) → Set.map (\q → δ (q, σ)
                                   (Set.map singleton i)
                                   (Set.filter (intersects f) (powerSet (qs m)))
 
--- Pg 32 http://www.dcc.fc.up.pt/~nam/web/resources/rafaelamsc.pdf
+-- Pg 32 https://www.dcc.fc.up.pt/~nam/web/resources/rafaelamsc.pdf
 codeterminization ∷ (Finite q, Finite s) ⇒ FA q s → FA (Set q) s
 codeterminization = reversal . determinization . reversal
 
