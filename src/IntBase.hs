@@ -86,8 +86,6 @@ instance Semigroup ℤ where
 instance Monoid ℤ where
   mempty  ∷ ℤ
   mempty  = Zero
-  mappend ∷ ℤ → ℤ → ℤ
-  mappend = (<>)
 instance Group ℤ where
   invert ∷ ℤ → ℤ
   invert = int Next Zero Prev
