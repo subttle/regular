@@ -8,7 +8,7 @@ module NA where
 -- import           Language (ℒ)
 import           Finite
 -- import           Data.Bool.Unicode
-import           Data.Functor.Contravariant (Predicate, Predicate (..))
+import           Data.Functor.Contravariant (Contravariant, contramap, Predicate, Predicate (..))
 -- import           Data.Void (Void)
 
 -- Experiment based on:
@@ -28,3 +28,6 @@ data NA q s =
 data SomeNA s where
   SomeNA ∷ (Show q, Finite q) ⇒ NA q s → SomeNA s
 
+instance Contravariant (NA q) where
+  contramap ∷ (g → s) → NA q s → NA q g
+  contramap h (NA o t) = NA o (\q → t q . h)
