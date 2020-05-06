@@ -271,14 +271,12 @@ partitionEithers' ∷ (Foldable t) ⇒ t (Either a b) → ([a], [b])
 partitionEithers' = partitionEithers . Foldable.toList
 
 -- allNoneSome' ∷ Predicate a → Op (These (NonEmpty a) (NonEmpty a)) (NonEmpty a)
--- allNoneSome' (Predicate p) = contramap (fmap (\a → bool (Left a) (Right a) (p a))) (Op partitionEithersNE)
--- allNoneSome' = (>$$<) (Op partitionEithersNE) . fmap . (liftA3 bool Left Right . getPredicate)
+-- allNoneSome' (Predicate p) = contramap (fmap (liftA3 bool Left Right p))) (Op partitionEithersNE)
 allNoneSome ∷ Predicate a → (NonEmpty a → These (NonEmpty a) (NonEmpty a))
 allNoneSome = partitionEithersNE ‥ filter'
   where
     filter' ∷ Predicate a → NonEmpty a → NonEmpty (Either a a)
-    filter' (Predicate p) = fmap (\a → bool (Left a) (Right a) (p a))
-    -- filter' = (.) fmap (liftA3 bool Left Right . getPredicate)
+    filter' (Predicate p) = fmap (liftA3 bool Left Right p)
 
 
 -- A more general version of `lefts` from `Data.Either`
