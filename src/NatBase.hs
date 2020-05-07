@@ -59,8 +59,6 @@ instance Semigroup ℕ where
 instance Monoid ℕ where
   mempty ∷ ℕ
   mempty  = Zero
-  mappend ∷ ℕ → ℕ → ℕ
-  mappend = (<>)
 
 instance Show ℕ where
   show ∷ ℕ → String
