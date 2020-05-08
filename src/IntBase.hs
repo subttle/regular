@@ -142,13 +142,18 @@ fromOrdering ∷ Ordering → ℤ
 fromOrdering = ordering (Prev Zero) Zero (Next Zero)
 
 toBits ∷ ℤ → [Bool]
-toBits (Prev i) = False : toBits i
-toBits Zero     = []
-toBits (Next i) = True  : toBits i
+toBits = List.unfoldr c
+  where
+    c ∷ ℤ → Maybe (Bool, ℤ)
+    c (Prev i) = Just (False, i)
+    c Zero     = Nothing
+    c (Next i) = Just (True,  i)
 
--- TODO better name
-toBits' ∷ ℤ → [Either ℤ ℤ]
-toBits' (Prev i) = Left  i : toBits' i
-toBits' Zero     = []
-toBits' (Next i) = Right i : toBits' i
-
+-- TODO better name?
+telescope ∷ ℤ → [Either ℤ ℤ]
+telescope = List.unfoldr c
+  where
+    c ∷ ℤ → Maybe (Either ℤ ℤ, ℤ)
+    c (Prev i) = Just (Left  i, i)
+    c Zero     = Nothing
+    c (Next i) = Just (Right i, i)
