@@ -257,6 +257,14 @@ ordering lt _  _  LT = lt
 ordering _  eq _  EQ = eq
 ordering _  _  gt GT = gt
 
+tripartion ∷ ∀ a . (a → Ordering) → [a] → ([a], [a], [a])
+tripartion cmp = foldr select ([], [], [])
+  where
+    select ∷ a → ([a], [a], [a]) → ([a], [a], [a])
+    select a ~(lt, eq, gt) = ordering (a : lt,     eq,     gt)
+                                      (    lt, a : eq,     gt)
+                                      (    lt,     eq, a : gt) (cmp a)
+
 partitionWith ∷ (a → Either b c) → [a] → ([b], [c])
 partitionWith  = partitionEithers ‥ fmap
 
