@@ -257,6 +257,12 @@ ordering lt _  _  LT = lt
 ordering _  eq _  EQ = eq
 ordering _  _  gt GT = gt
 
+smashedCompare ∷ (Ord a) ⇒ a → a → Smash a a
+smashedCompare = smashedComparison defaultComparison
+
+smashedComparison ∷ Comparison a → a → a → Smash a a
+smashedComparison (Comparison cmp) a₁ a₂ = ordering (Smash a₁ a₂) Nada (Smash a₂ a₁) (cmp a₁ a₂)
+
 tripartition ∷ ∀ f a . (Foldable f) ⇒ (a → Ordering) → f a → ([a], [a], [a])
 tripartition cmp = foldr select ([], [], []) . toList
   where
