@@ -1400,6 +1400,42 @@ instance U.Universe Month
 instance U.Finite   Month
 instance Finite     Month
 
+-- https://en.wikipedia.org/wiki/Quadrant_(plane_geometry)
+data Quadrant where
+  Q₁ ∷ Quadrant
+  Q₂ ∷ Quadrant
+  Q₃ ∷ Quadrant
+  Q₄ ∷ Quadrant
+  deriving (Eq, Enum, Ord, Bounded)
+
+instance U.Universe Quadrant
+instance U.Finite   Quadrant
+instance Finite     Quadrant
+instance Fancy Quadrant where
+  unicode  ∷ Quadrant → Char
+  unicode  Q₁ = 'Ⅰ'
+  unicode  Q₂ = 'Ⅱ'
+  unicode  Q₃ = 'Ⅲ'
+  unicode  Q₄ = 'Ⅳ'
+  unicode' ∷ Quadrant → Char
+  unicode' Q₁ = 'ⅰ'
+  unicode' Q₂ = 'ⅱ'
+  unicode' Q₃ = 'ⅲ'
+  unicode' Q₄ = 'ⅳ'
+  plain ∷ Quadrant → String
+  plain Q₁ = "Q₁"
+  plain Q₂ = "Q₂"
+  plain Q₃ = "Q₃"
+  plain Q₄ = "Q₄"
+instance Show Quadrant where
+  show ∷ Quadrant → String
+  show = show'
+-- non unicode aliases for convenience
+type Q1 = Q₁
+type Q2 = Q₂
+type Q3 = Q₃
+type Q4 = Q₄
+
 data Suit where
   Spade   ∷ Suit
   Heart   ∷ Suit
