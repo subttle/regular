@@ -82,6 +82,9 @@ instance NotEmpty Ordering where
 instance NotEmpty Quadrant where
   wit  ∷ Quadrant
   wit  = Q₁
+instance NotEmpty Octant where
+  wit  ∷ Octant
+  wit  = O₁
 instance NotEmpty Fin₁ where
   wit ∷ Fin₁
   wit = 0
@@ -181,6 +184,9 @@ instance NEF Ordering where
 instance NEF Quadrant where
   asNE ∷ NonEmpty Quadrant
   asNE = Q₁ :| [Q₂, Q₃, Q₄]
+instance NEF Octant where
+  asNE ∷ NonEmpty Octant
+  asNE = O₁ :| [O₂, O₃, O₄, O₅, O₆, O₇, O₈]
 
 instance (Finite a) ⇒ NEF (Maybe a) where
   asNE ∷ NonEmpty (Maybe a)
@@ -1447,6 +1453,74 @@ quadrant i _  _   _  Q₁ = i
 quadrant _ ii _   _  Q₂ = ii
 quadrant _ _  iii _  Q₃ = iii
 quadrant _ _  _   iv Q₄ = iv
+
+
+-- https://en.wikipedia.org/wiki/Octant_(solid_geometry)
+data Octant where
+  O₁ ∷ Octant
+  O₂ ∷ Octant
+  O₃ ∷ Octant
+  O₄ ∷ Octant
+  O₅ ∷ Octant
+  O₆ ∷ Octant
+  O₇ ∷ Octant
+  O₈ ∷ Octant
+  deriving (Eq, Enum, Ord, Bounded)
+
+instance U.Universe Octant
+instance U.Finite   Octant
+instance Finite     Octant
+instance Fancy Octant where
+  unicode  ∷ Octant → Char
+  unicode O₁ = 'Ⅰ'
+  unicode O₂ = 'Ⅱ'
+  unicode O₃ = 'Ⅲ'
+  unicode O₄ = 'Ⅳ'
+  unicode O₅ = 'Ⅴ'
+  unicode O₆ = 'Ⅵ'
+  unicode O₇ = 'Ⅶ'
+  unicode O₈ = 'Ⅷ'
+  unicode' ∷ Octant → Char
+  unicode' O₁ = 'ⅰ'
+  unicode' O₂ = 'ⅱ'
+  unicode' O₃ = 'ⅲ'
+  unicode' O₄ = 'ⅳ'
+  unicode' O₅ = 'ⅴ'
+  unicode' O₆ = 'ⅵ'
+  unicode' O₇ = 'ⅶ'
+  unicode' O₈ = 'ⅷ'
+  plain ∷ Octant → String
+  plain O₁ = "O₁"
+  plain O₂ = "O₂"
+  plain O₃ = "O₃"
+  plain O₄ = "O₄"
+  plain O₅ = "O₅"
+  plain O₆ = "O₆"
+  plain O₇ = "O₇"
+  plain O₈ = "O₈"
+instance Show Octant where
+  show ∷ Octant → String
+  show = show'
+-- non unicode aliases for convenience
+type O1 = O₁
+type O2 = O₂
+type O3 = O₃
+type O4 = O₄
+type O5 = O₅
+type O6 = O₆
+type O7 = O₇
+type O8 = O₈
+-- case analysis for `Octant` type
+octant ∷ a → a → a → a → a → a → a → a → Octant → a
+octant i _  _   _  _ _  _   _    O₁ = i
+octant _ ii _   _  _ _  _   _    O₂ = ii
+octant _ _  iii _  _ _  _   _    O₃ = iii
+octant _ _  _   iv _ _  _   _    O₄ = iv
+octant _ _  _   _  v _  _   _    O₅ = v
+octant _ _  _   _  _ vi _   _    O₆ = vi
+octant _ _  _   _  _ _  vii _    O₇ = vii
+octant _ _  _   _  _ _  _   viii O₈ = viii
+
 
 data Suit where
   Spade   ∷ Suit
