@@ -8,6 +8,7 @@ module IntBase where
 import           Data.Functor.Foldable (Fix (..), Recursive, Corecursive, Base, project, embed)
 import           Data.Function (on)
 import           Data.Group (Group, invert)
+import           Data.List (unfoldr)
 import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)), (<|))
 import qualified Data.List.NonEmpty as NE
 import           GHC.Real (reduce)
@@ -142,7 +143,7 @@ fromOrdering ∷ Ordering → ℤ
 fromOrdering = ordering (Prev Zero) Zero (Next Zero)
 
 toBits ∷ ℤ → [Bool]
-toBits = List.unfoldr c
+toBits = unfoldr c
   where
     c ∷ ℤ → Maybe (Bool, ℤ)
     c (Prev i) = Just (False, i)
@@ -151,7 +152,7 @@ toBits = List.unfoldr c
 
 -- TODO better name?
 telescope ∷ ℤ → [Either ℤ ℤ]
-telescope = List.unfoldr c
+telescope = unfoldr c
   where
     c ∷ ℤ → Maybe (Either ℤ ℤ, ℤ)
     c (Prev i) = Just (Left  i, i)

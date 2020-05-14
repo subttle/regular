@@ -36,7 +36,7 @@ import           Data.Semigroup.Foldable (Foldable1, toNonEmpty)
 import           Data.Semigroup.Traversable (Traversable1)
 import           Data.Void
 import           Data.Bifunctor (bimap)
-import           Control.Applicative (liftA2, getZipList, ZipList (..))
+import           Control.Applicative (liftA2, liftA3, getZipList, ZipList (..))
 import           Control.Monad (replicateM)
 import           Control.Arrow ((|||), (&&&))
 import           Prelude.Unicode (ℤ, ℚ)
