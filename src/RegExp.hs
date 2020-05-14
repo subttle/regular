@@ -279,6 +279,16 @@ instance Monad RegExp where
   (>>=) (α :| β) f = (α >>= f) :| (β >>= f)
   (>>=) (α :. β) f = (α >>= f) :. (β >>= f)
   (>>=) (Star α) f = Star (α >>= f)
+{-
+  -- more point-free version
+  (>>=) ∷ RegExp s → (s → RegExp g) → RegExp g
+  (>>=) Zero     = const Zero
+  (>>=) One      = const One
+  (>>=) (Lit  s) = ($ s)
+  (>>=) (α :| β) = (:|) . (>>=) α <*> (>>=) β
+  (>>=) (α :. β) = (:.) . (>>=) α <*> (>>=) β
+  (>>=) (Star α) = Star . (>>=) α
+-}
 
 -- "character class"
 fromSet ∷ (Ord s) ⇒ Set s → RegExp s
