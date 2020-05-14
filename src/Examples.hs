@@ -579,3 +579,15 @@ mod3eq2 = Predicate (\i → i `mod` 3 == 2)
 
 congruenceMod3 ∷ Equivalence Integer
 congruenceMod3 = equating' (`mod` 3)
+
+cardsBySuit ∷ Equivalence Card
+cardsBySuit = equating' suit
+
+cardsByRank ∷ Equivalence Card
+cardsByRank = equating' rank
+
+cardsByColor ∷ Equivalence Card
+cardsByColor = equating' color
+
+suitsByColor ∷ Equivalence Suit
+suitsByColor = equating' colorOf

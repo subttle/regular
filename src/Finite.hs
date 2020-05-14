@@ -1813,15 +1813,3 @@ colorOf Club    = Black'
 color ∷ Card → DisplayColor
 color = colorOf . suit
 
-cardsBySuit ∷ Equivalence Card
-cardsBySuit = equating' suit
-
-cardsByRank ∷ Equivalence Card
-cardsByRank = equating' rank
-
-cardsByColor ∷ Equivalence Card
-cardsByColor = equating' color
-
-suitsByColor ∷ Equivalence Suit
-suitsByColor = equating' colorOf
-
