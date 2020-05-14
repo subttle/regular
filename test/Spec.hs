@@ -203,38 +203,6 @@ testNFAshuffle = scope "NFA.shuffle" . expect $ and [test]
     test ∷ Bool
     test = ab_cd == shuffled
 
--- An involution is a mapping, f, that coincides with its own inverse, i.e.,
--- f x ≡ f⁻¹ x
--- or, equivalently,
--- f (f x) ≡ x
-involution
-  ∷ ∀ a b . (Eq a, Eq b)
-  ⇒ [Either a b] → (a → b) → (b → a) → Bool
-involution x ab ba = fmap (f . f) x == x
-  where
-    -- Turn an `a` into a `b` or
-    -- turn a `b` into an `a`
-    f ∷ Either a b → Either a b
-    f = either (Right . ab) (Left . ba)
-
--- https://en.wikipedia.org/wiki/Inverse_function#Left_and_right_inverses
--- A retraction, aka "left inverse", 
-retraction
-  ∷ ∀ a b . (Finite a, Eq b)
-  ⇒ (a → b) → (b → a) → Bool
-retraction = involution (fmap Left (asList ∷ [a]))
-
--- A section, aka "right inverse"
-section
-  ∷ ∀ a b . (Eq a, Finite b)
-  ⇒ (a → b) → (b → a) → Bool
-section = involution (fmap Right (asList ∷ [b]))
-
-bijection
-  ∷ ∀ a b . (Finite a, Finite b)
-  ⇒ (a → b) → (b → a) → Bool
-bijection = involution (asList ∷ [Either a b])
-
 -- Coinductive bisimulation (partial)
 -- Either the bisimulation will succeed (on the given subset) or
 -- it will produce a counter-example to the bisimulation
