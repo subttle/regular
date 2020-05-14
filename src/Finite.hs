@@ -79,6 +79,9 @@ instance NotEmpty Bool where
 instance NotEmpty Ordering where
   wit  ∷ Ordering
   wit  = LT
+instance NotEmpty Quadrant where
+  wit  ∷ Quadrant
+  wit  = Q₁
 instance NotEmpty Fin₁ where
   wit ∷ Fin₁
   wit = 0
@@ -175,6 +178,9 @@ instance NEF Bool where
 instance NEF Ordering where
   asNE ∷ NonEmpty Ordering
   asNE = LT :| [EQ, GT]
+instance NEF Quadrant where
+  asNE ∷ NonEmpty Quadrant
+  asNE = Q₁ :| [Q₂, Q₃, Q₄]
 
 instance (Finite a) ⇒ NEF (Maybe a) where
   asNE ∷ NonEmpty (Maybe a)
@@ -1435,6 +1441,12 @@ type Q1 = Q₁
 type Q2 = Q₂
 type Q3 = Q₃
 type Q4 = Q₄
+-- case analysis for `Quadrant` type
+quadrant ∷ a → a → a → a → Quadrant → a
+quadrant i _  _   _  Q₁ = i
+quadrant _ ii _   _  Q₂ = ii
+quadrant _ _  iii _  Q₃ = iii
+quadrant _ _  _   iv Q₄ = iv
 
 data Suit where
   Spade   ∷ Suit
