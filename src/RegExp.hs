@@ -69,6 +69,7 @@ import           Data.Set (Set)
 import           Data.Set as Set hiding ((\\))
 import           Data.Set.Unicode ((∅), (∉), (∪)) -- (∈)
 import           Data.Bool.Unicode ((∧), (∨))
+import           Data.Bool (bool)
 import           Data.Ord.Unicode ((≥))
 import           Data.Foldable (toList)
 import           Data.Functor.Foldable (Fix (..))
@@ -544,7 +545,7 @@ constant α | nullable α = One
 derivative ∷ (Ord s) ⇒ RegExp s → s → RegExp s
 derivative Zero     _ = zero
 derivative One      _ = zero
-derivative (Lit σ') σ = if σ' == σ then one else zero
+derivative (Lit σ') σ = bool zero one (σ' == σ)
 derivative (α :| β) σ =  derivative α σ + derivative β σ
 derivative (α :. β) σ = (derivative α σ * β) + (constant α * derivative β σ)
 derivative (Star α) σ =  derivative α σ * star α
