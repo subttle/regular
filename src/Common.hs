@@ -96,7 +96,7 @@ andAlg = Algebra φ
 (⋄) = (<>)
 
 -- TODO precedence
--- TODO infixl 8 ‥
+-- TODO infixl 8 ‥ -- …
 (‥) ∷ (a → b) → (c → d     → a) → (c → d     → b)
 (‥) = (.)    .    (.)
 
@@ -505,7 +505,7 @@ fromEnum' = fromIntegral . fromEnum
 
 -- A version of `enumFrom` which returns `NonEmpty a` rather than `[a]`
 enumFrom' ∷ (Enum a) ⇒ a → NonEmpty a
-enumFrom' a = a :| enumFrom (succ a)
+enumFrom' a = a :| drop 1 (enumFrom a)
 
 indexed ∷ (Traversable t) ⇒ t a → t (a, ℕ)
 indexed = mapWithIndex (flip (,))
