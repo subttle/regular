@@ -256,6 +256,21 @@ asynchronous (DFA δ₁ q₀ f₁) (DFA δ₂ p₀ f₂) = DFA δ (q₀, p₀) (
     δ ((q, p), Left  σ) = (δ₁ (q, σ), p        )
     δ ((q, p), Right γ) = (q,         δ₂ (p, γ))
 
+{-
+import qualified Data.Can as Can (Can (..))
+import           Data.Can
+
+-- FIXME rename, consider https://lotsofwords.com/*chronous
+asdf1 ∷ ∀ q p s g . (Ord q, Ord p) ⇒ DFA q s → DFA p g → DFA (q, p) (Can s g)
+asdf1 (DFA δ₁ q₀ f₁) (DFA δ₂ p₀ f₂) = DFA δ (q₀, p₀) (f₁ × f₂)
+  where
+    δ ∷ ((q, p), Can s g) → (q, p)
+    δ ((q, p),  Can.Non     ) = (q,         p        )
+    δ ((q, p), (Can.One σ  )) = (δ₁ (q, σ), p        )
+    δ ((q, p), (Can.Eno   γ)) = (q,         δ₂ (p, γ))
+    δ ((q, p), (Can.Two σ γ)) = (δ₁ (q, σ), δ₂ (p, γ))
+-}
+
 -- The symmetric difference ("exclusive or", or "xor") of two DFAs
 -- ℒ(m₁) ⊕ ℒ(m₂) = (ℒ(m₁) - ℒ(m₂)) ∪ (ℒ(m₂) - ℒ(m₁))
 xor ∷ (Finite q, Finite p) ⇒ DFA q s → DFA p s → DFA ((q, p), (p, q)) s
