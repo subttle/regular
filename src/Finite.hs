@@ -165,6 +165,15 @@ instance NotEmpty [a] where
 instance NotEmpty (Maybe a) where
   wit ∷ Maybe a
   wit = Nothing
+instance NotEmpty (Smash a b) where
+  wit ∷ Smash a b
+  wit = Nada
+instance NotEmpty (Wedge a b) where
+  wit ∷ Wedge a b
+  wit = Nowhere
+instance NotEmpty (Can a b) where
+  wit ∷ Can a b
+  wit = C.Non
 instance NotEmpty (Set a) where
   wit ∷ Set a
   wit = (∅)
