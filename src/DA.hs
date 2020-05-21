@@ -87,6 +87,21 @@ instance ContraWedge (DA q) where
   contrawedge ∷ (s → Wedge g₁ g₂) → DA q g₁ → DA q g₂ → DA q s
   contrawedge h (DA o₁ t₁) (DA o₂ t₂) = DA undefined (\q → wedge q (t₁ q) (t₂ q) . h)
 
+{-
+asdf2e ∷ ∀ q p s . DA q s → DA p s → DA (Either q p) s
+asdf2e (DA (Predicate o₁) t₁) (DA (Predicate o₂) t₂) = DA o t
+  where
+    o ∷ Predicate (Either q p)
+    o = Predicate (either o₁ o₂)
+    t ∷ Either q p → s → Either q p
+    t c σ = either (Left . flip t₁ σ) (Right . flip t₂ σ) c
+    -- t = (flip r)
+    --   where
+    --     r ∷ s → Either q p → Either q p
+    --     r = getOp (contramap (liftA2 bimap (flip t₁) (flip t₂)) (Op id))
+
+-}
+
 literal ∷ ∀ s . (Finite s) ⇒ s → (DA.DA Ordering s, Ordering)
 literal σ = (DA (Predicate (== EQ)) t, LT)
   where
