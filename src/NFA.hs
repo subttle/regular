@@ -195,6 +195,7 @@ import qualified Data.Can as Can (Can (..))
 import           Data.Can
 import           Data.Smash
 import           Data.Wedge
+import           Data.These
 
 -- FIXME rename, consider https://lotsofwords.com/*chronous
 asdf1 ∷ ∀ q p s g . (Ord q, Ord p) ⇒ NFA q s → NFA p g → NFA (q, p) (Can s g)
@@ -229,6 +230,14 @@ asdfw (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA δ (q₀, p₀) (f₁ ×
     δ ((q, p),  Nowhere     ) = singleton q × singleton p
     δ ((q, p), (Here    σ  )) = (δ₁ (q, σ)) × singleton p
     δ ((q, p), (There     γ)) = singleton q × (δ₂ (p, γ))
+
+asdft ∷ ∀ q p s g . (Ord q, Ord p) ⇒ NFA q s → NFA p g → NFA (q, p) (These s g)
+asdft (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA δ (q₀, p₀) (f₁ × f₂)
+  where
+    δ ∷ ((q, p), These s g) → Set (q, p)
+    δ ((q, p), (This  σ   )) = (δ₁ (q, σ)) × singleton p
+    δ ((q, p), (That     γ)) = singleton q × (δ₂ (p, γ))
+    δ ((q, p), (These σ  γ)) = (δ₁ (q, σ)) × (δ₂ (p, γ))
 -}
 
 toFA ∷ (Finite q) ⇒ NFA q s → FA.FA q s
