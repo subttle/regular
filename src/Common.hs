@@ -287,10 +287,10 @@ partitionEithers' = partitionEithers . Foldable.toList
 -- allNoneSome' ∷ Predicate a → Op (These (NonEmpty a) (NonEmpty a)) (NonEmpty a)
 -- allNoneSome' (Predicate p) = contramap (fmap (liftA3 bool Left Right p))) (Op partitionEithersNE)
 allNoneSome ∷ Predicate a → (NonEmpty a → These (NonEmpty a) (NonEmpty a))
-allNoneSome = partitionEithersNE ‥ filter'
+allNoneSome = partitionEithersNE ‥ filter''
   where
-    filter' ∷ Predicate a → NonEmpty a → NonEmpty (Either a a)
-    filter' (Predicate p) = fmap (liftA3 bool Left Right p)
+    filter'' ∷ Predicate a → NonEmpty a → NonEmpty (Either a a)
+    filter'' (Predicate p) = fmap (liftA3 bool Left Right p)
 
 
 -- A more general version of `lefts` from `Data.Either`
@@ -454,6 +454,10 @@ elemIndex' = fmap fromIntegral ‥ List.elemIndex
 
 elemIndices' ∷ (Eq a) ⇒ a → [a] → [ℕ]
 elemIndices' = fmap fromIntegral ‥ List.elemIndices
+
+-- A wrapper for `filter` which uses `Predicate` type.
+filter' ∷ (Foldable f) ⇒ Predicate a → f a → [a]
+filter' (Predicate p) = List.filter p . toList
 
 -- A wrapper for `deleteBy` which uses `Equivalence` type.
 deleteBy' ∷ (Foldable f) ⇒ Equivalence a → a → f a → [a]
