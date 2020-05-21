@@ -269,6 +269,15 @@ asdf1 (DFA δ₁ q₀ f₁) (DFA δ₂ p₀ f₂) = DFA δ (q₀, p₀) (f₁ ×
     δ ((q, p), (Can.One σ  )) = (δ₁ (q, σ), p        )
     δ ((q, p), (Can.Eno   γ)) = (q,         δ₂ (p, γ))
     δ ((q, p), (Can.Two σ γ)) = (δ₁ (q, σ), δ₂ (p, γ))
+
+asdf2 ∷ ∀ q p s g . (Ord q, Ord p) ⇒ DFA q s → DFA p s → DFA (Can q p) s
+asdf2 (DFA δ₁ q₀ f₁) (DFA δ₂ p₀ f₂) = DFA δ (Can.Two q₀ p₀) (Set.map (uncurry Can.Two) (f₁ × f₂))
+  where
+    δ ∷ (Can q p, s) → Can q p
+    δ (Can.Non    , _) = Can.Non
+    δ (Can.One q  , σ) = Can.One (δ₁ (q, σ))
+    δ (Can.Eno   p, σ) = Can.Eno             (δ₂ (p, σ))
+    δ (Can.Two q p, σ) = Can.Two (δ₁ (q, σ)) (δ₂ (p, σ))
 -}
 
 -- The symmetric difference ("exclusive or", or "xor") of two DFAs
