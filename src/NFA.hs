@@ -190,6 +190,47 @@ asynchronous (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA δ (q₀, p₀) (
     δ ((q, p), Left  σ) = δ₁ (q, σ)   × singleton p
     δ ((q, p), Right γ) = singleton q × δ₂ (p, γ)
 
+{-
+import qualified Data.Can as Can (Can (..))
+import           Data.Can
+import           Data.Smash
+import           Data.Wedge
+
+-- FIXME rename, consider https://lotsofwords.com/*chronous
+asdf1 ∷ ∀ q p s g . (Ord q, Ord p) ⇒ NFA q s → NFA p g → NFA (q, p) (Can s g)
+asdf1 (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA δ (q₀, p₀) (f₁ × f₂)
+  where
+    δ ∷ ((q, p), Can s g) → Set (q, p)
+    δ ((q, p),  Can.Non     ) = singleton q × singleton p
+    δ ((q, p), (Can.One σ  )) = δ₁ (q, σ)   × singleton p
+    δ ((q, p), (Can.Eno   γ)) = singleton q × δ₂ (p, γ)
+    δ ((q, p), (Can.Two σ γ)) = δ₁ (q, σ)   × δ₂ (p, γ)
+
+asdf2 ∷ ∀ q p s . (Ord q, Ord p) ⇒ NFA q s → NFA p s → NFA (Can q p) s
+asdf2 (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA δ (Can.Two q₀ p₀) (Set.map (uncurry Can.Two) (f₁ × f₂))
+  where
+    δ ∷ (Can q p, s) → Set (Can q p)
+    δ (Can.Non    , _) = singleton        Can.Non -- TODO `(∅)`
+    δ (Can.One q  , σ) = Set.map          Can.One   (δ₁ (q, σ))
+    δ (Can.Eno   p, σ) = Set.map          Can.Eno                 (δ₂ (p, σ))
+    δ (Can.Two q p, σ) = Set.map (uncurry Can.Two) ((δ₁ (q, σ)) × (δ₂ (p, σ)))
+
+asdfs ∷ ∀ q p s g . (Ord q, Ord p) ⇒ NFA q s → NFA p g → NFA (q, p) (Smash s g)
+asdfs (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA δ (q₀, p₀) (f₁ × f₂)
+  where
+    δ ∷ ((q, p), Smash s g) → Set (q, p)
+    δ ((q, p),  Nada      ) = singleton q × singleton p
+    δ ((q, p), (Smash σ γ)) = δ₁ (q, σ)   × δ₂ (p, γ)
+
+asdfw ∷ ∀ q p s g . (Ord q, Ord p) ⇒ NFA q s → NFA p g → NFA (q, p) (Wedge s g)
+asdfw (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA δ (q₀, p₀) (f₁ × f₂)
+  where
+    δ ∷ ((q, p), Wedge s g) → Set (q, p)
+    δ ((q, p),  Nowhere     ) = singleton q × singleton p
+    δ ((q, p), (Here    σ  )) = (δ₁ (q, σ)) × singleton p
+    δ ((q, p), (There     γ)) = singleton q × (δ₂ (p, γ))
+-}
+
 toFA ∷ (Finite q) ⇒ NFA q s → FA.FA q s
 toFA (NFA δ q₀ f) = FA.FA δ (singleton q₀) f
 
