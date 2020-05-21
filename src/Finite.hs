@@ -806,8 +806,7 @@ instance (Finite a)
       bits ∷ [[Bool]]
       bits = replicateM (length as) bs
       toFunction ∷ [(a, Bool)] → a → Bool
-      -- toFunction list = \a → fromJust (lookup a list) -- TODO I like this better but need to get rid of hlint warning -- {-# ANN asList "HLint: warn Redundant lambda" #-}
-      toFunction list a = fromJust (lookup a list)
+      toFunction = fromJust ‥ flip lookup
 
 -- TODO may want to move this code (if keeping it) to testing folder when done implementing `Finite` instance for `Equivalence`.
 
