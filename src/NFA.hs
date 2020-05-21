@@ -198,8 +198,8 @@ import           Data.Wedge
 import           Data.These
 
 -- FIXME rename, consider https://lotsofwords.com/*chronous
-asdf1 ∷ ∀ q p s g . (Ord q, Ord p) ⇒ NFA q s → NFA p g → NFA (q, p) (Can s g)
-asdf1 (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA δ (q₀, p₀) (f₁ × f₂)
+asdf1c ∷ ∀ q p s g . (Ord q, Ord p) ⇒ NFA q s → NFA p g → NFA (q, p) (Can s g)
+asdf1c (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA δ (q₀, p₀) (f₁ × f₂)
   where
     δ ∷ ((q, p), Can s g) → Set (q, p)
     δ ((q, p),  Can.Non     ) = singleton q × singleton p
@@ -207,8 +207,8 @@ asdf1 (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA δ (q₀, p₀) (f₁ ×
     δ ((q, p), (Can.Eno   γ)) = singleton q × δ₂ (p, γ)
     δ ((q, p), (Can.Two σ γ)) = δ₁ (q, σ)   × δ₂ (p, γ)
 
-asdf2 ∷ ∀ q p s . (Ord q, Ord p) ⇒ NFA q s → NFA p s → NFA (Can q p) s
-asdf2 (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA δ (Can.Two q₀ p₀) (Set.map (uncurry Can.Two) (f₁ × f₂))
+asdf2c ∷ ∀ q p s . (Ord q, Ord p) ⇒ NFA q s → NFA p s → NFA (Can q p) s
+asdf2c (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA δ (Can.Two q₀ p₀) (Set.map (uncurry Can.Two) (f₁ × f₂))
   where
     δ ∷ (Can q p, s) → Set (Can q p)
     δ (Can.Non    , _) = singleton        Can.Non -- TODO `(∅)`
@@ -216,28 +216,36 @@ asdf2 (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA δ (Can.Two q₀ p₀) (
     δ (Can.Eno   p, σ) = Set.map          Can.Eno                 (δ₂ (p, σ))
     δ (Can.Two q p, σ) = Set.map (uncurry Can.Two) ((δ₁ (q, σ)) × (δ₂ (p, σ)))
 
-asdfs ∷ ∀ q p s g . (Ord q, Ord p) ⇒ NFA q s → NFA p g → NFA (q, p) (Smash s g)
-asdfs (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA δ (q₀, p₀) (f₁ × f₂)
+asdf1s ∷ ∀ q p s g . (Ord q, Ord p) ⇒ NFA q s → NFA p g → NFA (q, p) (Smash s g)
+asdf1s (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA δ (q₀, p₀) (f₁ × f₂)
   where
     δ ∷ ((q, p), Smash s g) → Set (q, p)
     δ ((q, p),  Nada      ) = singleton q × singleton p
     δ ((q, p), (Smash σ γ)) = δ₁ (q, σ)   × δ₂ (p, γ)
 
-asdfw ∷ ∀ q p s g . (Ord q, Ord p) ⇒ NFA q s → NFA p g → NFA (q, p) (Wedge s g)
-asdfw (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA δ (q₀, p₀) (f₁ × f₂)
+asdf1w ∷ ∀ q p s g . (Ord q, Ord p) ⇒ NFA q s → NFA p g → NFA (q, p) (Wedge s g)
+asdf1w (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA δ (q₀, p₀) (f₁ × f₂)
   where
     δ ∷ ((q, p), Wedge s g) → Set (q, p)
     δ ((q, p),  Nowhere     ) = singleton q × singleton p
     δ ((q, p), (Here    σ  )) = (δ₁ (q, σ)) × singleton p
     δ ((q, p), (There     γ)) = singleton q × (δ₂ (p, γ))
 
-asdft ∷ ∀ q p s g . (Ord q, Ord p) ⇒ NFA q s → NFA p g → NFA (q, p) (These s g)
-asdft (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA δ (q₀, p₀) (f₁ × f₂)
+asdf1t ∷ ∀ q p s g . (Ord q, Ord p) ⇒ NFA q s → NFA p g → NFA (q, p) (These s g)
+asdf1t (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA δ (q₀, p₀) (f₁ × f₂)
   where
     δ ∷ ((q, p), These s g) → Set (q, p)
     δ ((q, p), (This  σ   )) = (δ₁ (q, σ)) × singleton p
     δ ((q, p), (That     γ)) = singleton q × (δ₂ (p, γ))
     δ ((q, p), (These σ  γ)) = (δ₁ (q, σ)) × (δ₂ (p, γ))
+
+asdf2t ∷ ∀ q p s . (Ord q, Ord p) ⇒ NFA q s → NFA p s → NFA (These q p) s
+asdf2t (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA δ (These q₀ p₀) (Set.map (uncurry These) (f₁ × f₂))
+  where
+    δ ∷ (These q p, s) → Set (These q p)
+    δ ((This  q  ), σ) = Set.map          This    (δ₁ (q, σ))
+    δ ((That    p), σ) = Set.map          That                  (δ₂ (p, σ))
+    δ ((These q p), σ) = Set.map (uncurry These) ((δ₁ (q, σ)) × (δ₂ (p, σ)))
 -}
 
 toFA ∷ (Finite q) ⇒ NFA q s → FA.FA q s
