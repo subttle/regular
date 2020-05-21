@@ -888,12 +888,20 @@ order = F.foldl lcm 1 . fmap length' . fromEquivalence . cycles
 byOrder ∷ (Finite a) ⇒ Equivalence (Comparison a)
 byOrder = equating' order
 
--- Count the parts of an equivalence
-count ∷ (Finite a) ⇒ Equivalence a → ℕ
-count = genericLength . fromEquivalence
+-- Count the number of elements for which the predicate returns `True`
+countImage ∷ (Finite a) ⇒ Predicate a → ℕ
+countimage = length' . flip filter' asList
 
-byCount ∷ (Finite a) ⇒ Equivalence (Equivalence a)
-byCount = equating' count
+-- Something like `a`'s powerset grouped by size
+byCountingImage ∷ (Finite a) ⇒ Equivalence (Predicate a)
+byCountingImage = equating' countImage
+
+-- Count the parts of an equivalence
+countParts ∷ (Finite a) ⇒ Equivalence a → ℕ
+countParts = genericLength . fromEquivalence
+
+byCountingParts ∷ (Finite a) ⇒ Equivalence (Equivalence a)
+byCountingParts = equating' countParts
 
 byLength ∷ (Foldable t) ⇒ Equivalence (t a)
 byLength = equating' length
