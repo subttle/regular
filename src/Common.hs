@@ -215,9 +215,10 @@ fixedPoint' (Equivalence (≡)) f a | f a ≡ a = a
 fixedPoint' (Equivalence (≡)) f a           = fixedPoint' (Equivalence (≡)) f (f a)
 
 -- `replicateM` with parameter of type ℕ (instead of parameter of type ℤ)
+-- TODO replicateM' = natf (const (pure [])) ((<*>) (liftA2 (:)) . replicateM' . pred)
 replicateM' ∷ (Applicative m) ⇒ ℕ → m a → m [a]
-replicateM' 0 _ = pure []
-replicateM' n f = liftA2 (:) f (replicateM' (n - 1) f)
+replicateM' 0 = const (pure [])
+replicateM' n = (<*>) (liftA2 (:)) (replicateM' (pred n))
 
 -- Something like free monoid. Lazily generate all possible finite sequences over the given alphabet.
 freeMonoid ∷ [a] → [[a]]
