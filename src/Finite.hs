@@ -804,7 +804,10 @@ instance (Finite a)
       bs ∷ [Bool]
       bs = asList
       bits ∷ [[Bool]]
-      bits = replicateM (length as) bs
+      bits = replicateM' cardinality_a bs
+        where
+          cardinality_a ∷ ℕ
+          cardinality_a = unTagged (U.cardinality ∷ Tagged a ℕ)
       toFunction ∷ [(a, Bool)] → a → Bool
       toFunction = fromJust ‥ flip lookup
 
