@@ -3,9 +3,11 @@
 
 module NatBase where
 
-import           Data.Function (on)
-import           Numeric.Natural (Natural)
+import           Control.Applicative (Alternative, empty, (<|>))
+import           Control.Monad.Fix
+import           Data.Function (on, (&))
 import           Data.Functor.Contravariant (Predicate (..))
+import           Numeric.Natural (Natural)
 import           Prelude hiding (even, odd)
 
 -- N.B. this entire file is currently experimental/untested/WIP!
@@ -21,6 +23,38 @@ data NatF a where
 deriving instance Functor     NatF
 deriving instance Foldable    NatF
 deriving instance Traversable NatF
+
+instance (Show a) ⇒ Show (NatF a) where
+  show ∷ NatF a → String
+  show = natf "ZeroF" (quoted . show)
+    where
+      quoted ∷ String → String
+      quoted = ("(SuccF " ++) . (++ ")")
+
+instance Applicative NatF where
+  pure ∷ a → NatF a
+  pure = SuccF
+  (<*>) ∷ NatF (a → b) → NatF a → NatF b
+  (<*>) = natf (const ZeroF) fmap
+instance Alternative NatF where
+  empty ∷ NatF a
+  empty = ZeroF
+  (<|>) ∷ NatF a → NatF a → NatF a
+  (<|>) = natf id (flip const)
+instance Monad NatF where
+  (>>=) ∷ NatF a → (a → NatF b) → NatF b
+  (>>=) = natf (const ZeroF) (&)
+
+instance MonadFix NatF where
+  mfix ∷ ∀ a . (a → NatF a) → NatF a
+  mfix f = f a
+    where
+      a ∷ a
+      a = unfix (f a)
+        where
+          unfix ∷ NatF a → a
+          unfix (SuccF a) = a
+          unfix ZeroF     = undefined
 
 -- case analysis
 nat ∷ a → (a → a) → ℕ → a
