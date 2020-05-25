@@ -467,6 +467,7 @@ deleteBy' (Equivalence (≡)) a = deleteBy (≡) a . toList
 -- A wrapper for `intersectBy` which uses `Equivalence` type.
 intersectBy' ∷ (Foldable f) ⇒ Equivalence a → f a → f a → [a]
 intersectBy' (Equivalence (≡)) = intersectBy (≡) `on` toList
+-- intersectBy' = flip on toList . intersectBy . getEquivalence -- TODO
 
 -- A wrapper for `deleteFirstsBy` which uses `Equivalence` type.
 deleteFirstsBy' ∷ (Foldable f) ⇒ Equivalence a → f a → f a → [a]
@@ -475,15 +476,23 @@ deleteFirstsBy' (Equivalence (≡)) = deleteFirstsBy (≡) `on` toList
 -- Intuitively this is just like `elem` from `Data.List` but with
 -- user supplied equivalence relation.
 elemBy ∷ (Foldable f) ⇒ Equivalence a → a → f a → Bool
-elemBy (Equivalence (≡)) = any . (≡)
+-- elemBy (Equivalence (≡)) = any . (≡)
+-- elemBy (≡) = any . (getEquivalence (≡))
+elemBy = any ‥ getEquivalence
 
 -- A wrapper for `sortBy` which uses `Comparison` type.
 sortBy' ∷ Comparison a → [a] → [a]
-sortBy' (Comparison cmp) = sortBy cmp
+-- sortBy' (Comparison cmp) = sortBy cmp
+sortBy' = sortBy . getComparison
+
+-- sortBy'' ∷ Op ([a] → [a]) (Comparison a)
+-- sortBy'' = contramap getComparison (Op sortBy)
 
 -- A wrapper for `minimumBy` which uses `Comparison` type. -- FIXME: should be `Foldable1`
 minimumBy' ∷ (Foldable t) ⇒ Comparison a → t a → a
-minimumBy' (Comparison cmp) = Foldable.minimumBy cmp
+-- minimumBy' (Comparison cmp) = Foldable.minimumBy cmp
+-- minimumBy' cmp = Foldable.minimumBy (getComparison cmp)
+minimumBy' = Foldable.minimumBy . getComparison
 
 -- A wrapper for `maximumBy` which uses `Comparison` type. -- FIXME: should be `Foldable1`
 maximumBy' ∷ (Foldable t) ⇒ Comparison a → t a → a
