@@ -6,7 +6,7 @@ module NatBase where
 import           Control.Applicative (Alternative, empty, (<|>))
 import           Control.Monad.Fix
 import           Data.Function (on, (&))
-import           Data.Functor.Contravariant (Predicate (..))
+import           Data.Functor.Contravariant (contramap, Predicate (..), Op (..))
 import           Numeric.Natural (Natural)
 import           Prelude hiding (even, odd)
 
@@ -62,9 +62,19 @@ nat z _ Zero     = z
 nat z s (Succ n) = s (nat z s n)
 
 -- N.B. `maybe ∷ b → (a → b) → Maybe a → b`
-natf ∷ b → (a → b) → NatF a → b
+natf ∷ b
+     → (     a → b)
+     → (NatF a → b)
 natf z _ ZeroF     = z
 natf _ s (SuccF a) = s a
+
+unfoldn ∷ ∀ a b
+        . (b → NatF (a, b))
+        → (b →      [a]   )
+unfoldn h = getOp (contramap h c)
+  where
+    c ∷ Op [a] (NatF (a, b))
+    c = Op (natf [] (\(a, b) → a : unfoldn h b))
 
 toNatural ∷ ℕ → Natural
 toNatural = nat 0 succ
