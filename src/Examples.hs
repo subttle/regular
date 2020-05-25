@@ -580,6 +580,20 @@ mod3eq2 = Predicate (\i → i `mod` 3 == 2)
 congruenceMod3 ∷ Equivalence Integer
 congruenceMod3 = equating' (`mod` 3)
 
+spades ∷ Predicate Card
+-- spades = Predicate (\(Card _ s) → (==) Spade s)
+-- spades = Predicate (\c → (==) Spade (suit c))
+spades = Predicate ((==) Spade . suit)
+
+hearts ∷ Predicate Card
+hearts = Predicate ((==) Heart . suit)
+
+diamonds ∷ Predicate Card
+diamonds = Predicate ((==) Diamond . suit)
+
+clubs ∷ Predicate Card
+clubs = Predicate ((==) Club . suit)
+
 cardsBySuit ∷ Equivalence Card
 cardsBySuit = equating' suit
 
