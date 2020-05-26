@@ -256,6 +256,13 @@ asynchronous (DFA δ₁ q₀ f₁) (DFA δ₂ p₀ f₂) = DFA δ (q₀, p₀) (
     δ ((q, p), Left  σ) = (δ₁ (q, σ), p        )
     δ ((q, p), Right γ) = (q,         δ₂ (p, γ))
 
+perfectShuffle ∷ ∀ q p s . (Ord q, Ord p) ⇒ DFA q s → DFA p s → DFA (q, p, Bool) s
+perfectShuffle (DFA δ₁ q₀ f₁) (DFA δ₂ p₀ f₂) = DFA δ (q₀, p₀, False) (Set.map (\(q, p) → (q, p, False)) (f₁ × f₂))
+  where
+    δ ∷ ((q, p, Bool), s) → (q, p, Bool)
+    δ ((q, p, False), σ) = (δ₁ (q, σ),     p    , True )
+    δ ((q, p, True ), σ) = (    q    , δ₂ (p, σ), False)
+
 {-
 import qualified Data.Can as Can (Can (..))
 import           Data.Can
