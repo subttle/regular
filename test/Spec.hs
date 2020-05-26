@@ -41,6 +41,7 @@ suite = tests [ testFizzBuzz
               , testDFArquotient
               , testDFAinvhomimage
               , testRESubstitution
+              , testDFAPerfectShuffle
               , testNFAshuffle
               , testBisimSubset (by5, DFA.toLanguage by5) (List.take 101 (freeMonoid asList))
               -- "For example, the restricted growth function 0,1,1,2,0,3,1 defines the set partition {{1,5}, {2,3,7}, {4}, {6}}"
@@ -169,6 +170,35 @@ testRESubstitution = scope "RE.>>=" . expect $ result == expected -- N.B. the us
     expected =  Star (         RE.fromList [2, 3])
             :. (Star (Lit 0 :| RE.fromList [0, 1])
             :.  Star (         RE.fromList [2, 3]))
+
+-- Example from: https://courses.engr.illinois.edu/cs373/fa2010/Exams/midterm1sol.pdf
+testDFAPerfectShuffle ∷ Test ()
+testDFAPerfectShuffle = scope "DFA.perfectShuffle" . expect $ l == expected
+  where    
+    -- {"1010"}
+    l ∷ [[Fin₂]]
+    l = Config.language ab
+      where
+        ab ∷ DFA (Set (Either Bool Bool), Set (Either Bool Bool), Bool) Fin₂
+        ab = DFA.perfectShuffle a b
+          where
+            -- A = {"11"}
+            a ∷ DFA (Set (Either Bool Bool)) Fin₂
+            a = DFA.fromNFA (NFA.concatenate a' a')
+              where
+                -- {"1"}
+                a' ∷ NFA Bool Fin₂
+                a' = NFA.literal 1
+            -- B = {"00"}
+            b ∷ DFA (Set (Either Bool Bool)) Fin₂
+            b = DFA.fromNFA (NFA.concatenate b' b')
+              where
+                -- {"0"}
+                b' ∷ NFA Bool Fin₂
+                b' = NFA.literal 0
+    -- {"1010"}
+    expected ∷ [[Fin₂]]
+    expected = [[1, 0, 1, 0]]
 
 -- TODO
 -- Shuffle
