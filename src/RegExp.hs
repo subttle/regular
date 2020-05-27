@@ -48,6 +48,7 @@ module RegExp
   , RegExp.size
   , heightAlgebra
   , sizeAlgebra
+  , dropout
   , languageAlg
   , convert
   , RegExp.optional
@@ -371,6 +372,26 @@ sizeAlgebra = Algebra φ
     φ (UnionF  α β) = 1 + α + β
     φ (ConcatF α β) = 1 + α + β
     φ (StarF   α)   = 1 + α
+
+-- Given a language, ℒ, the dropout(ℒ) is all strings
+-- which result from from dropping one symbol from any string in ℒ
+-- i.e. dropout(ℒ) = { lr | lσr ∈ ℒ 
+--                        , l   ∈ ∑★
+--                        ,  σ  ∈ ∑
+--                        ,   r ∈ ∑★
+--                   }
+-- FIXME consider if it may be better to model this as `dropout ∷ RegExp s → Maybe (RegExp s)`
+-- FIXME and have `dropout Zero = Nothing`?
+dropout ∷ RegExp s → RegExp s
+dropout Zero     = Zero
+dropout One      = Zero
+dropout (Lit  _) = One
+dropout (α :| β) = (dropout α             )
+                :| (             dropout β)
+dropout (α :. β) = (dropout α :.         β)
+                :| (        α :. dropout β)
+dropout (Star α) = (             Star    α)
+                :| (dropout α :. Star    α)
 
 -- Associativity, commutativity and idempotency (ACI) properties normalized
 -- Note:  ℒ(γ) ≡ ℒ(normalize γ)
