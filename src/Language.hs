@@ -22,6 +22,7 @@ type ℒ s = Predicate [s]
 -- TODO I bet it would be much cleaner for some parts to implement in terms of monoid instead of list
 
 instance (Finite s) ⇒ Σ (ℒ s) s
+instance (Finite s) ⇒ Σ ([s] → Bool) s
 
 -- provided for convenience/clarity.
 -- ℓ `accepts` w ≡ ℓ w
@@ -148,5 +149,5 @@ predicate ∷ ℒ s → Predicate [s]
 predicate (Predicate ℓ) = Predicate ℓ -- ℒ.ℒ -- TODO lol
 
 -- N.B. this is a convenience function, it does not terminate even for finite languages!
--- language ∷ (Finite s) ⇒ ℒ s → [[s]]
--- language (Predicate ℓ) = filter ℓ (sigmaStar ℓ)
+language ∷ (Finite s) ⇒ ℒ s → [[s]]
+language (Predicate ℓ) = filter ℓ (sigmaStar ℓ)
