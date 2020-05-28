@@ -4,6 +4,7 @@ module Config where
 
 import           Common (fixedPoint, intersects, upToLength, size', (‥))
 import           Finite (Q, Σ, asList, qs, sigmaStar)
+import qualified Data.List as List
 import           Data.Set as Set (Set, filter, singleton, insert, disjoint)
 import           Data.Set.Unicode ((∩), (∖), (∋), (⊆))
 import           Data.Eq.Unicode ((≠))
@@ -45,6 +46,8 @@ class (Q (automaton q s) q, Σ (automaton q s) s, Eq occupy) ⇒ Configuration a
     bideterministic ∷ automaton q s → Bool
     bideterministic m = deterministic m ∧ codeterministic m
 
+    deltaD ∷ automaton q s → (occupy, s) → occupy
+
     -- δ★ : Q × Σ★ → Q
     -- "Extended delta" - The delta function extended from single symbols to strings (lists of symbols).
     -- Take a DFA and a starting state, q, for that DFA, then compute the state p such that δ★(q, w) = p
@@ -65,6 +68,9 @@ class (Q (automaton q s) q, Σ (automaton q s) s, Eq occupy) ⇒ Configuration a
 
     eval'' ∷ automaton q s → [s] → Set q
     eval'' m w = delta'' m (occupied m (initial m), w)
+
+    traced ∷ automaton q s → [s] → (occupy, [(occupy, s)])
+    traced m = List.mapAccumL (\occupy s → (deltaD  m (occupy, s), (occupy, s))) (initial m)
 
     -- Given an automaton and a state, q, determine the set of states reachable in exactly one move
     -- i.e. all the "outgoing arrows" of the state.

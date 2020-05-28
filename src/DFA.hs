@@ -99,7 +99,10 @@ instance (Finite q, Finite s) ⇒ Configuration DFA q s q where
   -- { q ∈ Q | ∃w ∈ Σ★, δ★(q₀, w) = q }
   accessible ∷ DFA q s → Set q
   accessible m@(DFA _ q₀ _) = reachable m q₀
-  
+
+  deltaD ∷ DFA q s → (q, s) → q
+  deltaD (DFA δ _ _) = δ
+
   -- δ★ : Q × Σ★ → Q
   -- "Extended delta" - The delta function extended from single symbols to strings (lists of symbols).
   -- Take a DFA and a starting state, q, for that DFA, then compute the state p such that δ★(q, w) = p
@@ -116,6 +119,10 @@ instance (Finite q, Finite s) ⇒ Configuration DFA q s q where
   eval ∷ DFA q s → [s] → q
   eval m@(DFA _ q₀ _) w = delta' m (q₀, w)
 
+  -- trace δ★(q, w)
+  traced ∷ DFA q s → [s] → (q, [(q, s)])
+  traced (DFA δ q₀ _) = List.mapAccumL (\q σ → (δ (q, σ), (q, σ))) q₀
+
   -- Take a DFA, m, and a string, w, and decide if that string is accepted/recognized
   -- m accepts a string w ∈ Σ★ iff δ★(q₀, w) ∈ F
   accepts ∷ DFA q s → [s] → Bool
@@ -129,10 +136,6 @@ instance (Finite q, Finite s) ⇒ Configuration DFA q s q where
   -- N.B. information is lost in this conversion, i.e. q₀ and F will be dropped
   toGraph ∷ DFA q s → TG.TG q s
   toGraph (DFA δ _ _) = TG.TG (\s → stars (fmap (\q → (q, [δ (q, s)])) asList))
-
--- trace δ★(q, w)
-traced ∷ ∀ q s . DFA q s → [s] → (q, [(q, s)])
-traced (DFA δ q₀ _) = List.mapAccumL (\q σ → (δ (q, σ), (q, σ))) q₀
 
 -- Determine if a string, w, synchronizes (or "resets") a DFA, m
 -- http://www.math.uni.wroc.pl/~kisiel/auto/eppstein.pdf

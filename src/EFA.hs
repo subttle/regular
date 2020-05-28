@@ -87,6 +87,10 @@ instance (Finite q, Finite s) ⇒ Configuration EFA q s (Set q) where
   accessible ∷ EFA q s → Set q
   accessible m@(EFA _ q₀ _) = reachable m q₀
 
+  -- FIXME untested, also, consider characteristics of eclosure placement
+  deltaD ∷ EFA q s → (Set q, s) → Set q
+  deltaD m@(EFA δ _ _) (states, s) = eclosure m (foldMap (\q → δ (q, Just s)) states)
+
   -- δ★ : Q × (Σ ∪ {ε})★ → P(Q)
   -- "Extended delta"
   -- Extend the δ function to accept strings of symbols

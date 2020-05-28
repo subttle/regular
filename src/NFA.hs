@@ -87,6 +87,9 @@ instance (Finite q, Finite s) ⇒ Configuration NFA q s (Set q) where
   accessible ∷ NFA q s → Set q
   accessible m@(NFA _ q₀ _) = reachable m q₀
 
+  deltaD ∷ NFA q s → (Set q, s) → Set q
+  deltaD (NFA δ _ _) (states, s) = foldMap (\q → δ (q, s)) states
+
   -- δ⋆ : Q × Σ★ → P(Q)
   -- "Extended delta"
   -- Take an NFA and a starting state, q, for that NFA,
