@@ -37,6 +37,7 @@ import           Data.Wedge
 import           Common
 import           GHC.Enum (boundedEnumFrom)
 import           Data.Fin (Fin)
+import qualified Data.Fin as Fin (absurd)
 import qualified Data.Type.Nat as Nat
 import           Prelude.Unicode (ℤ)
 import           Numeric.Natural.Unicode (ℕ)
@@ -652,6 +653,9 @@ type Nat12  = 'Nat.S Nat11
 type Nat13  = 'Nat.S Nat12
 type Nat14  = 'Nat.S Nat13
 type Nat15  = 'Nat.S Nat14
+{-
+type Nat16  = 'Nat.S Nat15
+-}
 
 type Fin₀  = Fin Nat.Nat0
 type Fin₁  = Fin Nat.Nat1
@@ -669,6 +673,236 @@ type Fin₁₂ = Fin Nat12
 type Fin₁₃ = Fin Nat13
 type Fin₁₄ = Fin Nat14
 type Fin₁₅ = Fin Nat15
+{-
+type Fin₁₆ = Fin Nat16
+-}
+-- case analysis for `Fin₁` type
+fin₀ ∷ Fin₀ → a
+fin₀ = Fin.absurd
+
+-- case analysis for `Fin₁` type
+fin₁ ∷ a → Fin₁ → a
+fin₁ a 0 = a
+
+-- case analysis for `Fin₂` type
+fin₂ ∷ a → a → Fin₂ → a
+fin₂ a _ 0 = a
+fin₂ _ a 1 = a
+
+-- case analysis for `Fin₃` type
+fin₃ ∷ a → a → a → Fin₃ → a
+fin₃ a _ _ 0 = a
+fin₃ _ a _ 1 = a
+fin₃ _ _ a 2 = a
+
+-- case analysis for `Fin₄` type
+fin₄ ∷ a → a → a → a → Fin₄ → a
+fin₄ a _ _ _ 0 = a
+fin₄ _ a _ _ 1 = a
+fin₄ _ _ a _ 2 = a
+fin₄ _ _ _ a 3 = a
+
+-- case analysis for `Fin₅` type
+fin₅ ∷ a → a → a → a → a → Fin₅ → a
+fin₅ a _ _ _ _ 0 = a
+fin₅ _ a _ _ _ 1 = a
+fin₅ _ _ a _ _ 2 = a
+fin₅ _ _ _ a _ 3 = a
+fin₅ _ _ _ _ a 4 = a
+
+-- case analysis for `Fin₆` type
+fin₆ ∷ a → a → a → a → a → a → Fin₆ → a
+fin₆ a _ _ _ _ _ 0 = a
+fin₆ _ a _ _ _ _ 1 = a
+fin₆ _ _ a _ _ _ 2 = a
+fin₆ _ _ _ a _ _ 3 = a
+fin₆ _ _ _ _ a _ 4 = a
+fin₆ _ _ _ _ _ a 5 = a
+
+-- case analysis for `Fin₇` type
+fin₇ ∷ a → a → a → a → a → a → a → Fin₇ → a
+fin₇ a _ _ _ _ _ _ 0 = a
+fin₇ _ a _ _ _ _ _ 1 = a
+fin₇ _ _ a _ _ _ _ 2 = a
+fin₇ _ _ _ a _ _ _ 3 = a
+fin₇ _ _ _ _ a _ _ 4 = a
+fin₇ _ _ _ _ _ a _ 5 = a
+fin₇ _ _ _ _ _ _ a 6 = a
+
+-- case analysis for `Fin₈` type
+fin₈ ∷ a → a → a → a → a → a → a → a → Fin₈ → a
+fin₈ a _ _ _ _ _ _ _ 0 = a
+fin₈ _ a _ _ _ _ _ _ 1 = a
+fin₈ _ _ a _ _ _ _ _ 2 = a
+fin₈ _ _ _ a _ _ _ _ 3 = a
+fin₈ _ _ _ _ a _ _ _ 4 = a
+fin₈ _ _ _ _ _ a _ _ 5 = a
+fin₈ _ _ _ _ _ _ a _ 6 = a
+fin₈ _ _ _ _ _ _ _ a 7 = a
+
+-- case analysis for `Fin₉` type
+fin₉ ∷ a → a → a → a → a → a → a → a → a → Fin₉ → a
+fin₉ a _ _ _ _ _ _ _ _ 0 = a
+fin₉ _ a _ _ _ _ _ _ _ 1 = a
+fin₉ _ _ a _ _ _ _ _ _ 2 = a
+fin₉ _ _ _ a _ _ _ _ _ 3 = a
+fin₉ _ _ _ _ a _ _ _ _ 4 = a
+fin₉ _ _ _ _ _ a _ _ _ 5 = a
+fin₉ _ _ _ _ _ _ a _ _ 6 = a
+fin₉ _ _ _ _ _ _ _ a _ 7 = a
+fin₉ _ _ _ _ _ _ _ _ a 8 = a
+
+-- case analysis for `Fin₁₀` type
+fin₁₀ ∷ a → a → a → a → a → a → a → a → a → a → Fin₁₀ → a
+fin₁₀ a _ _ _ _ _ _ _ _ _ 0 = a
+fin₁₀ _ a _ _ _ _ _ _ _ _ 1 = a
+fin₁₀ _ _ a _ _ _ _ _ _ _ 2 = a
+fin₁₀ _ _ _ a _ _ _ _ _ _ 3 = a
+fin₁₀ _ _ _ _ a _ _ _ _ _ 4 = a
+fin₁₀ _ _ _ _ _ a _ _ _ _ 5 = a
+fin₁₀ _ _ _ _ _ _ a _ _ _ 6 = a
+fin₁₀ _ _ _ _ _ _ _ a _ _ 7 = a
+fin₁₀ _ _ _ _ _ _ _ _ a _ 8 = a
+fin₁₀ _ _ _ _ _ _ _ _ _ a 9 = a
+
+-- case analysis for `Fin₁₁` type
+fin₁₁ ∷ a → a → a → a → a → a → a → a → a → a → a → Fin₁₁ → a
+fin₁₁ a _ _ _ _ _ _ _ _ _ _ 0  = a
+fin₁₁ _ a _ _ _ _ _ _ _ _ _ 1  = a
+fin₁₁ _ _ a _ _ _ _ _ _ _ _ 2  = a
+fin₁₁ _ _ _ a _ _ _ _ _ _ _ 3  = a
+fin₁₁ _ _ _ _ a _ _ _ _ _ _ 4  = a
+fin₁₁ _ _ _ _ _ a _ _ _ _ _ 5  = a
+fin₁₁ _ _ _ _ _ _ a _ _ _ _ 6  = a
+fin₁₁ _ _ _ _ _ _ _ a _ _ _ 7  = a
+fin₁₁ _ _ _ _ _ _ _ _ a _ _ 8  = a
+fin₁₁ _ _ _ _ _ _ _ _ _ a _ 9  = a
+fin₁₁ _ _ _ _ _ _ _ _ _ _ a 10 = a
+
+-- case analysis for `Fin₁₂` type
+fin₁₂ ∷ a → a → a → a → a → a → a → a → a → a → a → a → Fin₁₂ → a
+fin₁₂ a _ _ _ _ _ _ _ _ _ _ _ 0  = a
+fin₁₂ _ a _ _ _ _ _ _ _ _ _ _ 1  = a
+fin₁₂ _ _ a _ _ _ _ _ _ _ _ _ 2  = a
+fin₁₂ _ _ _ a _ _ _ _ _ _ _ _ 3  = a
+fin₁₂ _ _ _ _ a _ _ _ _ _ _ _ 4  = a
+fin₁₂ _ _ _ _ _ a _ _ _ _ _ _ 5  = a
+fin₁₂ _ _ _ _ _ _ a _ _ _ _ _ 6  = a
+fin₁₂ _ _ _ _ _ _ _ a _ _ _ _ 7  = a
+fin₁₂ _ _ _ _ _ _ _ _ a _ _ _ 8  = a
+fin₁₂ _ _ _ _ _ _ _ _ _ a _ _ 9  = a
+fin₁₂ _ _ _ _ _ _ _ _ _ _ a _ 10 = a
+fin₁₂ _ _ _ _ _ _ _ _ _ _ _ a 11 = a
+
+-- case analysis for `Fin₁₃` type
+fin₁₃ ∷ a → a → a → a → a → a → a → a → a → a → a → a → a → Fin₁₃ → a
+fin₁₃ a _ _ _ _ _ _ _ _ _ _ _ _ 0  = a
+fin₁₃ _ a _ _ _ _ _ _ _ _ _ _ _ 1  = a
+fin₁₃ _ _ a _ _ _ _ _ _ _ _ _ _ 2  = a
+fin₁₃ _ _ _ a _ _ _ _ _ _ _ _ _ 3  = a
+fin₁₃ _ _ _ _ a _ _ _ _ _ _ _ _ 4  = a
+fin₁₃ _ _ _ _ _ a _ _ _ _ _ _ _ 5  = a
+fin₁₃ _ _ _ _ _ _ a _ _ _ _ _ _ 6  = a
+fin₁₃ _ _ _ _ _ _ _ a _ _ _ _ _ 7  = a
+fin₁₃ _ _ _ _ _ _ _ _ a _ _ _ _ 8  = a
+fin₁₃ _ _ _ _ _ _ _ _ _ a _ _ _ 9  = a
+fin₁₃ _ _ _ _ _ _ _ _ _ _ a _ _ 10 = a
+fin₁₃ _ _ _ _ _ _ _ _ _ _ _ a _ 11 = a
+fin₁₃ _ _ _ _ _ _ _ _ _ _ _ _ a 12 = a
+
+-- case analysis for `Fin₁₄` type
+fin₁₄ ∷ a → a → a → a → a → a → a → a → a → a → a → a → a → a → Fin₁₄ → a
+fin₁₄ a _ _ _ _ _ _ _ _ _ _ _ _ _ 0  = a
+fin₁₄ _ a _ _ _ _ _ _ _ _ _ _ _ _ 1  = a
+fin₁₄ _ _ a _ _ _ _ _ _ _ _ _ _ _ 2  = a
+fin₁₄ _ _ _ a _ _ _ _ _ _ _ _ _ _ 3  = a
+fin₁₄ _ _ _ _ a _ _ _ _ _ _ _ _ _ 4  = a
+fin₁₄ _ _ _ _ _ a _ _ _ _ _ _ _ _ 5  = a
+fin₁₄ _ _ _ _ _ _ a _ _ _ _ _ _ _ 6  = a
+fin₁₄ _ _ _ _ _ _ _ a _ _ _ _ _ _ 7  = a
+fin₁₄ _ _ _ _ _ _ _ _ a _ _ _ _ _ 8  = a
+fin₁₄ _ _ _ _ _ _ _ _ _ a _ _ _ _ 9  = a
+fin₁₄ _ _ _ _ _ _ _ _ _ _ a _ _ _ 10 = a
+fin₁₄ _ _ _ _ _ _ _ _ _ _ _ a _ _ 11 = a
+fin₁₄ _ _ _ _ _ _ _ _ _ _ _ _ a _ 12 = a
+fin₁₄ _ _ _ _ _ _ _ _ _ _ _ _ _ a 13 = a
+
+-- case analysis for `Fin₁₅` type
+fin₁₅ ∷ a → a → a → a → a → a → a → a → a → a → a → a → a → a → a → Fin₁₅ → a
+fin₁₅ a _ _ _ _ _ _ _ _ _ _ _ _ _ _ 0  = a
+fin₁₅ _ a _ _ _ _ _ _ _ _ _ _ _ _ _ 1  = a
+fin₁₅ _ _ a _ _ _ _ _ _ _ _ _ _ _ _ 2  = a
+fin₁₅ _ _ _ a _ _ _ _ _ _ _ _ _ _ _ 3  = a
+fin₁₅ _ _ _ _ a _ _ _ _ _ _ _ _ _ _ 4  = a
+fin₁₅ _ _ _ _ _ a _ _ _ _ _ _ _ _ _ 5  = a
+fin₁₅ _ _ _ _ _ _ a _ _ _ _ _ _ _ _ 6  = a
+fin₁₅ _ _ _ _ _ _ _ a _ _ _ _ _ _ _ 7  = a
+fin₁₅ _ _ _ _ _ _ _ _ a _ _ _ _ _ _ 8  = a
+fin₁₅ _ _ _ _ _ _ _ _ _ a _ _ _ _ _ 9  = a
+fin₁₅ _ _ _ _ _ _ _ _ _ _ a _ _ _ _ 10 = a
+fin₁₅ _ _ _ _ _ _ _ _ _ _ _ a _ _ _ 11 = a
+fin₁₅ _ _ _ _ _ _ _ _ _ _ _ _ a _ _ 12 = a
+fin₁₅ _ _ _ _ _ _ _ _ _ _ _ _ _ a _ 13 = a
+fin₁₅ _ _ _ _ _ _ _ _ _ _ _ _ _ _ a 14 = a
+
+{-
+-- case analysis for `Fin₁₆` type
+fin₁₆ ∷ a → a → a → a → a → a → a → a → a → a → a → a → a → a → a → a → Fin₁₆ → a
+fin₁₆ a _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 0  = a
+fin₁₆ _ a _ _ _ _ _ _ _ _ _ _ _ _ _ _ 1  = a
+fin₁₆ _ _ a _ _ _ _ _ _ _ _ _ _ _ _ _ 2  = a
+fin₁₆ _ _ _ a _ _ _ _ _ _ _ _ _ _ _ _ 3  = a
+fin₁₆ _ _ _ _ a _ _ _ _ _ _ _ _ _ _ _ 4  = a
+fin₁₆ _ _ _ _ _ a _ _ _ _ _ _ _ _ _ _ 5  = a
+fin₁₆ _ _ _ _ _ _ a _ _ _ _ _ _ _ _ _ 6  = a
+fin₁₆ _ _ _ _ _ _ _ a _ _ _ _ _ _ _ _ 7  = a
+fin₁₆ _ _ _ _ _ _ _ _ a _ _ _ _ _ _ _ 8  = a
+fin₁₆ _ _ _ _ _ _ _ _ _ a _ _ _ _ _ _ 9  = a
+fin₁₆ _ _ _ _ _ _ _ _ _ _ a _ _ _ _ _ 10 = a
+fin₁₆ _ _ _ _ _ _ _ _ _ _ _ a _ _ _ _ 11 = a
+fin₁₆ _ _ _ _ _ _ _ _ _ _ _ _ a _ _ _ 12 = a
+fin₁₆ _ _ _ _ _ _ _ _ _ _ _ _ _ a _ _ 13 = a
+fin₁₆ _ _ _ _ _ _ _ _ _ _ _ _ _ _ a _ 14 = a
+fin₁₆ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ a 15 = a
+-}
+
+-- non unicode aliases for convenience
+fin0  ∷ Fin₀ → a
+fin0  = fin₀
+fin1  ∷ a → Fin₁ → a
+fin1  = fin₁
+fin2  ∷ a → a → Fin₂ → a
+fin2  = fin₂
+fin3  ∷ a → a → a → Fin₃ → a
+fin3  = fin₃
+fin4  ∷ a → a → a → a → Fin₄ → a
+fin4  = fin₄
+fin5  ∷ a → a → a → a → a → Fin₅ → a
+fin5  = fin₅
+fin6  ∷ a → a → a → a → a → a → Fin₆ → a
+fin6  = fin₆
+fin7  ∷ a → a → a → a → a → a → a → Fin₇ → a
+fin7  = fin₇
+fin8  ∷ a → a → a → a → a → a → a → a → Fin₈ → a
+fin8  = fin₈
+fin9  ∷ a → a → a → a → a → a → a → a → a → Fin₉ → a
+fin9  = fin₉
+fin10 ∷ a → a → a → a → a → a → a → a → a → a → Fin₁₀ → a
+fin10 = fin₁₀
+fin11 ∷ a → a → a → a → a → a → a → a → a → a → a → Fin₁₁ → a
+fin11 = fin₁₁
+fin12 ∷ a → a → a → a → a → a → a → a → a → a → a → a → Fin₁₂ → a
+fin12 = fin₁₂
+fin13 ∷ a → a → a → a → a → a → a → a → a → a → a → a → a → Fin₁₃ → a
+fin13 = fin₁₃
+fin14 ∷ a → a → a → a → a → a → a → a → a → a → a → a → a → a → Fin₁₄ → a
+fin14 = fin₁₄
+fin15 ∷ a → a → a → a → a → a → a → a → a → a → a → a → a → a → a → Fin₁₅ → a
+fin15 = fin₁₅
+{-
+fin16 ∷ a → a → a → a → a → a → a → a → a → a → a → a → a → a → a → a → Fin₁₆ → a
+fin16 = fin₁₆
+-}
 
 type Fin0  = Fin₀
 type Fin1  = Fin₁
@@ -686,6 +920,9 @@ type Fin12 = Fin₁₂
 type Fin13 = Fin₁₃
 type Fin14 = Fin₁₄
 type Fin15 = Fin₁₅
+{-
+type Fin16 = Fin₁₆
+-}
 
 instance U.Universe Fin₁
 instance U.Finite   Fin₁
@@ -746,6 +983,12 @@ instance Finite     Fin₁₄
 instance U.Universe Fin₁₅
 instance U.Finite   Fin₁₅
 instance Finite     Fin₁₅
+
+{-
+instance U.Universe Fin₁₆
+instance U.Finite   Fin₁₆
+instance Finite     Fin₁₆
+-}
 
 -- TODO deleteme
 instance (Show a, Finite a) ⇒ Show (Predicate a) where
