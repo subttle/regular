@@ -130,6 +130,10 @@ instance (Finite q, Finite s) ⇒ Configuration DFA q s q where
   toGraph ∷ DFA q s → TG.TG q s
   toGraph (DFA δ _ _) = TG.TG (\s → stars (fmap (\q → (q, [δ (q, s)])) asList))
 
+-- trace δ★(q, w)
+traced ∷ ∀ q s . DFA q s → [s] → (q, [(q, s)])
+traced (DFA δ q₀ _) = List.mapAccumL (\q σ → (δ (q, σ), (q, σ))) q₀
+
 -- Determine if a string, w, synchronizes (or "resets") a DFA, m
 -- http://www.math.uni.wroc.pl/~kisiel/auto/eppstein.pdf
 -- A string, w, "resets" a DFA when ∃w ∈ Σ★, ∀q ∈ Q, δ★(q, w) = p for some p ∈ Q
