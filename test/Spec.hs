@@ -164,7 +164,7 @@ testREDropout = scope "RE.dropout" . expect $ and [test₁, test₂]
             -- A·(B·C) is the regular expression such that
             -- ℒ (A·(B·C))             = {"ABC"}
             expression  ∷ RegExp Alpha
-            expression  = RegExp.fromList [A, B, C]
+            expression  = RE.fromList [A, B, C]
         -- {"AB", "AC", "BC"}
         expected ∷ [[Alpha]]
         expected = [ [A, B]
@@ -181,7 +181,7 @@ testREDropout = scope "RE.dropout" . expect $ and [test₁, test₂]
           where
             -- ℒ (D ∣ (A·(B·C) ∣ E·F)) = {"ABC", "D", "EF"}
             expression  ∷ RegExp Alpha
-            expression  = RegExp.fromWords [[A, B, C], [D], [E, F]]
+            expression  = RE.fromWords [[A, B, C], [D], [E, F]]
         -- {"", "AB", "AC", "BC", "E", "F"}
         expected ∷ [[Alpha]]
         expected = [ []
