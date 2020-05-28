@@ -150,6 +150,48 @@ testDFAinvhomimage = scope "DFA.invhomimage" . expect $ same
             δ (2, False) = 2
             δ (2, True ) = 2
 
+testREDropout ∷ Test ()
+testREDropout = scope "RE.dropout" . expect $ and [test₁, test₂]
+  where
+    -- ℒ (A·(B·C)) ≟ {"AB", "AC", "BC"}
+    test₁ ∷ Bool
+    test₁ = expected == language (expression')
+      where
+        -- ℒ (ε·(B·C) ∣ A·(ε·C ∣ B·ε)) = {"AB", "AC", "BC"}
+        expression' ∷ RegExp Alpha
+        expression' = dropout expression
+          where
+            -- A·(B·C) is the regular expression such that
+            -- ℒ (A·(B·C))             = {"ABC"}
+            expression  ∷ RegExp Alpha
+            expression  = RegExp.fromList [A, B, C]
+        -- {"AB", "AC", "BC"}
+        expected ∷ [[Alpha]]
+        expected = [ [A, B]
+                   , [A, C]
+                   , [B, C]
+                   ]
+    -- ℒ (D ∣ (A·(B·C) ∣ E·F)) ≟ {"", "AB", "AC", "BC", "E", "F"}
+    test₂ ∷ Bool
+    test₂ = expected == language (expression')
+      where
+        -- ℒ (ε ∣ ((ε·(B·C) ∣ A·(ε·C ∣ B·ε)) ∣ (ε·F ∣ E·ε)))
+        expression' ∷ RegExp Alpha
+        expression' = dropout expression
+          where
+            -- ℒ (D ∣ (A·(B·C) ∣ E·F)) = {"ABC", "D", "EF"}
+            expression  ∷ RegExp Alpha
+            expression  = RegExp.fromWords [[A, B, C], [D], [E, F]]
+        -- {"", "AB", "AC", "BC", "E", "F"}
+        expected ∷ [[Alpha]]
+        expected = [ []
+                   , [A, B]
+                   , [A, C]
+                   , [B, C]
+                   , [E]
+                   , [F]
+                   ]
+
 -- Substitution
 -- A Second Course in Formal Languages and Automata Theory (Pg 55, Example 3.3.4)
 -- s(101) = (cd)*(a+ab)*(cd)*
