@@ -893,7 +893,7 @@ byOrder = equating' order
 
 -- Count the number of elements for which the predicate returns `True`
 countImage ∷ (Finite a) ⇒ Predicate a → ℕ
-countimage = length' . flip filter' asList
+countImage = length' . flip filter' asList
 
 -- Something like `a`'s powerset grouped by size
 byCountingImage ∷ (Finite a) ⇒ Equivalence (Predicate a)
