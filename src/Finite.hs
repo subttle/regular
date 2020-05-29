@@ -653,9 +653,7 @@ type Nat12  = 'Nat.S Nat11
 type Nat13  = 'Nat.S Nat12
 type Nat14  = 'Nat.S Nat13
 type Nat15  = 'Nat.S Nat14
-{-
 type Nat16  = 'Nat.S Nat15
--}
 
 type Fin₀  = Fin Nat.Nat0
 type Fin₁  = Fin Nat.Nat1
@@ -673,9 +671,8 @@ type Fin₁₂ = Fin Nat12
 type Fin₁₃ = Fin Nat13
 type Fin₁₄ = Fin Nat14
 type Fin₁₅ = Fin Nat15
-{-
 type Fin₁₆ = Fin Nat16
--}
+
 -- case analysis for `Fin₁` type
 fin₀ ∷ Fin₀ → a
 fin₀ = Fin.absurd
@@ -845,7 +842,6 @@ fin₁₅ _ _ _ _ _ _ _ _ _ _ _ _ a _ _ 12 = a
 fin₁₅ _ _ _ _ _ _ _ _ _ _ _ _ _ a _ 13 = a
 fin₁₅ _ _ _ _ _ _ _ _ _ _ _ _ _ _ a 14 = a
 
-{-
 -- case analysis for `Fin₁₆` type
 fin₁₆ ∷ a → a → a → a → a → a → a → a → a → a → a → a → a → a → a → a → Fin₁₆ → a
 fin₁₆ a _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 0  = a
@@ -864,45 +860,42 @@ fin₁₆ _ _ _ _ _ _ _ _ _ _ _ _ a _ _ _ 12 = a
 fin₁₆ _ _ _ _ _ _ _ _ _ _ _ _ _ a _ _ 13 = a
 fin₁₆ _ _ _ _ _ _ _ _ _ _ _ _ _ _ a _ 14 = a
 fin₁₆ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ a 15 = a
--}
 
 -- non unicode aliases for convenience
-fin0  ∷ Fin₀ → a
+fin0  ∷                                                                                 Fin₀ → a
 fin0  = fin₀
-fin1  ∷ a → Fin₁ → a
+fin1  ∷                                                                            a → (Fin₁ → a)
 fin1  = fin₁
-fin2  ∷ a → a → Fin₂ → a
+fin2  ∷                                                                       a → (a → (Fin₂ → a))
 fin2  = fin₂
-fin3  ∷ a → a → a → Fin₃ → a
+fin3  ∷                                                                  a → (a → (a → (Fin₃ → a)))
 fin3  = fin₃
-fin4  ∷ a → a → a → a → Fin₄ → a
+fin4  ∷                                                             a → (a → (a → (a → (Fin₄ → a))))
 fin4  = fin₄
-fin5  ∷ a → a → a → a → a → Fin₅ → a
+fin5  ∷                                                        a → (a → (a → (a → (a → (Fin₅ → a)))))
 fin5  = fin₅
-fin6  ∷ a → a → a → a → a → a → Fin₆ → a
+fin6  ∷                                                   a → (a → (a → (a → (a → (a → (Fin₆ → a))))))
 fin6  = fin₆
-fin7  ∷ a → a → a → a → a → a → a → Fin₇ → a
+fin7  ∷                                              a → (a → (a → (a → (a → (a → (a → (Fin₇ → a)))))))
 fin7  = fin₇
-fin8  ∷ a → a → a → a → a → a → a → a → Fin₈ → a
+fin8  ∷                                         a → (a → (a → (a → (a → (a → (a → (a → (Fin₈ → a))))))))
 fin8  = fin₈
-fin9  ∷ a → a → a → a → a → a → a → a → a → Fin₉ → a
+fin9  ∷                                    a → (a → (a → (a → (a → (a → (a → (a → (a → (Fin₉ → a)))))))))
 fin9  = fin₉
-fin10 ∷ a → a → a → a → a → a → a → a → a → a → Fin₁₀ → a
+fin10 ∷                               a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (Fin₁₀ → a))))))))))
 fin10 = fin₁₀
-fin11 ∷ a → a → a → a → a → a → a → a → a → a → a → Fin₁₁ → a
+fin11 ∷                          a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (Fin₁₁ → a)))))))))))
 fin11 = fin₁₁
-fin12 ∷ a → a → a → a → a → a → a → a → a → a → a → a → Fin₁₂ → a
+fin12 ∷                     a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (Fin₁₂ → a))))))))))))
 fin12 = fin₁₂
-fin13 ∷ a → a → a → a → a → a → a → a → a → a → a → a → a → Fin₁₃ → a
+fin13 ∷                a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (Fin₁₃ → a)))))))))))))
 fin13 = fin₁₃
-fin14 ∷ a → a → a → a → a → a → a → a → a → a → a → a → a → a → Fin₁₄ → a
+fin14 ∷           a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (Fin₁₄ → a))))))))))))))
 fin14 = fin₁₄
-fin15 ∷ a → a → a → a → a → a → a → a → a → a → a → a → a → a → a → Fin₁₅ → a
+fin15 ∷      a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (Fin₁₅ → a)))))))))))))))
 fin15 = fin₁₅
-{-
-fin16 ∷ a → a → a → a → a → a → a → a → a → a → a → a → a → a → a → a → Fin₁₆ → a
+fin16 ∷ a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (a → (Fin₁₆ → a))))))))))))))))
 fin16 = fin₁₆
--}
 
 type Fin0  = Fin₀
 type Fin1  = Fin₁
@@ -920,9 +913,7 @@ type Fin12 = Fin₁₂
 type Fin13 = Fin₁₃
 type Fin14 = Fin₁₄
 type Fin15 = Fin₁₅
-{-
 type Fin16 = Fin₁₆
--}
 
 instance U.Universe Fin₁
 instance U.Finite   Fin₁
@@ -984,11 +975,9 @@ instance U.Universe Fin₁₅
 instance U.Finite   Fin₁₅
 instance Finite     Fin₁₅
 
-{-
 instance U.Universe Fin₁₆
 instance U.Finite   Fin₁₆
 instance Finite     Fin₁₆
--}
 
 -- TODO deleteme
 instance (Show a, Finite a) ⇒ Show (Predicate a) where
