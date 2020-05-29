@@ -673,7 +673,7 @@ type Fin₁₄ = Fin Nat14
 type Fin₁₅ = Fin Nat15
 type Fin₁₆ = Fin Nat16
 
--- case analysis for `Fin₁` type
+-- "case analysis for `Fin₀` type" :)
 fin₀ ∷ Fin₀ → a
 fin₀ = Fin.absurd
 
