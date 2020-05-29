@@ -31,6 +31,7 @@ endsWith1 = DFA δ False (singleton True)
 endsWithD ∷ DFA Bool Alpha
 endsWithD = contramap h endsWith1
   where
+    -- N.B. partitioning :)
     h ∷ Alpha → Fin₂
     h D = 1
     h _ = 0
