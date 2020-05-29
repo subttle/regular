@@ -16,18 +16,32 @@ import           Data.Eq.Unicode ((≠))
 import           Data.Ord.Unicode ((≤), (≥))
 import           Common ((≰), equating')
 import           Data.Either (fromRight)
-import           Data.Functor.Contravariant (Predicate (..), Equivalence (..))
+import           Data.Functor.Contravariant (contramap, Predicate (..), Equivalence (..))
 import qualified Data.Universe as U (Universe, Finite)
 
 -- A DFA which accepts all binary strings ending in "1"
 endsWith1 ∷ DFA Bool Fin₂
 endsWith1 = DFA δ False (singleton True)
   where
+    -- N.B. if this had been a DFA of type `DFA Bool Bool`
+    -- N.B. then this would be `δ = uncurry (const (id))`
     δ ∷ (Bool, Fin₂) → Bool
-    δ (False, 0) = False
-    δ (False, 1) = True
-    δ (True,  0) = False
-    δ (True,  1) = True
+    δ = uncurry (const (fin₂ False True))
+
+endsWithD ∷ DFA Bool Alpha
+endsWithD = contramap h endsWith1
+  where
+    h ∷ Alpha → Fin₂
+    h D = 1
+    h _ = 0
+
+endsWithEorD ∷ DFA Bool (Either Alpha Alpha)
+endsWithEorD = contramap h endsWith1
+  where
+    h ∷ Either Alpha Alpha → Fin₂
+    h (Left  E) = 1
+    h (Right D) = 1
+    h _         = 0
 
 -- The set of strings which end in "01"
 endsWith01 ∷ NFA.NFA Fin₄ Fin₂
