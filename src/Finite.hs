@@ -861,6 +861,99 @@ fin₁₆ _ _ _ _ _ _ _ _ _ _ _ _ _ a _ _ 13 = a
 fin₁₆ _ _ _ _ _ _ _ _ _ _ _ _ _ _ a _ 14 = a
 fin₁₆ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ a 15 = a
 
+-- FIXME finish idea about partition₀
+
+partition₁ ∷ ∀ f a . (Foldable f) ⇒ (a → Fin₁) → f a → ([a])
+partition₁ cmp = List.foldr select' ([]) . F.toList
+  where
+    select' ∷ a → ([a]) → ([a])
+    select' a ~(eq) = fin₁
+                        (a : eq)
+                      (cmp a)
+
+partition₂ ∷ ∀ f a . (Foldable f) ⇒ (a → Fin₂) → f a → ([a], [a])
+partition₂ cmp = List.foldr select' ([], []) . F.toList
+  where
+    select' ∷ a → ([a], [a]) → ([a], [a])
+    select' a ~(lt, gt) = fin₂
+                            (a : lt,     gt)
+                            (    lt, a : gt)
+                          (cmp a)
+
+partition₃ ∷ ∀ f a . (Foldable f) ⇒ (a → Fin₃) → f a → ([a], [a], [a])
+partition₃ cmp = List.foldr select' ([], [], []) . F.toList
+  where
+    select' ∷ a → ([a], [a], [a]) → ([a], [a], [a])
+    select' a ~(lt, eq, gt) = fin₃
+                                (a : lt,     eq,     gt)
+                                (    lt, a : eq,     gt)
+                                (    lt,     eq, a : gt)
+                              (cmp a)
+
+partition₄ ∷ ∀ f a . (Foldable f) ⇒ (a → Fin₄) → f a → ([a], [a], [a], [a])
+partition₄ cmp = List.foldr select' ([], [], [], []) . F.toList
+  where
+    select' ∷ a → ([a], [a], [a], [a]) → ([a], [a], [a], [a])
+    select' a ~(i, ii, iii, iv) = fin₄
+                                    (a : i,     ii,     iii,     iv)
+                                    (    i, a : ii,     iii,     iv)
+                                    (    i,     ii, a : iii,     iv)
+                                    (    i,     ii,     iii, a : iv)
+                                  (cmp a)
+
+partition₅ ∷ ∀ f a . (Foldable f) ⇒ (a → Fin₅) → f a → ([a], [a], [a], [a], [a])
+partition₅ cmp = List.foldr select' ([], [], [], [], []) . F.toList
+  where
+    select' ∷ a → ([a], [a], [a], [a], [a]) → ([a], [a], [a], [a], [a])
+    select' a ~(i, ii, iii, iv, v) = fin₅
+                                       (a : i,     ii,     iii,     iv,     v)
+                                       (    i, a : ii,     iii,     iv,     v)
+                                       (    i,     ii, a : iii,     iv,     v)
+                                       (    i,     ii,     iii, a : iv,     v)
+                                       (    i,     ii,     iii,     iv, a : v)
+                                     (cmp a)
+partition₆ ∷ ∀ f a . (Foldable f) ⇒ (a → Fin₆) → f a → ([a], [a], [a], [a], [a], [a])
+partition₆ cmp = List.foldr select' ([], [], [], [], [], []) . F.toList
+  where
+    select' ∷ a → ([a], [a], [a], [a], [a], [a]) → ([a], [a], [a], [a], [a], [a])
+    select' a ~(i, ii, iii, iv, v, vi) = fin₆
+                                           (a : i,     ii,     iii,     iv,     v,     vi)
+                                           (    i, a : ii,     iii,     iv,     v,     vi)
+                                           (    i,     ii, a : iii,     iv,     v,     vi)
+                                           (    i,     ii,     iii, a : iv,     v,     vi)
+                                           (    i,     ii,     iii,     iv, a : v,     vi)
+                                           (    i,     ii,     iii,     iv,     v, a : vi)
+                                         (cmp a)
+
+partition₇ ∷ ∀ f a . (Foldable f) ⇒ (a → Fin₇) → f a → ([a], [a], [a], [a], [a], [a], [a])
+partition₇ cmp = List.foldr select' ([], [], [], [], [], [], []) . F.toList
+  where
+    select' ∷ a → ([a], [a], [a], [a], [a], [a], [a]) → ([a], [a], [a], [a], [a], [a], [a])
+    select' a ~(i, ii, iii, iv, v, vi, vii) = fin₇
+                                                (a : i,     ii,     iii,     iv,     v,     vi,     vii)
+                                                (    i, a : ii,     iii,     iv,     v,     vi,     vii)
+                                                (    i,     ii, a : iii,     iv,     v,     vi,     vii)
+                                                (    i,     ii,     iii, a : iv,     v,     vi,     vii)
+                                                (    i,     ii,     iii,     iv, a : v,     vi,     vii)
+                                                (    i,     ii,     iii,     iv,     v, a : vi,     vii)
+                                                (    i,     ii,     iii,     iv,     v,     vi, a : vii)
+                                              (cmp a)
+
+partition₈ ∷ ∀ f a . (Foldable f) ⇒ (a → Fin₈) → f a → ([a], [a], [a], [a], [a], [a], [a], [a])
+partition₈ cmp = List.foldr select' ([], [], [], [], [], [], [], []) . F.toList
+  where
+    select' ∷ a → ([a], [a], [a], [a], [a], [a], [a], [a]) → ([a], [a], [a], [a], [a], [a], [a], [a])
+    select' a ~(i, ii, iii, iv, v, vi, vii, viii) = fin₈
+                                                      (a : i,     ii,     iii,     iv,     v,     vi,     vii,     viii)
+                                                      (    i, a : ii,     iii,     iv,     v,     vi,     vii,     viii)
+                                                      (    i,     ii, a : iii,     iv,     v,     vi,     vii,     viii)
+                                                      (    i,     ii,     iii, a : iv,     v,     vi,     vii,     viii)
+                                                      (    i,     ii,     iii,     iv, a : v,     vi,     vii,     viii)
+                                                      (    i,     ii,     iii,     iv,     v, a : vi,     vii,     viii)
+                                                      (    i,     ii,     iii,     iv,     v,     vi, a : vii,     viii)
+                                                      (    i,     ii,     iii,     iv,     v,     vi,     vii, a : viii)
+                                                    (cmp a)
+
 -- non unicode aliases for convenience
 fin0  ∷                                                                                 Fin₀ → a
 fin0  = fin₀
