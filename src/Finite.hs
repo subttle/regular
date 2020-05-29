@@ -629,6 +629,10 @@ instance (Finite a, Finite b, Finite c, Finite d, Finite e)
   asList ∷ [(a, b, c, d, e)]
   asList = liftM5 (,,,,) asList asList asList asList asList
 
+instance (Finite a, Eq b) ⇒ Eq ((→) a b) where
+  (==) ∷ (a → b) → (a → b) → Bool
+  (==) = flip all asList ‥ (liftA2 (==))
+
 -- Something like Fin₀
 instance Enum Void where
   toEnum ∷ Int → Void
