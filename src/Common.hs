@@ -154,6 +154,9 @@ lowerContraCoyoneda (CCoyoneda h fb) = contramap h fb
 ntContraCoyoneda ∷ (∀ c . (f c → g c)) → ContraCoyoneda f a → ContraCoyoneda g a
 ntContraCoyoneda η (CCoyoneda h fb) = CCoyoneda h (η fb)
 
+foldableToSet ∷ (Foldable t, Ord a) ⇒ t a → Set a
+foldableToSet = Set.fromList . Foldable.toList
+
 -- requires containers-0.5.11 or newer
 -- TODO deleteme after this is closed: https://github.com/roelvandijk/containers-unicode-symbols/issues/6
 (×) ∷ (Ord a, Ord b) ⇒ Set a → Set b → Set (a, b)
