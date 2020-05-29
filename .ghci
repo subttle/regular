@@ -8,3 +8,4 @@ import Data.Functor.Contravariant
 import Data.Functor.Contravariant.Divisible
 import qualified Data.List as List
 import qualified Data.List.NonEmpty as NE
+import qualified Data.Set as Set
