@@ -183,9 +183,9 @@ freegroup n z p (Pos a ga) = p a (freegroup n z p ga)
 instance (Show a) ⇒ Show (FreeGroup a) where
   -- FIXME best way to show entire thing (symbols, etc)
   show ∷ FreeGroup a → String
-  show (Neg a ga) = "(-" <> show a <> "TODO" <> ")" -- FIXME
+  show (Neg a ga) = "(-" <> show a <> " " <> show ga <> ")"
   show Zer        = "0"
-  show (Pos a ga) = "(+" <> show a <> "TODO" <> ")" -- FIXME
+  show (Pos a ga) = "(+" <> show a <> " " <> show ga <> ")"
 
 instance Semigroup (FreeGroup a) where
   (<>) ∷ FreeGroup a → FreeGroup a → FreeGroup a
@@ -203,9 +203,10 @@ instance Group (FreeGroup a) where
 
 instance Functor FreeGroup where
   fmap ∷ (a → b) → FreeGroup a → FreeGroup b
-  fmap f (Neg a ga) = Neg (f a) (fmap f ga)
-  fmap _ Zer        = Zer
-  fmap f (Pos a ga) = Pos (f a) (fmap f ga)
+  -- fmap f (Neg a ga) = Neg (f a) (fmap f ga)
+  -- fmap _  Zer       = Zer
+  -- fmap f (Pos a ga) = Pos (f a) (fmap f ga)
+  fmap f = freegroup (Neg . f) Zer (Pos . f)
 
 instance Foldable FreeGroup where
   -- TODO
