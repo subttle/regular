@@ -446,6 +446,10 @@ applyN = Foldable.foldr (.) id ‥ genericReplicate
 length' ∷ (Foldable f) ⇒ f a → ℕ
 length' = fromIntegral . length
 
+-- A wrapper for `find` which uses `Predicate` type.
+find' ∷ (Foldable f) ⇒ (Predicate a) → f a → Maybe a
+find' (Predicate p) = List.find p
+
 -- A version of List.findIndex which returns `Maybe ℕ` instead of `Maybe Int`
 findIndex' ∷ (a → Bool) → [a] → Maybe ℕ
 findIndex' = fmap fromIntegral ‥ List.findIndex
