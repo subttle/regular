@@ -216,10 +216,9 @@ instance Group (FreeGroup a) where
 
 instance Functor FreeGroup where
   fmap ∷ (a → b) → FreeGroup a → FreeGroup b
-  -- fmap f (Neg a ga) = Neg (f a) (fmap f ga)
-  -- fmap _  Zer       = Zer
-  -- fmap f (Pos a ga) = Pos (f a) (fmap f ga)
-  fmap f = freegroup (Neg . f) Zer (Pos . f)
+  fmap f (Neg a ga) = Neg (f a) (fmap f ga)
+  fmap _  Zer       = Zer
+  fmap f (Pos a ga) = Pos (f a) (fmap f ga)
 
 instance Foldable FreeGroup where
   -- TODO
