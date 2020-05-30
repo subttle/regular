@@ -15,7 +15,7 @@ import           Data.List (unfoldr)
 import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)), (<|))
 import qualified Data.List.NonEmpty as NE
 import           GHC.Real (reduce)
-import           Common ((‥), ordering)
+import           Common ((‥), ordering, quoteWith)
 
 -- N.B. this entire file is currently experimental/untested/WIP!
 
@@ -181,11 +181,24 @@ freegroup _ z _ Zer        = z
 freegroup n z p (Pos a ga) = p a (freegroup n z p ga)
 
 instance (Show a) ⇒ Show (FreeGroup a) where
-  -- FIXME best way to show entire thing (symbols, etc)
   show ∷ FreeGroup a → String
-  show (Neg a ga) = "(-" <> show a <> " " <> show ga <> ")"
-  show Zer        = "0"
-  show (Pos a ga) = "(+" <> show a <> " " <> show ga <> ")"
+  show = show₁
+    where
+      -- (+True (-False 0))
+      show₁ ∷ forall a . (Show a) ⇒ FreeGroup a → String
+      show₁ (Neg a ga) = "(-" <> show a <> " " <> show ga <> ")"
+      show₁ Zer        = "0"
+      show₁ (Pos a ga) = "(+" <> show a <> " " <> show ga <> ")"
+      -- (+True(-False(0)))
+      show₂ ∷ forall a . (Show a) ⇒ FreeGroup a → String
+      show₂ = freegroup ((quoteWith "(-" ")") ‥ shows)
+                        "(0)"
+                        ((quoteWith "(+" ")") ‥ shows)
+      -- (+True)(-False)(0)
+      show₃ ∷ forall a . (Show a) ⇒ FreeGroup a → String
+      show₃ = freegroup (showString . quoteWith "(-" ")" . show)
+                        "(0)"
+                        (showString . quoteWith "(+" ")" . show)
 
 instance Semigroup (FreeGroup a) where
   (<>) ∷ FreeGroup a → FreeGroup a → FreeGroup a
