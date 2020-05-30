@@ -169,56 +169,56 @@ telescope = unfoldr c
 -- TODO https://planetmath.org/freegroup
 -}
 data FreeGroup a where
-  Zer ∷ FreeGroup a
   Neg ∷ a → (FreeGroup a → FreeGroup a)
+  Zer ∷ FreeGroup a
   Pos ∷ a → (FreeGroup a → FreeGroup a)
 
 -- case analysis
-freegroup ∷ b → (a → (b → b)) → (a → (b → b)) → (FreeGroup a → b)
--- freegroup ∷ b → (a → b → b) → (a → b → b) → FreeGroup a → b
-freegroup z _ _ Zer        = z
-freegroup z n p (Neg a ga) = n a (freegroup z n p ga)
-freegroup z n p (Pos a ga) = p a (freegroup z n p ga)
+freegroup ∷ (a → (b → b)) → b → (a → (b → b)) → (FreeGroup a → b)
+-- freegroup ∷ (a → b → b) → b → (a → b → b) → FreeGroup a → b
+freegroup n z p (Neg a ga) = n a (freegroup n z p ga)
+freegroup _ z _ Zer        = z
+freegroup n z p (Pos a ga) = p a (freegroup n z p ga)
 
 instance (Show a) ⇒ Show (FreeGroup a) where
   -- FIXME best way to show entire thing (symbols, etc)
   show ∷ FreeGroup a → String
-  show Zer        = "0"
   show (Neg a ga) = "(-" <> show a <> "TODO" <> ")" -- FIXME
+  show Zer        = "0"
   show (Pos a ga) = "(+" <> show a <> "TODO" <> ")" -- FIXME
 
 instance Semigroup (FreeGroup a) where
   (<>) ∷ FreeGroup a → FreeGroup a → FreeGroup a
+  (<>) (Neg a l) r   = Neg a (l <> r)
   (<>) Zer        r  =             r
   (<>)        l  Zer =        l
   (<>) (Pos a l) r   = Pos a (l <> r)
-  (<>) (Neg a l) r   = Neg a (l <> r)
 instance Monoid (FreeGroup a) where
   mempty ∷ FreeGroup a
   mempty = Zer
 instance Group (FreeGroup a) where
   -- FIXME: untested
   invert ∷ FreeGroup a → FreeGroup a
-  invert = freegroup Zer Pos Neg
+  invert = freegroup Pos Zer Neg
 
 instance Functor FreeGroup where
   fmap ∷ (a → b) → FreeGroup a → FreeGroup b
-  fmap _ Zer        = Zer
   fmap f (Neg a ga) = Neg (f a) (fmap f ga)
+  fmap _ Zer        = Zer
   fmap f (Pos a ga) = Pos (f a) (fmap f ga)
 
 instance Foldable FreeGroup where
   -- TODO
   foldMap ∷ (Monoid m) ⇒ (a → m) → FreeGroup a → m
-  foldMap _ Zer        = mempty
   foldMap f (Neg a ga) = f a <> foldMap f ga
+  foldMap _ Zer        = mempty
   foldMap f (Pos a ga) = f a <> foldMap f ga
 
 instance Traversable FreeGroup where
   -- TODO
   traverse ∷ (Applicative f) ⇒ (a → f b) → FreeGroup a → f (FreeGroup b)
-  traverse _ Zer        = pure Zer
   traverse f (Neg a ga) = Neg <$> f a <*> traverse f ga
+  traverse _ Zer        = pure Zer
   traverse f (Pos a ga) = Pos <$> f a <*> traverse f ga
 
 instance Applicative FreeGroup where
@@ -231,20 +231,19 @@ instance Applicative FreeGroup where
   pure (.) <*> u <*> v <*> w = u <*> (v <*> w) -- Composition
   -}
   pure ∷ a → FreeGroup a
-  -- pure a = Pos a Zer
   pure = flip Pos Zer -- TODO
 
   (<*>) ∷ FreeGroup (a → b) → FreeGroup a → FreeGroup b
   (<*>) = ap
 
 instance Monad FreeGroup where
-  (>>=) ∷ FreeGroup a → (a → FreeGroup b) → FreeGroup b
+  (>>=) ∷ ∀ a b . FreeGroup a → (a → FreeGroup b) → FreeGroup b
   (>>=) = join ‥ (<&>)
     where
-      join ∷ FreeGroup (FreeGroup a) → FreeGroup a
+      join ∷ FreeGroup (FreeGroup b) → FreeGroup b
+      join (Neg gb ggb) = invert gb <> join ggb
       join Zer          = Zer
-      join (Neg ga gga) = invert ga <> join gga
-      join (Pos ga gga) =        ga <> join gga
+      join (Pos gb ggb) =        gb <> join ggb
 
 instance Alternative FreeGroup where
   empty ∷ FreeGroup a
