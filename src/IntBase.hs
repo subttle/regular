@@ -190,7 +190,7 @@ instance (Show a) ⇒ Show (FreeGroup a) where
 instance Semigroup (FreeGroup a) where
   (<>) ∷ FreeGroup a → FreeGroup a → FreeGroup a
   (<>) (Neg a l) r   = Neg a (l <> r)
-  (<>) Zer        r  =             r
+  (<>) Zer       r   =             r
   (<>)        l  Zer =        l
   (<>) (Pos a l) r   = Pos a (l <> r)
 instance Monoid (FreeGroup a) where
