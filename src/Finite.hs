@@ -37,7 +37,7 @@ import           Data.Wedge
 import           Common
 import           GHC.Enum (boundedEnumFrom)
 import           Data.Fin (Fin)
-import qualified Data.Fin as Fin (absurd)
+import qualified Data.Fin as Fin (absurd, toNatural)
 import qualified Data.Type.Nat as Nat
 import           Prelude.Unicode (ℤ)
 import           Numeric.Natural.Unicode (ℕ)
@@ -1046,6 +1046,16 @@ instance U.Universe Fin₇
 instance U.Finite   Fin₇
 instance Finite     Fin₇
 
+-- Addition modulo 8
+instance Semigroup Fin₈ where
+  (<>) ∷ Fin₈ → Fin₈ → Fin₈
+  (<>) = toEnum ‥ (fromIntegral ‥ (flip mod 8 ‥ ((+) `on` Fin.toNatural)))
+instance Monoid Fin₈ where
+  mempty ∷ Fin₈
+  mempty = 0
+instance Group Fin₈ where
+  invert ∷ Fin₈ → Fin₈
+  invert = fin₈ 0 7 6 5 4 3 2 1
 instance U.Universe Fin₈
 instance U.Finite   Fin₈
 instance Finite     Fin₈
