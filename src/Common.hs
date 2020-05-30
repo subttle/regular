@@ -547,7 +547,10 @@ hom = mconcat ‥ fmap
 
 -- Prepend and append quotation marks to a given `String`.
 quotations ∷ String → String
-quotations = ("\"" ++) . (++ "\"")
+quotations = quoteWith "\"" "\""
+
+quoteWith ∷ String → String → (String → String)
+quoteWith l r = (l ++) . (++ r)
 
 -- DFA q s → [((q, s), q)]
 format ∷ (Show c, Show r) ⇒ Map c r → String
