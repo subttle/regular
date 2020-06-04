@@ -20,14 +20,13 @@ import           Data.List as List
 import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)))
 import qualified Data.List.NonEmpty as NE
 import           Data.Maybe (fromJust)
-import           Data.These (These, These(..), these)
+import           Data.These (These, These(..))
 import           Data.These.Combinators (catThese)
 import           Data.Void (Void, absurd)
 import qualified Data.Foldable as F
 import           Data.Function (on)
-import           Data.Functor.Const (Const (..))
 import           Data.Functor.Contravariant
-import           Data.Functor.Contravariant.Divisible (Decidable, Divisible, divide, conquer, choose, lose)
+import           Data.Functor.Contravariant.Divisible (conquer)
 import           Data.Functor.Identity (Identity (..))
 import           Data.Ord (Down (..))
 import           Data.Can (Can)
@@ -690,17 +689,20 @@ fin₀ = Fin.absurd
 -- case analysis for `Fin₁` type
 fin₁ ∷ a → Fin₁ → a
 fin₁ a 0 = a
+fin₁ _ _ = impossible -- add unreachable case to get rid of GHC warning
 
 -- case analysis for `Fin₂` type
 fin₂ ∷ a → a → Fin₂ → a
 fin₂ a _ 0 = a
 fin₂ _ a 1 = a
+fin₂ _ _ _ = impossible -- add unreachable case to get rid of GHC warning
 
 -- case analysis for `Fin₃` type
 fin₃ ∷ a → a → a → Fin₃ → a
 fin₃ a _ _ 0 = a
 fin₃ _ a _ 1 = a
 fin₃ _ _ a 2 = a
+fin₃ _ _ _ _ = impossible -- add unreachable case to get rid of GHC warning
 
 -- case analysis for `Fin₄` type
 fin₄ ∷ a → a → a → a → Fin₄ → a
@@ -708,6 +710,7 @@ fin₄ a _ _ _ 0 = a
 fin₄ _ a _ _ 1 = a
 fin₄ _ _ a _ 2 = a
 fin₄ _ _ _ a 3 = a
+fin₄ _ _ _ _ _ = impossible -- add unreachable case to get rid of GHC warning
 
 -- case analysis for `Fin₅` type
 fin₅ ∷ a → a → a → a → a → Fin₅ → a
@@ -716,6 +719,7 @@ fin₅ _ a _ _ _ 1 = a
 fin₅ _ _ a _ _ 2 = a
 fin₅ _ _ _ a _ 3 = a
 fin₅ _ _ _ _ a 4 = a
+fin₅ _ _ _ _ _ _ = impossible -- add unreachable case to get rid of GHC warning
 
 -- case analysis for `Fin₆` type
 fin₆ ∷ a → a → a → a → a → a → Fin₆ → a
@@ -725,6 +729,7 @@ fin₆ _ _ a _ _ _ 2 = a
 fin₆ _ _ _ a _ _ 3 = a
 fin₆ _ _ _ _ a _ 4 = a
 fin₆ _ _ _ _ _ a 5 = a
+fin₆ _ _ _ _ _ a 5 = impossible -- add unreachable case to get rid of GHC warning
 
 -- case analysis for `Fin₇` type
 fin₇ ∷ a → a → a → a → a → a → a → Fin₇ → a
@@ -735,6 +740,7 @@ fin₇ _ _ _ a _ _ _ 3 = a
 fin₇ _ _ _ _ a _ _ 4 = a
 fin₇ _ _ _ _ _ a _ 5 = a
 fin₇ _ _ _ _ _ _ a 6 = a
+fin₇ _ _ _ _ _ _ _ _ = impossible -- add unreachable case to get rid of GHC warning
 
 -- case analysis for `Fin₈` type
 fin₈ ∷ a → a → a → a → a → a → a → a → Fin₈ → a
@@ -746,6 +752,7 @@ fin₈ _ _ _ _ a _ _ _ 4 = a
 fin₈ _ _ _ _ _ a _ _ 5 = a
 fin₈ _ _ _ _ _ _ a _ 6 = a
 fin₈ _ _ _ _ _ _ _ a 7 = a
+fin₈ _ _ _ _ _ _ _ _ _ = impossible -- add unreachable case to get rid of GHC warning
 
 -- case analysis for `Fin₉` type
 fin₉ ∷ a → a → a → a → a → a → a → a → a → Fin₉ → a
@@ -758,6 +765,7 @@ fin₉ _ _ _ _ _ a _ _ _ 5 = a
 fin₉ _ _ _ _ _ _ a _ _ 6 = a
 fin₉ _ _ _ _ _ _ _ a _ 7 = a
 fin₉ _ _ _ _ _ _ _ _ a 8 = a
+fin₉ _ _ _ _ _ _ _ _ _ _ = impossible -- add unreachable case to get rid of GHC warning
 
 -- case analysis for `Fin₁₀` type
 fin₁₀ ∷ a → a → a → a → a → a → a → a → a → a → Fin₁₀ → a
@@ -771,6 +779,7 @@ fin₁₀ _ _ _ _ _ _ a _ _ _ 6 = a
 fin₁₀ _ _ _ _ _ _ _ a _ _ 7 = a
 fin₁₀ _ _ _ _ _ _ _ _ a _ 8 = a
 fin₁₀ _ _ _ _ _ _ _ _ _ a 9 = a
+fin₁₀ _ _ _ _ _ _ _ _ _ _ _ = impossible -- add unreachable case to get rid of GHC warning
 
 -- case analysis for `Fin₁₁` type
 fin₁₁ ∷ a → a → a → a → a → a → a → a → a → a → a → Fin₁₁ → a
@@ -785,6 +794,7 @@ fin₁₁ _ _ _ _ _ _ _ a _ _ _ 7  = a
 fin₁₁ _ _ _ _ _ _ _ _ a _ _ 8  = a
 fin₁₁ _ _ _ _ _ _ _ _ _ a _ 9  = a
 fin₁₁ _ _ _ _ _ _ _ _ _ _ a 10 = a
+fin₁₁ _ _ _ _ _ _ _ _ _ _ _ _  = impossible -- add unreachable case to get rid of GHC warning
 
 -- case analysis for `Fin₁₂` type
 fin₁₂ ∷ a → a → a → a → a → a → a → a → a → a → a → a → Fin₁₂ → a
@@ -800,6 +810,8 @@ fin₁₂ _ _ _ _ _ _ _ _ a _ _ _ 8  = a
 fin₁₂ _ _ _ _ _ _ _ _ _ a _ _ 9  = a
 fin₁₂ _ _ _ _ _ _ _ _ _ _ a _ 10 = a
 fin₁₂ _ _ _ _ _ _ _ _ _ _ _ a 11 = a
+fin₁₂ _ _ _ _ _ _ _ _ _ _ _ _ _  = impossible -- add unreachable case to get rid of GHC warning
+
 
 -- case analysis for `Fin₁₃` type
 fin₁₃ ∷ a → a → a → a → a → a → a → a → a → a → a → a → a → Fin₁₃ → a
@@ -816,6 +828,7 @@ fin₁₃ _ _ _ _ _ _ _ _ _ a _ _ _ 9  = a
 fin₁₃ _ _ _ _ _ _ _ _ _ _ a _ _ 10 = a
 fin₁₃ _ _ _ _ _ _ _ _ _ _ _ a _ 11 = a
 fin₁₃ _ _ _ _ _ _ _ _ _ _ _ _ a 12 = a
+fin₁₃ _ _ _ _ _ _ _ _ _ _ _ _ _ _  = impossible -- add unreachable case to get rid of GHC warning
 
 -- case analysis for `Fin₁₄` type
 fin₁₄ ∷ a → a → a → a → a → a → a → a → a → a → a → a → a → a → Fin₁₄ → a
@@ -833,6 +846,7 @@ fin₁₄ _ _ _ _ _ _ _ _ _ _ a _ _ _ 10 = a
 fin₁₄ _ _ _ _ _ _ _ _ _ _ _ a _ _ 11 = a
 fin₁₄ _ _ _ _ _ _ _ _ _ _ _ _ a _ 12 = a
 fin₁₄ _ _ _ _ _ _ _ _ _ _ _ _ _ a 13 = a
+fin₁₄ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _  = impossible -- add unreachable case to get rid of GHC warning
 
 -- case analysis for `Fin₁₅` type
 fin₁₅ ∷ a → a → a → a → a → a → a → a → a → a → a → a → a → a → a → Fin₁₅ → a
@@ -851,6 +865,7 @@ fin₁₅ _ _ _ _ _ _ _ _ _ _ _ a _ _ _ 11 = a
 fin₁₅ _ _ _ _ _ _ _ _ _ _ _ _ a _ _ 12 = a
 fin₁₅ _ _ _ _ _ _ _ _ _ _ _ _ _ a _ 13 = a
 fin₁₅ _ _ _ _ _ _ _ _ _ _ _ _ _ _ a 14 = a
+fin₁₅ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _  = impossible -- add unreachable case to get rid of GHC warning
 
 -- case analysis for `Fin₁₆` type
 fin₁₆ ∷ a → a → a → a → a → a → a → a → a → a → a → a → a → a → a → a → Fin₁₆ → a
@@ -870,6 +885,7 @@ fin₁₆ _ _ _ _ _ _ _ _ _ _ _ _ a _ _ _ 12 = a
 fin₁₆ _ _ _ _ _ _ _ _ _ _ _ _ _ a _ _ 13 = a
 fin₁₆ _ _ _ _ _ _ _ _ _ _ _ _ _ _ a _ 14 = a
 fin₁₆ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ a 15 = a
+fin₁₆ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _  = impossible -- add unreachable case to get rid of GHC warning
 
 -- FIXME finish idea about partition₀
 
@@ -1416,8 +1432,8 @@ instance (Show a, Finite a)
       -- ⦍ 1 2 3 ⦐
       -- ⦏ 3 2 1 ⦎
       -- TODO add cycle notation
-      showp ∷ ∀ a. (Show a, Finite a) ⇒ Comparison a → String
-      showp comparison = topline
+      _showp ∷ Comparison a → String -- ∷ ∀ a . (Show a, Finite a) ⇒ Comparison a → String
+      _showp comparison = topline
                       <> "\n"
                       <> botline
         where
@@ -1428,14 +1444,14 @@ instance (Show a, Finite a)
           topline = "⦍" <> (top >>= show) <> "⦐"
           botline = "⦏" <> (bot >>= show) <> "⦎"
       -- show Comparison as a function
-      showf ∷ ∀ a. (Show a, Finite a) ⇒ Comparison a → String
-      showf (Comparison cmp) = unlines (fmap show' graph)
+      _showf ∷ Comparison a → String -- ∷ ∀ a . (Show a, Finite a) ⇒ Comparison a → String
+      _showf (Comparison cmp) = unlines (fmap show'' graph)
         where
           domain ∷ [(a, a)]
           domain = asList
           graph  ∷ [(a, a, Ordering)]
           graph  = fmap (\(a₁, a₂) → (a₁, a₂, a₁ `cmp` a₂)) domain
-          show' (a₁, a₂, o) = show a₁ ++ ", " ++ show a₂ ++ " ↦ " ++ show o
+          show'' (a₁, a₂, o) = show a₁ ++ ", " ++ show a₂ ++ " ↦ " ++ show o
 
 instance (Finite a)
        ⇒ Group (Comparison a) where
@@ -1571,20 +1587,20 @@ instance (Show a, Finite a) ⇒ Show (Equivalence a) where
   show = showl
     where
       -- show an Equivalence as a list of disjoint lists of elements
-      showl ∷ ∀ a. (Show a, Finite a) ⇒ Equivalence a → String
+      showl ∷ Equivalence a → String -- ∷ ∀ a . (Show a, Finite a) ⇒ Equivalence a → String
       showl = show . fmap NE.toList . fromEquivalence
       -- show an Equivalence as a function
-      showf ∷ ∀ a. (Show a, Finite a) ⇒ Equivalence a → String
-      showf (Equivalence (≡)) = unlines (fmap show' graph)
+      _showf ∷ Equivalence a → String -- ∷ ∀ a . (Show a, Finite a) ⇒ Equivalence a → String
+      _showf (Equivalence (≡)) = unlines (fmap show'' graph)
         where
           domain ∷ [(a, a)]
           domain = asList
           graph  ∷ [(a, a, Bool)]
           graph  = fmap (\(a₁, a₂) → (a₁, a₂, a₁ ≡ a₂)) domain
-          show' (a₁, a₂, b) = show a₁ ++ ", " ++ show a₂ ++ " ↦ " ++ show b
+          show'' (a₁, a₂, b) = show a₁ ++ ", " ++ show a₂ ++ " ↦ " ++ show b
       -- show an Equivalence relation as a Ferrer's diagram -- TODO can improve this later, but this works
-      showferrers ∷ ∀ a. (Show a, Finite a) ⇒ Equivalence a → String
-      showferrers e = unlines (sortOn (Down . genericLength) (fmap (fmap (const '*')) parts))
+      _showferrers ∷ Equivalence a → String -- ∷ ∀ a . (Show a, Finite a) ⇒ Equivalence a → String
+      _showferrers e = unlines (sortOn (Down . length') (fmap (fmap (const '*')) parts))
         where
           parts ∷ [[a]]
           parts = fmap NE.toList (fromEquivalence e)
@@ -1679,12 +1695,18 @@ data D₆ where
 
 -- non unicode aliases for convenience
 type D6 = D₆
-side1 = Side₁ ∷ D₆
-side2 = Side₂ ∷ D₆
-side3 = Side₃ ∷ D₆
-side4 = Side₄ ∷ D₆
-side5 = Side₅ ∷ D₆
-side6 = Side₆ ∷ D₆
+side1 ∷ D₆
+side1 = Side₁
+side2 ∷ D₆
+side2 = Side₂
+side3 ∷ D₆
+side3 = Side₃
+side4 ∷ D₆
+side4 = Side₄
+side5 ∷ D₆
+side5 = Side₅
+side6 ∷ D₆
+side6 = Side₆
 
 instance Show D₆ where
   show ∷ D₆ → String
@@ -1807,10 +1829,10 @@ instance Show Quadrant where
   show ∷ Quadrant → String
   show = show'
 -- non unicode aliases for convenience
-type Q1 = Q₁
-type Q2 = Q₂
-type Q3 = Q₃
-type Q4 = Q₄
+type Q1 = 'Q₁
+type Q2 = 'Q₂
+type Q3 = 'Q₃
+type Q4 = 'Q₄
 -- case analysis for `Quadrant` type
 quadrant ∷ a → a → a → a → Quadrant → a
 quadrant i _  _   _  Q₁ = i
@@ -1866,14 +1888,14 @@ instance Show Octant where
   show ∷ Octant → String
   show = show'
 -- non unicode aliases for convenience
-type O1 = O₁
-type O2 = O₂
-type O3 = O₃
-type O4 = O₄
-type O5 = O₅
-type O6 = O₆
-type O7 = O₇
-type O8 = O₈
+type O1 = 'O₁
+type O2 = 'O₂
+type O3 = 'O₃
+type O4 = 'O₄
+type O5 = 'O₅
+type O6 = 'O₆
+type O7 = 'O₇
+type O8 = 'O₈
 -- case analysis for `Octant` type
 octant ∷ a → a → a → a → a → a → a → a → Octant → a
 octant i _  _   _  _ _  _   _    O₁ = i
@@ -2045,7 +2067,7 @@ instance Fancy Card where
   unicode (Card Two   Diamond) = '🃂'
   unicode (Card Two   Club   ) = '🃒'
   plain ∷ Card → String
-  plain (Card rank suit) = plain rank ++ " of " ++ plain suit ++ "s"
+  plain (Card r s) = plain r ++ " of " ++ plain s ++ "s"
 
 instance Show Card where
   show ∷ Card → String
