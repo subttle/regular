@@ -61,7 +61,7 @@ instance (Finite q, Finite s) ⇒ Configuration FA q s (Set q) where
 
   accessible ∷ FA q s → Set q
   accessible m = foldMap (reachable m) (initial m)
-  
+
   delta'' ∷ FA q s → (Set q, [s]) → Set q
   delta'' (FA δ _ _) = uncurry (Prelude.foldl (\states σ → foldMap (\q → δ (q,  σ)) states))
 
@@ -87,7 +87,7 @@ epsilon = FA (const (∅)) (singleton ()) (singleton ())
 
 
 -- Given a symbol, construct an FA which recognizes exactly that symbol and nothing else
-literal ∷ forall s . (Eq s) ⇒ s → FA Bool s
+literal ∷ ∀ s . (Eq s) ⇒ s → FA Bool s
 literal σ' = FA δ (singleton False) (singleton True)
   where
     δ ∷ (Bool, s) → Set Bool
@@ -96,7 +96,7 @@ literal σ' = FA δ (singleton False) (singleton True)
 
 -- Given a set of symbols, construct an FA which recognizes exactly those set of literals and nothing else
 -- Much like a character class of a regular expression.
-fromSet ∷ forall s . (Ord s) ⇒ Set s → FA Bool s
+fromSet ∷ ∀ s . (Ord s) ⇒ Set s → FA Bool s
 fromSet s = FA δ (singleton False) (singleton True)
   where
     δ ∷ (Bool, s) → Set Bool
@@ -105,7 +105,7 @@ fromSet s = FA δ (singleton False) (singleton True)
 
 -- Given two FAs m₁ and m₂, return an FA which recognizes any string from
 -- m₁ immediately followed by any string from m₂
-concatenate ∷ forall q p s . (Ord q, Ord p) ⇒ FA q s → FA p s → FA (Either q p) s
+concatenate ∷ ∀ q p s . (Ord q, Ord p) ⇒ FA q s → FA p s → FA (Either q p) s
 concatenate (FA δ₁ i₁ f₁) (FA δ₂ i₂ f₂) = FA δ (Set.map Left  i₁) (Set.map Right f₂)
   where
     δ ∷ (Either q p, s) → Set (Either q p)
@@ -118,7 +118,7 @@ concatenate (FA δ₁ i₁ f₁) (FA δ₂ i₂ f₂) = FA δ (Set.map Left  i�
 synchronous ∷ (Ord q, Ord p) ⇒ FA q s → FA p s → FA (q, p) s
 synchronous (FA δ₁ i₁ f₁) (FA δ₂ i₂ f₂) = FA (\((q, p), σ) → δ₁ (q, σ) × δ₂ (p, σ)) (i₁ × i₂) (f₁ × f₂)
 
-asynchronous ∷ forall q p s g . (Ord q, Ord p) ⇒ FA q s → FA p g → FA (q, p) (Either s g)
+asynchronous ∷ ∀ q p s g . (Ord q, Ord p) ⇒ FA q s → FA p g → FA (q, p) (Either s g)
 asynchronous (FA δ₁ i₁ f₁) (FA δ₂ i₂ f₂) = FA δ (i₁ × i₂) (f₁ × f₂)
   where
     δ ∷ ((q, p), Either s g) → Set (q, p)
