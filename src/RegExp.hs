@@ -569,16 +569,17 @@ nullable = nullable' . normalize
 -- https://people.mpi-sws.org/~turon/re-deriv.pdf
 -- Theorem 3.1, helper function, "v(r)".
 constant ∷ (Ord s) ⇒ RegExp s → RegExp s
-constant α | nullable α = One
-           | otherwise  = Zero
+constant = bool Zero One . nullable
 
 -- Brzozowski ∂ with respect to σ ∈ Σ
 derivative ∷ (Ord s) ⇒ RegExp s → s → RegExp s
 derivative Zero     _ = zero
 derivative One      _ = zero
 derivative (Lit σ') σ = bool zero one (σ' == σ)
-derivative (α :| β) σ =  derivative α σ + derivative β σ
-derivative (α :. β) σ = (derivative α σ * β) + (constant α * derivative β σ)
+derivative (α :| β) σ =  derivative α σ
+                      +                   derivative β σ
+derivative (α :. β) σ = (derivative α σ *            β  )
+                      + (constant   α   * derivative β σ)
 derivative (Star α) σ =  derivative α σ * star α
 
 -- Brzozowski ∂ extended to strings
