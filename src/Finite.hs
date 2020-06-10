@@ -1594,10 +1594,10 @@ representatives (Equivalence (≡)) = nubBy (≡) asList
 
 -- TODO explore other options to do this?
 equivalenceClass ∷ ∀ a . (Finite a) ⇒ Equivalence a → a → NonEmpty a
-equivalenceClass (Equivalence (≡)) a₁ = NE.insert a₁ (fmap snd (catThese (partitionedBy (Equivalence (≡)) a₁)))
+equivalenceClass eq a₁ = NE.insert a₁ (fmap snd (catThese (partitionedBy eq a₁)))
   where
     -- TODO describe in terms of irreflexive kernel / anti-reflexive kernel?
-    partitionedBy ∷ ∀ a . (Finite a) ⇒ Equivalence a → a → [These a a]
+    partitionedBy ∷ Equivalence a → a → [These a a] -- ∀ a . (Finite a) ⇒ Equivalence a → a → [These a a]
     partitionedBy (Equivalence (≡)) a₁ = fmap f (asList ∷ [a])
       where
         f ∷ a → These a a
