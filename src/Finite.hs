@@ -10,9 +10,10 @@ import           Data.Set as Set
 import           Data.Set.Unicode ((∅))
 import           Data.Set.Ordered (OSet)
 import qualified Data.Set.Ordered as OSet
-import           Data.Foldable.Unicode ((∈), (∋))
-import           Data.Eq.Unicode ((≠))
 import           Data.Bool.Unicode ((∧), (∨))
+import           Data.Eq.Unicode ((≠))
+import           Data.Foldable.Unicode ((∈), (∋))
+import           Data.Ord.Unicode ((≤))
 import           Control.Monad
 import           Control.Applicative
 import           Data.Group (Group, invert)
@@ -1230,6 +1231,29 @@ toRGS (≡) = RGS (fmap (fromEnumBy' (≡) . representative (≡)) asList)
 
 fromRGS ∷ (Finite a) ⇒ RGS a → Equivalence a
 fromRGS (RGS rgs) = equating' (genericIndex rgs . fromEnum')
+
+-- TODO I think I tested this version in GHCI earlier but still need to add to test suit
+-- TODO a lot to rework/clean up here but this works for now
+-- TODO better name?
+-- Checks the following two conditions:
+-- a₁ = 0
+-- and
+-- aᵢ₊₁ ≤ 1 + max (a₁, a₂, ..., aᵢ)
+restricted ∷ Predicate (NonEmpty ℕ)
+restricted = Predicate p
+  where
+    p ∷ NonEmpty ℕ → Bool
+    p (0 :| t) = res
+      where
+        (res, _) = List.foldl check (True, 0) t
+          where
+            check ∷ (Bool, ℕ) → ℕ → (Bool, ℕ)
+            check     (True,  maxₙ) n = (n ≤ maxₙ + 1, max maxₙ n)
+            check ret@(False, _   ) _ = ret
+    p (_ :| _) = False
+    -- p ∷ NonEmpty ℕ → Bool
+    -- p (0 :| t) = fst (List.foldl (uncurry ((bool (const . ((,) False)) ((liftA2 (,) . (≥) . succ) <*> max)))) (True, 0) t)
+    -- p _        = False
 
 -- TODO https://proofwiki.org/wiki/Definition:Cycle_Decomposition
 cycles ∷ (Finite a) ⇒ Comparison a → Equivalence a
