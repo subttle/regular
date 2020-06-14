@@ -50,10 +50,10 @@ instance (Finite q, Finite s) ⇒ Configuration FA q s (Set q) where
   occupied = const id
 
   initial ∷ FA q s → Set q
-  initial (FA _ i _) = i
+  initial = initial
 
   final   ∷ FA q s → Set q
-  final   (FA _ _ f) = f
+  final   = final
 
   (⊢) ∷ FA q s → (Set q, [s]) → (Set q, [s])
   (⊢) _          (states,    []) = (states,                           [])
