@@ -89,7 +89,6 @@ empty = FA (const (∅)) (∅) (∅)
 epsilon ∷ FA () s
 epsilon = FA (const (∅)) (singleton ()) (singleton ())
 
-
 -- Given a symbol, construct an FA which recognizes exactly that symbol and nothing else
 literal ∷ ∀ s . (Eq s) ⇒ s → FA Bool s
 literal σ' = FA δ (singleton False) (singleton True)
@@ -129,8 +128,9 @@ asynchronous (FA δ₁ i₁ f₁) (FA δ₂ i₂ f₂) = FA δ (i₁ × i₂) (f
     δ ((q, p), Left  σ) = δ₁ (q, σ)   × singleton p
     δ ((q, p), Right γ) = singleton q × δ₂ (p, γ)
 
+-- reverse the graph, swap initial and final states
 reversal ∷ (Finite q, Finite s) ⇒ FA q s → FA q s
-reversal m@(FA.FA _ i f) = fromGraph (TG.reverse (toGraph m)) f i
+reversal m = fromGraph (TG.reverse (toGraph m)) (final m) (initial m)
 
 fromGraph ∷ (Finite s, Finite q) ⇒ TG.TG q s → Set q → Set q → FA q s
 fromGraph (TG.TG t) = FA (\(q, s) → postSet q (t s))
