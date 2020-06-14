@@ -47,7 +47,7 @@ instance (Finite q, Finite s) ⇒ Configuration FA q s (Set q) where
   complete                   =                all ((≥ 1) . size') . image
 
   occupied ∷ FA q s → Set q → Set q
-  occupied _ = id
+  occupied = const id
 
   initial ∷ FA q s → Set q
   initial (FA _ i _) = i
