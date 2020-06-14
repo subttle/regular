@@ -62,6 +62,10 @@ instance (Finite q, Finite s) ⇒ Configuration FA q s (Set q) where
   accessible ∷ FA q s → Set q
   accessible m = foldMap (reachable m) (initial m)
 
+  -- TODO unchecked/untested
+  deltaD ∷ FA q s → (Set q, s) → Set q
+  deltaD (FA δ _ _) (states, σ) = foldMap δ (states × singleton σ) -- fst ((⊢) m (states, [σ]))
+
   delta'' ∷ FA q s → (Set q, [s]) → Set q
   delta'' (FA δ _ _) = uncurry (Prelude.foldl (\states σ → foldMap (\q → δ (q,  σ)) states))
 
@@ -154,7 +158,7 @@ codeterminization = reversal . determinization . reversal
 -- minimize with `FA` so there is no need to add extra states when reversing (because of single start state) as with NFA
 -- Brzozowski minimization
 minimize ∷ (Finite q, Finite s) ⇒ FA q s → FA (Set (Set q)) s
-minimize = determinization . reversal . determinization . reversal -- or even `determinization . codeterminization`
+minimize = determinization . codeterminization
 
 deltaToMap ∷ (Finite q, Finite s) ⇒ FA q s → Map (q, s) (Set q)
 deltaToMap m@(FA δ _ _) = Map.fromSet δ (domain m)
