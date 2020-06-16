@@ -394,9 +394,9 @@ testOpenersClosers = and [test₀, test₁, test₂, test₃, test₄, test₅, 
     -- {5, 7}
     expectedTransients ∷ [Fin₉]
     expectedTransients = [4, 6]
-    -- {9}
+    -- {8}
     expectedSingletons ∷ [Fin₉]
-    expectedSingletons = [8]
+    expectedSingletons = [7]
     -- Some assumptions that it shouldn't hurt to test explicitly
     -- TODO also test noncrossing and nonnesting predicates here?
     test₀ ∷ Bool
@@ -421,10 +421,10 @@ testOpenersClosers = and [test₀, test₁, test₂, test₃, test₄, test₅, 
     -- (transients {{1, 4}, {2, 5, 7, 9}, {3, 6}, {8}}) ≟ {5, 7}
     test₆ ∷ Bool
     test₆ = transients figure₂ == expectedTransients
-    -- (singletons {{1, 7, 9}, {2, 5, 6}, {3, 4}, {8}}) ≟ {9}
+    -- (singletons {{1, 7, 9}, {2, 5, 6}, {3, 4}, {8}}) ≟ {8}
     test₇ ∷ Bool
     test₇ = singletons figure₁ == expectedSingletons
-    -- (singletons {{1, 4}, {2, 5, 7, 9}, {3, 6}, {8}}) ≟ {9}
+    -- (singletons {{1, 4}, {2, 5, 7, 9}, {3, 6}, {8}}) ≟ {8}
     test₈ ∷ Bool
     test₈ = singletons figure₂ == expectedSingletons
 -}
