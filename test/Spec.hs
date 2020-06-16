@@ -367,7 +367,7 @@ testCycles = scope "Comparison.Cycles" . expect $ and [test₁, test₂, test₃
 -- https://arxiv.org/abs/0904.1097
 -- Pg 3. Crossings and nestings in set partitions of classical types (v2)
 testOpenersClosers ∷ Bool
-testOpenersClosers = and [test₀, test₁, test₂, test₃, test₄]
+testOpenersClosers = and [test₀, test₁, test₂, test₃, test₄, test₅, test₆, test₇, test₈]
   where
     -- "Figure 1. A non-crossing set partition of [9]."
     -- {{1, 7, 9}, {2, 5, 6}, {3, 4}, {8}}
@@ -391,6 +391,12 @@ testOpenersClosers = and [test₀, test₁, test₂, test₃, test₄]
     -- {4, 5, 6, 7, 9}
     expectedClosers ∷ [Fin₉]
     expectedClosers = [3, 4, 5, 6, 8]
+    -- {5, 7}
+    expectedTransients ∷ [Fin₉]
+    expectedTransients = [4, 6]
+    -- {9}
+    expectedSingletons ∷ [Fin₉]
+    expectedSingletons = [8]
     -- Some assumptions that it shouldn't hurt to test explicitly
     -- TODO also test noncrossing and nonnesting predicates here?
     test₀ ∷ Bool
@@ -409,6 +415,18 @@ testOpenersClosers = and [test₀, test₁, test₂, test₃, test₄]
     -- (closers {{1, 4}, {2, 5, 7, 9}, {3, 6}, {8}}) ≟ {4, 5, 6, 7, 9}
     test₄ ∷ Bool
     test₄ = closers figure₂ == expectedClosers
+    -- (transients {{1, 7, 9}, {2, 5, 6}, {3, 4}, {8}}) ≟ {5, 7}
+    test₅ ∷ Bool
+    test₅ = transients figure₁ == expectedTransients
+    -- (transients {{1, 4}, {2, 5, 7, 9}, {3, 6}, {8}}) ≟ {5, 7}
+    test₆ ∷ Bool
+    test₆ = transients figure₂ == expectedTransients
+    -- (singletons {{1, 7, 9}, {2, 5, 6}, {3, 4}, {8}}) ≟ {9}
+    test₇ ∷ Bool
+    test₇ = singletons figure₁ == expectedSingletons
+    -- (singletons {{1, 4}, {2, 5, 7, 9}, {3, 6}, {8}}) ≟ {9}
+    test₈ ∷ Bool
+    test₈ = singletons figure₂ == expectedSingletons
 -}
 
 -- TODO finish moving test in when easytest works again with latest GHC
