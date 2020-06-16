@@ -467,6 +467,15 @@ elemIndices' = fmap fromIntegral ‥ List.elemIndices
 filter' ∷ (Foldable f) ⇒ Predicate a → f a → [a]
 filter' (Predicate p) = List.filter p . toList
 
+-- An alias for `filter'`
+-- Keeps elements which match the predicate
+include ∷ (Foldable f) ⇒ Predicate a → f a → [a]
+include = filter'
+
+-- Discards elements which match the predicate
+exclude ∷ (Foldable f) ⇒ Predicate a → f a → [a]
+exclude (Predicate p) = List.filter (not . p) . toList
+
 -- A wrapper for `deleteBy` which uses `Equivalence` type.
 deleteBy' ∷ (Foldable f) ⇒ Equivalence a → a → f a → [a]
 deleteBy' (Equivalence (≡)) a = deleteBy (≡) a . toList
