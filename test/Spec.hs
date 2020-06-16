@@ -363,6 +363,53 @@ testCycles = scope "Comparison.Cycles" . expect $ and [test₁, test₂, test₃
     test₃ = cycles c₁ == toEquivalence [0 NE.:| [2, 3], 1 NE.:| [4]]
 
 
+{-
+-- https://arxiv.org/abs/0904.1097
+-- Pg 3. Crossings and nestings in set partitions of classical types (v2)
+testOpenersClosers ∷ Bool
+testOpenersClosers = and [test₀, test₁, test₂, test₃, test₄]
+  where
+    -- "Figure 1. A non-crossing set partition of [9]."
+    -- {{1, 7, 9}, {2, 5, 6}, {3, 4}, {8}}
+    figure₁ ∷ Equivalence Fin₉
+    figure₁ = toEquivalence [ NE.fromList [0, 6, 8] -- {1, 7, 9}
+                            , NE.fromList [1, 4, 5] -- {2, 5, 6}
+                            , NE.fromList [2, 3]    -- {3, 4}
+                            , NE.fromList [7]       -- {8}
+                            ]
+    -- "Figure 2. A non-nesting set partition of [9]."
+    -- {{1, 4}, {2, 5, 7, 9}, {3, 6}, {8}}
+    figure₂ ∷ Equivalence Fin₉
+    figure₂ = toEquivalence [ NE.fromList [0, 3]       -- {1, 4}
+                            , NE.fromList [1, 4, 6, 8] -- {2, 5, 7, 9}
+                            , NE.fromList [2, 5]       -- {3, 6}
+                            , NE.fromList [7]          -- {8}
+                            ]
+    -- {1, 2, 3, 5, 7}
+    expectedOpeners ∷ [Fin₉]
+    expectedOpeners = [0, 1, 2, 4, 6]
+    -- {4, 5, 6, 7, 9}
+    expectedClosers ∷ [Fin₉]
+    expectedClosers = [3, 4, 5, 6, 8]
+    -- Some assumptions that it shouldn't hurt to test explicitly
+    -- TODO also test noncrossing and nonnesting predicates here?
+    test₀ ∷ Bool
+    test₀ = and [ getPredicate lawful figure₁
+                , getPredicate lawful figure₂
+                ]
+    -- (openers {{1, 7, 9}, {2, 5, 6}, {3, 4}, {8}}) ≟ {1, 2, 3, 5, 7}
+    test₁ ∷ Bool
+    test₁ = openers figure₁ == expectedOpeners
+    -- (openers {{1, 4}, {2, 5, 7, 9}, {3, 6}, {8}}) ≟ {1, 2, 3, 5, 7}
+    test₂ ∷ Bool
+    test₂ = openers figure₂ == expectedOpeners
+    -- (closers {{1, 7, 9}, {2, 5, 6}, {3, 4}, {8}}) ≟ {4, 5, 6, 7, 9}
+    test₃ ∷ Bool
+    test₃ = closers figure₁ == expectedClosers
+    -- (closers {{1, 4}, {2, 5, 7, 9}, {3, 6}, {8}}) ≟ {4, 5, 6, 7, 9}
+    test₄ ∷ Bool
+    test₄ = closers figure₂ == expectedClosers
+-}
 
 -- TODO finish moving test in when easytest works again with latest GHC
 -- TODO open ticket for easytest and ghc-8.8.3?
