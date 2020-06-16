@@ -1428,6 +1428,7 @@ toEnumBy' = genericIndex . representatives
 
 representativeC ∷ (Finite a) ⇒ Comparison a → a → a
 representativeC c = genericIndex (comparisonToList c) . fromEnum'
+-- representativeC = getOp . contramap fromEnum' . Op . genericIndex . comparisonToList
 
 -- I mean technically you could :P lol
 equivalenceClassC ∷ (Finite a) ⇒ Comparison a → a → NonEmpty a
@@ -1436,6 +1437,7 @@ equivalenceClassC = pure ‥ representativeC
 -- TODO
 composeC ∷ ∀ a . (Finite a) ⇒ Comparison a → Comparison a → Comparison a
 composeC c₁ c₂ = listToComparison (fmap (representativeC c₁ . representativeC c₂) asList)
+-- composeC c₁ c₂ = listToComparison (flip fmap asList (((.) `on` representativeC) c₁ c₂))
 
 -- Counts the number of possible total orders over a finite set
 cardinalityC ∷ ∀ a . (Finite a) ⇒ Comparison a → ℕ
