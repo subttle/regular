@@ -7,6 +7,7 @@
 module DFA where
 
 import           Prelude             hiding (map)
+import           Data.Bool (bool)
 import           Data.Functor.Contravariant (Contravariant, contramap, Equivalence (..), Predicate (..))
 import           Data.Function (on)
 import qualified Data.List           as List
@@ -378,7 +379,7 @@ fromSet s = DFA δ LT (singleton EQ)
 
 -- TODO untested
 toSet ∷ (Finite q, Finite s) ⇒ DFA q s → Set s
-toSet m@(DFA δ _ _) = foldMap (\(q, σ) → if δ (q, σ) ∈ useful m then singleton σ else (∅)) (useful m × sigma m)
+toSet m@(DFA δ _ _) = foldMap (\(q, σ) → bool (∅) (singleton σ) (δ (q, σ) ∈ useful m)) (useful m × sigma m)
 
 dot ∷ (Finite s) ⇒ DFA Ordering s
 dot = fromSet asSet
