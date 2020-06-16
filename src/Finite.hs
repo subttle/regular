@@ -1607,6 +1607,10 @@ equivalenceClass eq a₁ = NE.insert a₁ (fmap snd (catThese (partitionedBy eq 
         f a₂ | a₁ ≡ a₂  = These a₁ a₂ -- equal by `≡` but not `==`
         f a₂            = That     a₂ -- not equal
 
+-- https://arxiv.org/pdf/math/0601081.pdf
+singletons ∷ ∀ a . (Finite a) ⇒ Equivalence a → [a]
+singletons (≡) = List.filter (\a → (==) (a :| []) (equivalenceClass (≡) a)) asList
+
 -- https://arxiv.org/pdf/0904.1097.pdf
 -- non-maximal elements of the blocks
 openers ∷ ∀ a . (Finite a) ⇒ Equivalence a → [a]
@@ -1616,6 +1620,12 @@ openers (≡) = List.filter (\a → a ≠ maximum (equivalenceClass (≡) a)) as
 -- non-minimal elements of the blocks
 closers ∷ ∀ a . (Finite a) ⇒ Equivalence a → [a]
 closers (≡) = List.filter (\a → a ≠ minimum (equivalenceClass (≡) a)) asList
+
+-- https://arxiv.org/pdf/math/0601081.pdf
+-- neither minimal nor maximal elements of the blocks
+transients ∷ ∀ a . (Finite a) ⇒ Equivalence a → [a]
+transients (≡) = List.filter (\a → a ≠ (maximum (equivalenceClass (≡) a))
+                                 ∧ a ≠ (minimum (equivalenceClass (≡) a))) asList
 
 -- TODO deleteme
 instance (Show a, Finite a) ⇒ Show (Equivalence a) where
