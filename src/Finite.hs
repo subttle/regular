@@ -6,6 +6,7 @@
 
 module Finite where
 
+import           Data.Bool (bool)
 import           Data.Set as Set
 import           Data.Set.Unicode ((∅))
 import           Data.Set.Ordered (OSet)
@@ -1115,14 +1116,13 @@ instance (Show a, Finite a) ⇒ Show (Predicate a) where
   show = showpredset
     where
       -- show predicate as a bitstring
-      showpredbits ∷ ∀ a . (Finite a) ⇒ Predicate a → String
+      showpredbits ∷ Predicate a → String -- ∷ ∀ a . (Finite a) ⇒ Predicate a → String
       showpredbits (Predicate p) = fmap (toBit . p) (asList ∷ [a])
         where
           toBit ∷ Bool → Char
-          toBit False = '0'
-          toBit True  = '1'
+          toBit = bool '0' '1'
       -- show predicate as a function
-      showpredf ∷ ∀ a . (Show a, Finite a) ⇒ Predicate a → String
+      showpredf ∷ Predicate a → String -- ∷ ∀ a . (Show a, Finite a) ⇒ Predicate a → String
       showpredf (Predicate p) = unlines (fmap (\(a, b) → show a <> " ↦ " <> show b) graph)
         where
           domain ∷ [a]
@@ -1132,7 +1132,7 @@ instance (Show a, Finite a) ⇒ Show (Predicate a) where
           graph ∷ [(a, Bool)]
           graph  = zip domain image_
       -- show predicate as a set
-      showpredset ∷ ∀ a . (Show a, Finite a) ⇒ Predicate a → String
+      showpredset ∷ Predicate a → String -- ∷ ∀ a . (Show a, Finite a) ⇒ Predicate a → String
       showpredset (Predicate p) = show (Set' (Set.filter p asSet))
 
 instance (Finite a)
