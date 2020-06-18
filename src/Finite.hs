@@ -1113,7 +1113,7 @@ instance Finite     Fin₁₆
 -- TODO deleteme
 instance (Show a, Finite a) ⇒ Show (Predicate a) where
   show ∷ Predicate a → String
-  show = showpredset
+  show = showcolors
     where
       -- show predicate as a bitstring
       showpredbits ∷ Predicate a → String -- ∷ ∀ a . (Finite a) ⇒ Predicate a → String
@@ -1134,6 +1134,10 @@ instance (Show a, Finite a) ⇒ Show (Predicate a) where
       -- show predicate as a set
       showpredset ∷ Predicate a → String -- ∷ ∀ a . (Show a, Finite a) ⇒ Predicate a → String
       showpredset (Predicate p) = show (Set' (Set.filter p asSet))
+      -- show the elements of 'a', with coloring determined by the predicate
+      showcolors ∷ Predicate a → String --  ∷ ∀ a . (Show a, Finite a) ⇒ Predicate a → String
+      showcolors (Predicate p) = concatMap (\a → bool ((flip toColor) Red' (show a)) ((flip toColor) Green (show a)) (p a)) asList
+
 
 instance (Finite a)
        ⇒ Eq (Predicate a) where
