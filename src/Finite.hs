@@ -216,6 +216,11 @@ class (Finite sigma) ⇒ Σ formalism sigma | formalism → sigma where
   sigmaPlus ∷ formalism → [[sigma]]
   sigmaPlus = const (freeSemigroup asList)
 
+  -- FIXME this works for now...
+  -- Σ⁺ = Σ⋆ \ {ε}, the positive closure (using a `NonEmpty` type for each word)
+  sigmaPlusNE ∷ formalism → [NonEmpty sigma]
+  sigmaPlusNE = const (fmap NE.fromList (freeSemigroup asList))
+
   -- (Σ ∪ {ε})
   sigma_ε ∷ formalism → Set (Maybe sigma)
   sigma_ε = Set.insert Nothing . Set.mapMonotonic Just . sigma
