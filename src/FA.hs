@@ -97,6 +97,20 @@ literal σ' = FA δ (singleton False) (singleton True)
     δ (False, σ) | σ == σ' = singleton True
     δ _                    = (∅)
 
+{-
+-- TODO
+-- Given a symbol, construct an FA which recognizes exactly that symbol and nothing else
+literal ∷ ∀ s . (Eq s) ⇒ s → FA Bool s
+literal = fa (singleton False) (singleton True) . uncurry . (bool (singleton True) (∅) … (flip . ((∨) ‥ (≠))))
+  where
+    fa ∷ Set q → Set q → ((q, s) → Set q) → FA q s
+    fa = flip . (flip FA.FA)
+
+-- TODO
+literal' ∷ ∀ s . Equivalence s → s → FA Bool s
+literal' = undefined
+-}
+
 -- Given a set of symbols, construct an FA which recognizes exactly those set of literals and nothing else
 -- Much like a character class of a regular expression.
 fromSet ∷ ∀ s . (Ord s) ⇒ Set s → FA Bool s
