@@ -9,6 +9,7 @@ import           Data.Function (on, (&))
 import           Data.Functor.Contravariant (contramap, Predicate (..), Op (..))
 import           Numeric.Natural (Natural)
 import           Prelude hiding (even, odd)
+import           Common (quoteWith)
 
 -- N.B. this entire file is currently experimental/untested/WIP!
 
@@ -26,10 +27,7 @@ deriving instance Traversable NatF
 
 instance (Show a) ⇒ Show (NatF a) where
   show ∷ NatF a → String
-  show = natf "ZeroF" (quoted . show)
-    where
-      quoted ∷ String → String
-      quoted = ("(SuccF " ++) . (++ ")")
+  show = natf "ZeroF" ((quoteWith "(SuccF " ")") . show)
 
 instance Applicative NatF where
   pure ∷ a → NatF a
