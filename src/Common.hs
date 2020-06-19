@@ -34,6 +34,7 @@ import           Data.Functor.Foldable (Fix (..), unfix, ListF (..))
 import           Data.Function (on, fix)
 import           Data.Semigroup.Foldable (Foldable1, toNonEmpty)
 import           Data.Semigroup.Traversable (Traversable1)
+import           Data.Tree (Forest, Tree (..))
 import           Data.Void
 import           Data.Bifunctor (bimap)
 import           Control.Applicative (liftA2, liftA3, getZipList, ZipList (..))
@@ -216,6 +217,22 @@ fixedPoint f a            = fixedPoint f (f a)
 fixedPoint' ∷ Equivalence a → (a → a) → a → a
 fixedPoint' (Equivalence (≡)) f a | f a ≡ a = a
 fixedPoint' (Equivalence (≡)) f a           = fixedPoint' (Equivalence (≡)) f (f a)
+
+-- Based on `replicateTree` from http://hackage.haskell.org/package/type-indexed-queues
+-- TODO still can clean this up a bit, but left this way for now on purpose
+replicateTree ∷ ∀ a . ℕ → a → Tree a
+replicateTree 0 a = Node a []
+replicateTree n a = Node a forest
+  where
+    forest ∷ Forest a
+    forest = bool ((replicateTree ((n - 1) -  m * lm) a : genericReplicate lm (replicateTree m a)))
+                  (                                       genericReplicate lm (replicateTree m a) )
+                                  ((n - 1) == m * lm)
+      where
+        m ∷ ℕ
+        m = head [y | y ← [1 ..],  (n - 1) ≤  y * y]
+        lm ∷ ℕ
+        lm =                       (n - 1) `div` m
 
 -- `replicateM` with parameter of type ℕ (instead of parameter of type ℤ)
 -- TODO replicateM' = natf (const (pure [])) ((<*>) (liftA2 (:)) . replicateM' . pred)
