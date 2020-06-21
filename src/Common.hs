@@ -311,7 +311,7 @@ allNoneSome ∷ Predicate a → (NonEmpty a → These (NonEmpty a) (NonEmpty a))
 allNoneSome = partitionEithersNE ‥ filter''
   where
     filter'' ∷ Predicate a → NonEmpty a → NonEmpty (Either a a)
-    filter'' (Predicate p) = fmap (liftA3 bool Left Right p)
+    filter'' = fmap . liftA3 bool Left Right . getPredicate
 
 
 -- A more general version of `lefts` from `Data.Either`
@@ -340,7 +340,7 @@ generate = NE.unfoldr c (pure 2)
           where
             -- TODO memoize me, clean up tree version and use that
             f ∷ ℕ → NonEmpty ℕ
-            f n = NE.fromList (List.genericReplicate (n - 1) n) <> pure (n Prelude.+ 1)
+            f n = NE.fromList (List.genericReplicate (n - 1) n) ⋄ pure (n + 1)
 
 -- partitions of a list
 -- partitions [0..2] = [ [[0],[1],[2]]
