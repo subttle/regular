@@ -34,7 +34,7 @@ import           Data.Functor.Foldable (Fix (..), unfix, ListF (..))
 import           Data.Function (on, fix)
 import           Data.Semigroup.Foldable (Foldable1, toNonEmpty)
 import           Data.Semigroup.Traversable (Traversable1)
-import           Data.Tree (Forest, Tree (..))
+import           Data.Tree (Forest, Tree (..), unfoldTree)
 import           Data.Void
 import           Data.Bifunctor (bimap)
 import           Control.Applicative (liftA2, liftA3, getZipList, ZipList (..))
@@ -328,7 +328,7 @@ unionLefts  = Set.mapMonotonic (fromLeft  undefined) . Set.filter isRight -- Set
 unionRights ∷ (Ord b) ⇒ Set (Either a b) → Set b
 unionRights = Set.mapMonotonic (fromRight undefined) . Set.filter isLeft  -- Set.dropWhileAntitone isLeft -- TODO can I use `dropWhileAntitone` here to improve efficiency? is ordering needed on `Either a b`?
 
--- generate set partitions tree (for now in list form)
+-- generate set partitions tree (using nonempty lists)
 generate ∷ NonEmpty (NonEmpty ℕ)
 generate = NE.unfoldr c (pure 2)
   where
@@ -341,6 +341,16 @@ generate = NE.unfoldr c (pure 2)
             -- TODO memoize me, clean up tree version and use that
             f ∷ ℕ → NonEmpty ℕ
             f n = NE.fromList (List.genericReplicate (n - 1) n) ⋄ pure (n + 1)
+
+-- N.B. this does not terminate!
+-- unfold the set partitions tree
+-- TODO should be able to test that taking the length of the list
+-- TODO indexed at level `n` should correspond to `bell (n + 1)`
+generate' ∷ Tree ℕ
+generate' = unfoldTree c 2
+  where
+    c ∷ ℕ → (ℕ, [ℕ])
+    c n = (n, List.genericReplicate (n - 1) n ⋄ pure (n + 1))
 
 -- partitions of a list
 -- partitions [0..2] = [ [[0],[1],[2]]
