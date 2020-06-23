@@ -352,6 +352,16 @@ generate' = unfoldTree c 2
     c ∷ ℕ → (ℕ, [ℕ])
     c n = (n, List.genericReplicate (n - 1) n ⋄ pure (n + 1))
 
+-- TODO
+generate'' ∷ ℕ → Tree (ℕ, ℕ)
+generate'' restriction = unfoldTree c (0, 2)
+  where
+    c ∷ (ℕ, ℕ) → ((ℕ, ℕ), [(ℕ, ℕ)])
+    c (l, n) = (,) (l + 1, n) (bool (fmap (bimap (+ 1) id . ((,) l)) ns) mempty ((==) l restriction))
+      where
+        ns ∷ [ℕ]
+        ns = List.genericReplicate (n - 1) n ⋄ pure (n + 1)
+
 -- partitions of a list
 -- partitions [0..2] = [ [[0],[1],[2]]
 --                     , [[0],[1,2]]
