@@ -341,6 +341,30 @@ generate = NE.unfoldr c (pure 2)
             -- TODO memoize me, clean up tree version and use that
             f ∷ ℕ → NonEmpty ℕ
             f n = NE.fromList (List.genericReplicate (n - 1) n) ⋄ pure (n + 1)
+            {-
+            -- TODO in opposite order
+            f ∷ ℕ → NonEmpty ℕ
+            -- f n = (n + 1) :| (genericReplicate (n - 1) n)
+            -- f n = (:|) (n + 1) (genericReplicate (n - 1) n)
+            -- f n = (:|) ((+ 1) n) (genericReplicate (n - 1) n)
+            -- f n = (:|) (succ n) (genericReplicate (pred n) n)
+            -- f = liftA2 (:|) succ (genericReplicate =<< pred)
+            -- f = liftA2 (:|) succ (pred >>= genericReplicate)
+            f = liftA2 (:|) succ (pred >>= genericReplicate)
+            -}
+{-
+import           Control.Monad (join, replicateM)
+
+-- generate set partitions tree (using nonempty lists)
+generate ∷ NonEmpty (NonEmpty ℕ)
+generate = NE.unfoldr c (pure 2)
+  where
+    c ∷ NonEmpty ℕ → (NonEmpty ℕ, Maybe (NonEmpty ℕ))
+    c = fmap Just . (bimap f f . join (,))
+      where
+        f ∷ NonEmpty ℕ → NonEmpty ℕ
+        f = (=<<) (liftA2 (:|) succ (pred >>= genericReplicate))
+-}
 
 -- N.B. this does not terminate!
 -- unfold the set partitions tree
@@ -351,6 +375,17 @@ generate' = unfoldTree c 2
   where
     c ∷ ℕ → (ℕ, [ℕ])
     c n = (n, List.genericReplicate (n - 1) n ⋄ pure (n + 1))
+{-
+-- TODO
+generate' ∷ Tree ℕ
+generate' = unfoldTree c 2
+  where
+    c ∷ ℕ → (ℕ, [ℕ])
+    c = (,) <*> (liftA2 (:) succ (pred >>= genericReplicate))
+-- or
+generate' ∷ Tree ℕ
+generate' = unfoldTree ((,) <*> (liftA2 (:) succ (pred >>= genericReplicate))) 2
+-}
 
 -- TODO
 generate'' ∷ ℕ → Tree (ℕ, ℕ)
@@ -582,6 +617,7 @@ skeleton = mapWithIndex const
 
 mapWithIndex ∷ (Traversable t) ⇒ (ℕ → a → b) → t a → t b
 mapWithIndex f = snd . mapAccumL (((.) . (,) . (1 +)) <*> f) 0
+-- mapWithIndex = snd ‥ (flip mapAccumL 0 . ((<*>) ((.) . (,) . succ))) -- TODO need to check
 
 -- If using this, may want to consider using uniform-pair
 -- https://github.com/conal/uniform-pair
