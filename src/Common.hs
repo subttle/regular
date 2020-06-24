@@ -396,6 +396,17 @@ generate'' restriction = unfoldTree c (0, 2)
       where
         ns ∷ [ℕ]
         ns = List.genericReplicate (n - 1) n ⋄ pure (n + 1)
+{-
+generate'' ∷ ℕ → Tree (ℕ, ℕ)
+generate'' restriction = unfoldTree c (0, 2)
+  where
+    c ∷ (ℕ, ℕ) → ((ℕ, ℕ), [(ℕ, ℕ)])
+    c (l, n) = (,) ((,) (succ l)  $  n )
+                   ((,) (succ l) <$> ns)
+      where
+        ns ∷ [ℕ]
+        ns = bool ((:) (succ n) (genericReplicate (pred n) n)) [] ((==) l restriction)
+-}
 
 -- partitions of a list
 -- partitions [0..2] = [ [[0],[1],[2]]
