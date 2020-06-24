@@ -408,6 +408,25 @@ generate'' restriction = unfoldTree c (0, 2)
         ns = bool ((:) (succ n) (genericReplicate (pred n) n)) [] ((==) l restriction)
 -}
 
+-- TODO have a few variants of this but this is the main theme
+generate''' ∷ ℕ → Tree ((ℕ, ℕ), ℕ)
+generate''' restriction = unfoldTree c ((0, 2), 0)
+  where
+    c ∷ ((ℕ, ℕ), ℕ) → (((ℕ, ℕ), ℕ), [((ℕ, ℕ), ℕ)])
+    c ((l, n), i) = (((succ l, n), i), ns'')
+      where
+        -- N.B. this is backwards :P
+        -- add index
+        ns'' ∷ [((ℕ, ℕ), ℕ)]
+        ns'' = indexed ns'
+          where
+            -- add level
+            ns' ∷ [(ℕ, ℕ)]
+            ns' = (,) (succ l) <$> ns
+              where
+                ns ∷ [ℕ]
+                ns = bool ((:) (succ n) (genericReplicate (pred n) n)) [] ((==) l restriction)
+
 -- partitions of a list
 -- partitions [0..2] = [ [[0],[1],[2]]
 --                     , [[0],[1,2]]
