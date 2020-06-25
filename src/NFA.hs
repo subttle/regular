@@ -81,8 +81,8 @@ instance (Finite q, Finite s) ⇒ Configuration NFA q s (Set q) where
 
   -- Given an NFA, m, and a configuration, return what it yields in one step
   (⊢) ∷ NFA q s → (Set q, [s]) → (Set q, [s])
-  (⊢) _           (states,    []) = (states,                           [])
-  (⊢) (NFA δ _ _) (states, σ : w) = (foldMap δ (states × singleton σ),  w)
+  (⊢) _           (states,     []) = (           states               , [])
+  (⊢) (NFA δ _ _) (states, σ : w ) = (foldMap δ (states × singleton σ), w )
 
   accessible ∷ NFA q s → Set q
   accessible m@(NFA _ q₀ _) = reachable m q₀
@@ -175,9 +175,9 @@ concatenate (NFA δ₁ q₀ f₁) (NFA δ₂ p₀ f₂) = NFA δ (Left q₀) (Se
   where
     δ ∷ (Either q p, s) → Set (Either q p)
     -- if this state, q, is a final state, merge q's transitions with p₀'s transitions
-    δ (Left  q, σ) | q ∈ f₁ =               δ₁ (q, σ) ⊎ δ₂ (p₀, σ)  -- merge any last state of m₁ with p₀
-    δ (Left  q, σ)          = Set.map Left (δ₁ (q, σ))
-    δ (Right p, σ)          =            Set.map Right (δ₂ (p,  σ))
+    δ (Left  q, σ) | q ∈ f₁ = δ₁ (q, σ) ⊎ δ₂ (p₀, σ)  -- merge any last state of m₁ with p₀
+    δ (Left  q, σ)          = δ₁ (q, σ) ⊎ (∅)
+    δ (Right p, σ)          = (∅)       ⊎ δ₂ (p , σ)
 
 -- The product construction
 -- Essentially this runs two NFAs (which both share the same alphabet) "in parallel" together in lock step
