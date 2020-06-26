@@ -736,7 +736,7 @@ fin₆ _ _ a _ _ _ 2 = a
 fin₆ _ _ _ a _ _ 3 = a
 fin₆ _ _ _ _ a _ 4 = a
 fin₆ _ _ _ _ _ a 5 = a
-fin₆ _ _ _ _ _ a 5 = impossible -- add unreachable case to get rid of GHC warning
+fin₆ _ _ _ _ _ _ _ = impossible -- add unreachable case to get rid of GHC warning
 
 -- case analysis for `Fin₇` type
 fin₇ ∷ a → a → a → a → a → a → a → Fin₇ → a
