@@ -127,9 +127,9 @@ concatenate (FA δ₁ i₁ f₁) (FA δ₂ i₂ f₂) = FA δ (Set.map Left  i�
   where
     δ ∷ (Either q p, s) → Set (Either q p)
     -- if this state, q, is a final state, merge q's transitions with p₀'s transitions
-    δ (Left  q, σ) | q ∈ f₁ =               δ₁ (q, σ) ⊎ foldMap (\p₀ → δ₂ (p₀, σ)) i₂  -- merge any last state of m₁ with p₀
-    δ (Left  q, σ)          = Set.map Left (δ₁ (q, σ))
-    δ (Right p, σ)          =                           Set.map Right (δ₂ (p,  σ))
+    δ (Left  q, σ) | q ∈ f₁ = (δ₁ (q, σ)) ⊎ foldMap (\p₀ → δ₂ (p₀, σ)) i₂  -- merge any last state of m₁ with p₀
+    δ (Left  q, σ)          = (δ₁ (q, σ)) ⊎ (∅)
+    δ (Right p, σ)          = (∅)         ⊎ (δ₂ (p,  σ))
 
 -- The product construction
 synchronous ∷ (Ord q, Ord p) ⇒ FA q s → FA p s → FA (q, p) s
