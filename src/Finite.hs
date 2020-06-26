@@ -2262,6 +2262,14 @@ color = colorOf . suit
 -- f x ≡ f⁻¹ x
 -- or, equivalently,
 -- f (f x) ≡ x
+-- FIXME need to make this:
+-- FIXME `⇒ NonEmpty (Either a b) → (a → b) → (b → a) → Bool`
+-- FIXME so as to avoid:
+-- FIXME ```
+-- FIXME λ> involution [] id (const False)
+-- FIXME True
+-- FIXME ```
+-- FIXME (but I want to address EasyTest problem first)
 involution
   ∷ ∀ a b . (Eq a, Eq b)
   ⇒ [Either a b] → (a → b) → (b → a) → Bool
