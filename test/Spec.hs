@@ -16,7 +16,7 @@ import qualified Language
 import           Common
 import           Finite
 import           Examples (by3, by5, by5', minimal, ab, cd)
-import           Data.Set (singleton)
+import           Data.Set (Set, singleton)
 import           Config
 import           Numeric.Natural.Unicode (ℕ)
 import           Data.Bool (bool)
@@ -25,7 +25,7 @@ import           Data.Functor.Contravariant (contramap, Equivalence (..), Compar
 import qualified Data.Group as G
 import           EasyTest (Test, tests, scope, expect, run)
 import qualified Data.List as List
-import qualified Data.List.NonEmpty as NE (NonEmpty(..))
+import qualified Data.List.NonEmpty as NE (NonEmpty (..), fromList)
 import           Data.Either (isRight, isLeft, lefts)
 
 main ∷ IO ()
@@ -41,6 +41,7 @@ suite = tests [ testFizzBuzz
               , testDFArquotient
               , testDFAinvhomimage
               , testRESubstitution
+              , testREDropout
               , testDFAPerfectShuffle
               , testNFAshuffle
               , testBisimSubset (by5, DFA.toLanguage by5) (List.take 101 (freeMonoid asList))
@@ -51,6 +52,7 @@ suite = tests [ testFizzBuzz
               , testComposeC
               , testGroupInvert
               , testCycles
+              , testOpenersClosers
               ]
 
 -- Test that ordinary FizzBuzz has the same output as the FizzBuzz which uses DFA
@@ -155,11 +157,11 @@ testREDropout = scope "RE.dropout" . expect $ and [test₁, test₂]
   where
     -- ℒ (A·(B·C)) ≟ {"AB", "AC", "BC"}
     test₁ ∷ Bool
-    test₁ = expected == language (expression')
+    test₁ = expected == RE.language (expression')
       where
         -- ℒ (ε·(B·C) ∣ A·(ε·C ∣ B·ε)) = {"AB", "AC", "BC"}
         expression' ∷ RegExp Alpha
-        expression' = dropout expression
+        expression' = RE.dropout expression
           where
             -- A·(B·C) is the regular expression such that
             -- ℒ (A·(B·C))             = {"ABC"}
@@ -173,11 +175,11 @@ testREDropout = scope "RE.dropout" . expect $ and [test₁, test₂]
                    ]
     -- ℒ (D ∣ (A·(B·C) ∣ E·F)) ≟ {"", "AB", "AC", "BC", "E", "F"}
     test₂ ∷ Bool
-    test₂ = expected == language (expression')
+    test₂ = expected == RE.language (expression')
       where
         -- ℒ (ε ∣ ((ε·(B·C) ∣ A·(ε·C ∣ B·ε)) ∣ (ε·F ∣ E·ε)))
         expression' ∷ RegExp Alpha
-        expression' = dropout expression
+        expression' = RE.dropout expression
           where
             -- ℒ (D ∣ (A·(B·C) ∣ E·F)) = {"ABC", "D", "EF"}
             expression  ∷ RegExp Alpha
@@ -363,11 +365,10 @@ testCycles = scope "Comparison.Cycles" . expect $ and [test₁, test₂, test₃
     test₃ = cycles c₁ == toEquivalence [0 NE.:| [2, 3], 1 NE.:| [4]]
 
 
-{-
 -- https://arxiv.org/abs/0904.1097
 -- Pg 3. Crossings and nestings in set partitions of classical types (v2)
-testOpenersClosers ∷ Bool
-testOpenersClosers = and [test₀, test₁, test₂, test₃, test₄, test₅, test₆, test₇, test₈]
+testOpenersClosers ∷ Test ()
+testOpenersClosers = scope "Equivalence.OpenersClosers" . expect $ and [test₀, test₁, test₂, test₃, test₄, test₅, test₆, test₇, test₈]
   where
     -- "Figure 1. A non-crossing set partition of [9]."
     -- {{1, 7, 9}, {2, 5, 6}, {3, 4}, {8}}
@@ -427,10 +428,8 @@ testOpenersClosers = and [test₀, test₁, test₂, test₃, test₄, test₅, 
     -- (singletons {{1, 4}, {2, 5, 7, 9}, {3, 6}, {8}}) ≟ {8}
     test₈ ∷ Bool
     test₈ = singletons figure₂ == expectedSingletons
--}
 
--- TODO finish moving test in when easytest works again with latest GHC
--- TODO open ticket for easytest and ghc-8.8.3?
+-- TODO finish moving test
 {-
 
 import           Control.Comonad

@@ -91,7 +91,7 @@ test-suite regular-test
   build-depends:       base
                      , containers >= 0.5.11.0
                      , regular
-                     , easytest
+                     , easytest >= 0.1
                      , base-unicode-symbols
                      , groups
   ghc-options:         -threaded
