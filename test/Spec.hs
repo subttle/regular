@@ -32,32 +32,32 @@ main ∷ IO ()
 main = run suite
 
 suite ∷ Test ()
-suite = tests [ testFizzBuzz
-              , scope "DFA.empty"     . expect $ Config.language DFA.empty          == ([]   ∷ [[Bool]])
-              , scope "DFA.epsilon"   . expect $ Config.language DFA.epsilon        == ([[]] ∷ [[Bool]])
-              , scope "DFA.literal"   . expect $ Config.language (DFA.literal True) == [[True]]
-              , scope "DFA.quotient"  . expect $ minimal `DFA.equal` quotient minimal && size' (useful (quotient minimal)) < size' (useful minimal)
-              , scope "DFA.toRE"      . expect $ toRE by5 `RE.equivalent` by5'
-              , testDFArquotient
-              , testDFAinvhomimage
-              , testRESubstitution
-              , testREDropout
-              , testDFAPerfectShuffle
-              , testNFAshuffle
-              , testBisimSubset (by5, DFA.toLanguage by5) (List.take 101 (freeMonoid asList))
+suite = tests [ scope "main.FizzBuzz"              . expect $ testFizzBuzz
+              , scope "DFA.empty"                  . expect $ Config.language DFA.empty          == ([]   ∷ [[Bool]])
+              , scope "DFA.epsilon"                . expect $ Config.language DFA.epsilon        == ([[]] ∷ [[Bool]])
+              , scope "DFA.literal"                . expect $ Config.language (DFA.literal True) == [[True]]
+              , scope "DFA.quotient"               . expect $ minimal `DFA.equal` quotient minimal && size' (useful (quotient minimal)) < size' (useful minimal)
+              , scope "DFA.toRE"                   . expect $ toRE by5 `RE.equivalent` by5'
+              , scope "DFA.rquotient"              . expect $ testDFArquotient
+              , scope "DFA.invhomimage"            . expect $ testDFAinvhomimage
+              , scope "RE.>>="                     . expect $ testRESubstitution
+              , scope "RE.dropout"                 . expect $ testREDropout
+              , scope "DFA.perfectShuffle"         . expect $ testDFAPerfectShuffle
+              , scope "NFA.shuffle"                . expect $ testNFAshuffle
+              , scope "bisim"                      . expect $ testBisimSubset (by5, DFA.toLanguage by5) (List.take 101 (freeMonoid asList))
               -- "For example, the restricted growth function 0,1,1,2,0,3,1 defines the set partition {{1,5}, {2,3,7}, {4}, {6}}"
               -- https://www8.cs.umu.se/kurser/TDBAfl/VT06/algorithms/BOOK/BOOK4/NODE153.HTM
-              , scope "toRGS"         . expect $ toRGS (toEquivalence [0 NE.:| [4], 1 NE.:| [2, 6], 3 NE.:| [], 5 NE.:| []]) == (RGS [0, 1, 1, 2, 0, 3, 1] ∷ RGS Fin₇)
-              , scope "RGS"           . expect $ bijection (toRGS @ Suit) (fromRGS @ Suit) -- bijection (toRGS ∷ Equivalence Suit → RGS Suit) (fromRGS ∷ RGS Suit → Equivalence Suit)
-              , testComposeC
-              , testGroupInvert
-              , testCycles
-              , testOpenersClosers
+              , scope "toRGS"                      . expect $ toRGS (toEquivalence [0 NE.:| [4], 1 NE.:| [2, 6], 3 NE.:| [], 5 NE.:| []]) == (RGS [0, 1, 1, 2, 0, 3, 1] ∷ RGS Fin₇)
+              , scope "RGS"                        . expect $ bijection (toRGS @ Suit) (fromRGS @ Suit) -- bijection (toRGS ∷ Equivalence Suit → RGS Suit) (fromRGS ∷ RGS Suit → Equivalence Suit)
+              , scope "Comparison.Compose"         . expect $ testComposeC
+              , scope "Comparison.Invert"          . expect $ testGroupInvert
+              , scope "Comparison.Cycles"          . expect $ testCycles
+              , scope "Equivalence.OpenersClosers" . expect $ testOpenersClosers
               ]
 
 -- Test that ordinary FizzBuzz has the same output as the FizzBuzz which uses DFA
-testFizzBuzz ∷ Test ()
-testFizzBuzz = scope "main.FizzBuzz" . expect $ woDFA == wDFA
+testFizzBuzz ∷ Bool
+testFizzBuzz = woDFA == wDFA
   where
     -- FizzBuzz (without DFA)
     woDFA ∷ [String]
@@ -91,8 +91,8 @@ testFizzBuzz = scope "main.FizzBuzz" . expect $ woDFA == wDFA
                    | otherwise = show n
 
 -- https://math.stackexchange.com/questions/871662/finding-right-quotient-of-languages
-testDFArquotient ∷ Test ()
-testDFArquotient = scope "DFA.rquotient" . expect $ and e₃Tests
+testDFArquotient ∷ Bool
+testDFArquotient = and e₃Tests
   where
     -- L₁ = {"carrot"}
     e₃L₁ ∷ DFA Fin₈ Alpha
@@ -122,8 +122,8 @@ testDFArquotient = scope "DFA.rquotient" . expect $ and e₃Tests
               , Prelude.take 2 (Config.language e₃L₁L₂) == [[C, A, R, R], [C, A, R, R, O]]
               ]
 
-testDFAinvhomimage ∷ Test ()
-testDFAinvhomimage = scope "DFA.invhomimage" . expect $ same
+testDFAinvhomimage ∷ Bool
+testDFAinvhomimage = same
   where
     same ∷ Bool
     same = DFA.invhomimage h slide22 `DFA.equal` expected
@@ -152,8 +152,8 @@ testDFAinvhomimage = scope "DFA.invhomimage" . expect $ same
             δ (2, False) = 2
             δ (2, True ) = 2
 
-testREDropout ∷ Test ()
-testREDropout = scope "RE.dropout" . expect $ and [test₁, test₂]
+testREDropout ∷ Bool
+testREDropout = and [test₁, test₂]
   where
     -- ℒ (A·(B·C)) ≟ {"AB", "AC", "BC"}
     test₁ ∷ Bool
@@ -197,8 +197,8 @@ testREDropout = scope "RE.dropout" . expect $ and [test₁, test₂]
 -- Substitution
 -- A Second Course in Formal Languages and Automata Theory (Pg 55, Example 3.3.4)
 -- s(101) = (cd)*(a+ab)*(cd)*
-testRESubstitution ∷ Test ()
-testRESubstitution = scope "RE.>>=" . expect $ result == expected -- N.B. the use of structural equality is intentional here
+testRESubstitution ∷ Bool
+testRESubstitution = result == expected -- N.B. the use of structural equality is intentional here
   where
     original ∷ RegExp Fin₂
     original = RE.fromList [1, 0, 1]
@@ -216,8 +216,8 @@ testRESubstitution = scope "RE.>>=" . expect $ result == expected -- N.B. the us
             :.  Star (         RE.fromList [2, 3]))
 
 -- Example from: https://courses.engr.illinois.edu/cs373/fa2010/Exams/midterm1sol.pdf
-testDFAPerfectShuffle ∷ Test ()
-testDFAPerfectShuffle = scope "DFA.perfectShuffle" . expect $ l == expected
+testDFAPerfectShuffle ∷ Bool
+testDFAPerfectShuffle = l == expected
   where    
     -- {"1010"}
     l ∷ [[Fin₂]]
@@ -247,8 +247,8 @@ testDFAPerfectShuffle = scope "DFA.perfectShuffle" . expect $ l == expected
 -- TODO
 -- Shuffle
 -- A Second Course in Formal Languages and Automata Theory (Pg 57, Example 3.3.8)
-testNFAshuffle ∷ Test ()
-testNFAshuffle = scope "NFA.shuffle" . expect $ and [test]
+testNFAshuffle ∷ Bool
+testNFAshuffle = and [test]
   where
     ab_cd ∷ [[Alpha]]
     ab_cd = fmap (fmap abcdh) (Config.language abcd')
@@ -288,8 +288,8 @@ testBisimSubset ∷ forall q s automaton p
                 . (Finite q, Finite s, Configuration automaton q s p)
                 ⇒ (automaton q s, ℒ s)
                 → [[s]]
-                → Test ()
-testBisimSubset (m, ℓ) subset = scope "bisim" . expect $ isBisim
+                → Bool
+testBisimSubset (m, ℓ) subset = isBisim
   where
     -- try to partition, into two parts, (a subset/sample of) Σ⋆:
     -- words tagged with `Right` (ℒ₁ ≡ ℒ₂)
@@ -315,8 +315,8 @@ testBisimSubset (m, ℓ) subset = scope "bisim" . expect $ isBisim
     _negationProof = lefts witnesses
 
 -- Composition of permutations
-testComposeC ∷ Test ()
-testComposeC = scope "Comparison.Compose" . expect $ and [test₁, test₂, test₃]
+testComposeC ∷ Bool
+testComposeC = and [test₁, test₂, test₃]
   where
     -- https://en.wikipedia.org/wiki/Permutation_group#Composition_of_permutations%E2%80%93the_group_product
     (p, q) = (listToComparison [1, 3, 0, 2, 4], listToComparison [4, 3, 2, 1, 0]) ∷ (Comparison Fin₅, Comparison Fin₅)
@@ -340,8 +340,8 @@ testComposeC = scope "Comparison.Compose" . expect $ and [test₁, test₂, test
     test₃ = comparisonToList c₄ == [3, 1, 0, 2]
 
 -- test laws of group invert function
-testGroupInvert ∷ Test ()
-testGroupInvert = scope "Comparison.Invert" . expect $ and [test₁, test₂]
+testGroupInvert ∷ Bool
+testGroupInvert = and [test₁, test₂]
   where
     comparisons ∷ [Comparison Fin₅]
     comparisons = asList
@@ -351,8 +351,8 @@ testGroupInvert = scope "Comparison.Invert" . expect $ and [test₁, test₂]
     test₂ = all (\c → (G.invert c) `composeC` (         c) == mempty) comparisons
 
 -- test to check that `cycles` function gives back a lawful equivalence relation
-testCycles ∷ Test ()
-testCycles = scope "Comparison.Cycles" . expect $ and [test₁, test₂, test₃]
+testCycles ∷ Bool
+testCycles = and [test₁, test₂, test₃]
   where
     -- https://www.youtube.com/watch?v=MpKG6FmcIHk
     c₁ ∷ Comparison Fin₅ -- 3 5 4 1 2
@@ -367,8 +367,8 @@ testCycles = scope "Comparison.Cycles" . expect $ and [test₁, test₂, test₃
 
 -- https://arxiv.org/abs/0904.1097
 -- Pg 3. Crossings and nestings in set partitions of classical types (v2)
-testOpenersClosers ∷ Test ()
-testOpenersClosers = scope "Equivalence.OpenersClosers" . expect $ and [test₀, test₁, test₂, test₃, test₄, test₅, test₆, test₇, test₈]
+testOpenersClosers ∷ Bool
+testOpenersClosers = and [test₀, test₁, test₂, test₃, test₄, test₅, test₆, test₇, test₈]
   where
     -- "Figure 1. A non-crossing set partition of [9]."
     -- {{1, 7, 9}, {2, 5, 6}, {3, 4}, {8}}
