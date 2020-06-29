@@ -164,7 +164,7 @@ trace    (DFA δ q₀ _) w = NE.scanl (curry δ) q₀ w
 -- Brzozowski derivative
 -- ∂σ(ℒ(m)) = { w | σw ∈ ℒ(m) }
 derivative ∷ DFA q s → s → DFA q s
-derivative (DFA δ q₀ f) σ = DFA δ (δ (q₀, σ)) f
+derivative  (DFA δ q₀ f) σ = DFA δ (      (curry δ) q₀ σ) f
 
 -- Brzozowski derivative extended to strings
 derivative' ∷ (Finite q, Finite s) ⇒ DFA q s → [s] → DFA q s
