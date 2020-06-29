@@ -23,7 +23,7 @@ import           Data.Bool (bool)
 import           Data.Eq.Unicode ((≠))
 import           Data.Functor.Contravariant (contramap, Equivalence (..), Comparison (..), Predicate (..))
 import qualified Data.Group as G
-import           EasyTest (Test, tests, scope, expect, run)
+import           EasyTest (Test, tests, scope, expect, run, expectEqual)
 import qualified Data.List as List
 import qualified Data.List.NonEmpty as NE (NonEmpty (..), fromList)
 import           Data.Either (isRight, isLeft, lefts)
@@ -32,32 +32,31 @@ main ∷ IO ()
 main = run suite
 
 suite ∷ Test ()
-suite = tests [ scope "main.FizzBuzz"              . expect $ testFizzBuzz
-              , scope "DFA.empty"                  . expect $ Config.language DFA.empty          == ([]   ∷ [[Bool]])
-              , scope "DFA.epsilon"                . expect $ Config.language DFA.epsilon        == ([[]] ∷ [[Bool]])
-              , scope "DFA.literal"                . expect $ Config.language (DFA.literal True) == [[True]]
-              , scope "DFA.quotient"               . expect $ minimal `DFA.equal` quotient minimal && size' (useful (quotient minimal)) < size' (useful minimal)
-              , scope "DFA.toRE"                   . expect $ toRE by5 `RE.equivalent` by5'
-              , scope "DFA.rquotient"              . expect $ testDFArquotient
-              , scope "DFA.invhomimage"            . expect $ testDFAinvhomimage
-              , scope "RE.>>="                     . expect $ testRESubstitution
-              , scope "RE.dropout"                 . expect $ testREDropout
-              , scope "DFA.perfectShuffle"         . expect $ testDFAPerfectShuffle
-              , scope "NFA.shuffle"                . expect $ testNFAshuffle
-              , scope "bisim"                      . expect $ testBisimSubset (by5, DFA.toLanguage by5) (List.take 101 (freeMonoid asList))
-              -- "For example, the restricted growth function 0,1,1,2,0,3,1 defines the set partition {{1,5}, {2,3,7}, {4}, {6}}"
-              -- https://www8.cs.umu.se/kurser/TDBAfl/VT06/algorithms/BOOK/BOOK4/NODE153.HTM
-              , scope "toRGS"                      . expect $ toRGS (toEquivalence [0 NE.:| [4], 1 NE.:| [2, 6], 3 NE.:| [], 5 NE.:| []]) == (RGS [0, 1, 1, 2, 0, 3, 1] ∷ RGS Fin₇)
-              , scope "RGS"                        . expect $ bijection (toRGS @ Suit) (fromRGS @ Suit) -- bijection (toRGS ∷ Equivalence Suit → RGS Suit) (fromRGS ∷ RGS Suit → Equivalence Suit)
-              , scope "Comparison.Compose"         . expect $ testComposeC
-              , scope "Comparison.Invert"          . expect $ testGroupInvert
-              , scope "Comparison.Cycles"          . expect $ testCycles
-              , scope "Equivalence.OpenersClosers" . expect $ testOpenersClosers
+suite = tests [ scope "main.FizzBuzz"              testFizzBuzz
+              , scope "DFA.empty"                  testDFAEmptyLanguage
+              , scope "DFA.epsilon"                testDFAEpsilon
+              , scope "DFA.literal"                testDFALiteral
+              , scope "DFA.quotient"               testDFAquotient
+              , scope "DFA.toRE"                   testDFAtoRE
+              , scope "DFA.rquotient"              testDFArquotient
+              , scope "DFA.invhomimage"            testDFAinvhomimage
+              , scope "DFA.perfectShuffle"         testDFAPerfectShuffle
+              , scope "NFA.shuffle"                testNFAshuffle
+              , scope "RE.>>="                     testRESubstitution
+              , scope "RE.dropout"                 testREDropout
+              -- , scope _ _
+              , scope "Comparison.Compose"         testComposeC
+              , scope "Comparison.Invert"          testGroupInvert
+              , scope "Comparison.Cycles"          testCycles
+              , scope "Equivalence.OpenersClosers" testOpenersClosers
+              , scope "Equivalence.toRGS"          testEquivalencetoRGS
+              , scope "Equivalence.bijection"      testEquivalenceBijection
+              , scope "bisim"                      (testBisimSubset (by5, DFA.toLanguage by5) (List.take 101 (freeMonoid asList)))
               ]
 
 -- Test that ordinary FizzBuzz has the same output as the FizzBuzz which uses DFA
-testFizzBuzz ∷ Bool
-testFizzBuzz = woDFA == wDFA
+testFizzBuzz ∷ Test ()
+testFizzBuzz = expectEqual woDFA wDFA
   where
     -- FizzBuzz (without DFA)
     woDFA ∷ [String]
@@ -90,9 +89,26 @@ testFizzBuzz = woDFA == wDFA
                    | buzz n    = "Buzz"
                    | otherwise = show n
 
+testDFAEmptyLanguage ∷ Test ()
+testDFAEmptyLanguage = expectEqual (Config.language DFA.empty)          ([      ] ∷ [[Bool]])
+
+testDFAEpsilon       ∷ Test ()
+testDFAEpsilon       = expectEqual (Config.language DFA.epsilon)        ([[    ]] ∷ [[Bool]])
+
+testDFALiteral       ∷ Test ()
+testDFALiteral       = expectEqual (Config.language (DFA.literal True)) ([[True]] ∷ [[Bool]])
+
+testDFAquotient ∷ Test ()
+testDFAquotient = tests [test₁, test₂]
+  where
+    test₁ ∷ Test ()
+    test₁ = expect (DFA.equal                (quotient minimal)                  minimal  )
+    test₂ ∷ Test ()
+    test₂ = expect ((<)       (size' (useful (quotient minimal))) (size' (useful minimal)))
+
 -- https://math.stackexchange.com/questions/871662/finding-right-quotient-of-languages
-testDFArquotient ∷ Bool
-testDFArquotient = and e₃Tests
+testDFArquotient ∷ Test ()
+testDFArquotient = tests e₃Tests
   where
     -- L₁ = {"carrot"}
     e₃L₁ ∷ DFA Fin₈ Alpha
@@ -113,17 +129,17 @@ testDFArquotient = and e₃Tests
     e₃L₁L₂ ∷ DFA Fin₈ Alpha
     e₃L₁L₂ = DFA.rquotient e₃L₁ e₃L₂
     -- {"carrot"} / {"t", "ot"} = {"carro", "carr"}
-    e₃Tests ∷ [Bool]
-    e₃Tests = [ Config.accepts e₃L₁   [C, A, R, R, O, T]                  -- test that "carrot" ∈ L₁
-              , Config.accepts e₃L₂   [O, T]                              -- test that     "ot" ∈    L₂
-              , Config.accepts e₃L₂   [T]                                 -- test that      "t" ∈    L₂
-              , Config.accepts e₃L₁L₂ [C, A, R, R, O]                     -- test that "carro"  ∈ L₁/L₂
-              , Config.accepts e₃L₁L₂ [C, A, R, R]                        -- test that "carr"   ∈ L₁/L₂
-              , Prelude.take 2 (Config.language e₃L₁L₂) == [[C, A, R, R], [C, A, R, R, O]]
+    e₃Tests ∷ [Test ()]
+    e₃Tests = [ expect      (Config.accepts e₃L₁   [C, A, R, R, O, T])                  -- test that "carrot" ∈ L₁
+              , expect      (Config.accepts e₃L₂   [O, T])                              -- test that     "ot" ∈    L₂
+              , expect      (Config.accepts e₃L₂   [T])                                 -- test that      "t" ∈    L₂
+              , expect      (Config.accepts e₃L₁L₂ [C, A, R, R, O])                     -- test that "carro"  ∈ L₁/L₂
+              , expect      (Config.accepts e₃L₁L₂ [C, A, R, R])                        -- test that "carr"   ∈ L₁/L₂
+              , expectEqual (Prelude.take 2 (Config.language e₃L₁L₂)) [[C, A, R, R], [C, A, R, R, O]]
               ]
 
-testDFAinvhomimage ∷ Bool
-testDFAinvhomimage = same
+testDFAinvhomimage ∷ Test ()
+testDFAinvhomimage = expect same
   where
     same ∷ Bool
     same = DFA.invhomimage h slide22 `DFA.equal` expected
@@ -152,12 +168,12 @@ testDFAinvhomimage = same
             δ (2, False) = 2
             δ (2, True ) = 2
 
-testREDropout ∷ Bool
-testREDropout = and [test₁, test₂]
+testREDropout ∷ Test ()
+testREDropout = tests [test₁, test₂]
   where
     -- ℒ (A·(B·C)) ≟ {"AB", "AC", "BC"}
-    test₁ ∷ Bool
-    test₁ = expected == RE.language (expression')
+    test₁ ∷ Test ()
+    test₁ = expectEqual expected (RE.language expression')
       where
         -- ℒ (ε·(B·C) ∣ A·(ε·C ∣ B·ε)) = {"AB", "AC", "BC"}
         expression' ∷ RegExp Alpha
@@ -174,8 +190,8 @@ testREDropout = and [test₁, test₂]
                    , [B, C]
                    ]
     -- ℒ (D ∣ (A·(B·C) ∣ E·F)) ≟ {"", "AB", "AC", "BC", "E", "F"}
-    test₂ ∷ Bool
-    test₂ = expected == RE.language (expression')
+    test₂ ∷ Test ()
+    test₂ = expectEqual expected (RE.language expression')
       where
         -- ℒ (ε ∣ ((ε·(B·C) ∣ A·(ε·C ∣ B·ε)) ∣ (ε·F ∣ E·ε)))
         expression' ∷ RegExp Alpha
@@ -197,8 +213,8 @@ testREDropout = and [test₁, test₂]
 -- Substitution
 -- A Second Course in Formal Languages and Automata Theory (Pg 55, Example 3.3.4)
 -- s(101) = (cd)*(a+ab)*(cd)*
-testRESubstitution ∷ Bool
-testRESubstitution = result == expected -- N.B. the use of structural equality is intentional here
+testRESubstitution ∷ Test ()
+testRESubstitution = expectEqual result expected -- N.B. the use of structural equality is intentional here
   where
     original ∷ RegExp Fin₂
     original = RE.fromList [1, 0, 1]
@@ -216,8 +232,8 @@ testRESubstitution = result == expected -- N.B. the use of structural equality i
             :.  Star (         RE.fromList [2, 3]))
 
 -- Example from: https://courses.engr.illinois.edu/cs373/fa2010/Exams/midterm1sol.pdf
-testDFAPerfectShuffle ∷ Bool
-testDFAPerfectShuffle = l == expected
+testDFAPerfectShuffle ∷ Test ()
+testDFAPerfectShuffle = expectEqual l expected
   where    
     -- {"1010"}
     l ∷ [[Fin₂]]
@@ -244,11 +260,14 @@ testDFAPerfectShuffle = l == expected
     expected ∷ [[Fin₂]]
     expected = [[1, 0, 1, 0]]
 
+testDFAtoRE ∷ Test ()
+testDFAtoRE = expect (RE.equivalent (toRE by5) by5')
+
 -- TODO
 -- Shuffle
 -- A Second Course in Formal Languages and Automata Theory (Pg 57, Example 3.3.8)
-testNFAshuffle ∷ Bool
-testNFAshuffle = and [test]
+testNFAshuffle ∷ Test ()
+testNFAshuffle = expectEqual ab_cd shuffled
   where
     ab_cd ∷ [[Alpha]]
     ab_cd = fmap (fmap abcdh) (Config.language abcd')
@@ -274,8 +293,6 @@ testNFAshuffle = and [test]
                , [C, A, D, B]
                , [C, D, A, B]
                ]
-    test ∷ Bool
-    test = ab_cd == shuffled
 
 -- Coinductive bisimulation (partial)
 -- Either the bisimulation will succeed (on the given subset) or
@@ -284,12 +301,13 @@ testNFAshuffle = and [test]
 -- basically we take some subset of Σ⋆ to be sampled for
 -- "observational equality", here meaning both `m` and `ℓ`
 -- are in agreeance of which words to accept and reject.
+-- TODO should write version which better utilizes EasyTest, probably should move the bisim part to another file :)
 testBisimSubset ∷ forall q s automaton p
                 . (Finite q, Finite s, Configuration automaton q s p)
                 ⇒ (automaton q s, ℒ s)
                 → [[s]]
-                → Bool
-testBisimSubset (m, ℓ) subset = isBisim
+                → Test ()
+testBisimSubset (m, ℓ) subset = expect isBisim
   where
     -- try to partition, into two parts, (a subset/sample of) Σ⋆:
     -- words tagged with `Right` (ℒ₁ ≡ ℒ₂)
@@ -315,8 +333,8 @@ testBisimSubset (m, ℓ) subset = isBisim
     _negationProof = lefts witnesses
 
 -- Composition of permutations
-testComposeC ∷ Bool
-testComposeC = and [test₁, test₂, test₃]
+testComposeC ∷ Test ()
+testComposeC = tests [test₁, test₂, test₃]
   where
     -- https://en.wikipedia.org/wiki/Permutation_group#Composition_of_permutations%E2%80%93the_group_product
     (p, q) = (listToComparison [1, 3, 0, 2, 4], listToComparison [4, 3, 2, 1, 0]) ∷ (Comparison Fin₅, Comparison Fin₅)
@@ -331,44 +349,52 @@ testComposeC = and [test₁, test₂, test₃]
     c₄ ∷ Comparison Fin₄ -- 4 2 1 3
     c₄ = c₂ `composeC` c₁
 
-    test₁ ∷ Bool
-    test₁ = q `composeC` p == listToComparison [3, 1, 4, 2, 0] -- 4 2 5 3 1
-
-    test₂ ∷ Bool
-    test₂ = comparisonToList c₃ == [1, 3, 2, 0]
-    test₃ ∷ Bool
-    test₃ = comparisonToList c₄ == [3, 1, 0, 2]
+    test₁ ∷ Test ()
+    test₁ = expectEqual (q `composeC` p) (listToComparison [3, 1, 4, 2, 0]) -- 4 2 5 3 1
+    test₂ ∷ Test ()
+    test₂ = expectEqual (comparisonToList c₃) [1, 3, 2, 0]
+    test₃ ∷ Test ()
+    test₃ = expectEqual (comparisonToList c₄) [3, 1, 0, 2]
 
 -- test laws of group invert function
-testGroupInvert ∷ Bool
-testGroupInvert = and [test₁, test₂]
+testGroupInvert ∷ Test ()
+testGroupInvert = tests [test₁, test₂]
   where
     comparisons ∷ [Comparison Fin₅]
     comparisons = asList
-    test₁ ∷ Bool
-    test₁ = all (\c → (         c) `composeC` (G.invert c) == mempty) comparisons
-    test₂ ∷ Bool
-    test₂ = all (\c → (G.invert c) `composeC` (         c) == mempty) comparisons
+    -- TODO can probably improve this :)
+    test₁ ∷ Test ()
+    test₁ = expect (all (\c → (         c) `composeC` (G.invert c) == mempty) comparisons)
+    test₂ ∷ Test ()
+    test₂ = expect (all (\c → (G.invert c) `composeC` (         c) == mempty) comparisons)
 
 -- test to check that `cycles` function gives back a lawful equivalence relation
-testCycles ∷ Bool
-testCycles = and [test₁, test₂, test₃]
+testCycles ∷ Test ()
+testCycles = tests [test₁, test₂, test₃]
   where
     -- https://www.youtube.com/watch?v=MpKG6FmcIHk
     c₁ ∷ Comparison Fin₅ -- 3 5 4 1 2
     c₁ = listToComparison [2, 4, 3, 0, 1]
-    test₁ ∷ Bool
-    test₁ = getPredicate lawfulComparison c₁
-    test₂ ∷ Bool
-    test₂ = getPredicate lawful (cycles c₁)
-    test₃ ∷ Bool
-    test₃ = cycles c₁ == toEquivalence [0 NE.:| [2, 3], 1 NE.:| [4]]
+    test₁ ∷ Test ()
+    test₁ = expect (getPredicate lawfulComparison c₁)
+    test₂ ∷ Test ()
+    test₂ = expect (getPredicate lawful (cycles c₁))
+    test₃ ∷ Test ()
+    test₃ = expectEqual (cycles c₁) (toEquivalence [0 NE.:| [2, 3], 1 NE.:| [4]])
 
+-- "For example, the restricted growth function 0,1,1,2,0,3,1 defines the set partition {{1,5}, {2,3,7}, {4}, {6}}"
+-- https://www8.cs.umu.se/kurser/TDBAfl/VT06/algorithms/BOOK/BOOK4/NODE153.HTM
+testEquivalencetoRGS ∷ Test ()
+testEquivalencetoRGS = expectEqual (toRGS (toEquivalence [0 NE.:| [4], 1 NE.:| [2, 6], 3 NE.:| [], 5 NE.:| []]))
+                                   (RGS [0, 1, 1, 2, 0, 3, 1] ∷ RGS Fin₇)
+
+testEquivalenceBijection ∷ Test ()
+testEquivalenceBijection = expect (bijection (toRGS @ Suit) (fromRGS @ Suit)) -- bijection (toRGS ∷ Equivalence Suit → RGS Suit) (fromRGS ∷ RGS Suit → Equivalence Suit)
 
 -- https://arxiv.org/abs/0904.1097
 -- Pg 3. Crossings and nestings in set partitions of classical types (v2)
-testOpenersClosers ∷ Bool
-testOpenersClosers = and [test₀, test₁, test₂, test₃, test₄, test₅, test₆, test₇, test₈]
+testOpenersClosers ∷ Test ()
+testOpenersClosers = tests [test₀, test₁, test₂, test₃, test₄, test₅, test₆, test₇, test₈]
   where
     -- "Figure 1. A non-crossing set partition of [9]."
     -- {{1, 7, 9}, {2, 5, 6}, {3, 4}, {8}}
@@ -400,34 +426,34 @@ testOpenersClosers = and [test₀, test₁, test₂, test₃, test₄, test₅, 
     expectedSingletons = [7]
     -- Some assumptions that it shouldn't hurt to test explicitly
     -- TODO also test noncrossing and nonnesting predicates here?
-    test₀ ∷ Bool
-    test₀ = and [ getPredicate lawful figure₁
-                , getPredicate lawful figure₂
-                ]
+    test₀ ∷ Test ()
+    test₀ = tests [ expect (getPredicate lawful figure₁)
+                  , expect (getPredicate lawful figure₂)
+                  ]
     -- (openers {{1, 7, 9}, {2, 5, 6}, {3, 4}, {8}}) ≟ {1, 2, 3, 5, 7}
-    test₁ ∷ Bool
-    test₁ = openers figure₁ == expectedOpeners
+    test₁ ∷ Test ()
+    test₁ = expectEqual expectedOpeners (openers figure₁)
     -- (openers {{1, 4}, {2, 5, 7, 9}, {3, 6}, {8}}) ≟ {1, 2, 3, 5, 7}
-    test₂ ∷ Bool
-    test₂ = openers figure₂ == expectedOpeners
+    test₂ ∷ Test ()
+    test₂ = expectEqual expectedOpeners (openers figure₂)
     -- (closers {{1, 7, 9}, {2, 5, 6}, {3, 4}, {8}}) ≟ {4, 5, 6, 7, 9}
-    test₃ ∷ Bool
-    test₃ = closers figure₁ == expectedClosers
+    test₃ ∷ Test ()
+    test₃ = expectEqual expectedClosers (closers figure₁)
     -- (closers {{1, 4}, {2, 5, 7, 9}, {3, 6}, {8}}) ≟ {4, 5, 6, 7, 9}
-    test₄ ∷ Bool
-    test₄ = closers figure₂ == expectedClosers
+    test₄ ∷ Test ()
+    test₄ = expectEqual expectedClosers (closers figure₂)
     -- (transients {{1, 7, 9}, {2, 5, 6}, {3, 4}, {8}}) ≟ {5, 7}
-    test₅ ∷ Bool
-    test₅ = transients figure₁ == expectedTransients
+    test₅ ∷ Test ()
+    test₅ = expectEqual expectedTransients (transients figure₁)
     -- (transients {{1, 4}, {2, 5, 7, 9}, {3, 6}, {8}}) ≟ {5, 7}
-    test₆ ∷ Bool
-    test₆ = transients figure₂ == expectedTransients
+    test₆ ∷ Test ()
+    test₆ = expectEqual expectedTransients (transients figure₂)
     -- (singletons {{1, 7, 9}, {2, 5, 6}, {3, 4}, {8}}) ≟ {8}
-    test₇ ∷ Bool
-    test₇ = singletons figure₁ == expectedSingletons
+    test₇ ∷ Test ()
+    test₇ = expectEqual expectedSingletons (singletons figure₁)
     -- (singletons {{1, 4}, {2, 5, 7, 9}, {3, 6}, {8}}) ≟ {8}
-    test₈ ∷ Bool
-    test₈ = singletons figure₂ == expectedSingletons
+    test₈ ∷ Test ()
+    test₈ = expectEqual expectedSingletons (singletons figure₂)
 
 -- TODO finish moving test
 {-
