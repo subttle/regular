@@ -44,14 +44,13 @@ suite = tests [ scope "main.FizzBuzz"              testFizzBuzz
               , scope "NFA.shuffle"                testNFAshuffle
               , scope "RE.>>="                     testRESubstitution
               , scope "RE.dropout"                 testREDropout
-              -- , scope _ _
+              , scope "bisim"                      testBisimSubset
               , scope "Comparison.Compose"         testComposeC
               , scope "Comparison.Invert"          testGroupInvert
               , scope "Comparison.Cycles"          testCycles
               , scope "Equivalence.OpenersClosers" testOpenersClosers
               , scope "Equivalence.toRGS"          testEquivalencetoRGS
               , scope "Equivalence.bijection"      testEquivalenceBijection
-              , scope "bisim"                      (testBisimSubset (by5, DFA.toLanguage by5) (List.take 101 (freeMonoid asList)))
               ]
 
 -- Test that ordinary FizzBuzz has the same output as the FizzBuzz which uses DFA
@@ -301,13 +300,13 @@ testNFAshuffle = expectEqual ab_cd shuffled
 -- basically we take some subset of Σ⋆ to be sampled for
 -- "observational equality", here meaning both `m` and `ℓ`
 -- are in agreeance of which words to accept and reject.
--- TODO should write version which better utilizes EasyTest, probably should move the bisim part to another file :)
-testBisimSubset ∷ forall q s automaton p
-                . (Finite q, Finite s, Configuration automaton q s p)
-                ⇒ (automaton q s, ℒ s)
-                → [[s]]
-                → Test ()
-testBisimSubset (m, ℓ) subset = expect isBisim
+-- FIXME should write version which better utilizes EasyTest, probably should move the bisim part to another file :)
+testBisimSubset' ∷ forall q s automaton p
+                 . (Finite q, Finite s, Configuration automaton q s p)
+                 ⇒ (automaton q s, ℒ s)
+                 → [[s]]
+                 → Bool
+testBisimSubset' (m, ℓ) subset = isBisim
   where
     -- try to partition, into two parts, (a subset/sample of) Σ⋆:
     -- words tagged with `Right` (ℒ₁ ≡ ℒ₂)
@@ -331,6 +330,9 @@ testBisimSubset (m, ℓ) subset = expect isBisim
     -- i.e. a list of counter examples
     _negationProof ∷ [[s]]
     _negationProof = lefts witnesses
+
+testBisimSubset ∷ Test ()
+testBisimSubset = expect (testBisimSubset' (by5, DFA.toLanguage by5) (List.take 101 (freeMonoid asList)))
 
 -- Composition of permutations
 testComposeC ∷ Test ()
@@ -362,11 +364,12 @@ testGroupInvert = tests [test₁, test₂]
   where
     comparisons ∷ [Comparison Fin₅]
     comparisons = asList
-    -- TODO can probably improve this :)
+    -- TODO perhaps `nologging` can help keep this from taking over console output?
+    -- TODO or can consider e.g. `comparisons ∷ [Comparison Fin₄]`
     test₁ ∷ Test ()
-    test₁ = expect (all (\c → (         c) `composeC` (G.invert c) == mempty) comparisons)
+    test₁ = tests (fmap (\c → expectEqual mempty ((         c) `composeC` (G.invert c))) comparisons)
     test₂ ∷ Test ()
-    test₂ = expect (all (\c → (G.invert c) `composeC` (         c) == mempty) comparisons)
+    test₂ = tests (fmap (\c → expectEqual mempty ((G.invert c) `composeC` (         c))) comparisons)
 
 -- test to check that `cycles` function gives back a lawful equivalence relation
 testCycles ∷ Test ()
