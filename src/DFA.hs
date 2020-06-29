@@ -6,20 +6,22 @@
 
 module DFA where
 
-import           Prelude             hiding (map)
+import           Algebra.Graph.Relation as Relation hiding (domain)
 import           Data.Bool (bool)
 import           Data.Functor.Contravariant (Contravariant, contramap, Equivalence (..), Predicate (..))
 import           Data.Function (on)
+import           Data.List.NonEmpty (NonEmpty)
+import qualified Data.List.NonEmpty  as NE
 import qualified Data.List           as List
+import qualified Data.Map            as Map
 import           Data.Set            as Set hiding (foldl, intersection)
 import           Data.Set.Unicode ((∅), (∈), (∉), (∖), (∪))
 import           Data.Bool.Unicode ((∧), (∨))
-import qualified Data.Map            as Map
 import           Numeric.Algebra.Class (sumWith)
+import           Prelude             hiding (map)
 import           Common
 import           Finite
 import           Config
-import           Algebra.Graph.Relation as Relation hiding (domain)
 import qualified TransitionGraph as TG
 import qualified NFA
 import qualified EFA
@@ -150,22 +152,31 @@ synchronizes m w = size' (delta'' m (qs m, w)) == 1
 rejected ∷ (Finite q, Finite s) ⇒ DFA q s → [[s]]
 rejected = language . complement
 
+-- TODO can delete this because it is redundant given `eval` already defined,
+-- TODO however for now I'm keeping it for reference
+evaluate ∷ DFA q s → [s] → q
+evaluate (DFA δ q₀ _) w =    foldl (curry δ) q₀ w
+
+-- Trace the path the DFA takes for a word
+trace ∷ DFA q s → [s] → NonEmpty q
+trace    (DFA δ q₀ _) w = NE.scanl (curry δ) q₀ w
+
 -- Brzozowski derivative
 -- ∂σ(ℒ(m)) = { w | σw ∈ ℒ(m) }
 derivative ∷ DFA q s → s → DFA q s
-derivative m@(DFA δ q₀ _) σ = m { q0 = δ (q₀, σ) }
+derivative (DFA δ q₀ f) σ = DFA δ (δ (q₀, σ)) f
 
 -- Brzozowski derivative extended to strings
 derivative' ∷ (Finite q, Finite s) ⇒ DFA q s → [s] → DFA q s
-derivative' m wrt           = m { q0 = eval m wrt }
+derivative' (DFA δ q₀ f) w = DFA δ (foldl (curry δ) q₀ w) f
 
 -- The "right language" of m wrt some state q
 right ∷ DFA q s → q → DFA q s
-right m q = m { q0 = q }
+right (DFA δ _ f) q = DFA δ q f
 
 -- The "left language" of q
 left ∷ DFA q s → q → DFA q s
-left m q = m { fs = singleton q }
+left (DFA δ q₀ _) = DFA δ q₀ . singleton
 
 -- The equivalence relation formed on Q by indistinguishable states for m
 -- Two states having the same right language are indistinguishable
