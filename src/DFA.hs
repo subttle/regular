@@ -49,7 +49,8 @@ instance (Finite s) ⇒ Σ (SomeDFA s) s
 
 instance Contravariant (DFA q) where
   contramap ∷ (s → g) → DFA q g → DFA q s
-  contramap h (DFA δ q₀ f) = DFA (\(q, σ) → δ (q, h σ)) q₀ f
+  -- contramap h (DFA δ q₀ f) = DFA (\(q, σ) →              δ (q, h σ)) q₀ f
+  contramap h (DFA δ q₀ f) = DFA (\(q, σ) →       (curry δ) q (h σ)) q₀ f
 
 invhomimage ∷ (s → [g]) → DFA q g → DFA q s
 invhomimage h (DFA δ q₀ f) = DFA (\(q, σ) → foldl (curry δ) q (h σ)) q₀ f
@@ -75,14 +76,14 @@ instance (Show s, Finite s) ⇒ Show (SomeDFA s) where
 instance (Finite q, Finite s) ⇒ Configuration DFA q s q where
   -- By construction of a DFA type this will be `True`
   deterministic ∷ DFA q s → Bool
-  deterministic _ = True
+  deterministic   = const True
 
   codeterministic ∷ DFA q s → Bool
   codeterministic = deterministic . FA.reversal . toFA
 
   -- By construction of a DFA type this will be `True`
   complete      ∷ DFA q s → Bool
-  complete      _ = True
+  complete        = const True
 
   occupied ∷ DFA q s → q → Set q 
   occupied _ = singleton
@@ -146,7 +147,8 @@ instance (Finite q, Finite s) ⇒ Configuration DFA q s q where
 -- evaluate the same word from all states of Q, not just q₀
 -- i.e. |{ δ★(q, w) | q ∈ Q }| = 1
 synchronizes ∷ (Finite q, Finite s) ⇒ DFA q s → [s] → Bool
-synchronizes m w = size' (delta'' m (qs m, w)) == 1
+-- synchronizes m w = size' (delta'' m (qs m, w)) == 1
+synchronizes m w = (==) 1 (size' (delta'' m (qs m, w)))
 
 -- Lazily generate all the rejected strings of the given DFA
 rejected ∷ (Finite q, Finite s) ⇒ DFA q s → [[s]]
