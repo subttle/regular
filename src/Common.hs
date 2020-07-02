@@ -13,7 +13,7 @@ import qualified Data.Set as Set
 import           Data.Set.Unicode ((∪))
 import           Data.Bool.Unicode ((∧))
 import           Data.Bool (bool)
-import           Data.Ord.Unicode ((≤))
+import           Data.Ord.Unicode ((≤), (≥))
 import           Data.Eq.Unicode ((≠))
 import           Data.List as List
 import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)), (<|))
@@ -178,6 +178,9 @@ infixl 5 <<-
 
 (≰) ∷ (Ord a) ⇒ a → a → Bool
 (≰) = not ‥ (≤)
+
+(≱) ∷ (Ord a) ⇒ a → a → Bool
+(≱) = not ‥ (≥)
 
 when' ∷ a → Bool → Maybe a
 when' = bool Nothing . Just
