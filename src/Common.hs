@@ -96,6 +96,11 @@ andAlg = Algebra φ
 (⋄) ∷ (Semigroup m) ⇒ m → m → m
 (⋄) = (<>)
 
+-- "Prepend an element to the stream."
+-- N.B. (⊲) ∷ a → (NonEmpty a → NonEmpty a)
+(⊲) ∷ a → NonEmpty a → NonEmpty a
+(⊲) = (<|)
+
 -- TODO precedence
 -- TODO infixl 8 ‥ -- …
 (‥) ∷ (a → b) → (c → d     → a) → (c → d     → b)
@@ -176,9 +181,11 @@ infixl 5 <<-
 (<<-) ∷ (Ord a) ⇒ a → Set a → Set a
 (<<-) = Set.insert
 
+-- neither less than nor equal to
 (≰) ∷ (Ord a) ⇒ a → a → Bool
 (≰) = not ‥ (≤)
 
+-- neither greater than nor equal to
 (≱) ∷ (Ord a) ⇒ a → a → Bool
 (≱) = not ‥ (≥)
 
