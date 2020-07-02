@@ -179,6 +179,9 @@ infixl 5 <<-
 (≰) ∷ (Ord a) ⇒ a → a → Bool
 (≰) = not ‥ (≤)
 
+when' ∷ a → Bool → Maybe a
+when' = bool Nothing . Just
+
 while ∷ (a → Bool) → (a → a) → a → a
 while p = until (not . p)
 
