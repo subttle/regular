@@ -455,7 +455,7 @@ partitionsNE = partitionsNE' . toNonEmpty
   where
     partitionsNE' ∷ NonEmpty a → NonEmpty (NonEmpty (NonEmpty a))
     partitionsNE' (a₁ :| [])        = pure (pure (pure a₁))
-    partitionsNE' (a₁ :| (a₂ : as)) = ((pure a₁ <|) :| pure (\(h :| t) → (a₁ <| h) :| t)) <*> partitionsNE' (a₂ :| as)
+    partitionsNE' (a₁ :| (a₂ : as)) = ((pure a₁ ⊲) :| pure (\(h :| t) → (a₁ ⊲ h) :| t)) <*> partitionsNE' (a₂ :| as)
 
 -- partitions of a set
 -- partitions' {0..2} = [ [[2,1,0]]
@@ -469,7 +469,7 @@ partitions' = Foldable.foldl (\xs → (xs >>=) . go) [[]]
   where
     go ∷ a → [NonEmpty a] → [[NonEmpty a]]
     go a []       = pure (pure (pure a))
-    go a (p : ps) = pure ((a <| p) : ps) <> fmap (p :) (go a ps)
+    go a (p : ps) = pure ((a ⊲ p) : ps) <> fmap (p :) (go a ps)
 
 -- Stirling numbers of the first kind (signed)
 -- https://proofwiki.org/wiki/Definition:Stirling_Numbers_of_the_First_Kind/Signed
@@ -510,10 +510,10 @@ choose' (n, k)          = choose' (n - 1, k - 1) + choose' (n - 1, k)
 -- Catalan numbers
 -- https://oeis.org/A000108
 catalan ∷ NonEmpty ℕ
-catalan = 1 <| NE.unfoldr c (pure 1)
+catalan = 1 ⊲ NE.unfoldr c (pure 1)
   where
     c ∷ NonEmpty ℕ → (ℕ, Maybe (NonEmpty ℕ))
-    c ns = (n, Just (n <| ns))
+    c ns = (n, Just (n ⊲ ns))
       where
         n ∷ ℕ
         n = sum (NE.zipWith (*) ns (NE.reverse ns))
@@ -523,26 +523,26 @@ catalan = 1 <| NE.unfoldr c (pure 1)
 -- http://www.cs.ox.ac.uk/people/jeremy.gibbons/publications/rationals.pdf
 -- FIXME untested
 rationals ∷ NonEmpty ℚ
-rationals = fix ((<|) 1 . (=<<) (\q → pure (1 + q) <> pure (1 / (1 + q))))
+rationals = fix ((⊲) 1 . (=<<) (\q → pure (1 + q) ⋄ pure (1 / (1 + q))))
 
 -- Natural numbers (as a non-empty list)
 -- http://oeis.org/A001477
 naturals ∷ NonEmpty ℕ
 -- naturals = NE.iterate (+1) 0
-naturals = fix ((<|) 0 . fmap (+ 1))
+naturals = fix ((⊲) 0 . fmap (+ 1))
 
 powers ∷ ℕ → NonEmpty ℕ
-powers n = fix ((<|) 1 . fmap (* n))
+powers n = fix ((⊲) 1 . fmap (* n))
 
 -- Fibonacci numbers (as a non-empty list)
 -- http://oeis.org/A000045
 fibonacci ∷ NonEmpty ℕ
-fibonacci = fix ((<|) 0 . NE.scanl (+) 1)
+fibonacci = fix ((⊲) 0 . NE.scanl (+) 1)
 
 -- Factorial numbers (as a non-empty list)
 -- http://oeis.org/A000142
 factorials ∷ NonEmpty ℕ
-factorials = fix ((<|) 1 . NE.zipWith (*) (enumFrom' 1))
+factorials = fix ((⊲) 1 . NE.zipWith (*) (enumFrom' 1))
 
 factorial ∷ ℕ → ℕ
 factorial = product . enumFromTo 1
@@ -552,7 +552,7 @@ factorial = product . enumFromTo 1
 -- bell ∷ ℕ → ℕ
 -- bell n = sum (fmap (\k → stirling₂ (n, k)) [0 .. n])
 bell ∷ ℕ → ℕ
-bell n = NE.head (applyN n (\ns → NE.scanl1 (+) (NE.last ns <| ns)) (pure 1))
+bell n = NE.head (applyN n (\ns → NE.scanl1 (+) (NE.last ns ⊲ ns)) (pure 1))
 
 -- Apply a function `n` times
 applyN ∷ ℕ → (a → a) → a → a
@@ -638,7 +638,7 @@ descending ta = snd (mapAccumL (\as _ → let mx = maximum as in (delete mx as, 
 
 -- TODO
 rotate ∷ ℕ → [a] → [a]
-rotate n as = getOp (contramap (`mod` genericLength as) (Op (genericDrop <> genericTake))) n as
+rotate n as = getOp (contramap (`mod` genericLength as) (Op (genericDrop ⋄ genericTake))) n as
 
 -- TODO can probably be improved, but works for now
 rotations ∷ [a] → [[a]]
