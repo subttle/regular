@@ -31,7 +31,7 @@ import           Data.Foldable as Foldable
 import           Data.Functor.Contravariant.Divisible (Divisible, Decidable, divide, divided, conquer, choose, chosen, lose)
 import           Data.Functor.Contravariant (Contravariant, Op (..), Predicate (..), Comparison (..), Equivalence (..), defaultComparison, defaultEquivalence, contramap, (>$<), (>$$<))
 import           Data.Functor.Foldable (Fix (..), unfix, ListF (..))
-import           Data.Function (on, fix)
+import           Data.Function (on, fix, (&))
 import           Data.Semigroup.Foldable (Foldable1, toNonEmpty)
 import           Data.Semigroup.Traversable (Traversable1)
 import           Data.Tree (Forest, Tree (..), unfoldTree)
@@ -678,13 +678,14 @@ hom = mconcat ‥ fmap
 quotations ∷ String → String
 quotations = quoteWith "\"" "\""
 
-quoteWith ∷ String → String → (String → String)
-quoteWith l r = (l ++) . (++ r)
+-- Another subtle observation could be made here :)
+quoteWith ∷ (Monoid m) ⇒ m → m → (m → m)
+quoteWith l r = (l ⋄) . (⋄ r)
 
 -- DFA q s → [((q, s), q)]
 format ∷ (Show c, Show r) ⇒ Map c r → String
-format m = foldl1 (\a b → a ++ "\n" ++ b)  -- manually intercalate the Map with newlines.
-           (mapWithKey (\k v → "  δ " ++ show k ++ " ↦ " ++ show v) m)
+format = foldl1 ((&) "\n" ‥ quoteWith)  -- manually intercalate the Map with newlines.
+         . mapWithKey (\k v → "  δ " ++ show k ++ " ↦ " ++ show v)
 
 format' ∷ ∀ c r . (Show c, Show r) ⇒ Map c (Set r) → String
 format' = go -- .  Map.filter (not . Set.null)
