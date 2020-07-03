@@ -267,15 +267,12 @@ freeMonoidFrom n = ([n ..] >>=) . flip replicateM'
 freeSemigroup ∷ [a] → [[a]]
 freeSemigroup = freeMonoidFrom 1
 
+-- FIXME change name to avoid conflict with `Data.These.toThese`
 toThese   ∷ Either (a, b) (Either a b) → These a b
-toThese   (Left  (a, b)  )             = These a b
-toThese   (Right (Right b))            = That    b
-toThese   (Right (Left  a))            = This  a
+toThese   = either (uncurry These) (either This That)
 
 fromThese ∷ These a b                  → Either (a, b) (Either a b)
-fromThese (These a b)                  = Left  (a, b)
-fromThese (That    b)                  = Right (Right b)
-fromThese (This  a  )                  = Right (Left  a)
+fromThese = these (Right . Left) (Right . Right) (Left ‥ (,))
 
 -- Equivalence ((==) `on` (not . (==) GT))
 lteq ∷ Equivalence Ordering
