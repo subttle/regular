@@ -468,8 +468,8 @@ partitions' ∷ (Foldable t) ⇒ t a → [[NonEmpty a]]
 partitions' = Foldable.foldl (\xs → (xs >>=) . go) [[]]
   where
     go ∷ a → [NonEmpty a] → [[NonEmpty a]]
-    go a []       = pure (pure (pure a))
-    go a (p : ps) = pure ((a ⊲ p) : ps) <> fmap (p :) (go a ps)
+    go a      []  = pure (pure (pure a))
+    go a (p : ps) = pure ((a ⊲ p) : ps) ⋄ fmap (p :) (go a ps)
 
 -- Stirling numbers of the first kind (signed)
 -- https://proofwiki.org/wiki/Definition:Stirling_Numbers_of_the_First_Kind/Signed
@@ -761,7 +761,7 @@ newtype Set' a = Set' { unSet' ∷ Set a }
 
 instance (Show a) ⇒ Show (Set' a) where
   show ∷ Set' a → String
-  show = quoteWith "{"  "}" . intercalate ", " . (show <$>) . Set.toList . unSet'
+  show = quoteWith "{"  "}" . intercalate ", " . fmap show . Set.toList . unSet'
 
 -- Perhaps improving clarity in some spots
 charToString ∷ Char → String
