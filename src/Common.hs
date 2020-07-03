@@ -6,6 +6,9 @@
 
 module Common where
 
+import           Control.Applicative (liftA2, liftA3, getZipList, ZipList (..))
+import           Control.Arrow ((|||), (&&&))
+import           Control.Monad (replicateM)
 import           Data.Maybe as Maybe
 import           Data.Map as Map (Map, null, empty, unionsWith, singleton, insert, mapWithKey, foldlWithKey, insertWith, foldrWithKey)
 import           Data.Set (Set)
@@ -37,9 +40,6 @@ import           Data.Semigroup.Traversable (Traversable1)
 import           Data.Tree (Forest, Tree (..), unfoldTree)
 import           Data.Void
 import           Data.Bifunctor (bimap)
-import           Control.Applicative (liftA2, liftA3, getZipList, ZipList (..))
-import           Control.Monad (replicateM)
-import           Control.Arrow ((|||), (&&&))
 import           Prelude.Unicode (ℤ, ℚ)
 import           Numeric.Natural.Unicode (ℕ)
 
@@ -703,8 +703,7 @@ format'' = go -- .  Map.filter (not . Set.null)
     go m              = foldl1 (\a b → a ++ "\n" ++ b )  -- manually intercalate the Map with newlines.
                         (mapWithKey (\k v → "  δ " ++ show'' k ++ " ↦ " ++ show (Set' v)) m)
     show'' ∷ (q, Maybe s) → String
-    show'' (q, Just  σ) = "(" ++ show q ++ "," ++ show σ ++ ")"
-    show'' (q, Nothing) = "(" ++ show q ++ ",ε)"
+    show'' (q, σ) = quoteWith "(" ")" (quoteWith (show q) (maybe "ε" show σ) (","))
 
 -- Some helper functions for nicely displaying languages
 toStrings ∷ (Show s) ⇒ [[s]] → [String]
