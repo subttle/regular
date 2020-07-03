@@ -86,26 +86,26 @@ instance (Finite q, Finite s) ⇒ Configuration DFA q s q where
   complete        = const True
 
   occupied ∷ DFA q s → q → Set q 
-  occupied _ = singleton
+  occupied = const singleton
+
+  deltaD  ∷ DFA q s → ((q, s) → q)
+  deltaD  = delta
 
   initial ∷ DFA q s → q
-  initial (DFA _ q₀ _) = q₀
+  initial = q0
 
   final   ∷ DFA q s → Set q
-  final   (DFA _ _  f) = f
+  final   = fs
 
   -- Given a DFA, m, and a configuration, return what it yields in one step
   (⊢) ∷ DFA q s → (q, [s]) → (q, [s])
-  (⊢) _           (q,    []) = (q,        [])
-  (⊢) (DFA δ _ _) (q, σ : w) = (δ (q, σ), w )
+  (⊢) _           (q,     []) = (   q    , [])
+  (⊢) (DFA δ _ _) (q, σ : w ) = (δ (q, σ), w )
 
   -- Determine which states are accessible in the given DFA, i.e.
   -- { q ∈ Q | ∃w ∈ Σ★, δ★(q₀, w) = q }
   accessible ∷ DFA q s → Set q
   accessible m@(DFA _ q₀ _) = reachable m q₀
-
-  deltaD ∷ DFA q s → (q, s) → q
-  deltaD (DFA δ _ _) = δ
 
   -- δ★ : Q × Σ★ → Q
   -- "Extended delta" - The delta function extended from single symbols to strings (lists of symbols).
