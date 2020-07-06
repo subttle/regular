@@ -66,8 +66,7 @@ import           Data.Function (on)
 import           Control.Selective (Selective, select, selectM)
 import           Control.Monad (ap)
 import           Data.List as List hiding (last, map)
-import           Data.Set (Set)
-import           Data.Set as Set hiding ((\\))
+import           Data.Set as Set (Set, map, insert, singleton, toList)
 import           Data.Set.Unicode ((∅), (∉), (∪)) -- (∈)
 import           Data.Bool.Unicode ((∧), (∨))
 import           Data.Bool (bool)
@@ -467,25 +466,23 @@ linear = snd . linear' (∅)
                          (             s₂,     r) = linear' s₁ β
     linear' s (Star α) =                            linear' s  α
 
--- first(E) = { a | av ∈ ℒ(E) }
+-- first(E) = { a | a · w ∈ ℒ(E) }
 first ∷ (Ord s) ⇒ RegExp s → Set s
-first Zero                  = (∅)
-first One                   = (∅)
-first (Lit  σ)              = Set.singleton σ
-first (α :| β)              = first α ∪ first β
-first (α :. β) | nullable α = first α ∪ first β
-               | otherwise  = first α
-first (Star α)              = first α
+first Zero     = (∅)
+first One      = (∅)
+first (Lit  σ) = singleton σ
+first (α :| β) =                 first α ∪ first β
+first (α :. β) = bool (first α) (first α ∪ first β) (nullable α)
+first (Star α) =       first α
 
--- last(E) = { a | va ∈ ℒ(E) }
+-- last(E) = { a | w · a ∈ ℒ(E) }
 last ∷ (Ord s) ⇒ RegExp s → Set s
-last Zero                  = (∅)
-last One                   = (∅)
-last (Lit  σ)              = Set.singleton σ
-last (α :| β)              = last α ∪ last β
-last (α :. β) | nullable β = last α ∪ last β
-              | otherwise  = last β
-last (Star α)              = last α
+last  Zero     = (∅)
+last  One      = (∅)
+last  (Lit  σ) = singleton σ
+last  (α :| β) =                 last  α ∪ last  β
+last  (α :. β) = bool (last  β) (last  α ∪ last  β) (nullable β)
+last  (Star α) =       last  α
 
 -- Lazily generate the entire language of the given Regular Expression.
 -- Mathematically, this is defined as a Set,
@@ -583,7 +580,8 @@ derivative (α :. β) σ = (derivative α σ *            β  )
 derivative (Star α) σ =  derivative α σ * star α
 
 -- Brzozowski ∂ extended to strings
--- "The derivative of a language ℒ ⊆ Σ★ with respect to a string w ∈ Σ★ is defined to be ∂w ℒ = { v | w · v ∈ ℒ }."
+-- "The derivative of a language ℒ ⊆ Σ★ with respect to a string w ∈ Σ★
+-- is defined to be ∂w ℒ = { a | w · a ∈ ℒ }."
 derivative' ∷ (Ord s) ⇒ RegExp s → [s] → RegExp s
 derivative' = List.foldl derivative
 
