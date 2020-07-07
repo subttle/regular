@@ -51,7 +51,7 @@ newtype  CoAlgebra f t =  CoAlgebra (          t  → f                 t)
 newtype   RAlgebra f t =   RAlgebra (f (Fix f, t) →                   t)
 newtype RCoAlgebra f t = RCoAlgebra (          t  → f (Either (Fix f) t))
 -- Mendler-style
-newtype   MAlgebra f t =   MAlgebra (∀ a. (a → t) → (f a → t))
+newtype   MAlgebra f t =   MAlgebra (∀ a . (a → t) → (f a → t))
 
 -- Mendler-style Catamorphism
 mcata ∷ MAlgebra f c → Fix f → c
@@ -89,9 +89,10 @@ coelgot φ (CoAlgebra ψ) = φ . (id &&& fmap (coelgot φ (CoAlgebra ψ)) . ψ)
 
 andAlg ∷ Algebra (ListF Bool) Bool
 andAlg = Algebra φ
-  where φ ∷ ListF Bool Bool → Bool
-        φ Nil        = True
-        φ (Cons x y) = x ∧ y
+  where
+    φ ∷ ListF Bool Bool → Bool
+    φ Nil        = True
+    φ (Cons x y) = (∧) x y
 
 (⋄) ∷ (Semigroup m) ⇒ m → m → m
 (⋄) = (<>)
