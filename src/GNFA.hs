@@ -70,12 +70,12 @@ instance Profunctor GNFA where
 instance (Show q, Finite q, Show s, Finite s)
        ⇒ Show (GNFA q s) where
   show ∷ GNFA q s → String
-  show m = List.intercalate "\n, " 
-           [ "( Q  = "                                              ++ (show . Set' . qs)              m
-           ,   "Σ  = "                                              ++ (show . Set' . sigma)           m
-           ,   "δ : (Q ∖ {qᶠ}) × (Q ∖ {qᵢ}) → Regular Expression\n" ++ (format . Map.fromList . table) m
-           ,   "qᵢ = "                                              ++ show (Init  ())
-           ,   "qᶠ = "                                              ++ show (Final ()) ++ ")"
+  show m = quoteWith "(" ")" . List.intercalate "," . fmap (quoteWith " " "\n") $
+           [ "Q  = "                                              ++ show (Set' (qs    m))
+           , "Σ  = "                                              ++ show (Set' (sigma m))
+           , "δ : (Q ∖ {qᶠ}) × (Q ∖ {qᵢ}) → Regular Expression\n" ++ (format . Map.fromList . table) m
+           , "qᵢ = "                                              ++ show (Init  ())
+           , "qᶠ = "                                              ++ show (Final ())
            ]
 
 accepts ∷ (Finite q, Ord s) ⇒ GNFA q s → [s] → Bool
