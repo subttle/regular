@@ -10,8 +10,9 @@ import           Prelude hiding ((*), (+))
 import           Common
 import           Finite
 import           Language (ℒ)
-import           RegExp (RegExp)
-import           RegExp as RE
+import           RegExp (RegExp, zero, (*), (+), star)
+import qualified RegExp as RE
+import           Control.Applicative (liftA2)
 import           Control.Selective (Selective, select, (<*?))
 import qualified Data.List as List
 import           Data.Set as Set
@@ -52,11 +53,13 @@ instance Applicative (GNFA q) where
   pure = point
 
   (<*>) ∷ GNFA q (s → g) → GNFA q s → GNFA q g
-  (<*>) (GNFA δ₁) (GNFA δ₂) = GNFA (\(q₁, q₂) → δ₁ (q₁, q₂) <*> δ₂ (q₁, q₂))
+  -- (<*>) (GNFA δ₁) (GNFA δ₂) = GNFA (\(q₁, q₂) → δ₁ (q₁, q₂) <*> δ₂ (q₁, q₂))
+  (<*>) (GNFA δ₁) (GNFA δ₂) = GNFA (liftA2 (<*>) δ₁ δ₂)
 
 instance Selective (GNFA q) where
   select ∷ GNFA q (Either s g) → GNFA q (s → g) → GNFA q g
-  select (GNFA δ₁) (GNFA δ₂) = GNFA (\(q₁, q₂) → δ₁ (q₁, q₂) <*? δ₂ (q₁, q₂))
+  -- select (GNFA δ₁) (GNFA δ₂) = GNFA (\(q₁, q₂) → δ₁ (q₁, q₂) <*? δ₂ (q₁, q₂))
+  select (GNFA δ₁) (GNFA δ₂) = GNFA (liftA2 (<*?) δ₁ δ₂)
 
 instance Profunctor GNFA where
   rmap ∷ (s → g) → GNFA q s → GNFA q g
