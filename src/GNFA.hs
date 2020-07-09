@@ -99,7 +99,6 @@ table (GNFA δ) = zip domain image
 reduce ∷ (Finite q, Ord s) ⇒ GNFA q s → GNFA Void s
 reduce = lmap absurd . flip (Set.foldl rip) asSet
 
--- δ₁(q, p) = δ(q, r) ⊗ δ(r, r)⋆ ⊗ δ(r, p) ⊕ δ(q, p) where q, p, r ∈ Q, and r is the state to "rip"
 rip ∷ ∀ q s . (Eq q, Ord s) ⇒ GNFA q s → q → GNFA q s
 rip (GNFA δ) q = GNFA δ₁
   where
@@ -107,9 +106,14 @@ rip (GNFA δ) q = GNFA δ₁
     qᵣ = Right q
     δ₁ ∷ (Either Init q, Either Final q) → RegExp s
     δ₁ (q₁, q₂) | (q₁ == qᵣ) ∨ (q₂ == qᵣ) = zero -- We are ripping qᵣ out, so if qᵣ is an arg to δ₁, return Zero
-    δ₁ (q₁, q₂)                           = δ (q₁, qᵣ) * (star (δ (qᵣ, qᵣ)) * δ (qᵣ, q₂)) + δ (q₁, q₂)
+    -- δ₁ (q₁, q₂)                           = δ (q₁, qᵣ) * (star (δ (qᵣ, qᵣ)) * δ (qᵣ, q₂)) + δ (q₁, q₂)
     -- or
-    -- δ₁ (q₁, q₂)                           = δ (q₁, q₂) + (δ (q₁, qᵣ) * (star (δ (qᵣ, qᵣ)) * δ (qᵣ, q₂)))
+    --
+    -- δ₁(q, p) = δ(q,       p)
+    --          ⊕ δ(q, r)
+    --          ⊗ δ   (r, r)⋆
+    --          ⊗ δ      (r, p)  where q, p, r ∈ Q, and r is the state to "rip"
+    δ₁ (q₁, q₂)                           = δ (q₁, q₂) + (δ (q₁, qᵣ) * (star (δ (qᵣ, qᵣ)) * δ (qᵣ, q₂)))
 
 extract ∷ GNFA Void s → RegExp s
 extract (GNFA δ) = δ (Left (Init ()), Left (Final ()))
