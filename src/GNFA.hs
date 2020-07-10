@@ -71,12 +71,15 @@ instance (Show q, Finite q, Show s, Finite s)
        ⇒ Show (GNFA q s) where
   show ∷ GNFA q s → String
   show m = quoteWith "(" ")" . List.intercalate "," . fmap (quoteWith " " "\n") $
-           [ "Q  = "                                              ++ show (Set' (qs    m))
-           , "Σ  = "                                              ++ show (Set' (sigma m))
+           [ equation "Q"  (show (Set' (qs    m)))
+           , equation "Σ"  (show (Set' (sigma m)))
            , "δ : (Q ∖ {qᶠ}) × (Q ∖ {qᵢ}) → Regular Expression\n" ++ (format . Map.fromList . table) m
-           , "qᵢ = "                                              ++ show (Init  ())
-           , "qᶠ = "                                              ++ show (Final ())
+           , equation "qᵢ" (show (Init  ())      )
+           , equation "qᶠ" (show (Final ())      )
            ]
+    where
+      equation ∷ String → String → String
+      equation lhs rhs = quoteWith lhs rhs (quoteWith " " " " ("="))
 
 accepts ∷ (Finite q, Ord s) ⇒ GNFA q s → [s] → Bool
 accepts = RE.matches . toRE
