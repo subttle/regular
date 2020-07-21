@@ -156,7 +156,7 @@ testDFAinvhomimage = expect same
         h ∷ Bool → [Fin₂]
         h False = [0,1]
         h True  = []
-        expected ∷ DFA Fin₃ Bool 
+        expected ∷ DFA Fin₃ Bool
         expected = DFA δ 0 (singleton 2)
           where
             δ ∷ (Fin₃, Bool) → Fin₃
@@ -170,7 +170,7 @@ testDFAinvhomimage = expect same
 testREDropout ∷ Test ()
 testREDropout = tests [test₁, test₂]
   where
-    -- ℒ (A·(B·C)) ≟ {"AB", "AC", "BC"}
+    -- ℒ (dropout (A·(B·C))) ≟ {"AB", "AC", "BC"}
     test₁ ∷ Test ()
     test₁ = expectEqual expected (RE.language expression')
       where
