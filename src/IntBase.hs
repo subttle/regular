@@ -15,7 +15,7 @@ import           Data.List (unfoldr)
 import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)), (<|))
 import qualified Data.List.NonEmpty as NE
 import           GHC.Real (reduce)
-import           Common ((‥), ordering, quoteWith)
+import           Common ((⊲), (⋄), (‥), ordering, quoteWith)
 
 -- N.B. this entire file is currently experimental/untested/WIP!
 
@@ -135,9 +135,9 @@ type instance Base Integer = IntegerF
 
 
 toOrderings ∷ ℤ → NonEmpty Ordering
-toOrderings (Prev i) =      LT <| toOrderings i
+toOrderings (Prev i) =      LT ⊲ toOrderings i
 toOrderings Zero     = pure EQ
-toOrderings (Next i) =      GT <| toOrderings i
+toOrderings (Next i) =      GT ⊲ toOrderings i
 
 toOrdering ∷ ℤ → Ordering
 toOrdering = int (const LT) EQ (const GT)
@@ -185,27 +185,27 @@ instance (Show a) ⇒ Show (FreeGroup a) where
   show = show₁
     where
       -- (+True (-False 0))
-      show₁ ∷ forall a . (Show a) ⇒ FreeGroup a → String
-      show₁ (Neg a ga) = "(-" <> show a <> " " <> show ga <> ")"
+      show₁ ∷ ∀ a . (Show a) ⇒ FreeGroup a → String
+      show₁ (Neg a ga) = "(-" ⋄ show a ⋄ " " ⋄ show ga ⋄ ")"
       show₁ Zer        = "0"
-      show₁ (Pos a ga) = "(+" <> show a <> " " <> show ga <> ")"
+      show₁ (Pos a ga) = "(+" ⋄ show a ⋄ " " ⋄ show ga ⋄ ")"
       -- (+True(-False(0)))
-      show₂ ∷ forall a . (Show a) ⇒ FreeGroup a → String
+      show₂ ∷ ∀ a . (Show a) ⇒ FreeGroup a → String
       show₂ = freegroup ((quoteWith "(-" ")") ‥ shows)
                         "(0)"
                         ((quoteWith "(+" ")") ‥ shows)
       -- (+True)(-False)(0)
-      show₃ ∷ forall a . (Show a) ⇒ FreeGroup a → String
+      show₃ ∷ ∀ a . (Show a) ⇒ FreeGroup a → String
       show₃ = freegroup (showString . quoteWith "(-" ")" . show)
                         "(0)"
                         (showString . quoteWith "(+" ")" . show)
 
 instance Semigroup (FreeGroup a) where
   (<>) ∷ FreeGroup a → FreeGroup a → FreeGroup a
-  (<>) (Neg a l) r   = Neg a (l <> r)
+  (<>) (Neg a l) r   = Neg a (l ⋄ r)
   (<>) Zer       r   =             r
   (<>)        l  Zer =        l
-  (<>) (Pos a l) r   = Pos a (l <> r)
+  (<>) (Pos a l) r   = Pos a (l ⋄ r)
 instance Monoid (FreeGroup a) where
   mempty ∷ FreeGroup a
   mempty = Zer
@@ -223,9 +223,9 @@ instance Functor FreeGroup where
 instance Foldable FreeGroup where
   -- TODO
   foldMap ∷ (Monoid m) ⇒ (a → m) → FreeGroup a → m
-  foldMap f (Neg a ga) = f a <> foldMap f ga
+  foldMap f (Neg a ga) = f a ⋄ foldMap f ga
   foldMap _ Zer        = mempty
-  foldMap f (Pos a ga) = f a <> foldMap f ga
+  foldMap f (Pos a ga) = f a ⋄ foldMap f ga
 
 instance Traversable FreeGroup where
   -- TODO
@@ -254,9 +254,9 @@ instance Monad FreeGroup where
   (>>=) = join ‥ (<&>)
     where
       join ∷ FreeGroup (FreeGroup b) → FreeGroup b
-      join (Neg gb ggb) = invert gb <> join ggb
+      join (Neg gb ggb) = invert gb ⋄ join ggb
       join Zer          = Zer
-      join (Pos gb ggb) =        gb <> join ggb
+      join (Pos gb ggb) =        gb ⋄ join ggb
 
 instance Alternative FreeGroup where
   empty ∷ FreeGroup a
