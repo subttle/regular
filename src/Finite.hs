@@ -1,8 +1,9 @@
-{-# LANGUAGE FlexibleInstances          #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE ExplicitForAll             #-}
 {-# LANGUAGE DataKinds                  #-}
+{-# LANGUAGE ExplicitForAll             #-}
+{-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE FunctionalDependencies     #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE TypeOperators              #-}
 
 module Finite where
 
@@ -154,9 +155,9 @@ instance NotEmpty Rank where
 instance NotEmpty Card where
   wit ∷ Card
   wit = Card wit wit
-instance NotEmpty D₆ where
-  wit ∷ D₆
-  wit = Side₁
+instance NotEmpty (:🎲) where
+  wit ∷ (:🎲)
+  wit = (⚀)
 instance NotEmpty Month where
   wit ∷ Month
   wit = January
@@ -1738,101 +1739,100 @@ instance Show Final where
   show ∷ Final → String
   show (Final ()) = "qᶠ"
 
--- A six-sided die -- TODO -- 🎲  U+1F3B2
-data D₆ where
-  Side₁ ∷ D₆
-  Side₂ ∷ D₆
-  Side₃ ∷ D₆
-  Side₄ ∷ D₆
-  Side₅ ∷ D₆
-  Side₆ ∷ D₆
+data (:🎲) where
+  (:⚀) ∷ (:🎲)
+  (:⚁) ∷ (:🎲)
+  (:⚂) ∷ (:🎲)
+  (:⚃) ∷ (:🎲)
+  (:⚄) ∷ (:🎲)
+  (:⚅) ∷ (:🎲)
   deriving (Eq, Enum, Ord, Bounded)
 
 -- non unicode aliases for convenience
-type D6 = D₆
-side1 ∷ D₆
-side1 = Side₁
-side2 ∷ D₆
-side2 = Side₂
-side3 ∷ D₆
-side3 = Side₃
-side4 ∷ D₆
-side4 = Side₄
-side5 ∷ D₆
-side5 = Side₅
-side6 ∷ D₆
-side6 = Side₆
+type D6 = (:🎲)
+side1 ∷ (:🎲)
+side1 = (:⚀)
+side2 ∷ (:🎲)
+side2 = (:⚁)
+side3 ∷ (:🎲)
+side3 = (:⚂)
+side4 ∷ (:🎲)
+side4 = (:⚃)
+side5 ∷ (:🎲)
+side5 = (:⚄)
+side6 ∷ (:🎲)
+side6 = (:⚅)
 
-instance Show D₆ where
-  show ∷ D₆ → String
+instance Show (:🎲) where
+  show ∷ (:🎲) → String
   show = show'
 
-instance U.Universe D₆
-instance U.Finite   D₆
-instance Finite     D₆
+instance U.Universe (:🎲)
+instance U.Finite   (:🎲)
+instance Finite     (:🎲)
 
-instance Fancy D₆ where
-  unicode  ∷ D₆ → Char
-  unicode Side₁ = '⚀'
-  unicode Side₂ = '⚁'
-  unicode Side₃ = '⚂'
-  unicode Side₄ = '⚃'
-  unicode Side₅ = '⚄'
-  unicode Side₆ = '⚅'
-  plain ∷ D₆ → String
-  plain Side₁ = "Side₁"
-  plain Side₂ = "Side₂"
-  plain Side₃ = "Side₃"
-  plain Side₄ = "Side₄"
-  plain Side₅ = "Side₅"
-  plain Side₆ = "Side₆"
-  show' ∷ D₆ → String
+instance Fancy (:🎲) where
+  unicode  ∷ (:🎲) → Char
+  unicode (:⚀) = '⚀'
+  unicode (:⚁) = '⚁'
+  unicode (:⚂) = '⚂'
+  unicode (:⚃) = '⚃'
+  unicode (:⚄) = '⚄'
+  unicode (:⚅) = '⚅'
+  plain ∷ (:🎲) → String
+  plain (:⚀) = "(:⚀)"
+  plain (:⚁) = "(:⚁)"
+  plain (:⚂) = "(:⚂)"
+  plain (:⚃) = "(:⚃)"
+  plain (:⚄) = "(:⚄)"
+  plain (:⚅) = "(:⚅)"
+  show' ∷ (:🎲) → String
   show' d = charToString (unicode d) `toColor` colorOf' d
     where
       -- TODO almost have the six colors of Rubik's cube, maybe try to update?
-      colorOf' ∷ D₆ → DisplayColor
-      colorOf' Side₁ = Red'    -- "⚀"
-      colorOf' Side₂ = Magenta -- "⚁" -- Orange
-      colorOf' Side₃ = Yellow  -- "⚂"
-      colorOf' Side₄ = Green   -- "⚃"
-      colorOf' Side₅ = Blue    -- "⚄"
-      colorOf' Side₆ = White   -- "⚅"
+      colorOf' ∷ (:🎲) → DisplayColor
+      colorOf' (:⚀) = Red'    -- "⚀"
+      colorOf' (:⚁) = Magenta -- "⚁" -- Orange
+      colorOf' (:⚂) = Yellow  -- "⚂"
+      colorOf' (:⚃) = Green   -- "⚃"
+      colorOf' (:⚄) = Blue    -- "⚄"
+      colorOf' (:⚅) = White   -- "⚅"
 
-(⚀) ∷ D₆
-(⚀) = Side₁
+(⚀) ∷ (:🎲)
+(⚀) = (:⚀)
 
-(⚁) ∷ D₆
-(⚁) = Side₂
+(⚁) ∷ (:🎲)
+(⚁) = (:⚁)
 
-(⚂) ∷ D₆
-(⚂) = Side₃
+(⚂) ∷ (:🎲)
+(⚂) = (:⚂)
 
-(⚃) ∷ D₆
-(⚃) = Side₄
+(⚃) ∷ (:🎲)
+(⚃) = (:⚃)
 
-(⚄) ∷ D₆
-(⚄) = Side₅
+(⚄) ∷ (:🎲)
+(⚄) = (:⚄)
 
-(⚅) ∷ D₆
-(⚅) = Side₆
+(⚅) ∷ (:🎲)
+(⚅) = (:⚅)
 
 -- automorphism which computes the flip of the six-sided die to the opposite side
-flipped ∷ D₆ → D₆
-flipped Side₁ = Side₆
-flipped Side₂ = Side₅
-flipped Side₃ = Side₄
-flipped Side₄ = Side₃
-flipped Side₅ = Side₂
-flipped Side₆ = Side₁
+flipped ∷ (:🎲) → (:🎲)
+flipped (:⚀) = (⚅)
+flipped (:⚁) = (⚄)
+flipped (:⚂) = (⚃)
+flipped (:⚃) = (⚂)
+flipped (:⚄) = (⚁)
+flipped (:⚅) = (⚀)
 
 -- non-deterministically knock over a die (rotate by 90 degrees)
-rotate90 ∷ D₆ → NonEmpty D₆
-rotate90 Side₁ = Side₂ :| [Side₃, Side₄, Side₅]
-rotate90 Side₂ = Side₁ :| [Side₃, Side₄, Side₆]
-rotate90 Side₃ = Side₁ :| [Side₂, Side₅, Side₆]
-rotate90 Side₄ = Side₁ :| [Side₂, Side₃, Side₆]
-rotate90 Side₅ = Side₁ :| [Side₃, Side₄, Side₆]
-rotate90 Side₆ = Side₂ :| [Side₃, Side₄, Side₅]
+rotate90 ∷ (:🎲) → NonEmpty (:🎲)
+rotate90 (:⚀) = (⚁) :| [(⚂), (⚃), (⚄)]
+rotate90 (:⚁) = (⚀) :| [(⚂), (⚃), (⚅)]
+rotate90 (:⚂) = (⚀) :| [(⚁), (⚄), (⚅)]
+rotate90 (:⚃) = (⚀) :| [(⚁), (⚂), (⚅)]
+rotate90 (:⚄) = (⚀) :| [(⚂), (⚃), (⚅)]
+rotate90 (:⚅) = (⚁) :| [(⚂), (⚃), (⚄)]
 
 data Month where
   January   ∷ Month
