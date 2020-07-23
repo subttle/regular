@@ -1748,20 +1748,39 @@ data (:🎲) where
   (:⚅) ∷ (:🎲)
   deriving (Eq, Enum, Ord, Bounded)
 
+-- aliases
+(⚀) ∷ (:🎲)
+(⚀) = (:⚀)
+
+(⚁) ∷ (:🎲)
+(⚁) = (:⚁)
+
+(⚂) ∷ (:🎲)
+(⚂) = (:⚂)
+
+(⚃) ∷ (:🎲)
+(⚃) = (:⚃)
+
+(⚄) ∷ (:🎲)
+(⚄) = (:⚄)
+
+(⚅) ∷ (:🎲)
+(⚅) = (:⚅)
+
 -- non unicode aliases for convenience
 type D6 = (:🎲)
 side1 ∷ (:🎲)
-side1 = (:⚀)
+side1 = (⚀)
 side2 ∷ (:🎲)
-side2 = (:⚁)
+side2 = (⚁)
 side3 ∷ (:🎲)
-side3 = (:⚂)
+side3 = (⚂)
 side4 ∷ (:🎲)
-side4 = (:⚃)
+side4 = (⚃)
 side5 ∷ (:🎲)
-side5 = (:⚄)
+side5 = (⚄)
 side6 ∷ (:🎲)
-side6 = (:⚅)
+side6 = (⚅)
 
 instance Show (:🎲) where
   show ∷ (:🎲) → String
@@ -1797,24 +1816,6 @@ instance Fancy (:🎲) where
       colorOf' (:⚃) = Green   -- "⚃"
       colorOf' (:⚄) = Blue    -- "⚄"
       colorOf' (:⚅) = White   -- "⚅"
-
-(⚀) ∷ (:🎲)
-(⚀) = (:⚀)
-
-(⚁) ∷ (:🎲)
-(⚁) = (:⚁)
-
-(⚂) ∷ (:🎲)
-(⚂) = (:⚂)
-
-(⚃) ∷ (:🎲)
-(⚃) = (:⚃)
-
-(⚄) ∷ (:🎲)
-(⚄) = (:⚄)
-
-(⚅) ∷ (:🎲)
-(⚅) = (:⚅)
 
 -- automorphism which computes the flip of the six-sided die to the opposite side
 flipped ∷ (:🎲) → (:🎲)
