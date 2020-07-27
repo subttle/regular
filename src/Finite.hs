@@ -1816,6 +1816,8 @@ instance Fancy (:🎲) where
       colorOf' (:⚃) = Green   -- "⚃"
       colorOf' (:⚄) = Blue    -- "⚄"
       colorOf' (:⚅) = White   -- "⚅"
+  named ∷ (:🎲) → String
+  named = const (charToString '🎲')
 
 -- automorphism which computes the flip of the six-sided die to the opposite side
 flipped ∷ (:🎲) → (:🎲)
@@ -2032,6 +2034,8 @@ instance Fancy (🁢) where
           coloring (Just (:⚃)) = Green
           coloring (Just (:⚄)) = Blue
           coloring (Just (:⚅)) = White
+  named ∷ (🁢) → String
+  named = const (charToString '🁢')
 
 topOf ∷ (🁢) → Maybe (:🎲)
 topOf (:🁣) = Nothing
@@ -2192,6 +2196,8 @@ instance Fancy Quadrant where
   plain Q₂ = "Q₂"
   plain Q₃ = "Q₃"
   plain Q₄ = "Q₄"
+  named ∷ Quadrant → String
+  named = const ("Quadrant") -- TODO
 instance Show Quadrant where
   show ∷ Quadrant → String
   show = show'
@@ -2251,6 +2257,8 @@ instance Fancy Octant where
   plain O₆ = "O₆"
   plain O₇ = "O₇"
   plain O₈ = "O₈"
+  named ∷ Octant → String
+  named = const ("Octant") -- TODO
 instance Show Octant where
   show ∷ Octant → String
   show = show'
@@ -2302,6 +2310,8 @@ instance Fancy Suit where
   plain Heart   = "Heart"
   plain Diamond = "Diamond"
   plain Club    = "Club"
+  named ∷ Suit → String
+  named = const ("Suit") -- TODO
   show' ∷ Suit → String
   show' s = charToString (unicode s) `toColor` colorOf s
 
@@ -2354,6 +2364,8 @@ instance Fancy Rank where
   plain Queen = "Queen"
   plain King  = "King"
   plain Ace   = "Ace"
+  named ∷ Rank → String
+  named = const ("Rank") -- TODO
 
 instance Show Rank where
   show ∷ Rank → String
@@ -2435,6 +2447,8 @@ instance Fancy Card where
   unicode (Card Two   Club   ) = '🃒'
   plain ∷ Card → String
   plain (Card r s) = plain r ++ " of " ++ plain s ++ "s"
+  named ∷ Card → String
+  named = const ("Card") -- TODO
 
 instance Show Card where
   show ∷ Card → String
