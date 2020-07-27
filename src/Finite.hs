@@ -1835,6 +1835,319 @@ rotate90 (:⚃) = (⚀) :| [(⚁), (⚂), (⚅)]
 rotate90 (:⚄) = (⚀) :| [(⚂), (⚃), (⚅)]
 rotate90 (:⚅) = (⚁) :| [(⚂), (⚃), (⚄)]
 
+{-
+-- https://www.unicode.org/charts/PDF/U1F030.pdf
+🁢
+🁣 🁤 🁥 🁦 🁧 🁨 🁩
+🁪 🁫 🁬 🁭 🁮 🁯 🁰
+🁱 🁲 🁳 🁴 🁵 🁶 🁷
+🁸 🁹 🁺 🁻 🁼 🁽 🁾
+🁿 🂀 🂁 🂂 🂃 🂄 🂅
+🂆 🂇 🂈 🂉 🂊 🂋 🂌
+🂍 🂎 🂏 🂐 🂑 🂒 🂓
+
+🀰
+🀱 🀲 🀳 🀴 🀵 🀶 🀷
+🀸 🀹 🀺 🀻 🀼 🀽 🀾
+🀿 🁀 🁁 🁂 🁃 🁄 🁅
+🁆 🁇 🁈 🁉 🁊 🁋 🁌
+🁍 🁎 🁏 🁐 🁑 🁒 🁓
+🁔 🁕 🁖 🁗 🁘 🁙 🁚
+🁛 🁜 🁝 🁞 🁟 🁠 🁡
+-}
+data (🁢) where
+  (:🁣) ∷ (🁢)
+  (:🁤) ∷ (🁢)
+  (:🁥) ∷ (🁢)
+  (:🁦) ∷ (🁢)
+  (:🁧) ∷ (🁢)
+  (:🁨) ∷ (🁢)
+  (:🁩) ∷ (🁢)
+  (:🁪) ∷ (🁢)
+  (:🁫) ∷ (🁢)
+  (:🁬) ∷ (🁢)
+  (:🁭) ∷ (🁢)
+  (:🁮) ∷ (🁢)
+  (:🁯) ∷ (🁢)
+  (:🁰) ∷ (🁢)
+  (:🁱) ∷ (🁢)
+  (:🁲) ∷ (🁢)
+  (:🁳) ∷ (🁢)
+  (:🁴) ∷ (🁢)
+  (:🁵) ∷ (🁢)
+  (:🁶) ∷ (🁢)
+  (:🁷) ∷ (🁢)
+  (:🁸) ∷ (🁢)
+  (:🁹) ∷ (🁢)
+  (:🁺) ∷ (🁢)
+  (:🁻) ∷ (🁢)
+  (:🁼) ∷ (🁢)
+  (:🁽) ∷ (🁢)
+  (:🁾) ∷ (🁢)
+  (:🁿) ∷ (🁢)
+  (:🂀) ∷ (🁢)
+  (:🂁) ∷ (🁢)
+  (:🂂) ∷ (🁢)
+  (:🂃) ∷ (🁢)
+  (:🂄) ∷ (🁢)
+  (:🂅) ∷ (🁢)
+  (:🂆) ∷ (🁢)
+  (:🂇) ∷ (🁢)
+  (:🂈) ∷ (🁢)
+  (:🂉) ∷ (🁢)
+  (:🂊) ∷ (🁢)
+  (:🂋) ∷ (🁢)
+  (:🂌) ∷ (🁢)
+  (:🂍) ∷ (🁢)
+  (:🂎) ∷ (🁢)
+  (:🂏) ∷ (🁢)
+  (:🂐) ∷ (🁢)
+  (:🂑) ∷ (🁢)
+  (:🂒) ∷ (🁢)
+  (:🂓) ∷ (🁢)
+  deriving (Eq, Ord, Bounded, Enum)
+
+instance U.Universe (🁢)
+instance U.Finite   (🁢)
+instance Finite     (🁢)
+
+instance Show (🁢) where
+  show ∷ (🁢) → String
+  show = show'
+instance Fancy (🁢) where
+  unicode ∷ (🁢) → Char
+  unicode (:🁣) = '🁣'
+  unicode (:🁤) = '🁤'
+  unicode (:🁥) = '🁥'
+  unicode (:🁦) = '🁦'
+  unicode (:🁧) = '🁧'
+  unicode (:🁨) = '🁨'
+  unicode (:🁩) = '🁩'
+  unicode (:🁪) = '🁪'
+  unicode (:🁫) = '🁫'
+  unicode (:🁬) = '🁬'
+  unicode (:🁭) = '🁭'
+  unicode (:🁮) = '🁮'
+  unicode (:🁯) = '🁯'
+  unicode (:🁰) = '🁰'
+  unicode (:🁱) = '🁱'
+  unicode (:🁲) = '🁲'
+  unicode (:🁳) = '🁳'
+  unicode (:🁴) = '🁴'
+  unicode (:🁵) = '🁵'
+  unicode (:🁶) = '🁶'
+  unicode (:🁷) = '🁷'
+  unicode (:🁸) = '🁸'
+  unicode (:🁹) = '🁹'
+  unicode (:🁺) = '🁺'
+  unicode (:🁻) = '🁻'
+  unicode (:🁼) = '🁼'
+  unicode (:🁽) = '🁽'
+  unicode (:🁾) = '🁾'
+  unicode (:🁿) = '🁿'
+  unicode (:🂀) = '🂀'
+  unicode (:🂁) = '🂁'
+  unicode (:🂂) = '🂂'
+  unicode (:🂃) = '🂃'
+  unicode (:🂄) = '🂄'
+  unicode (:🂅) = '🂅'
+  unicode (:🂆) = '🂆'
+  unicode (:🂇) = '🂇'
+  unicode (:🂈) = '🂈'
+  unicode (:🂉) = '🂉'
+  unicode (:🂊) = '🂊'
+  unicode (:🂋) = '🂋'
+  unicode (:🂌) = '🂌'
+  unicode (:🂍) = '🂍'
+  unicode (:🂎) = '🂎'
+  unicode (:🂏) = '🂏'
+  unicode (:🂐) = '🂐'
+  unicode (:🂑) = '🂑'
+  unicode (:🂒) = '🂒'
+  unicode (:🂓) = '🂓'
+  plain ∷ (🁢) → String
+  plain (:🁣) = "(:🁣)"
+  plain (:🁤) = "(:🁤)"
+  plain (:🁥) = "(:🁥)"
+  plain (:🁦) = "(:🁦)"
+  plain (:🁧) = "(:🁧)"
+  plain (:🁨) = "(:🁨)"
+  plain (:🁩) = "(:🁩)"
+  plain (:🁪) = "(:🁪)"
+  plain (:🁫) = "(:🁫)"
+  plain (:🁬) = "(:🁬)"
+  plain (:🁭) = "(:🁭)"
+  plain (:🁮) = "(:🁮)"
+  plain (:🁯) = "(:🁯)"
+  plain (:🁰) = "(:🁰)"
+  plain (:🁱) = "(:🁱)"
+  plain (:🁲) = "(:🁲)"
+  plain (:🁳) = "(:🁳)"
+  plain (:🁴) = "(:🁴)"
+  plain (:🁵) = "(:🁵)"
+  plain (:🁶) = "(:🁶)"
+  plain (:🁷) = "(:🁷)"
+  plain (:🁸) = "(:🁸)"
+  plain (:🁹) = "(:🁹)"
+  plain (:🁺) = "(:🁺)"
+  plain (:🁻) = "(:🁻)"
+  plain (:🁼) = "(:🁼)"
+  plain (:🁽) = "(:🁽)"
+  plain (:🁾) = "(:🁾)"
+  plain (:🁿) = "(:🁿)"
+  plain (:🂀) = "(:🂀)"
+  plain (:🂁) = "(:🂁)"
+  plain (:🂂) = "(:🂂)"
+  plain (:🂃) = "(:🂃)"
+  plain (:🂄) = "(:🂄)"
+  plain (:🂅) = "(:🂅)"
+  plain (:🂆) = "(:🂆)"
+  plain (:🂇) = "(:🂇)"
+  plain (:🂈) = "(:🂈)"
+  plain (:🂉) = "(:🂉)"
+  plain (:🂊) = "(:🂊)"
+  plain (:🂋) = "(:🂋)"
+  plain (:🂍) = "(:🂍)"
+  plain (:🂎) = "(:🂎)"
+  plain (:🂏) = "(:🂏)"
+  plain (:🂐) = "(:🂐)"
+  plain (:🂑) = "(:🂑)"
+  plain (:🂒) = "(:🂒)"
+  plain (:🂓) = "(:🂓)"
+  show' ∷ (🁢) → String
+  show' d = charToString (unicode d) `toColor` colorOf' d
+    where
+      -- TODO almost have the six colors of Rubik's cube, maybe try to update?
+      colorOf' ∷ (🁢) → DisplayColor
+      colorOf' = coloring . pick
+        where
+          pick ∷ (🁢) → Maybe (:🎲)
+          pick = topd
+          -- pick = botd d
+          coloring ∷ Maybe (:🎲) → DisplayColor
+          coloring Nothing     = Black'
+          coloring (Just (:⚀)) = Red'
+          coloring (Just (:⚁)) = Magenta -- Orange
+          coloring (Just (:⚂)) = Yellow
+          coloring (Just (:⚃)) = Green
+          coloring (Just (:⚄)) = Blue
+          coloring (Just (:⚅)) = White
+
+-- TODO better names
+topd ∷ (🁢) → Maybe (:🎲)
+topd (:🁣) = Nothing
+topd (:🁤) = Nothing
+topd (:🁥) = Nothing
+topd (:🁦) = Nothing
+topd (:🁧) = Nothing
+topd (:🁨) = Nothing
+topd (:🁩) = Nothing
+topd (:🁪) = Just (⚀)
+topd (:🁫) = Just (⚀)
+topd (:🁬) = Just (⚀)
+topd (:🁭) = Just (⚀)
+topd (:🁮) = Just (⚀)
+topd (:🁯) = Just (⚀)
+topd (:🁰) = Just (⚀)
+topd (:🁱) = Just (⚁)
+topd (:🁲) = Just (⚁)
+topd (:🁳) = Just (⚁)
+topd (:🁴) = Just (⚁)
+topd (:🁵) = Just (⚁)
+topd (:🁶) = Just (⚁)
+topd (:🁷) = Just (⚁)
+topd (:🁸) = Just (⚂)
+topd (:🁹) = Just (⚂)
+topd (:🁺) = Just (⚂)
+topd (:🁻) = Just (⚂)
+topd (:🁼) = Just (⚂)
+topd (:🁽) = Just (⚂)
+topd (:🁾) = Just (⚂)
+topd (:🁿) = Just (⚃)
+topd (:🂀) = Just (⚃)
+topd (:🂁) = Just (⚃)
+topd (:🂂) = Just (⚃)
+topd (:🂃) = Just (⚃)
+topd (:🂄) = Just (⚃)
+topd (:🂅) = Just (⚃)
+topd (:🂆) = Just (⚄)
+topd (:🂇) = Just (⚄)
+topd (:🂈) = Just (⚄)
+topd (:🂉) = Just (⚄)
+topd (:🂊) = Just (⚄)
+topd (:🂋) = Just (⚄)
+topd (:🂌) = Just (⚄)
+topd (:🂍) = Just (⚅)
+topd (:🂎) = Just (⚅)
+topd (:🂏) = Just (⚅)
+topd (:🂐) = Just (⚅)
+topd (:🂑) = Just (⚅)
+topd (:🂒) = Just (⚅)
+topd (:🂓) = Just (⚅)
+
+botd ∷ (🁢) → Maybe (:🎲)
+botd (:🁣) = Nothing
+botd (:🁤) = Just (⚀)
+botd (:🁥) = Just (⚁)
+botd (:🁦) = Just (⚂)
+botd (:🁧) = Just (⚃)
+botd (:🁨) = Just (⚄)
+botd (:🁩) = Just (⚅)
+botd (:🁪) = Nothing
+botd (:🁫) = Just (⚀)
+botd (:🁬) = Just (⚁)
+botd (:🁭) = Just (⚂)
+botd (:🁮) = Just (⚃)
+botd (:🁯) = Just (⚄)
+botd (:🁰) = Just (⚅)
+botd (:🁱) = Nothing
+botd (:🁲) = Just (⚀)
+botd (:🁳) = Just (⚁)
+botd (:🁴) = Just (⚂)
+botd (:🁵) = Just (⚃)
+botd (:🁶) = Just (⚄)
+botd (:🁷) = Just (⚅)
+botd (:🁸) = Nothing
+botd (:🁹) = Just (⚀)
+botd (:🁺) = Just (⚁)
+botd (:🁻) = Just (⚂)
+botd (:🁼) = Just (⚃)
+botd (:🁽) = Just (⚄)
+botd (:🁾) = Just (⚅)
+botd (:🁿) = Nothing
+botd (:🂀) = Just (⚀)
+botd (:🂁) = Just (⚁)
+botd (:🂂) = Just (⚂)
+botd (:🂃) = Just (⚃)
+botd (:🂄) = Just (⚄)
+botd (:🂅) = Just (⚅)
+botd (:🂆) = Nothing
+botd (:🂇) = Just (⚀)
+botd (:🂈) = Just (⚁)
+botd (:🂉) = Just (⚂)
+botd (:🂊) = Just (⚃)
+botd (:🂋) = Just (⚄)
+botd (:🂌) = Just (⚅)
+botd (:🂍) = Nothing
+botd (:🂎) = Just (⚀)
+botd (:🂏) = Just (⚁)
+botd (:🂐) = Just (⚂)
+botd (:🂑) = Just (⚃)
+botd (:🂒) = Just (⚄)
+botd (:🂓) = Just (⚅)
+
+byBottomD ∷ Equivalence (🁢)
+byBottomD = equating' botd
+
+byTopD ∷ Equivalence (🁢)
+byTopD = equating' topd
+
+byEqualTB ∷ Equivalence (🁢)
+-- byEqualTB = equating' (\d → topd d == botd d)
+byEqualTB = equating' (liftA2 (==) topd botd)
+
+type Domino = (🁢)
+
 data Month where
   January   ∷ Month
   February  ∷ Month
