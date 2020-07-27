@@ -808,6 +808,10 @@ class (Show a) ⇒ Fancy a where
   colored ∷ (a, DisplayColor) → String
   colored (s, color) = show' s `toColor` color
 
+  -- FIXME :)
+  named ∷ a → String
+  named = const mempty
+
 newtype CCPredicate a where
   CCPredicate ∷ ContraCoyoneda Predicate a → CCPredicate a
   deriving Contravariant via (ContraCoyoneda Predicate)
