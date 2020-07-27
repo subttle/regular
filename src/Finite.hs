@@ -2022,8 +2022,8 @@ instance Fancy (🁢) where
       colorOf' = coloring . pick
         where
           pick ∷ (🁢) → Maybe (:🎲)
-          pick = topd
-          -- pick = botd d
+          pick = topOf
+          -- pick = bottomOf d
           coloring ∷ Maybe (:🎲) → DisplayColor
           coloring Nothing     = Black'
           coloring (Just (:⚀)) = Red'
@@ -2033,118 +2033,116 @@ instance Fancy (🁢) where
           coloring (Just (:⚄)) = Blue
           coloring (Just (:⚅)) = White
 
--- TODO better names
-topd ∷ (🁢) → Maybe (:🎲)
-topd (:🁣) = Nothing
-topd (:🁤) = Nothing
-topd (:🁥) = Nothing
-topd (:🁦) = Nothing
-topd (:🁧) = Nothing
-topd (:🁨) = Nothing
-topd (:🁩) = Nothing
-topd (:🁪) = Just (⚀)
-topd (:🁫) = Just (⚀)
-topd (:🁬) = Just (⚀)
-topd (:🁭) = Just (⚀)
-topd (:🁮) = Just (⚀)
-topd (:🁯) = Just (⚀)
-topd (:🁰) = Just (⚀)
-topd (:🁱) = Just (⚁)
-topd (:🁲) = Just (⚁)
-topd (:🁳) = Just (⚁)
-topd (:🁴) = Just (⚁)
-topd (:🁵) = Just (⚁)
-topd (:🁶) = Just (⚁)
-topd (:🁷) = Just (⚁)
-topd (:🁸) = Just (⚂)
-topd (:🁹) = Just (⚂)
-topd (:🁺) = Just (⚂)
-topd (:🁻) = Just (⚂)
-topd (:🁼) = Just (⚂)
-topd (:🁽) = Just (⚂)
-topd (:🁾) = Just (⚂)
-topd (:🁿) = Just (⚃)
-topd (:🂀) = Just (⚃)
-topd (:🂁) = Just (⚃)
-topd (:🂂) = Just (⚃)
-topd (:🂃) = Just (⚃)
-topd (:🂄) = Just (⚃)
-topd (:🂅) = Just (⚃)
-topd (:🂆) = Just (⚄)
-topd (:🂇) = Just (⚄)
-topd (:🂈) = Just (⚄)
-topd (:🂉) = Just (⚄)
-topd (:🂊) = Just (⚄)
-topd (:🂋) = Just (⚄)
-topd (:🂌) = Just (⚄)
-topd (:🂍) = Just (⚅)
-topd (:🂎) = Just (⚅)
-topd (:🂏) = Just (⚅)
-topd (:🂐) = Just (⚅)
-topd (:🂑) = Just (⚅)
-topd (:🂒) = Just (⚅)
-topd (:🂓) = Just (⚅)
+topOf ∷ (🁢) → Maybe (:🎲)
+topOf (:🁣) = Nothing
+topOf (:🁤) = Nothing
+topOf (:🁥) = Nothing
+topOf (:🁦) = Nothing
+topOf (:🁧) = Nothing
+topOf (:🁨) = Nothing
+topOf (:🁩) = Nothing
+topOf (:🁪) = Just (⚀)
+topOf (:🁫) = Just (⚀)
+topOf (:🁬) = Just (⚀)
+topOf (:🁭) = Just (⚀)
+topOf (:🁮) = Just (⚀)
+topOf (:🁯) = Just (⚀)
+topOf (:🁰) = Just (⚀)
+topOf (:🁱) = Just (⚁)
+topOf (:🁲) = Just (⚁)
+topOf (:🁳) = Just (⚁)
+topOf (:🁴) = Just (⚁)
+topOf (:🁵) = Just (⚁)
+topOf (:🁶) = Just (⚁)
+topOf (:🁷) = Just (⚁)
+topOf (:🁸) = Just (⚂)
+topOf (:🁹) = Just (⚂)
+topOf (:🁺) = Just (⚂)
+topOf (:🁻) = Just (⚂)
+topOf (:🁼) = Just (⚂)
+topOf (:🁽) = Just (⚂)
+topOf (:🁾) = Just (⚂)
+topOf (:🁿) = Just (⚃)
+topOf (:🂀) = Just (⚃)
+topOf (:🂁) = Just (⚃)
+topOf (:🂂) = Just (⚃)
+topOf (:🂃) = Just (⚃)
+topOf (:🂄) = Just (⚃)
+topOf (:🂅) = Just (⚃)
+topOf (:🂆) = Just (⚄)
+topOf (:🂇) = Just (⚄)
+topOf (:🂈) = Just (⚄)
+topOf (:🂉) = Just (⚄)
+topOf (:🂊) = Just (⚄)
+topOf (:🂋) = Just (⚄)
+topOf (:🂌) = Just (⚄)
+topOf (:🂍) = Just (⚅)
+topOf (:🂎) = Just (⚅)
+topOf (:🂏) = Just (⚅)
+topOf (:🂐) = Just (⚅)
+topOf (:🂑) = Just (⚅)
+topOf (:🂒) = Just (⚅)
+topOf (:🂓) = Just (⚅)
 
-botd ∷ (🁢) → Maybe (:🎲)
-botd (:🁣) = Nothing
-botd (:🁤) = Just (⚀)
-botd (:🁥) = Just (⚁)
-botd (:🁦) = Just (⚂)
-botd (:🁧) = Just (⚃)
-botd (:🁨) = Just (⚄)
-botd (:🁩) = Just (⚅)
-botd (:🁪) = Nothing
-botd (:🁫) = Just (⚀)
-botd (:🁬) = Just (⚁)
-botd (:🁭) = Just (⚂)
-botd (:🁮) = Just (⚃)
-botd (:🁯) = Just (⚄)
-botd (:🁰) = Just (⚅)
-botd (:🁱) = Nothing
-botd (:🁲) = Just (⚀)
-botd (:🁳) = Just (⚁)
-botd (:🁴) = Just (⚂)
-botd (:🁵) = Just (⚃)
-botd (:🁶) = Just (⚄)
-botd (:🁷) = Just (⚅)
-botd (:🁸) = Nothing
-botd (:🁹) = Just (⚀)
-botd (:🁺) = Just (⚁)
-botd (:🁻) = Just (⚂)
-botd (:🁼) = Just (⚃)
-botd (:🁽) = Just (⚄)
-botd (:🁾) = Just (⚅)
-botd (:🁿) = Nothing
-botd (:🂀) = Just (⚀)
-botd (:🂁) = Just (⚁)
-botd (:🂂) = Just (⚂)
-botd (:🂃) = Just (⚃)
-botd (:🂄) = Just (⚄)
-botd (:🂅) = Just (⚅)
-botd (:🂆) = Nothing
-botd (:🂇) = Just (⚀)
-botd (:🂈) = Just (⚁)
-botd (:🂉) = Just (⚂)
-botd (:🂊) = Just (⚃)
-botd (:🂋) = Just (⚄)
-botd (:🂌) = Just (⚅)
-botd (:🂍) = Nothing
-botd (:🂎) = Just (⚀)
-botd (:🂏) = Just (⚁)
-botd (:🂐) = Just (⚂)
-botd (:🂑) = Just (⚃)
-botd (:🂒) = Just (⚄)
-botd (:🂓) = Just (⚅)
+bottomOf ∷ (🁢) → Maybe (:🎲)
+bottomOf (:🁣) = Nothing
+bottomOf (:🁤) = Just (⚀)
+bottomOf (:🁥) = Just (⚁)
+bottomOf (:🁦) = Just (⚂)
+bottomOf (:🁧) = Just (⚃)
+bottomOf (:🁨) = Just (⚄)
+bottomOf (:🁩) = Just (⚅)
+bottomOf (:🁪) = Nothing
+bottomOf (:🁫) = Just (⚀)
+bottomOf (:🁬) = Just (⚁)
+bottomOf (:🁭) = Just (⚂)
+bottomOf (:🁮) = Just (⚃)
+bottomOf (:🁯) = Just (⚄)
+bottomOf (:🁰) = Just (⚅)
+bottomOf (:🁱) = Nothing
+bottomOf (:🁲) = Just (⚀)
+bottomOf (:🁳) = Just (⚁)
+bottomOf (:🁴) = Just (⚂)
+bottomOf (:🁵) = Just (⚃)
+bottomOf (:🁶) = Just (⚄)
+bottomOf (:🁷) = Just (⚅)
+bottomOf (:🁸) = Nothing
+bottomOf (:🁹) = Just (⚀)
+bottomOf (:🁺) = Just (⚁)
+bottomOf (:🁻) = Just (⚂)
+bottomOf (:🁼) = Just (⚃)
+bottomOf (:🁽) = Just (⚄)
+bottomOf (:🁾) = Just (⚅)
+bottomOf (:🁿) = Nothing
+bottomOf (:🂀) = Just (⚀)
+bottomOf (:🂁) = Just (⚁)
+bottomOf (:🂂) = Just (⚂)
+bottomOf (:🂃) = Just (⚃)
+bottomOf (:🂄) = Just (⚄)
+bottomOf (:🂅) = Just (⚅)
+bottomOf (:🂆) = Nothing
+bottomOf (:🂇) = Just (⚀)
+bottomOf (:🂈) = Just (⚁)
+bottomOf (:🂉) = Just (⚂)
+bottomOf (:🂊) = Just (⚃)
+bottomOf (:🂋) = Just (⚄)
+bottomOf (:🂌) = Just (⚅)
+bottomOf (:🂍) = Nothing
+bottomOf (:🂎) = Just (⚀)
+bottomOf (:🂏) = Just (⚁)
+bottomOf (:🂐) = Just (⚂)
+bottomOf (:🂑) = Just (⚃)
+bottomOf (:🂒) = Just (⚄)
+bottomOf (:🂓) = Just (⚅)
 
 byBottomD ∷ Equivalence (🁢)
-byBottomD = equating' botd
+byBottomD = equating' bottomOf
 
 byTopD ∷ Equivalence (🁢)
-byTopD = equating' topd
+byTopD = equating' topOf
 
 byEqualTB ∷ Equivalence (🁢)
--- byEqualTB = equating' (\d → topd d == botd d)
-byEqualTB = equating' (liftA2 (==) topd botd)
+byEqualTB = equating' (liftA2 (==) topOf bottomOf)
 
 type Domino = (🁢)
 
