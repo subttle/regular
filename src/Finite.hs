@@ -2139,11 +2139,11 @@ bottomOf (:🂑) = Just (⚃)
 bottomOf (:🂒) = Just (⚄)
 bottomOf (:🂓) = Just (⚅)
 
-byBottomD ∷ Equivalence (🁢)
-byBottomD = equating' bottomOf
+byBottomOf ∷ Equivalence (🁢)
+byBottomOf = equating' bottomOf
 
-byTopD ∷ Equivalence (🁢)
-byTopD = equating' topOf
+byTopOf ∷ Equivalence (🁢)
+byTopOf = equating' topOf
 
 byEqualTB ∷ Equivalence (🁢)
 byEqualTB = equating' (liftA2 (==) topOf bottomOf)
