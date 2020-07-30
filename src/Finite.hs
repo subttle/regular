@@ -1857,6 +1857,299 @@ rotate90 (:⚅) = (⚁) :| [(⚂), (⚃), (⚄)]
 🁔 🁕 🁖 🁗 🁘 🁙 🁚
 🁛 🁜 🁝 🁞 🁟 🁠 🁡
 -}
+data (🀰) where
+  (:🀱) ∷ (🀰)
+  (:🀲) ∷ (🀰)
+  (:🀳) ∷ (🀰)
+  (:🀴) ∷ (🀰)
+  (:🀵) ∷ (🀰)
+  (:🀶) ∷ (🀰)
+  (:🀷) ∷ (🀰)
+  (:🀸) ∷ (🀰)
+  (:🀹) ∷ (🀰)
+  (:🀺) ∷ (🀰)
+  (:🀻) ∷ (🀰)
+  (:🀼) ∷ (🀰)
+  (:🀽) ∷ (🀰)
+  (:🀾) ∷ (🀰)
+  (:🀿) ∷ (🀰)
+  (:🁀) ∷ (🀰)
+  (:🁁) ∷ (🀰)
+  (:🁂) ∷ (🀰)
+  (:🁃) ∷ (🀰)
+  (:🁄) ∷ (🀰)
+  (:🁅) ∷ (🀰)
+  (:🁆) ∷ (🀰)
+  (:🁇) ∷ (🀰)
+  (:🁈) ∷ (🀰)
+  (:🁉) ∷ (🀰)
+  (:🁊) ∷ (🀰)
+  (:🁋) ∷ (🀰)
+  (:🁌) ∷ (🀰)
+  (:🁍) ∷ (🀰)
+  (:🁎) ∷ (🀰)
+  (:🁏) ∷ (🀰)
+  (:🁐) ∷ (🀰)
+  (:🁑) ∷ (🀰)
+  (:🁒) ∷ (🀰)
+  (:🁓) ∷ (🀰)
+  (:🁔) ∷ (🀰)
+  (:🁕) ∷ (🀰)
+  (:🁖) ∷ (🀰)
+  (:🁗) ∷ (🀰)
+  (:🁘) ∷ (🀰)
+  (:🁙) ∷ (🀰)
+  (:🁚) ∷ (🀰)
+  (:🁛) ∷ (🀰)
+  (:🁜) ∷ (🀰)
+  (:🁝) ∷ (🀰)
+  (:🁞) ∷ (🀰)
+  (:🁟) ∷ (🀰)
+  (:🁠) ∷ (🀰)
+  (:🁡) ∷ (🀰)
+  deriving (Eq, Ord, Bounded, Enum)
+
+instance U.Universe (🀰)
+instance U.Finite   (🀰)
+instance Finite     (🀰)
+
+instance Show (🀰) where
+  show ∷ (🀰) → String
+  show = show'
+instance Fancy (🀰) where
+  unicode ∷ (🀰) → Char
+  unicode (:🀱) = '🀱'
+  unicode (:🀲) = '🀲'
+  unicode (:🀳) = '🀳'
+  unicode (:🀴) = '🀴'
+  unicode (:🀵) = '🀵'
+  unicode (:🀶) = '🀶'
+  unicode (:🀷) = '🀷'
+  unicode (:🀸) = '🀸'
+  unicode (:🀹) = '🀹'
+  unicode (:🀺) = '🀺'
+  unicode (:🀻) = '🀻'
+  unicode (:🀼) = '🀼'
+  unicode (:🀽) = '🀽'
+  unicode (:🀾) = '🀾'
+  unicode (:🀿) = '🀿'
+  unicode (:🁀) = '🁀'
+  unicode (:🁁) = '🁁'
+  unicode (:🁂) = '🁂'
+  unicode (:🁃) = '🁃'
+  unicode (:🁄) = '🁄'
+  unicode (:🁅) = '🁅'
+  unicode (:🁆) = '🁆'
+  unicode (:🁇) = '🁇'
+  unicode (:🁈) = '🁈'
+  unicode (:🁉) = '🁉'
+  unicode (:🁊) = '🁊'
+  unicode (:🁋) = '🁋'
+  unicode (:🁌) = '🁌'
+  unicode (:🁍) = '🁍'
+  unicode (:🁎) = '🁎'
+  unicode (:🁏) = '🁏'
+  unicode (:🁐) = '🁐'
+  unicode (:🁑) = '🁑'
+  unicode (:🁒) = '🁒'
+  unicode (:🁓) = '🁓'
+  unicode (:🁔) = '🁔'
+  unicode (:🁕) = '🁕'
+  unicode (:🁖) = '🁖'
+  unicode (:🁗) = '🁗'
+  unicode (:🁘) = '🁘'
+  unicode (:🁙) = '🁙'
+  unicode (:🁚) = '🁚'
+  unicode (:🁛) = '🁛'
+  unicode (:🁜) = '🁜'
+  unicode (:🁝) = '🁝'
+  unicode (:🁞) = '🁞'
+  unicode (:🁟) = '🁟'
+  unicode (:🁠) = '🁠'
+  unicode (:🁡) = '🁡'
+  plain ∷ (🀰) → String
+  plain (:🀱) = "(:🀱)"
+  plain (:🀲) = "(:🀲)"
+  plain (:🀳) = "(:🀳)"
+  plain (:🀴) = "(:🀴)"
+  plain (:🀵) = "(:🀵)"
+  plain (:🀶) = "(:🀶)"
+  plain (:🀷) = "(:🀷)"
+  plain (:🀸) = "(:🀸)"
+  plain (:🀹) = "(:🀹)"
+  plain (:🀺) = "(:🀺)"
+  plain (:🀻) = "(:🀻)"
+  plain (:🀼) = "(:🀼)"
+  plain (:🀽) = "(:🀽)"
+  plain (:🀾) = "(:🀾)"
+  plain (:🀿) = "(:🀿)"
+  plain (:🁀) = "(:🁀)"
+  plain (:🁁) = "(:🁁)"
+  plain (:🁂) = "(:🁂)"
+  plain (:🁃) = "(:🁃)"
+  plain (:🁄) = "(:🁄)"
+  plain (:🁅) = "(:🁅)"
+  plain (:🁆) = "(:🁆)"
+  plain (:🁇) = "(:🁇)"
+  plain (:🁈) = "(:🁈)"
+  plain (:🁉) = "(:🁉)"
+  plain (:🁊) = "(:🁊)"
+  plain (:🁋) = "(:🁋)"
+  plain (:🁌) = "(:🁌)"
+  plain (:🁍) = "(:🁍)"
+  plain (:🁎) = "(:🁎)"
+  plain (:🁏) = "(:🁏)"
+  plain (:🁐) = "(:🁐)"
+  plain (:🁑) = "(:🁑)"
+  plain (:🁒) = "(:🁒)"
+  plain (:🁓) = "(:🁓)"
+  plain (:🁔) = "(:🁔)"
+  plain (:🁕) = "(:🁕)"
+  plain (:🁖) = "(:🁖)"
+  plain (:🁗) = "(:🁗)"
+  plain (:🁙) = "(:🁙)"
+  plain (:🁚) = "(:🁚)"
+  plain (:🁛) = "(:🁛)"
+  plain (:🁜) = "(:🁜)"
+  plain (:🁝) = "(:🁝)"
+  plain (:🁞) = "(:🁞)"
+  plain (:🁟) = "(:🁟)"
+  plain (:🁠) = "(:🁠)"
+  plain (:🁡) = "(:🁡)"
+  show' ∷ (🀰) → String
+  show' d = charToString (unicode d) `toColor` colorOf' d
+    where
+      -- TODO almost have the six colors of Rubik's cube, maybe try to update?
+      colorOf' ∷ (🀰) → DisplayColor
+      colorOf' = coloring . pick
+        where
+          pick ∷ (🀰) → Maybe (:🎲)
+          pick = leftOf
+          -- pick = rightOf d
+          coloring ∷ Maybe (:🎲) → DisplayColor
+          coloring Nothing     = Black'
+          coloring (Just (:⚀)) = Red'
+          coloring (Just (:⚁)) = Magenta -- Orange
+          coloring (Just (:⚂)) = Yellow
+          coloring (Just (:⚃)) = Green
+          coloring (Just (:⚄)) = Blue
+          coloring (Just (:⚅)) = White
+  named ∷ (🀰) → String
+  named = const (charToString '🀰')
+
+leftOf ∷ (🀰) → Maybe (:🎲)
+leftOf (:🀱) = Nothing
+leftOf (:🀲) = Nothing
+leftOf (:🀳) = Nothing
+leftOf (:🀴) = Nothing
+leftOf (:🀵) = Nothing
+leftOf (:🀶) = Nothing
+leftOf (:🀷) = Nothing
+leftOf (:🀸) = Just (⚀)
+leftOf (:🀹) = Just (⚀)
+leftOf (:🀺) = Just (⚀)
+leftOf (:🀻) = Just (⚀)
+leftOf (:🀼) = Just (⚀)
+leftOf (:🀽) = Just (⚀)
+leftOf (:🀾) = Just (⚀)
+leftOf (:🀿) = Just (⚁)
+leftOf (:🁀) = Just (⚁)
+leftOf (:🁁) = Just (⚁)
+leftOf (:🁂) = Just (⚁)
+leftOf (:🁃) = Just (⚁)
+leftOf (:🁄) = Just (⚁)
+leftOf (:🁅) = Just (⚁)
+leftOf (:🁆) = Just (⚂)
+leftOf (:🁇) = Just (⚂)
+leftOf (:🁈) = Just (⚂)
+leftOf (:🁉) = Just (⚂)
+leftOf (:🁊) = Just (⚂)
+leftOf (:🁋) = Just (⚂)
+leftOf (:🁌) = Just (⚂)
+leftOf (:🁍) = Just (⚃)
+leftOf (:🁎) = Just (⚃)
+leftOf (:🁏) = Just (⚃)
+leftOf (:🁐) = Just (⚃)
+leftOf (:🁑) = Just (⚃)
+leftOf (:🁒) = Just (⚃)
+leftOf (:🁓) = Just (⚃)
+leftOf (:🁔) = Just (⚄)
+leftOf (:🁕) = Just (⚄)
+leftOf (:🁖) = Just (⚄)
+leftOf (:🁗) = Just (⚄)
+leftOf (:🁘) = Just (⚄)
+leftOf (:🁙) = Just (⚄)
+leftOf (:🁚) = Just (⚄)
+leftOf (:🁛) = Just (⚅)
+leftOf (:🁜) = Just (⚅)
+leftOf (:🁝) = Just (⚅)
+leftOf (:🁞) = Just (⚅)
+leftOf (:🁟) = Just (⚅)
+leftOf (:🁠) = Just (⚅)
+leftOf (:🁡) = Just (⚅)
+
+rightOf ∷ (🀰) → Maybe (:🎲)
+rightOf (:🀱) = Nothing
+rightOf (:🀲) = Just (⚀)
+rightOf (:🀳) = Just (⚁)
+rightOf (:🀴) = Just (⚂)
+rightOf (:🀵) = Just (⚃)
+rightOf (:🀶) = Just (⚄)
+rightOf (:🀷) = Just (⚅)
+rightOf (:🀸) = Nothing
+rightOf (:🀹) = Just (⚀)
+rightOf (:🀺) = Just (⚁)
+rightOf (:🀻) = Just (⚂)
+rightOf (:🀼) = Just (⚃)
+rightOf (:🀽) = Just (⚄)
+rightOf (:🀾) = Just (⚅)
+rightOf (:🀿) = Nothing
+rightOf (:🁀) = Just (⚀)
+rightOf (:🁁) = Just (⚁)
+rightOf (:🁂) = Just (⚂)
+rightOf (:🁃) = Just (⚃)
+rightOf (:🁄) = Just (⚄)
+rightOf (:🁅) = Just (⚅)
+rightOf (:🁆) = Nothing
+rightOf (:🁇) = Just (⚀)
+rightOf (:🁈) = Just (⚁)
+rightOf (:🁉) = Just (⚂)
+rightOf (:🁊) = Just (⚃)
+rightOf (:🁋) = Just (⚄)
+rightOf (:🁌) = Just (⚅)
+rightOf (:🁍) = Nothing
+rightOf (:🁎) = Just (⚀)
+rightOf (:🁏) = Just (⚁)
+rightOf (:🁐) = Just (⚂)
+rightOf (:🁑) = Just (⚃)
+rightOf (:🁒) = Just (⚄)
+rightOf (:🁓) = Just (⚅)
+rightOf (:🁔) = Nothing
+rightOf (:🁕) = Just (⚀)
+rightOf (:🁖) = Just (⚁)
+rightOf (:🁗) = Just (⚂)
+rightOf (:🁘) = Just (⚃)
+rightOf (:🁙) = Just (⚄)
+rightOf (:🁚) = Just (⚅)
+rightOf (:🁛) = Nothing
+rightOf (:🁜) = Just (⚀)
+rightOf (:🁝) = Just (⚁)
+rightOf (:🁞) = Just (⚂)
+rightOf (:🁟) = Just (⚃)
+rightOf (:🁠) = Just (⚄)
+rightOf (:🁡) = Just (⚅)
+
+byRightOf ∷ Equivalence (🀰)
+byRightOf = equating' rightOf
+
+byLeftOf ∷ Equivalence (🀰)
+byLeftOf = equating' leftOf
+
+byEqualLR ∷ Equivalence (🀰)
+byEqualLR = equating' (liftA2 (==) leftOf rightOf)
+
+type Domino' = (🀰)
+
 data (🁢) where
   (:🁣) ∷ (🁢)
   (:🁤) ∷ (🁢)
