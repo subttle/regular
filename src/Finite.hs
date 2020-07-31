@@ -2456,6 +2456,9 @@ valLeft   = maybe 0 (succ . fromEnum') . leftOf
 bySum ∷ Equivalence (🁢)
 bySum = equating' (liftA2 (+) valTop valBottom)
 
+byProduct ∷ Equivalence (🁢)
+byProduct = equating' (liftA2 (*) valTop valBottom)
+
 type Domino = (🁢)
 
 fromHorizontal ∷ (🀰) → (🁢)
