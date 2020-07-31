@@ -2208,7 +2208,14 @@ instance Finite     (🁢)
 
 instance Show (🁢) where
   show ∷ (🁢) → String
-  show = show'
+  show = show₂
+    where
+      show₀ ∷ (🁢) → String
+      show₀ = show'
+      show₁ ∷ (🁢) → String
+      show₁ d = show (valTop d, valBottom d)
+      show₂ ∷ (🁢) → String
+      show₂ d = quoteWith "(" ")" (quoteWith (toColor (show (valTop d)) Red') ((show (valBottom d)) `toColor` Magenta) ",")
 instance Fancy (🁢) where
   unicode ∷ (🁢) → Char
   unicode (:🁣) = '🁣'
@@ -2458,6 +2465,12 @@ bySum = equating' (liftA2 (+) valTop valBottom)
 
 byProduct ∷ Equivalence (🁢)
 byProduct = equating' (liftA2 (*) valTop valBottom)
+
+byExp ∷ Equivalence (🁢)
+byExp = equating' (liftA2 (^) valBottom valTop)
+
+byExp' ∷ Equivalence (🁢)
+byExp' = equating' (liftA2 (^) valTop valBottom)
 
 type Domino = (🁢)
 
