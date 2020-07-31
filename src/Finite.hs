@@ -2454,7 +2454,7 @@ valLeft ∷ (🀰) → ℕ
 valLeft   = maybe 0 (succ . fromEnum') . leftOf
 
 bySum ∷ Equivalence (🁢)
-bySum = equating' (\d → valTop d + valBottom d)
+bySum = equating' (liftA2 (+) valTop valBottom)
 
 type Domino = (🁢)
 
