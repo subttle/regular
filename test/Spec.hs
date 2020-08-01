@@ -19,7 +19,9 @@ import           Examples (by3, by5, by5', minimal, ab, cd)
 import           Data.Set (Set, singleton)
 import           Config
 import           Numeric.Natural.Unicode (ℕ)
+import           Control.Applicative (liftA2)
 import           Data.Bool (bool)
+import           Data.Bool.Unicode ((∧))
 import           Data.Eq.Unicode ((≠))
 import           Data.Functor.Contravariant (contramap, Equivalence (..), Comparison (..), Predicate (..))
 import qualified Data.Group as G
@@ -62,11 +64,11 @@ testFizzBuzz = expectEqual woDFA wDFA
     woDFA = fmap fizzbuzz [1 .. 100]
       where
         fizz ∷ ℕ → Bool
-        fizz n = n `mod` 3 == 0
+        fizz = (==) 0 . (flip mod 3)
         buzz ∷ ℕ → Bool
-        buzz n = n `mod` 5 == 0
+        buzz = (==) 0 . (flip mod 5)
         fbzz ∷ ℕ → Bool
-        fbzz n = fizz n && buzz n
+        fbzz = liftA2 (∧) fizz buzz
         fizzbuzz ∷ ℕ → String
         fizzbuzz n | fbzz n    = "FizzBuzz"
                    | fizz n    = "Fizz"
@@ -77,11 +79,11 @@ testFizzBuzz = expectEqual woDFA wDFA
     wDFA = fmap fizzbuzz [1 .. 100]
       where
         fizz ∷ ℕ → Bool
-        fizz n = accepts  by3                         (toDigits n)
+        fizz = accepts  by3                         . toDigits
         buzz ∷ ℕ → Bool
-        buzz n = accepts                         by5  (toDigits n)
+        buzz = accepts                         by5  . toDigits
         fbzz ∷ ℕ → Bool
-        fbzz n = accepts (by3 `DFA.intersection` by5) (toDigits n)
+        fbzz = accepts (by3 `DFA.intersection` by5) . toDigits
         fizzbuzz ∷ ℕ → String
         fizzbuzz n | fbzz n    = "FizzBuzz"
                    | fizz n    = "Fizz"
