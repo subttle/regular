@@ -183,6 +183,18 @@ instance NotEmpty (Set a) where
 instance NotEmpty (OSet a) where
   wit ∷ OSet a
   wit = OSet.empty
+instance (NotEmpty a, NotEmpty b) ⇒ NotEmpty (a, b) where
+  wit ∷ (a, b)
+  wit = (wit, wit)
+instance (NotEmpty a, NotEmpty b, NotEmpty c) ⇒ NotEmpty (a, b, c) where
+  wit ∷ (a, b, c)
+  wit = (wit, wit, wit)
+instance (NotEmpty a, NotEmpty b, NotEmpty c, NotEmpty d) ⇒ NotEmpty (a, b, c, d) where
+  wit ∷ (a, b, c, d)
+  wit = (wit, wit, wit, wit)
+instance (NotEmpty a, NotEmpty b, NotEmpty c, NotEmpty d, NotEmpty e) ⇒ NotEmpty (a, b, c, d, e) where
+  wit ∷ (a, b, c, d, e)
+  wit = (wit, wit, wit, wit, wit)
 
 instance NEF () where
   asNE ∷ NonEmpty ()
