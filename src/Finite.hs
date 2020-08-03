@@ -212,6 +212,52 @@ instance NEF Octant where
   asNE ∷ NonEmpty Octant
   asNE = O₁ :| [O₂, O₃, O₄, O₅, O₆, O₇, O₈]
 
+instance NEF Fin₁ where
+  asNE ∷ NonEmpty Fin₁
+  asNE = 0 :| []
+instance NEF Fin₂ where
+  asNE ∷ NonEmpty Fin₂
+  asNE = 0 :| [1]
+instance NEF Fin₃ where
+  asNE ∷ NonEmpty Fin₃
+  asNE = 0 :| [1, 2]
+instance NEF Fin₄ where
+  asNE ∷ NonEmpty Fin₄
+  asNE = 0 :| [1, 2, 3]
+instance NEF Fin₅ where
+  asNE ∷ NonEmpty Fin₅
+  asNE = 0 :| [1, 2, 3, 4]
+instance NEF Fin₆ where
+  asNE ∷ NonEmpty Fin₆
+  asNE = 0 :| [1, 2, 3, 4, 5]
+instance NEF Fin₇ where
+  asNE ∷ NonEmpty Fin₇
+  asNE = 0 :| [1, 2, 3, 4, 5, 6]
+instance NEF Fin₈ where
+  asNE ∷ NonEmpty Fin₈
+  asNE = 0 :| [1, 2, 3, 4, 5, 6, 7]
+instance NEF Fin₉ where
+  asNE ∷ NonEmpty Fin₉
+  asNE = 0 :| [1, 2, 3, 4, 5, 6, 7, 8]
+instance NEF Fin₁₀ where
+  asNE ∷ NonEmpty Fin₁₀
+  asNE = 0 :| [1, 2, 3, 4, 5, 6, 7, 8, 9]
+instance NEF Fin₁₁ where
+  asNE ∷ NonEmpty Fin₁₁
+  asNE = 0 :| [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+instance NEF Fin₁₂ where
+  asNE ∷ NonEmpty Fin₁₂
+  asNE = 0 :| [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+instance NEF Fin₁₃ where
+  asNE ∷ NonEmpty Fin₁₃
+  asNE = 0 :| [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+instance NEF Fin₁₄ where
+  asNE ∷ NonEmpty Fin₁₄
+  asNE = 0 :| [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+instance NEF Fin₁₅ where
+  asNE ∷ NonEmpty Fin₁₅
+  asNE = 0 :| [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+
 instance (Finite a) ⇒ NEF (Maybe a) where
   asNE ∷ NonEmpty (Maybe a)
   asNE = Nothing :| asList
