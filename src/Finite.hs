@@ -215,63 +215,63 @@ instance NEF Octant where
 instance NEF Fin₁ where
   asNE ∷ NonEmpty Fin₁
   -- asNE = 0 :| []
-  asNE =                                                                          pure 0
+  asNE =                                                                pure 0
 instance NEF Fin₂ where
   asNE ∷ NonEmpty Fin₂
   -- asNE = 0 :| [1]
-  asNE = (fmap (getOp (contramap fromEnum (Op toEnum))) (asNE ∷ NonEmpty Fin₁)) ⋄ pure 1
+  asNE = fmap (getOp (contramap fromEnum (Op toEnum))) (asNE @ Fin₁)  ⋄ pure 1
 instance NEF Fin₃ where
   asNE ∷ NonEmpty Fin₃
   -- asNE = 0 :| [1, 2]
-  asNE = (fmap (getOp (contramap fromEnum (Op toEnum))) (asNE ∷ NonEmpty Fin₂)) ⋄ pure 2
+  asNE = fmap (getOp (contramap fromEnum (Op toEnum))) (asNE @ Fin₂)  ⋄ pure 2
 instance NEF Fin₄ where
   asNE ∷ NonEmpty Fin₄
   -- asNE = 0 :| [1, 2, 3]
-  asNE = (fmap (getOp (contramap fromEnum (Op toEnum))) (asNE ∷ NonEmpty Fin₃)) ⋄ pure 3
+  asNE = fmap (getOp (contramap fromEnum (Op toEnum))) (asNE @ Fin₃)  ⋄ pure 3
 instance NEF Fin₅ where
   asNE ∷ NonEmpty Fin₅
   -- asNE = 0 :| [1, 2, 3, 4]
-  asNE = (fmap (getOp (contramap fromEnum (Op toEnum))) (asNE ∷ NonEmpty Fin₄)) ⋄ pure 4
+  asNE = fmap (getOp (contramap fromEnum (Op toEnum))) (asNE @ Fin₄)  ⋄ pure 4
 instance NEF Fin₆ where
   asNE ∷ NonEmpty Fin₆
   -- asNE = 0 :| [1, 2, 3, 4, 5]
-  asNE = (fmap (getOp (contramap fromEnum (Op toEnum))) (asNE ∷ NonEmpty Fin₅)) ⋄ pure 5
+  asNE = fmap (getOp (contramap fromEnum (Op toEnum))) (asNE @ Fin₅)  ⋄ pure 5
 instance NEF Fin₇ where
   asNE ∷ NonEmpty Fin₇
   -- asNE = 0 :| [1, 2, 3, 4, 5, 6]
-  asNE = (fmap (getOp (contramap fromEnum (Op toEnum))) (asNE ∷ NonEmpty Fin₆)) ⋄ pure 6
+  asNE = fmap (getOp (contramap fromEnum (Op toEnum))) (asNE @ Fin₆)  ⋄ pure 6
 instance NEF Fin₈ where
   asNE ∷ NonEmpty Fin₈
   -- asNE = 0 :| [1, 2, 3, 4, 5, 6, 7]
-  asNE = (fmap (getOp (contramap fromEnum (Op toEnum))) (asNE ∷ NonEmpty Fin₇)) ⋄ pure 7
+  asNE = fmap (getOp (contramap fromEnum (Op toEnum))) (asNE @ Fin₇)  ⋄ pure 7
 instance NEF Fin₉ where
   asNE ∷ NonEmpty Fin₉
   -- asNE = 0 :| [1, 2, 3, 4, 5, 6, 7, 8]
-  asNE = (fmap (getOp (contramap fromEnum (Op toEnum))) (asNE ∷ NonEmpty Fin₈)) ⋄ pure 8
+  asNE = fmap (getOp (contramap fromEnum (Op toEnum))) (asNE @ Fin₈)  ⋄ pure 8
 instance NEF Fin₁₀ where
   asNE ∷ NonEmpty Fin₁₀
   -- asNE = 0 :| [1, 2, 3, 4, 5, 6, 7, 8, 9]
-  asNE = (fmap (getOp (contramap fromEnum (Op toEnum))) (asNE ∷ NonEmpty Fin₉)) ⋄ pure 9
+  asNE = fmap (getOp (contramap fromEnum (Op toEnum))) (asNE @ Fin₉)  ⋄ pure 9
 instance NEF Fin₁₁ where
   asNE ∷ NonEmpty Fin₁₁
   -- asNE = 0 :| [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-  asNE = (fmap (getOp (contramap fromEnum (Op toEnum))) (asNE ∷ NonEmpty Fin₁₀)) ⋄ pure 10
+  asNE = fmap (getOp (contramap fromEnum (Op toEnum))) (asNE @ Fin₁₀) ⋄ pure 10
 instance NEF Fin₁₂ where
   asNE ∷ NonEmpty Fin₁₂
   -- asNE = 0 :| [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-  asNE = (fmap (getOp (contramap fromEnum (Op toEnum))) (asNE ∷ NonEmpty Fin₁₁)) ⋄ pure 11
+  asNE = fmap (getOp (contramap fromEnum (Op toEnum))) (asNE @ Fin₁₁) ⋄ pure 11
 instance NEF Fin₁₃ where
   asNE ∷ NonEmpty Fin₁₃
   -- asNE = 0 :| [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-  asNE = (fmap (getOp (contramap fromEnum (Op toEnum))) (asNE ∷ NonEmpty Fin₁₂)) ⋄ pure 12
+  asNE = fmap (getOp (contramap fromEnum (Op toEnum))) (asNE @ Fin₁₂) ⋄ pure 12
 instance NEF Fin₁₄ where
   asNE ∷ NonEmpty Fin₁₄
   -- asNE = 0 :| [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
-  asNE = (fmap (getOp (contramap fromEnum (Op toEnum))) (asNE ∷ NonEmpty Fin₁₃)) ⋄ pure 13
+  asNE = fmap (getOp (contramap fromEnum (Op toEnum))) (asNE @ Fin₁₃) ⋄ pure 13
 instance NEF Fin₁₅ where
   asNE ∷ NonEmpty Fin₁₅
   -- asNE = 0 :| [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
-  asNE = (fmap (getOp (contramap fromEnum (Op toEnum))) (asNE ∷ NonEmpty Fin₁₄)) ⋄ pure 14
+  asNE = fmap (getOp (contramap fromEnum (Op toEnum))) (asNE @ Fin₁₄) ⋄ pure 14
 
 instance (Finite a) ⇒ NEF (Maybe a) where
   asNE ∷ NonEmpty (Maybe a)
