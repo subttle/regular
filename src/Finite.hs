@@ -277,6 +277,35 @@ instance (Finite a) ⇒ NEF (Maybe a) where
   asNE ∷ NonEmpty (Maybe a)
   asNE = Nothing :| asList
 
+{-
+-- FIXME
+
+instance (NEF a, NEF b) ⇒ NEF (a, b) where
+  asNE ∷ NonEmpty (a, b)
+  asNE = NE.zip (asNE ∷ NonEmpty a) (asNE ∷ NonEmpty b)
+
+instance (NEF a, NEF b, NEF c) ⇒ NEF (a, b, c) where
+  asNE ∷ NonEmpty (a, b, c)
+  asNE = zip3   (asNE ∷ NonEmpty a) (asNE ∷ NonEmpty b) (asNE ∷ NonEmpty c)
+    where
+      zip3 ∷ NonEmpty a → NonEmpty b → NonEmpty c → NonEmpty (a, b, c)
+      zip3 ~(a :| as) ~(b :| bs) ~(c :| cs) = (a, b, c) :| List.zip3 as bs cs
+
+instance (NEF a, NEF b, NEF c, NEF d) ⇒ NEF (a, b, c, d) where
+  asNE ∷ NonEmpty (a, b, c, d)
+  asNE = zip4   (asNE ∷ NonEmpty a) (asNE ∷ NonEmpty b) (asNE ∷ NonEmpty c) (asNE ∷ NonEmpty d)
+    where
+      zip4 ∷ NonEmpty a → NonEmpty b → NonEmpty c → NonEmpty d → NonEmpty (a, b, c, d)
+      zip4 ~(a :| as) ~(b :| bs) ~(c :| cs) ~(d :| ds) = (a, b, c, d) :| List.zip4 as bs cs ds
+
+instance (NEF a, NEF b, NEF c, NEF d, NEF e) ⇒ NEF (a, b, c, d, e) where
+  asNE ∷ NonEmpty (a, b, c, d, e)
+  asNE = zip5   (asNE ∷ NonEmpty a) (asNE ∷ NonEmpty b) (asNE ∷ NonEmpty c) (asNE ∷ NonEmpty d) (asNE ∷ NonEmpty e)
+    where
+      zip5 ∷ NonEmpty a → NonEmpty b → NonEmpty c → NonEmpty d → NonEmpty e → NonEmpty (a, b, c, d, e)
+      zip5 ~(a :| as) ~(b :| bs) ~(c :| cs) ~(d :| ds) ~(e :| es) = (a, b, c, d, e) :| List.zip5 as bs cs ds es
+-}
+
 class (Finite sigma) ⇒ Σ formalism sigma | formalism → sigma where
   -- Σ, The alphabet of the formalism
   sigma ∷ formalism → Set sigma
