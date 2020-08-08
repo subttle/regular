@@ -183,6 +183,9 @@ instance NotEmpty (Set a) where
 instance NotEmpty (OSet a) where
   wit ∷ OSet a
   wit = OSet.empty
+instance (NotEmpty a) ⇒ NotEmpty (Identity a) where
+  wit ∷ Identity a
+  wit = Identity wit
 instance (NotEmpty a, NotEmpty b) ⇒ NotEmpty (a, b) where
   wit ∷ (a, b)
   wit = (wit, wit)
