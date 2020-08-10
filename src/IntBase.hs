@@ -109,7 +109,7 @@ instance Enum ℤ where
   toEnum ∷ Int → ℤ
   toEnum = fromInteger . toInteger
   fromEnum ∷ ℤ → Int
-  fromEnum = int pred 0 succ
+  fromEnum = fromInteger . toInteger
   succ ∷ ℤ → ℤ
   succ = Next
   pred ∷ ℤ → ℤ
