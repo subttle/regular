@@ -107,10 +107,7 @@ instance Ord ℤ where
 -- N.B. this is not a bijection!
 instance Enum ℤ where
   toEnum ∷ Int → ℤ
-  toEnum i | i <  0 = Prev (toEnum (i + 1))
-           | i == 0 = Zero
-           | i >  0 = Next (toEnum (i - 1))
-
+  toEnum = fromInteger . toInteger
   fromEnum ∷ ℤ → Int
   fromEnum = int pred 0 succ
   succ ∷ ℤ → ℤ
