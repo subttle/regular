@@ -600,12 +600,14 @@ instance (Finite a, Finite b)
   toEnum ∷ Int → (a, b)
   toEnum i₀ = (toEnum aᵢ, toEnum bᵢ)
     where
-      cardinality_a ∷ ℕ
-      cardinality_a = unTagged (U.cardinality ∷ Tagged a ℕ)
-      cardinality_b ∷ ℕ
-      cardinality_b = unTagged (U.cardinality ∷ Tagged b ℕ)
       (i₁, bᵢ) = i₀ `quotRem` fromIntegral cardinality_b
+        where
+          cardinality_b ∷ ℕ
+          cardinality_b = unTagged (U.cardinality ∷ Tagged b ℕ)
       (_,  aᵢ) = i₁ `quotRem` fromIntegral cardinality_a
+        where
+          cardinality_a ∷ ℕ
+          cardinality_a = unTagged (U.cardinality ∷ Tagged a ℕ)
   fromEnum ∷ (a, b) → Int
   fromEnum (a, b) = fromIntegral $ aᵢ * cardinality_b
                                  +                  bᵢ
@@ -629,15 +631,18 @@ instance (Finite a, Finite b, Finite c)
   toEnum ∷ Int → (a, b, c)
   toEnum i₀ = (toEnum aᵢ, toEnum bᵢ, toEnum cᵢ)
     where
-      cardinality_a ∷ ℕ
-      cardinality_a = unTagged (U.cardinality ∷ Tagged a ℕ)
-      cardinality_b ∷ ℕ
-      cardinality_b = unTagged (U.cardinality ∷ Tagged b ℕ)
-      cardinality_c ∷ ℕ
-      cardinality_c = unTagged (U.cardinality ∷ Tagged c ℕ)
       (i₁, cᵢ) = i₀ `quotRem` fromIntegral cardinality_c
+        where
+          cardinality_c ∷ ℕ
+          cardinality_c = unTagged (U.cardinality ∷ Tagged c ℕ)
       (i₂, bᵢ) = i₁ `quotRem` fromIntegral cardinality_b
+        where
+          cardinality_b ∷ ℕ
+          cardinality_b = unTagged (U.cardinality ∷ Tagged b ℕ)
       (_,  aᵢ) = i₂ `quotRem` fromIntegral cardinality_a
+        where
+          cardinality_a ∷ ℕ
+          cardinality_a = unTagged (U.cardinality ∷ Tagged a ℕ)
   fromEnum ∷ (a, b, c) → Int
   fromEnum (a, b, c) = fromIntegral $ aᵢ * cardinality_b  * cardinality_c
                                     +                  bᵢ * cardinality_c
@@ -662,18 +667,22 @@ instance (Finite a, Finite b, Finite c, Finite d)
   toEnum ∷ Int → (a, b, c, d)
   toEnum i₀ = (toEnum aᵢ, toEnum bᵢ, toEnum cᵢ, toEnum dᵢ)
     where
-      cardinality_a ∷ ℕ
-      cardinality_a = unTagged (U.cardinality ∷ Tagged a ℕ)
-      cardinality_b ∷ ℕ
-      cardinality_b = unTagged (U.cardinality ∷ Tagged b ℕ)
-      cardinality_c ∷ ℕ
-      cardinality_c = unTagged (U.cardinality ∷ Tagged c ℕ)
-      cardinality_d ∷ ℕ
-      cardinality_d = unTagged (U.cardinality ∷ Tagged d ℕ)
       (i₁, dᵢ) = i₀ `quotRem` fromIntegral cardinality_d ∷ (Int, Int)
+        where
+          cardinality_d ∷ ℕ
+          cardinality_d = unTagged (U.cardinality ∷ Tagged d ℕ)
       (i₂, cᵢ) = i₁ `quotRem` fromIntegral cardinality_c ∷ (Int, Int)
+        where
+          cardinality_c ∷ ℕ
+          cardinality_c = unTagged (U.cardinality ∷ Tagged c ℕ)
       (i₃, bᵢ) = i₂ `quotRem` fromIntegral cardinality_b ∷ (Int, Int)
+        where
+          cardinality_b ∷ ℕ
+          cardinality_b = unTagged (U.cardinality ∷ Tagged b ℕ)
       (_,  aᵢ) = i₃ `quotRem` fromIntegral cardinality_a ∷ (Int, Int)
+        where
+          cardinality_a ∷ ℕ
+          cardinality_a = unTagged (U.cardinality ∷ Tagged a ℕ)
   fromEnum ∷ (a, b, c, d) → Int
   fromEnum (a, b, c, d) = fromIntegral $ aᵢ * cardinality_b  * cardinality_c  * cardinality_d
                                        +                  bᵢ * cardinality_c  * cardinality_d
@@ -701,21 +710,26 @@ instance (Finite a, Finite b, Finite c, Finite d, Finite e)
   toEnum ∷ Int → (a, b, c, d, e)
   toEnum i₀ = (toEnum aᵢ, toEnum bᵢ, toEnum cᵢ, toEnum dᵢ, toEnum eᵢ)
     where
-      cardinality_a ∷ ℕ
-      cardinality_a = unTagged (U.cardinality ∷ Tagged a ℕ)
-      cardinality_b ∷ ℕ
-      cardinality_b = unTagged (U.cardinality ∷ Tagged b ℕ)
-      cardinality_c ∷ ℕ
-      cardinality_c = unTagged (U.cardinality ∷ Tagged c ℕ)
-      cardinality_d ∷ ℕ
-      cardinality_d = unTagged (U.cardinality ∷ Tagged d ℕ)
-      cardinality_e ∷ ℕ
-      cardinality_e = unTagged (U.cardinality ∷ Tagged e ℕ)
       (i₁, eᵢ) = i₀ `quotRem` fromIntegral cardinality_e
+        where
+          cardinality_e ∷ ℕ
+          cardinality_e = unTagged (U.cardinality ∷ Tagged e ℕ)
       (i₂, dᵢ) = i₁ `quotRem` fromIntegral cardinality_d
+        where
+          cardinality_d ∷ ℕ
+          cardinality_d = unTagged (U.cardinality ∷ Tagged d ℕ)
       (i₃, cᵢ) = i₂ `quotRem` fromIntegral cardinality_c
+        where
+          cardinality_c ∷ ℕ
+          cardinality_c = unTagged (U.cardinality ∷ Tagged c ℕ)
       (i₄, bᵢ) = i₃ `quotRem` fromIntegral cardinality_b
+        where
+          cardinality_b ∷ ℕ
+          cardinality_b = unTagged (U.cardinality ∷ Tagged b ℕ)
       (_,  aᵢ) = i₄ `quotRem` fromIntegral cardinality_a
+        where
+          cardinality_a ∷ ℕ
+          cardinality_a = unTagged (U.cardinality ∷ Tagged a ℕ)
   fromEnum ∷ (a, b, c, d, e) → Int
   fromEnum (a, b, c, d, e) = fromIntegral $ aᵢ * cardinality_b  * cardinality_c  * cardinality_d  * cardinality_e
                                           +                  bᵢ * cardinality_c  * cardinality_d  * cardinality_e
