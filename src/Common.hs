@@ -97,10 +97,19 @@ andAlg = Algebra φ
 (⋄) ∷ (Semigroup m) ⇒ m → m → m
 (⋄) = (<>)
 
+-- append a nonempty list
+-- TODO might want to reconsider argument order?
+-- (non-unicode alias for `⊳`)
+(|>) ∷ NonEmpty a → a → NonEmpty a
+(|>) ((:|) a as) = (:|) a . (⋄) as . pure
+
 -- "Prepend an element to the stream."
 -- N.B. (⊲) ∷ a → (NonEmpty a → NonEmpty a)
 (⊲) ∷ a → NonEmpty a → NonEmpty a
 (⊲) = (<|)
+
+(⊳) ∷ NonEmpty a → a → NonEmpty a
+(⊳) = (|>)
 
 -- TODO precedence
 -- TODO infixl 8 ‥ -- …
