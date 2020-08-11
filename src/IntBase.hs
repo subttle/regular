@@ -6,7 +6,7 @@
 module IntBase where
 
 import           Control.Applicative (empty, (<|>), Alternative)
-import           Control.Monad (ap)
+import           Control.Monad (ap) -- TODO (liftM4, ap)
 import           Data.Functor ((<&>))
 import           Data.Functor.Foldable (Fix (..), Recursive, Corecursive, Base, project, embed)
 import           Data.Function (on)
@@ -67,6 +67,8 @@ instance Num ℤ where
   negate ∷ ℤ → ℤ
   negate = invert
   fromInteger ∷ Integer → ℤ
+  -- TODO
+  -- fromInteger = liftM4 ordering (Prev . fromInteger . succ) (const Zero) (Next . fromInteger . pred) (compare 0)
   fromInteger i | i < 0 = Prev (fromInteger (1 + i    ))
   fromInteger 0         = Zero
   fromInteger i | i > 0 = Next (fromInteger (    i - 1))
