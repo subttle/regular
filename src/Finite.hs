@@ -28,6 +28,7 @@ import           Data.These.Combinators (catThese)
 import           Data.Void (Void, absurd)
 import qualified Data.Foldable as F
 import           Data.Function (on)
+import           Data.Functor.Const (Const (..))
 import           Data.Functor.Contravariant
 import           Data.Functor.Contravariant.Divisible (conquer)
 import           Data.Functor.Identity (Identity (..))
@@ -183,6 +184,9 @@ instance NotEmpty (Set a) where
 instance NotEmpty (OSet a) where
   wit ∷ OSet a
   wit = OSet.empty
+instance (NotEmpty a) ⇒ NotEmpty (Const a b) where
+  wit ∷ Const a b
+  wit = Const wit
 instance (NotEmpty a) ⇒ NotEmpty (Identity a) where
   wit ∷ Identity a
   wit = Identity wit
