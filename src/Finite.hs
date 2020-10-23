@@ -1535,6 +1535,8 @@ comparisonToList (Comparison c) = sortBy c asList
 -- Reverse a total order
 reverseC ∷ Comparison a → Comparison a
 reverseC (Comparison c) = Comparison (flip c)
+-- reverseC c = Comparison (flip (getComparison c))
+-- reverseC = Comparison . flip . getComparison
 
 -- TODO this works for now but think if it is possible to do this but without throwing away information every time, by which I mean an implementation
 -- TODO which could search a smaller list after each find (i.e. delete the elements from the list as we find results for them)
@@ -1722,6 +1724,8 @@ predicateToSet (Predicate p) = Set.filter p asSet
 -- N.B. information is lost here, we can't distinguish `p` from `(not . p)` anymore
 fromPredicate ∷ Predicate a → Equivalence a
 fromPredicate (Predicate p) = equating' p
+-- fromPredicate p = equating' (getPredicate p)
+-- fromPredicate = equating' . getPredicate
 
 -- There is a way to do this safely by generating the NonEmpty list for the equivalence class
 -- and then using comonadic extract to guarantee the representative will always be there
@@ -2887,7 +2891,7 @@ data Rank where
   Eight ∷ Rank
   Nine  ∷ Rank
   Ten   ∷ Rank
-  Jack  ∷ Rank 
+  Jack  ∷ Rank
   Queen ∷ Rank
   King  ∷ Rank
   Ace   ∷ Rank
