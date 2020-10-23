@@ -202,6 +202,15 @@ instance (NotEmpty a, NotEmpty b, NotEmpty c, NotEmpty d) ⇒ NotEmpty (a, b, c,
 instance (NotEmpty a, NotEmpty b, NotEmpty c, NotEmpty d, NotEmpty e) ⇒ NotEmpty (a, b, c, d, e) where
   wit ∷ (a, b, c, d, e)
   wit = (wit, wit, wit, wit, wit)
+instance (NotEmpty a, NotEmpty b, NotEmpty c, NotEmpty d, NotEmpty e, NotEmpty f) ⇒ NotEmpty (a, b, c, d, e, f) where
+  wit ∷ (a, b, c, d, e, f)
+  wit = (wit, wit, wit, wit, wit, wit)
+instance (NotEmpty a, NotEmpty b, NotEmpty c, NotEmpty d, NotEmpty e, NotEmpty f, NotEmpty g) ⇒ NotEmpty (a, b, c, d, e, f, g) where
+  wit ∷ (a, b, c, d, e, f, g)
+  wit = (wit, wit, wit, wit, wit, wit, wit)
+instance (NotEmpty a, NotEmpty b, NotEmpty c, NotEmpty d, NotEmpty e, NotEmpty f, NotEmpty g, NotEmpty h) ⇒ NotEmpty (a, b, c, d, e, f, g, h) where
+  wit ∷ (a, b, c, d, e, f, g, h)
+  wit = (wit, wit, wit, wit, wit, wit, wit, wit)
 
 instance NEF () where
   asNE ∷ NonEmpty ()
