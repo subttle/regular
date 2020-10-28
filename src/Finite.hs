@@ -1280,7 +1280,7 @@ instance (Show a, Finite a) ⇒ Show (Predicate a) where
 instance (Finite a)
        ⇒ Eq (Predicate a) where
   (==) ∷ Predicate a → Predicate a → Bool
-  (Predicate p₁) == (Predicate p₂) = all (\a → p₁ a == p₂ a) asList
+  (==) (Predicate p₁) (Predicate p₂) = all (liftA2 (==) p₁ p₂) asList
 instance Bounded (Predicate a) where
   minBound ∷ Predicate a
   minBound = Predicate (const False)
@@ -1289,7 +1289,7 @@ instance Bounded (Predicate a) where
 instance (Finite a)
        ⇒ Ord (Predicate a) where
   compare ∷ Predicate a → Predicate a → Ordering
-  compare (Predicate p₁) (Predicate p₂) = foldMap (\a → p₁ a `compare` p₂ a) asList
+  compare (Predicate p₁) (Predicate p₂) = foldMap (liftA2 compare p₁ p₂) asList
 instance (Finite a)
        ⇒ Enum (Predicate a) where
   toEnum   ∷ Int         → Predicate a
