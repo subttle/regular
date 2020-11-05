@@ -71,13 +71,13 @@ instance (Finite q, Finite s) ⇒ Configuration EFA q s (Set q) where
   codeterministic = undefined  -- FIXME
 
   occupied ∷ EFA q s → Set q → Set q
-  occupied _ = id
+  occupied = const id
 
-  initial ∷ EFA q s → Set q
-  initial m@(EFA _ q₀ _) = eclosure m (singleton q₀)
+  initial  ∷ EFA q s → Set q
+  initial  = eclosure <*> (singleton . q0)
 
-  final   ∷ EFA q s → Set q
-  final     (EFA _ _  f) = f
+  final    ∷ EFA q s → Set q
+  final    = fs
 
   -- Given an EFA, m, and a configuration, return what it yields in one step
   (⊢) ∷ EFA q s → (Set q, [s]) → (Set q, [s])
