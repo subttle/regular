@@ -71,13 +71,13 @@ instance (Finite q, Finite s) ⇒ Configuration NFA q s (Set q) where
   codeterministic = deterministic . FA.reversal . toFA
 
   occupied ∷ NFA q s → Set q → Set q
-  occupied _ = id
+  occupied = const id
   
-  initial ∷ NFA q s → Set q
-  initial (NFA _ q₀ _) = singleton q₀
+  initial  ∷ NFA q s → Set q
+  initial  = singleton . q0
 
-  final   ∷ NFA q s → Set q
-  final   (NFA _ _  f) = f
+  final    ∷ NFA q s → Set q
+  final    = fs
 
   -- Given an NFA, m, and a configuration, return what it yields in one step
   (⊢) ∷ NFA q s → (Set q, [s]) → (Set q, [s])
