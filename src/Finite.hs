@@ -533,6 +533,7 @@ instance (Finite a, Finite b)
   -- 1 + a + b
   cardinality ∷ Tagged (Wedge a b) ℕ
   cardinality = liftA2 (\a b → 1 + a + b) (retag (U.cardinality ∷ Tagged a ℕ)) (retag (U.cardinality ∷ Tagged b ℕ))
+  -- cardinality = liftA2 (succ ‥ (+)) (retag (U.cardinality ∷ Tagged a ℕ)) (retag (U.cardinality ∷ Tagged b ℕ))
 instance (Finite a, Finite b, U.Universe a, U.Universe b)
        ⇒ U.Universe (Wedge a b)
 instance (Finite a, Finite b)
@@ -598,6 +599,7 @@ instance (Finite a, Finite b)
   -- 1 + ab
   cardinality ∷ Tagged (Smash a b) ℕ
   cardinality = liftA2 (\a b → 1 + a * b) (retag (U.cardinality ∷ Tagged a ℕ)) (retag (U.cardinality ∷ Tagged b ℕ))
+  -- cardinality = liftA2 (succ ‥ (*)) (retag (U.cardinality ∷ Tagged a ℕ)) (retag (U.cardinality ∷ Tagged b ℕ))
 instance (Finite a, Finite b, U.Universe a, U.Universe b)
        ⇒ U.Universe (Smash a b)
 instance (Finite a, Finite b)
