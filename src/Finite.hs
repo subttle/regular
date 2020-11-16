@@ -1276,7 +1276,7 @@ instance (Show a, Finite a) ⇒ Show (Predicate a) where
       showpredset (Predicate p) = show (Set' (Set.filter p asSet))
       -- show the elements of 'a', with coloring determined by the predicate
       showcolors ∷ Predicate a → String --  ∷ ∀ a . (Show a, Finite a) ⇒ Predicate a → String
-      showcolors (Predicate p) = concatMap (\a → bool ((flip toColor) Red' (show a)) ((flip toColor) Green (show a)) (p a)) asList
+      showcolors (Predicate p) = concatMap (\a → bool ((flip toColor) Red (show a)) ((flip toColor) Green (show a)) (p a)) asList
 
 
 instance (Finite a)
@@ -1948,7 +1948,7 @@ instance Fancy (:🎲) where
     where
       -- TODO almost have the six colors of Rubik's cube, maybe try to update?
       colorOf' ∷ (:🎲) → DisplayColor
-      colorOf' (:⚀) = Red'    -- "⚀"
+      colorOf' (:⚀) = Red     -- "⚀"
       colorOf' (:⚁) = Magenta -- "⚁" -- Orange
       colorOf' (:⚂) = Yellow  -- "⚂"
       colorOf' (:⚃) = Green   -- "⚃"
@@ -2165,8 +2165,8 @@ instance Fancy (🀰) where
           pick = leftOf
           -- pick = rightOf d
           coloring ∷ Maybe (:🎲) → DisplayColor
-          coloring Nothing     = Black'
-          coloring (Just (:⚀)) = Red'
+          coloring Nothing     = Black
+          coloring (Just (:⚀)) = Red
           coloring (Just (:⚁)) = Magenta -- Orange
           coloring (Just (:⚂)) = Yellow
           coloring (Just (:⚃)) = Green
@@ -2353,7 +2353,7 @@ instance Show (🁢) where
       show₁ ∷ (🁢) → String
       show₁ d = show (valTop d, valBottom d)
       show₂ ∷ (🁢) → String
-      show₂ d = quoteWith "(" ")" (quoteWith (toColor (show (valTop d)) Red') ((show (valBottom d)) `toColor` Magenta) ",")
+      show₂ d = quoteWith "(" ")" (quoteWith (toColor (show (valTop d)) Red) ((show (valBottom d)) `toColor` Magenta) ",")
 instance Fancy (🁢) where
   unicode ∷ (🁢) → Char
   unicode (:🁣) = '🁣'
@@ -2465,8 +2465,8 @@ instance Fancy (🁢) where
           pick = topOf
           -- pick = bottomOf d
           coloring ∷ Maybe (:🎲) → DisplayColor
-          coloring Nothing     = Black'
-          coloring (Just (:⚀)) = Red'
+          coloring Nothing     = Black
+          coloring (Just (:⚀)) = Red
           coloring (Just (:⚁)) = Magenta -- Orange
           coloring (Just (:⚂)) = Yellow
           coloring (Just (:⚃)) = Green
@@ -3136,10 +3136,10 @@ instance Show Card where
 (🃒) = Card Two   Club
 
 colorOf ∷ Suit → DisplayColor
-colorOf Spade   = Black'
-colorOf Heart   = Red'
-colorOf Diamond = Red'
-colorOf Club    = Black'
+colorOf Spade   = Black
+colorOf Heart   = Red
+colorOf Diamond = Red
+colorOf Club    = Black
 
 color ∷ Card → DisplayColor
 color = colorOf . suit

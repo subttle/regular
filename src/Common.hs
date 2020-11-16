@@ -774,10 +774,9 @@ instance (Show a) ⇒ Show (Set' a) where
 charToString ∷ Char → String
 charToString = (: [])
 
--- TODO change `Black'` to `Black`, `Red'` to `Red` after resolving naming conflict
 data DisplayColor where
-  Black'  ∷ DisplayColor
-  Red'    ∷ DisplayColor
+  Black   ∷ DisplayColor
+  Red     ∷ DisplayColor
   Green   ∷ DisplayColor
   Yellow  ∷ DisplayColor
   Blue    ∷ DisplayColor

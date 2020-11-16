@@ -278,7 +278,7 @@ startsWith0 = DFA δ 0 (singleton 1)
 
 -- Coursera Stanford Automata, NFA lecture
 -- http://spark-public.s3.amazonaws.com/automata/slides/4_fa3.pdf
-data RB = Red | Black deriving (Eq, Enum, Ord, Bounded, Show)
+data RB = Red' | Black' deriving (Eq, Enum, Ord, Bounded, Show)
 instance U.Universe RB
 instance U.Finite   RB
 instance Finite     RB
@@ -286,24 +286,24 @@ board ∷ NFA.NFA Fin₉ RB
 board = NFA.NFA δ 0 (singleton 8)
   where
     δ ∷ (Fin₉, RB) → Set Fin₉
-    δ (0,   Red) = fromList  [1, 3]
-    δ (0, Black) = singleton  4
-    δ (1,   Red) = fromList  [3, 5]
-    δ (1, Black) = fromList  [0, 2, 4]
-    δ (2,   Red) = fromList  [1, 5]
-    δ (2, Black) = singleton  4
-    δ (3,   Red) = fromList  [1, 7]
-    δ (3, Black) = fromList  [0, 4, 6]
-    δ (4,   Red) = fromList  [1, 3, 5, 7]
-    δ (4, Black) = fromList  [0, 2, 6, 8]
-    δ (5,   Red) = fromList  [1, 7]
-    δ (5, Black) = fromList  [2, 4, 8]
-    δ (6,   Red) = fromList  [3, 7]
-    δ (6, Black) = singleton  4
-    δ (7,   Red) = fromList  [3, 5]
-    δ (7, Black) = fromList  [4, 6, 8]
-    δ (8,   Red) = fromList  [5, 7]
-    δ (8, Black) = singleton  4
+    δ (0,   Red') = fromList  [1, 3]
+    δ (0, Black') = singleton  4
+    δ (1,   Red') = fromList  [3, 5]
+    δ (1, Black') = fromList  [0, 2, 4]
+    δ (2,   Red') = fromList  [1, 5]
+    δ (2, Black') = singleton  4
+    δ (3,   Red') = fromList  [1, 7]
+    δ (3, Black') = fromList  [0, 4, 6]
+    δ (4,   Red') = fromList  [1, 3, 5, 7]
+    δ (4, Black') = fromList  [0, 2, 6, 8]
+    δ (5,   Red') = fromList  [1, 7]
+    δ (5, Black') = fromList  [2, 4, 8]
+    δ (6,   Red') = fromList  [3, 7]
+    δ (6, Black') = singleton  4
+    δ (7,   Red') = fromList  [3, 5]
+    δ (7, Black') = fromList  [4, 6, 8]
+    δ (8,   Red') = fromList  [5, 7]
+    δ (8, Black') = singleton  4
 
 data Decimal = Plus | Minus | Period deriving (Eq, Ord, Enum, Bounded)
 instance U.Universe Decimal
