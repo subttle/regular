@@ -28,6 +28,7 @@ import           Data.These.Combinators (catThese)
 import           Data.Void (Void, absurd)
 import qualified Data.Foldable as F
 import           Data.Function (on)
+import           Data.Functor ((<&>))
 import           Data.Functor.Const (Const (..))
 import           Data.Functor.Contravariant
 import           Data.Functor.Contravariant.Divisible (conquer)
@@ -1257,10 +1258,7 @@ instance (Show a, Finite a) ⇒ Show (Predicate a) where
     where
       -- show predicate as a bitstring
       showpredbits ∷ Predicate a → String -- ∷ ∀ a . (Finite a) ⇒ Predicate a → String
-      showpredbits (Predicate p) = fmap (toBit . p) (asList ∷ [a])
-        where
-          toBit ∷ Bool → Char
-          toBit = bool '0' '1'
+      showpredbits = (<&>) asList . (bool '0' '1' ‥ getPredicate)
       -- show predicate as a function
       showpredf ∷ Predicate a → String -- ∷ ∀ a . (Show a, Finite a) ⇒ Predicate a → String
       showpredf (Predicate p) = unlines (fmap (\(a, b) → show a <> " ↦ " <> show b) graph)
@@ -1273,11 +1271,11 @@ instance (Show a, Finite a) ⇒ Show (Predicate a) where
           graph  = zip domain image_
       -- show predicate as a set
       showpredset ∷ Predicate a → String -- ∷ ∀ a . (Show a, Finite a) ⇒ Predicate a → String
-      showpredset (Predicate p) = show (Set' (Set.filter p asSet))
+      showpredset = show . Set' . flip Set.filter asSet . getPredicate
       -- show the elements of 'a', with coloring determined by the predicate
       showcolors ∷ Predicate a → String --  ∷ ∀ a . (Show a, Finite a) ⇒ Predicate a → String
-      showcolors (Predicate p) = concatMap (\a → bool ((flip toColor) Red (show a)) ((flip toColor) Green (show a)) (p a)) asList
-
+      -- showcolors (Predicate p) = concatMap (\a → bool ((flip toColor) Red (show a)) ((flip toColor) Green (show a)) (p a)) asList
+      showcolors = (>>=) asList . liftA3 bool ((`toColor` Red) . show) ((`toColor` Green) . show) . getPredicate
 
 instance (Finite a)
        ⇒ Eq (Predicate a) where
