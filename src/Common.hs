@@ -591,12 +591,12 @@ filter' (Predicate p) = List.filter p . toList
 
 -- An alias for `filter'`
 -- Keeps elements which match the predicate
-include ∷ (Foldable f) ⇒ Predicate a → f a → [a]
-include = filter'
+include ∷ (Foldable f) ⇒ f a → Predicate a → [a]
+include = flip filter'
 
 -- Discards elements which match the predicate
-exclude ∷ (Foldable f) ⇒ Predicate a → f a → [a]
-exclude (Predicate p) = List.filter (not . p) . toList
+exclude ∷ (Foldable f) ⇒ f a → Predicate a → [a]
+exclude list (Predicate p) = List.filter (not . p) (toList list)
 
 -- A wrapper for `deleteBy` which uses `Equivalence` type.
 deleteBy' ∷ (Foldable f) ⇒ Equivalence a → a → f a → [a]
