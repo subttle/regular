@@ -75,7 +75,7 @@ instance Num ℤ where
   abs ∷ ℤ → ℤ
   abs = undefined    -- FIXME implement
   signum ∷ ℤ → ℤ
-  signum = undefined -- FIXME implement
+  signum z = ordering (Prev Zero) Zero (Next Zero) (compare (toInteger z) 0)
 
 instance Real ℤ where
   toRational ∷ ℤ → Rational
