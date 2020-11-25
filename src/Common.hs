@@ -569,7 +569,7 @@ length' ∷ (Foldable f) ⇒ f a → ℕ
 length' = fromIntegral . length
 
 -- A wrapper for `find` which uses `Predicate` type.
-find' ∷ (Foldable f) ⇒ (Predicate a) → f a → Maybe a
+find' ∷ (Foldable f) ⇒ Predicate a → f a → Maybe a
 find' (Predicate p) = List.find p
 
 -- A version of List.findIndex which returns `Maybe ℕ` instead of `Maybe Int`
@@ -589,7 +589,7 @@ elemIndices' = fmap fromIntegral ‥ List.elemIndices
 filter' ∷ (Foldable f) ⇒ Predicate a → f a → [a]
 filter' (Predicate p) = List.filter p . toList
 
--- An alias for `filter'`
+-- An alias for `flip filter'`
 -- Keeps elements which match the predicate
 include ∷ (Foldable f) ⇒ f a → Predicate a → [a]
 include = flip filter'
