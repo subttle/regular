@@ -1405,6 +1405,16 @@ cycles = Equivalence . ((∋) ‥ orbit)
 -- https://proofwiki.org/wiki/Definition:Orbit_(Group_Theory)
 orbit ∷ (Finite a) ⇒ Comparison a → a → NonEmpty a
 orbit c a = a :| takeWhile (≠ a) (iterate (representativeC c) (representativeC c a))
+{-
+-- TODO
+orbit ∷ ∀ a . (Finite a) ⇒ Comparison a → a → NonEmpty a
+orbit cmp a₁ = NE.unfoldr c a₁
+  where
+    -- take an `a` and then give it back (i.e. we get identity for free), with possibly
+    -- an even further destinatiton
+    c ∷ a → (a, Maybe a) -- if acting on `a` changes it, we can return just the change, otherwise nothing :)
+    c a₂ = (a₂, act cmp a₂ `when'` (act cmp a₂ ≠ a₁))
+-}
 
 -- FIXME
 -- ~the least number of times the permutation has to be composed with itself
