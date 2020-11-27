@@ -1,8 +1,10 @@
-{-# OPTIONS_GHC -Wall #-}
+{-# OPTIONS_GHC -Wall                   #-}
+{-# LANGUAGE ConstraintKinds            #-}
 {-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE DerivingVia                #-}
 {-# LANGUAGE RankNTypes                 #-}
-{-# LANGUAGE ConstraintKinds            #-}
+{-# LANGUAGE FunctionalDependencies     #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
 
 module Common where
 
@@ -819,6 +821,11 @@ class (Show a) ⇒ Fancy a where
   -- FIXME :)
   named ∷ a → String
   named = const mempty
+
+-- Actions
+class (Semigroup s) ⇒ Act s a | a → s where
+  act ∷ s → a → a
+  -- TODO act = const id
 
 newtype CCPredicate a where
   CCPredicate ∷ ContraCoyoneda Predicate a → CCPredicate a
