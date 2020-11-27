@@ -57,7 +57,7 @@ instance Divisible (DA q) where
 
 instance Decidable (DA q) where
   lose ∷ (a → Void) → DA q a
-  lose _ = empty
+  lose = const empty
 
   choose ∷ (s → Either g₁ g₂) → DA q g₁ → DA q g₂ → DA q s
   choose h (DA (Predicate o₁) t₁) (DA (Predicate o₂) t₂) = DA (Predicate (\q →         o₁ q ∨ o₂ q     ))
