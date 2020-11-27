@@ -73,10 +73,10 @@ even0or1 = EFA.EFA δ 0 (fromList [1, 3])
 
 -- A DFA which accepts numbers (as a string of digits) only when
 -- they are evenly divisible by 5.
--- Theorem: A number is divisible by 5 iff its last digit is 0 or 5.
 by5 ∷ DFA Bool Fin₁₀
 by5 = DFA δ q₀ f
   where
+    -- Theorem: A number is divisible by 5 iff its last digit is 0 or 5.
     δ ∷ (Bool, Fin₁₀) → Bool
     δ (_, 0) = True
     δ (_, 5) = True
@@ -94,7 +94,6 @@ by5' = RE.star RE.dot RE.* RE.fromSet (fromList [0, 5])
 
 -- A DFA which accepts numbers (as a string of digits) only when
 -- they are evenly divisible by 3.
--- Theorem: A number is divisible by 3 iff the sum of its digits is divisible by 3.
 -- The transition function effectively keeps a running total modulo three by
 -- totaling the numeric value of its current state and the numeric value of the
 -- incoming digit, performing the modulo, and then converting that value back to a state.
@@ -103,6 +102,7 @@ by5' = RE.star RE.dot RE.* RE.fromSet (fromList [0, 5])
 by3 ∷ DFA (Either () Fin₃) Fin₁₀
 by3 = DFA δ (Left ()) (singleton (Right 0))
   where
+    -- Theorem: A number is divisible by 3 iff the sum of its digits is divisible by 3.
     δ ∷ (Either () Fin₃, Fin₁₀) → Either () Fin₃
     δ = Right . toEnum . (`mod` 3) . \(q, digit) → fromEnum (fromRight 0 q) + fromEnum digit
 
@@ -470,7 +470,7 @@ atleast21s = DFA δ 0 (singleton 2)
     δ (2, 1) = 2
 
 exactly20sANDatleast21s ∷ DFA (Fin₄, Fin₃) Fin₂
-exactly20sANDatleast21s  = exactly20s `DFA.intersection` atleast21s
+exactly20sANDatleast21s = exactly20s `DFA.intersection` atleast21s
 
 -- The language {"123456789"}
 digitsNFA ∷ NFA.NFA Fin₁₀ Fin₁₀
