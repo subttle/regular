@@ -151,12 +151,12 @@ fromGraph (TG.TG t) = FA (\(q, s) → postSet q (t s))
 
 instance (Show q, Finite q, Show s, Finite s) ⇒ Show (FA q s) where
   show ∷ FA q s → String
-  show m = List.intercalate "\n, "
-           ["( Q = "               ++ (show . Set' .      qs)          m
-           ,  "Σ = "               ++ (show . Set' .   sigma)          m
-           ,  "δ : Q × Σ → P(Q)\n" ++ (format' . Map.fromList . table) m
-           ,  "I = "               ++ (show . Set' . initial)          m
-           ,  "F = "               ++ (show . Set' .   final)          m ++ " )"
+  show m = quoteWith "( " " )" $ List.intercalate "\n, "
+           [ equation "Q"                 ((show    . Set'         . qs     ) m)
+           , equation "Σ"                 ((show    . Set'         . sigma  ) m)
+           , quoteWith "δ : Q × Σ → P(Q)" ((format' . Map.fromList . table  ) m) "\n"
+           , equation "I"                 ((show    . Set'         . initial) m)
+           , equation "F"                 ((show    . Set'         . final  ) m)
            ]
 
 -- Determinize the FA without transforming it to a DFA type
