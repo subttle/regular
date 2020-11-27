@@ -48,13 +48,13 @@ instance Contravariant SomeEFA where
 
 instance (Show q, Finite q, Show s, Finite s) ⇒ Show (EFA q s) where
   show ∷ EFA q s → String
-  show m@(EFA _ q₀ f) = List.intercalate "\n, "
-                        [ "( Q  = "                      ++ (show . Set' . qs)                m
-                        ,   "Σ  = "                      ++ (show . Set' . sigma)             m
-                        ,   "δ : Q × (Σ ∪ {ε}) → P(Q)\n" ++ (format'' . Map.fromList . table) m
-                        ,   "q₀ = "                      ++ show q₀
-                        ,   "F  = "                      ++ (show . Set' $ f) ++ " )"
-                        ]
+  show m = quoteWith "( " " )" $ List.intercalate "\n, "
+           [ equation "Q "                         ((show     . Set'         . qs     ) m)
+           , equation "Σ "                         ((show     . Set'         . sigma  ) m)
+           , quoteWith "δ  : Q × (Σ ∪ {ε}) → P(Q)" ((format'' . Map.fromList . table  ) m) "\n"
+           , equation "q₀"                         ((show     . q0                    ) m)
+           , equation "F "                         ((show     . Set'         . final  ) m)
+           ]
 
 instance (Show s, Finite s) ⇒ Show (SomeEFA s) where
   show ∷ SomeEFA s → String

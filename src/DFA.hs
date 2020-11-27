@@ -61,13 +61,13 @@ instance Contravariant SomeDFA where
 
 instance (Show q, Finite q, Show s, Finite s) ⇒ Show (DFA q s) where
   show ∷ DFA q s → String
-  show m@(DFA _ q₀ f) = List.intercalate "\n, "
-                        [ "( Q  = "            ++ (show . Set' . qs)    m
-                        ,   "Σ  = "            ++ (show . Set' . sigma) m
-                        ,   "δ  : Q × Σ → Q\n" ++ (format . deltaToMap) m
-                        ,   "q₀ = "            ++  show  q₀
-                        ,   "F  = "            ++ (show . Set' $ f) ++ ")"
-                        ]
+  show m = quoteWith "( " " )" $ List.intercalate "\n, "
+           [ equation "Q "              ((show . Set' . qs   ) m)
+           , equation "Σ "              ((show . Set' . sigma) m)
+           , quoteWith "δ  : Q × Σ → Q" ((format . deltaToMap) m) "\n"
+           , equation "q₀"              ((show . q0          ) m)
+           , equation "F "              ((show . Set' . fs   ) m)
+           ]
 
 instance (Show s, Finite s) ⇒ Show (SomeDFA s) where
   show ∷ SomeDFA s → String
