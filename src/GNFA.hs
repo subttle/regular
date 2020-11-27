@@ -77,9 +77,6 @@ instance (Show q, Finite q, Show s, Finite s)
            , equation "qᵢ" (show (Init  ())      )
            , equation "qᶠ" (show (Final ())      )
            ]
-    where
-      equation ∷ String → String → String
-      equation lhs rhs = quoteWith lhs rhs (quoteWith " " " " ("="))
 
 accepts ∷ (Finite q, Ord s) ⇒ GNFA q s → [s] → Bool
 accepts = RE.matches . toRE

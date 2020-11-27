@@ -683,13 +683,16 @@ impossible = error "Why, sometimes I've believed as many as six impossible thing
 hom ∷ (Monoid m) ⇒ (a → m) → [a] → m
 hom = mconcat ‥ fmap
 
+-- Another subtle observation could be made here :)
+quoteWith ∷ (Monoid m) ⇒ m → m → (m → m)
+quoteWith l r = (l ⋄) . (⋄ r)
+
 -- Prepend and append quotation marks to a given `String`.
 quotations ∷ String → String
 quotations = quoteWith "\"" "\""
 
--- Another subtle observation could be made here :)
-quoteWith ∷ (Monoid m) ⇒ m → m → (m → m)
-quoteWith l r = (l ⋄) . (⋄ r)
+equation ∷ String → String → String
+equation lhs rhs = quoteWith lhs rhs (quoteWith " " " " ("="))
 
 -- DFA q s → [((q, s), q)]
 format ∷ (Show c, Show r) ⇒ Map c r → String
