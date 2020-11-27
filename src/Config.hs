@@ -178,16 +178,13 @@ class (Q (automaton q s) q, Σ (automaton q s) s, Eq occupy) ⇒ Configuration a
     -- ℒ(m) = { w ∈ Σ★ | δ★(q₀, w) ∩ F ≠ ∅ } for NFA, EFA
     -- ℒ(m) = { w ∈ Σ★ | δ★(I, w) ∩ F ≠ ∅ } for FA
     language ∷ automaton q s → [[s]]
-    language m
-        -- if m produces the empty language then no need to waste computation
-        | isZero      m = []
-        -- if we know m accepts all strings, don't bother filtering with `accepts`, just return Σ★
-        | isSigmaStar m = sigmaStar m
-        | otherwise     = Prelude.filter (accepts m) strings'
-                    where strings'
-                            -- if the language is finite then we don't need to filter over all of Σ★ (and we may return a List which terminates!)
-                            -- because the language produced by the automaton is finite, we know there are no cycles in useful states so
-                            -- the language can't contain any string w such that |w| ≥ n where n is the number of useful states
-                            | finite m  = upToLength (size' (useful m)) (sigmaStar m)
-                            -- otherwise just filter `accepts` predicate over Σ★
-                            | otherwise = sigmaStar m
+    language m | isZero      m = []          -- if m produces the empty language then no need to waste computation
+               | isSigmaStar m = sigmaStar m -- if we know m accepts all strings, don't bother filtering with `accepts`, just return Σ★
+               | otherwise     = Prelude.filter (accepts m) strings'
+      where
+        -- if the language is finite then we don't need to filter over all of Σ★ (and we may return a List which terminates!)
+        -- because the language produced by the automaton is finite, we know there are no cycles in useful states so
+        -- the language can't contain any string w such that |w| ≥ n where n is the number of useful states
+        strings' ∷ [[s]]
+        strings' | finite m  = upToLength (size' (useful m)) (sigmaStar m)
+                 | otherwise = sigmaStar m -- otherwise just filter `accepts` predicate over Σ★
