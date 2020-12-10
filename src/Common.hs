@@ -825,6 +825,10 @@ class (Show a) ⇒ Fancy a where
   named ∷ a → String
   named = const mempty
 
+-- Assign something a default DisplayColor.
+class HasDisplayColor a where
+  toColor' ∷ a → DisplayColor
+
 -- Actions
 class (Semigroup s) ⇒ Act s a | a → s where
   act ∷ s → a → a

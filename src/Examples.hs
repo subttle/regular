@@ -14,7 +14,7 @@ import           Data.Set.Unicode ((∅))
 import           Data.Bool.Unicode ((∨), (∧))
 import           Data.Eq.Unicode ((≠))
 import           Data.Ord.Unicode ((≤), (≥))
-import           Common ((≰), equating')
+import           Common (toColor', (≰), equating')
 import           Data.Either (fromRight)
 import           Data.Functor.Contravariant (contramap, Predicate (..), Equivalence (..))
 import qualified Data.Universe as U (Universe, Finite)
@@ -616,7 +616,7 @@ cardsByRank ∷ Equivalence Card
 cardsByRank = equating' rank
 
 cardsByColor ∷ Equivalence Card
-cardsByColor = equating' color
+cardsByColor = equating' toColor'
 
 suitsByColor ∷ Equivalence Suit
-suitsByColor = equating' colorOf
+suitsByColor = equating' toColor'

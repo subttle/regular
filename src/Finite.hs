@@ -1841,7 +1841,9 @@ instance (Finite a)
   asList ∷ [Equivalence a]
   asList = fmap toEquivalence (partitions' asList)
 
-data Alpha = A | B | C | D | E | F | G | H | I | J | K | L | M | N | O | P | Q | R | S | T | U | V | W | X | Y | Z deriving (Eq, Ord, Enum, Bounded, Show, Read)
+data Alpha = A | B | C | D | E | F | G | H | I | J | K | L | M |
+             N | O | P | Q | R | S | T | U | V | W | X | Y | Z
+             deriving (Eq, Ord, Enum, Bounded, Show, Read)
 instance U.Universe Alpha
 instance U.Finite   Alpha
 instance Finite Alpha
@@ -1948,7 +1950,7 @@ instance Fancy (:🎲) where
   plain (:⚄) = "(:⚄)"
   plain (:⚅) = "(:⚅)"
   show' ∷ (:🎲) → String
-  show' d = charToString (unicode d) `toColor` colorOf' d
+  show' d = charToString (unicode d) `toColor` toColor' d
     where
       -- TODO almost have the six colors of Rubik's cube, maybe try to update?
       colorOf' ∷ (:🎲) → DisplayColor
@@ -2160,23 +2162,7 @@ instance Fancy (🀰) where
   plain (:🁠) = "(:🁠)"
   plain (:🁡) = "(:🁡)"
   show' ∷ (🀰) → String
-  show' d = charToString (unicode d) `toColor` colorOf' d
-    where
-      -- TODO almost have the six colors of Rubik's cube, maybe try to update?
-      colorOf' ∷ (🀰) → DisplayColor
-      colorOf' = coloring . pick
-        where
-          pick ∷ (🀰) → Maybe (:🎲)
-          pick = leftOf
-          -- pick = rightOf d
-          coloring ∷ Maybe (:🎲) → DisplayColor
-          coloring Nothing     = Black
-          coloring (Just (:⚀)) = Red
-          coloring (Just (:⚁)) = Magenta -- Orange
-          coloring (Just (:⚂)) = Yellow
-          coloring (Just (:⚃)) = Green
-          coloring (Just (:⚄)) = Blue
-          coloring (Just (:⚅)) = White
+  show' d = charToString (unicode d) `toColor` toColor' d
   named ∷ (🀰) → String
   named = const (charToString '🀰')
 
@@ -2358,7 +2344,8 @@ instance Show (🁢) where
       show₁ ∷ (🁢) → String
       show₁ d = show (valTop d, valBottom d)
       show₂ ∷ (🁢) → String
-      show₂ d = quoteWith "(" ")" (quoteWith (toColor (show (valTop d)) Red) ((show (valBottom d)) `toColor` Magenta) ",")
+      show₂ d = quoteWith "(" ")" (quoteWith (toColor (show (valTop    d)) Red    )
+                                             (toColor (show (valBottom d)) Magenta) ",")
 instance Fancy (🁢) where
   unicode ∷ (🁢) → Char
   unicode (:🁣) = '🁣'
@@ -2461,23 +2448,7 @@ instance Fancy (🁢) where
   plain (:🂒) = "(:🂒)"
   plain (:🂓) = "(:🂓)"
   show' ∷ (🁢) → String
-  show' d = charToString (unicode d) `toColor` colorOf' d
-    where
-      -- TODO almost have the six colors of Rubik's cube, maybe try to update?
-      colorOf' ∷ (🁢) → DisplayColor
-      colorOf' = coloring . pick
-        where
-          pick ∷ (🁢) → Maybe (:🎲)
-          pick = topOf
-          -- pick = bottomOf d
-          coloring ∷ Maybe (:🎲) → DisplayColor
-          coloring Nothing     = Black
-          coloring (Just (:⚀)) = Red
-          coloring (Just (:⚁)) = Magenta -- Orange
-          coloring (Just (:⚂)) = Yellow
-          coloring (Just (:⚃)) = Green
-          coloring (Just (:⚄)) = Blue
-          coloring (Just (:⚅)) = White
+  show' d = charToString (unicode d) `toColor` toColor' d
   named ∷ (🁢) → String
   named = const (charToString '🁢')
 
@@ -2883,7 +2854,7 @@ instance Fancy Suit where
   named ∷ Suit → String
   named = const ("Suit") -- TODO
   show' ∷ Suit → String
-  show' s = charToString (unicode s) `toColor` colorOf s
+  show' s = charToString (unicode s) `toColor` toColor' s
 
 instance Show Suit where
   show ∷ Suit → String
@@ -3022,7 +2993,7 @@ instance Fancy Card where
 
 instance Show Card where
   show ∷ Card → String
-  show c = show' c `toColor` color c
+  show c = show' c `toColor` toColor' c
 
 (🂡) ∷ Card
 (🂡) = Card Ace Spade
@@ -3141,18 +3112,63 @@ instance Show Card where
 (🃒) ∷ Card
 (🃒) = Card Two   Club
 
-colorOf ∷ Suit → DisplayColor
-colorOf Spade   = Black
-colorOf Heart   = Red
-colorOf Diamond = Red
-colorOf Club    = Black
+instance HasDisplayColor Suit where
+  toColor' ∷ Suit → DisplayColor
+  toColor' Spade   = Black
+  toColor' Heart   = Red
+  toColor' Diamond = Red
+  toColor' Club    = Black
 
-color ∷ Card → DisplayColor
-color = colorOf . suit
+instance HasDisplayColor Card where
+  toColor' ∷ Card → DisplayColor
+  toColor' = toColor' . suit
 
+instance HasDisplayColor (:🎲) where
+  -- TODO almost have the six colors of Rubik's cube, maybe try to update?
+  toColor' ∷ (:🎲) → DisplayColor
+  toColor' (:⚀) = Red     -- "⚀"
+  toColor' (:⚁) = Magenta -- "⚁" -- Orange
+  toColor' (:⚂) = Yellow  -- "⚂"
+  toColor' (:⚃) = Green   -- "⚃"
+  toColor' (:⚄) = Blue    -- "⚄"
+  toColor' (:⚅) = White   -- "⚅"
 
+instance HasDisplayColor (🁢) where
+  toColor' ∷ (🁢) → DisplayColor
+  toColor' = coloring . pick
+    where
+      pick ∷ (🁢) → Maybe (:🎲)
+      pick = topOf -- bottomOf
+      coloring ∷ Maybe (:🎲) → DisplayColor
+      coloring Nothing     = Black
+      coloring (Just (:⚀)) = Red
+      coloring (Just (:⚁)) = Magenta -- Orange
+      coloring (Just (:⚂)) = Yellow
+      coloring (Just (:⚃)) = Green
+      coloring (Just (:⚄)) = Blue
+      coloring (Just (:⚅)) = White
+instance HasDisplayColor (🀰) where
+  toColor' ∷ (🀰) → DisplayColor
+  toColor' = coloring . pick
+    where
+      pick ∷ (🀰) → Maybe (:🎲)
+      pick = leftOf -- rightOf
+      coloring ∷ Maybe (:🎲) → DisplayColor
+      coloring Nothing     = Black
+      coloring (Just (:⚀)) = Red
+      coloring (Just (:⚁)) = Magenta -- Orange
+      coloring (Just (:⚂)) = Yellow
+      coloring (Just (:⚃)) = Green
+      coloring (Just (:⚄)) = Blue
+      coloring (Just (:⚅)) = White
 
+instance HasDisplayColor Quadrant where
+  toColor' ∷ Quadrant → DisplayColor
+  toColor' = quadrant Black Red Green Yellow
 
+instance HasDisplayColor Octant where
+  toColor' ∷ Octant → DisplayColor
+  toColor' = octant   Black Red Green Yellow Blue Magenta Cyan White
 
 -- An involution is a mapping, f, that coincides with its own inverse, i.e.,
 -- f x ≡ f⁻¹ x
