@@ -1951,15 +1951,6 @@ instance Fancy (:🎲) where
   plain (:⚅) = "(:⚅)"
   show' ∷ (:🎲) → String
   show' d = charToString (unicode d) `toColor` toColor' d
-    where
-      -- TODO almost have the six colors of Rubik's cube, maybe try to update?
-      colorOf' ∷ (:🎲) → DisplayColor
-      colorOf' (:⚀) = Red     -- "⚀"
-      colorOf' (:⚁) = Magenta -- "⚁" -- Orange
-      colorOf' (:⚂) = Yellow  -- "⚂"
-      colorOf' (:⚃) = Green   -- "⚃"
-      colorOf' (:⚄) = Blue    -- "⚄"
-      colorOf' (:⚅) = White   -- "⚅"
   named ∷ (:🎲) → String
   named = const (charToString '🎲')
 
