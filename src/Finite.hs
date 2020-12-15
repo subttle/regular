@@ -3156,13 +3156,7 @@ instance HasDisplayColor (🁢) where
       pick ∷ (🁢) → Maybe (:🎲)
       pick = topOf -- bottomOf
       coloring ∷ Maybe (:🎲) → DisplayColor
-      coloring Nothing     = Black
-      coloring (Just (:⚀)) = Red
-      coloring (Just (:⚁)) = Magenta -- Orange
-      coloring (Just (:⚂)) = Yellow
-      coloring (Just (:⚃)) = Green
-      coloring (Just (:⚄)) = Blue
-      coloring (Just (:⚅)) = White
+      coloring = maybe Black toColor'
 instance HasDisplayColor (🀰) where
   toColor' ∷ (🀰) → DisplayColor
   toColor' = coloring . pick
@@ -3170,13 +3164,7 @@ instance HasDisplayColor (🀰) where
       pick ∷ (🀰) → Maybe (:🎲)
       pick = leftOf -- rightOf
       coloring ∷ Maybe (:🎲) → DisplayColor
-      coloring Nothing     = Black
-      coloring (Just (:⚀)) = Red
-      coloring (Just (:⚁)) = Magenta -- Orange
-      coloring (Just (:⚂)) = Yellow
-      coloring (Just (:⚃)) = Green
-      coloring (Just (:⚄)) = Blue
-      coloring (Just (:⚅)) = White
+      coloring = maybe Black toColor'
 
 instance HasDisplayColor Quadrant where
   toColor' ∷ Quadrant → DisplayColor
