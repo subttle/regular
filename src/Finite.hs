@@ -1841,12 +1841,37 @@ instance (Finite a)
   asList ∷ [Equivalence a]
   asList = fmap toEquivalence (partitions' asList)
 
-data Alpha = A | B | C | D | E | F | G | H | I | J | K | L | M |
-             N | O | P | Q | R | S | T | U | V | W | X | Y | Z
-             deriving (Eq, Ord, Enum, Bounded, Show, Read)
+data Alpha where
+  A ∷ Alpha
+  B ∷ Alpha
+  C ∷ Alpha
+  D ∷ Alpha
+  E ∷ Alpha
+  F ∷ Alpha
+  G ∷ Alpha
+  H ∷ Alpha
+  I ∷ Alpha
+  J ∷ Alpha
+  K ∷ Alpha
+  L ∷ Alpha
+  M ∷ Alpha
+  N ∷ Alpha
+  O ∷ Alpha
+  P ∷ Alpha
+  Q ∷ Alpha
+  R ∷ Alpha
+  S ∷ Alpha
+  T ∷ Alpha
+  U ∷ Alpha
+  V ∷ Alpha
+  W ∷ Alpha
+  X ∷ Alpha
+  Y ∷ Alpha
+  Z ∷ Alpha
+  deriving (Eq, Ord, Enum, Bounded, Show, Read)
 instance U.Universe Alpha
 instance U.Finite   Alpha
-instance Finite Alpha
+instance Finite     Alpha
 
 data DNA = Adenine | Cytosine | Guanine | Thymine deriving (Eq, Ord, Bounded, Enum)
 instance Show DNA where
