@@ -1965,6 +1965,7 @@ instance Finite     (:🎲)
 
 instance Fancy (:🎲) where
   unicode  ∷ (:🎲) → Char
+  -- unicode = getOp (contramap (toEnum . fromEnum) (Op (fin₆ '⚀' '⚁' '⚂' '⚃' '⚄' '⚅')))
   unicode (:⚀) = '⚀'
   unicode (:⚁) = '⚁'
   unicode (:⚂) = '⚂'
@@ -1972,6 +1973,7 @@ instance Fancy (:🎲) where
   unicode (:⚄) = '⚄'
   unicode (:⚅) = '⚅'
   plain ∷ (:🎲) → String
+  -- plain = getOp (contramap (toEnum . fromEnum) (Op (fin₆ "(:⚀)" "(:⚁)" "(:⚂)" "(:⚃)" "(:⚄)" "(:⚅)")))
   plain (:⚀) = "(:⚀)"
   plain (:⚁) = "(:⚁)"
   plain (:⚂) = "(:⚂)"
