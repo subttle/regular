@@ -2741,24 +2741,15 @@ data Quadrant where
 instance U.Universe Quadrant
 instance U.Finite   Quadrant
 instance Finite     Quadrant
-instance Fancy Quadrant where
+instance Fancy      Quadrant where
   unicode  ∷ Quadrant → Char
-  unicode  Q₁ = 'Ⅰ'
-  unicode  Q₂ = 'Ⅱ'
-  unicode  Q₃ = 'Ⅲ'
-  unicode  Q₄ = 'Ⅳ'
+  unicode  = quadrant 'Ⅰ' 'Ⅱ' 'Ⅲ' 'Ⅳ'
   unicode' ∷ Quadrant → Char
-  unicode' Q₁ = 'ⅰ'
-  unicode' Q₂ = 'ⅱ'
-  unicode' Q₃ = 'ⅲ'
-  unicode' Q₄ = 'ⅳ'
-  plain ∷ Quadrant → String
-  plain Q₁ = "Q₁"
-  plain Q₂ = "Q₂"
-  plain Q₃ = "Q₃"
-  plain Q₄ = "Q₄"
-  named ∷ Quadrant → String
-  named = const ("Quadrant") -- TODO
+  unicode' = quadrant 'ⅰ' 'ⅱ' 'ⅲ' 'ⅳ'
+  plain    ∷ Quadrant → String
+  plain    = quadrant "Q₁" "Q₂" "Q₃" "Q₄"
+  named    ∷ Quadrant → String
+  named    = const ("Quadrant")
 instance Show Quadrant where
   show ∷ Quadrant → String
   show = show'
@@ -2790,36 +2781,15 @@ data Octant where
 instance U.Universe Octant
 instance U.Finite   Octant
 instance Finite     Octant
-instance Fancy Octant where
+instance Fancy      Octant where
   unicode  ∷ Octant → Char
-  unicode O₁ = 'Ⅰ'
-  unicode O₂ = 'Ⅱ'
-  unicode O₃ = 'Ⅲ'
-  unicode O₄ = 'Ⅳ'
-  unicode O₅ = 'Ⅴ'
-  unicode O₆ = 'Ⅵ'
-  unicode O₇ = 'Ⅶ'
-  unicode O₈ = 'Ⅷ'
+  unicode  = octant 'Ⅰ' 'Ⅱ' 'Ⅲ' 'Ⅳ' 'Ⅴ' 'Ⅵ' 'Ⅶ' 'Ⅷ'
   unicode' ∷ Octant → Char
-  unicode' O₁ = 'ⅰ'
-  unicode' O₂ = 'ⅱ'
-  unicode' O₃ = 'ⅲ'
-  unicode' O₄ = 'ⅳ'
-  unicode' O₅ = 'ⅴ'
-  unicode' O₆ = 'ⅵ'
-  unicode' O₇ = 'ⅶ'
-  unicode' O₈ = 'ⅷ'
-  plain ∷ Octant → String
-  plain O₁ = "O₁"
-  plain O₂ = "O₂"
-  plain O₃ = "O₃"
-  plain O₄ = "O₄"
-  plain O₅ = "O₅"
-  plain O₆ = "O₆"
-  plain O₇ = "O₇"
-  plain O₈ = "O₈"
-  named ∷ Octant → String
-  named = const ("Octant") -- TODO
+  unicode' = octant 'ⅰ' 'ⅱ' 'ⅲ' 'ⅳ' 'ⅴ' 'ⅵ' 'ⅶ' 'ⅷ'
+  plain    ∷ Octant → String
+  plain    = octant "O₁" "O₂" "O₃" "O₄" "O₅" "O₆" "O₇" "O₈"
+  named    ∷ Octant → String
+  named    = const ("Octant")
 instance Show Octant where
   show ∷ Octant → String
   show = show'
