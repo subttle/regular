@@ -1623,11 +1623,13 @@ instance (Show a, Finite a)
       _showf ∷ Comparison a → String -- ∷ ∀ a . (Show a, Finite a) ⇒ Comparison a → String
       _showf (Comparison cmp) = unlines (fmap show'' graph)
         where
-          domain ∷ [(a, a)]
-          domain = asList
           graph  ∷ [(a, a, Ordering)]
           graph  = fmap (\(a₁, a₂) → (a₁, a₂, a₁ `cmp` a₂)) domain
-          show'' (a₁, a₂, o) = show a₁ ++ ", " ++ show a₂ ++ " ↦ " ++ show o
+            where
+              domain ∷ [(a, a)]
+              domain = asList
+          show'' ∷ (a, a, Ordering) → String
+          show'' (a₁, a₂, o) = quoteWith (quoteWith (show a₁) (show a₂) ", ") (show o) " ↦ "
 
 instance (Finite a)
        ⇒ Group (Comparison a) where
@@ -1791,11 +1793,13 @@ instance (Show a, Finite a) ⇒ Show (Equivalence a) where
       _showf ∷ Equivalence a → String -- ∷ ∀ a . (Show a, Finite a) ⇒ Equivalence a → String
       _showf (Equivalence (≡)) = unlines (fmap show'' graph)
         where
-          domain ∷ [(a, a)]
-          domain = asList
           graph  ∷ [(a, a, Bool)]
           graph  = fmap (\(a₁, a₂) → (a₁, a₂, a₁ ≡ a₂)) domain
-          show'' (a₁, a₂, b) = show a₁ ++ ", " ++ show a₂ ++ " ↦ " ++ show b
+            where
+              domain ∷ [(a, a)]
+              domain = asList
+          show''  ∷ (a, a, Bool) → String
+          show'' (a₁, a₂, b) = quoteWith (quoteWith (show a₁) (show a₂) ", ") (show b) " ↦ "
       -- show an Equivalence relation as a Ferrer's diagram -- TODO can improve this later, but this works
       _showferrers ∷ Equivalence a → String -- ∷ ∀ a . (Show a, Finite a) ⇒ Equivalence a → String
       _showferrers e = unlines (sortOn (Down . length') (fmap (fmap (const '*')) parts))
