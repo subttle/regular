@@ -180,6 +180,14 @@ right (DFA δ _ f) q = DFA δ q f
 left ∷ DFA q s → q → DFA q s
 left (DFA δ q₀ _) = DFA δ q₀ . singleton
 
+
+transition ∷ (Finite q, Finite s) ⇒ DFA q s → s → (q → q)
+transition (DFA δ _ _) σ = \q → δ (q, σ)
+
+-- TODO name?
+-- transitionStar ∷ (Finite q, Finite s) ⇒ DFA q s → [s] → (q → q)
+-- transitionStar m w = \q → delta' m (q, w)
+
 -- The equivalence relation formed on Q by indistinguishable states for m
 -- Two states having the same right language are indistinguishable
 -- they both lead to the same words being accepted.
