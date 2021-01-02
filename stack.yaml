@@ -1,11 +1,10 @@
 flags: {}
 extra-package-dbs: []
 packages:
-resolver: lts-15.16
+resolver: lts-16.27
 extra-deps:
 - algebra-4.3.1@sha256:38b3e2e7f1058b8f51dcb97c906d4e9871876fd82029a316970ee613fcca130f
 - containers-unicode-symbols-0.3.1.1@sha256:2f8e14cf2ec9c5f65614d3a3113b047c623729993dd12365b737b9d93ea30da2
-- smash-0.1.1.0
 - github: unisonweb/unison
   commit: 3f4e8a450a1bf7e370576709f0601836aabc6d79
   subdirs:
