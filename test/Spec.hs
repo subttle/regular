@@ -303,7 +303,7 @@ testNFAshuffle = expectEqual ab_cd shuffled
 -- "observational equality", here meaning both `m` and `ℓ`
 -- are in agreeance of which words to accept and reject.
 -- FIXME should write version which better utilizes EasyTest, probably should move the bisim part to another file :)
-testBisimSubset' ∷ forall q s automaton p
+testBisimSubset' ∷ ∀ q s automaton p
                  . (Finite q, Finite s, Configuration automaton q s p)
                  ⇒ (automaton q s, ℒ s)
                  → [[s]]
