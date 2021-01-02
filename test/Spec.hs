@@ -38,6 +38,7 @@ suite = tests [ scope "main.FizzBuzz"              testFizzBuzz
               , scope "DFA.empty"                  testDFAEmptyLanguage
               , scope "DFA.epsilon"                testDFAEpsilon
               , scope "DFA.literal"                testDFALiteral
+              , scope "DFA.union"                  testDFAUnion
               , scope "DFA.quotient"               testDFAquotient
               , scope "DFA.toRE"                   testDFAtoRE
               , scope "DFA.rquotient"              testDFArquotient
@@ -98,6 +99,40 @@ testDFAEpsilon       = expectEqual (Config.language DFA.epsilon)        ([[    ]
 
 testDFALiteral       ∷ Test ()
 testDFALiteral       = expectEqual (Config.language (DFA.literal True)) ([[True]] ∷ [[Bool]])
+
+-- N.B. Due to the nature of the `Set` type in GHC (namely the `Ord` constraint),
+-- both tests should explicitly have the result ordered the same (i.e. {"<", "="}).
+testDFAUnion         ∷ Test ()
+testDFAUnion         = tests [test₁, test₂]
+  where
+    -- Three example languages, L₁, L₂, L₃
+    -- L₁ = ℒ (eL₁) = {"<"}
+    eL₁ ∷ DFA Ordering Ordering
+    eL₁ = DFA.literal LT
+    -- L₂ = ℒ (eL₂) = {"="}
+    eL₂ ∷ DFA Ordering Ordering
+    eL₂ = DFA.literal EQ
+    -- L₃           = {"<", "="}
+    eL₃ ∷ [[Ordering]]
+    eL₃ = [[LT], [EQ]]
+    -- (L₁ ∪ L₂) ≟ L₃
+    test₁ ∷ Test ()
+    test₁ = expectEqual (Config.language ltEq) eL₃
+      where
+        --        L₁ ∪ L₂
+        -- =   {"<"} ∪ {"="}
+        -- =   {"<",    "="}
+        ltEq ∷ DFA (Ordering, Ordering) Ordering
+        ltEq = DFA.union eL₂ eL₁
+    -- (L₂ ∪ L₁) ≟ L₃
+    test₂ ∷ Test ()
+    test₂ = expectEqual (Config.language eqLt) eL₃
+      where
+        --      L₂ ∪ L₁
+        -- = {"="} ∪ {"<"}
+        -- = {"<",    "="}
+        eqLt ∷ DFA (Ordering, Ordering) Ordering
+        eqLt = DFA.union eL₁ eL₂
 
 testDFAquotient ∷ Test ()
 testDFAquotient = tests [test₁, test₂]
