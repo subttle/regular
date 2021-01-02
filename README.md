@@ -10,10 +10,10 @@ Here is a small example of what FizzBuzz looks like with DFA:
 
 -- A DFA which accepts numbers (as a string of digits) only when
 -- they are evenly divisible by 5.
--- Theorem: A number is divisible by 5 iff its last digit is 0 or 5.
 by5 ∷ DFA Bool Fin₁₀
 by5 = DFA δ q₀ f
   where
+    -- Theorem: A number is divisible by 5 iff its last digit is 0 or 5.
     δ ∷ (Bool, Fin₁₀) → Bool
     δ (_, 0) = True
     δ (_, 5) = True
@@ -25,7 +25,6 @@ by5 = DFA δ q₀ f
 
 -- A DFA which accepts numbers (as a string of digits) only when
 -- they are evenly divisible by 3.
--- Theorem: A number is divisible by 3 iff the sum of its digits is divisible by 3.
 -- The transition function effectively keeps a running total modulo three by
 -- totaling the numeric value of its current state and the numeric value of the
 -- incoming digit, performing the modulo, and then converting that value back to a state.
@@ -34,6 +33,7 @@ by5 = DFA δ q₀ f
 by3 ∷ DFA (Either () Fin₃) Fin₁₀
 by3 = DFA δ (Left ()) (singleton (Right 0))
   where
+    -- Theorem: A number is divisible by 3 iff the sum of its digits is divisible by 3.
     δ ∷ (Either () Fin₃, Fin₁₀) → Either () Fin₃
     δ = Right . toEnum . (`mod` 3) . \(q, digit) → fromEnum (fromRight 0 q) + fromEnum digit
 
@@ -76,7 +76,7 @@ That means, any time you have some `GNFA` (and we assume pure functional program
 
 ## Try
 
-This project currently uses [stack](https://docs.haskellstack.org/en/stable/README/) to build. Try out some of the code in the REPL:
+This project currently uses [stack](https://docs.haskellstack.org/en/stable/README/) to build. Because the project currently depends on the `algebra` and `containers-unicode-symbols`, you may have to set `allow-newer: true` [option](https://docs.haskellstack.org/en/stable/yaml_configuration/#allow-newer) in `~/.stack/config.yaml`. Then you can try out some of the code in the REPL:
 
 ```shell
 
