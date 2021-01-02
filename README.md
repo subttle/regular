@@ -76,7 +76,7 @@ That means, any time you have some `GNFA` (and we assume pure functional program
 
 ## Try
 
-This project currently uses [stack](https://docs.haskellstack.org/en/stable/README/) to build. Because the project currently depends on the `algebra` and `containers-unicode-symbols`, you may have to set `allow-newer: true` [option](https://docs.haskellstack.org/en/stable/yaml_configuration/#allow-newer) in `~/.stack/config.yaml`. Then you can try out some of the code in the REPL:
+This project currently uses [stack](https://docs.haskellstack.org/en/stable/README/) to build. Because the project currently depends on some older packages (`algebra` and `containers-unicode-symbols`), you may have to set the `allow-newer: true` [option](https://docs.haskellstack.org/en/stable/yaml_configuration/#allow-newer) in `~/.stack/config.yaml` before proceeding. Then you can try out some of the code in the REPL:
 
 ```shell
 
