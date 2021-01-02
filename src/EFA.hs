@@ -254,9 +254,9 @@ concatenate (EFA δ₁ q₀ f₁) (EFA δ₂ p₀ f₂) = EFA δ (Left q₀) (ma
   where
     δ ∷ (Either q p, Maybe s) → Set (Either q p)
     -- if this state, q, is a final state, merge q's transitions with p₀'s transitions
-    δ (Left  q, σ) | q ∈ f₁ =           δ₁ (q, σ) ⊎ δ₂ (p₀, σ)
-    δ (Left  q, σ)          = map Left (δ₁ (q, σ))
-    δ (Right p, σ)          =            map Right (δ₂ (p,  σ))
+    δ (Left  q, σ) | q ∈ f₁ = δ₁ (q, σ) ⊎ δ₂ (p₀, σ)
+    δ (Left  q, σ)          = δ₁ (q, σ) ⊎ (∅)
+    δ (Right p, σ)          = (∅)       ⊎ δ₂ (p,  σ)
 
 -- Kleene Star for Thompson's construction
 star ∷ ∀ q s . (Ord q) ⇒ EFA q s → EFA (Either Bool q) s
