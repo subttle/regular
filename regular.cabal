@@ -7,7 +7,7 @@ license:             BSD3
 license-file:        LICENSE
 author:              Ian Treyball
 maintainer:          ian.treyball@columbia.edu
-copyright:           2016 Ian Treyball
+copyright:           2016-2021 Ian Treyball
 category:            automata
 build-type:          Simple
 cabal-version:       >=1.20
