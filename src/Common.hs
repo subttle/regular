@@ -4,14 +4,13 @@
 {-# LANGUAGE DerivingVia                #-}
 {-# LANGUAGE RankNTypes                 #-}
 {-# LANGUAGE FunctionalDependencies     #-}
-{-# LANGUAGE MultiParamTypeClasses      #-}
 
 module Common where
 
 import           Control.Applicative (liftA2, liftA3, getZipList, ZipList (..))
 import           Control.Arrow ((|||), (&&&))
 import           Control.Monad (replicateM)
-import           Data.Maybe as Maybe
+import           Data.Maybe as Maybe (catMaybes, fromJust, isNothing)
 import           Data.Map as Map (Map, null, empty, unionsWith, singleton, insert, mapWithKey, foldlWithKey, insertWith, foldrWithKey)
 import           Data.Set (Set)
 import qualified Data.Set as Set
@@ -20,19 +19,19 @@ import           Data.Bool.Unicode ((∧))
 import           Data.Bool (bool)
 import           Data.Ord.Unicode ((≤), (≥))
 import           Data.Eq.Unicode ((≠))
-import           Data.List as List
+import           Data.List as List (filter, transpose, sortBy, find, delete, deleteBy, deleteFirstsBy, elemIndex, elemIndices, findIndex, findIndices, genericDrop, genericLength, genericReplicate, genericTake, intercalate, intersectBy, tails, unfoldr, mapAccumL)
 import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)), (<|))
 import qualified Data.List.NonEmpty as NE
-import           Data.These
-import           Data.Can (Can, can)
+import           Data.These (These (..), partitionEithersNE, partitionThese, these)
+import           Data.Can (Can (..), can)
 -- import qualified Data.Can as C
-import           Data.Smash
-import           Data.Wedge
+import           Data.Smash (Smash (..), smash)
+import           Data.Wedge (Wedge (..), wedge)
 import qualified Data.Type.Nat as Nat
 import           Data.Fin (Fin)
 import           Data.Char (digitToInt)
 import           Data.Either (lefts, rights, partitionEithers, fromLeft, fromRight, isLeft, isRight)
-import           Data.Foldable as Foldable
+import           Data.Foldable as Foldable (Foldable (toList, foldl, foldr), maximumBy, minimumBy)
 import           Data.Functor.Contravariant.Divisible (Divisible, Decidable, divide, divided, conquer, choose, chosen, lose)
 import           Data.Functor.Contravariant (Contravariant, Op (..), Predicate (..), Comparison (..), Equivalence (..), defaultComparison, defaultEquivalence, contramap, (>$<), (>$$<))
 import           Data.Functor.Foldable (Fix (..), unfix, ListF (..))
@@ -40,7 +39,7 @@ import           Data.Function (on, fix, (&))
 import           Data.Semigroup.Foldable (Foldable1, toNonEmpty)
 import           Data.Semigroup.Traversable (Traversable1)
 import           Data.Tree (Forest, Tree (..), unfoldTree)
-import           Data.Void
+import           Data.Void (Void, absurd)
 import           Data.Bifunctor (bimap)
 import           Prelude.Unicode (ℤ, ℚ, π)
 import           Numeric.Natural.Unicode (ℕ)
