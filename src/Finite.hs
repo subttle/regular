@@ -2751,7 +2751,7 @@ instance Fancy      Quadrant where
   plain    ∷ Quadrant → String
   plain    = quadrant "Q₁" "Q₂" "Q₃" "Q₄"
   named    ∷ Quadrant → String
-  named    = const ("Quadrant")
+  named    = const "Quadrant"
 instance Show Quadrant where
   show ∷ Quadrant → String
   show = show'
@@ -2791,7 +2791,7 @@ instance Fancy      Octant where
   plain    ∷ Octant → String
   plain    = octant "O₁" "O₂" "O₃" "O₄" "O₅" "O₆" "O₇" "O₈"
   named    ∷ Octant → String
-  named    = const ("Octant")
+  named    = const "Octant"
 instance Show Octant where
   show ∷ Octant → String
   show = show'
@@ -2844,7 +2844,7 @@ instance Fancy Suit where
   plain Diamond = "Diamond"
   plain Club    = "Club"
   named ∷ Suit → String
-  named = const ("Suit") -- TODO
+  named = const "Suit"
   show' ∷ Suit → String
   show' s = charToString (unicode s) `toColor` toColor' s
 
@@ -2898,7 +2898,7 @@ instance Fancy Rank where
   plain King  = "King"
   plain Ace   = "Ace"
   named ∷ Rank → String
-  named = const ("Rank") -- TODO
+  named = const "Rank"
 
 instance Show Rank where
   show ∷ Rank → String
@@ -2981,7 +2981,7 @@ instance Fancy Card where
   plain ∷ Card → String
   plain (Card r s) = plain r ++ " of " ++ plain s ++ "s"
   named ∷ Card → String
-  named = const ("Card") -- TODO
+  named = const "Card"
 
 instance Show Card where
   show ∷ Card → String
