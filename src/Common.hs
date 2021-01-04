@@ -42,8 +42,15 @@ import           Data.Semigroup.Traversable (Traversable1)
 import           Data.Tree (Forest, Tree (..), unfoldTree)
 import           Data.Void
 import           Data.Bifunctor (bimap)
-import           Prelude.Unicode (ℤ, ℚ)
+import           Prelude.Unicode (ℤ, ℚ, π)
 import           Numeric.Natural.Unicode (ℕ)
+
+-- Tau: the true circle constant :]
+-- whereas π = C∕D
+--         τ = C∕r
+-- tau = 2 * pi = 6.283185...
+τ ∷ (Floating a) ⇒ a
+τ = 2 * π
 
 -- type level flip
 newtype Flip t b a = Flip { unFlip ∷ t a b }
