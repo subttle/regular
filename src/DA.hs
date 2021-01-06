@@ -5,7 +5,7 @@
 
 module DA where
 
-import           Common (ContraThese, contrathese, ContraCan, contracan, ContraSmash, contrasmash, ContraWedge, contrawedge, (‥))
+import           Common (Set' (..), equation, quoteWith, ContraThese, contrathese, ContraCan, contracan, ContraSmash, contrasmash, ContraWedge, contrawedge, (‥))
 import qualified Language
 import           Language (ℒ)
 import           Finite (Q (..), Σ (sigma), Finite (asList))
@@ -16,6 +16,7 @@ import           Data.Can   (Can   (..), can)
 import           Data.Smash (Smash (..), smash)
 import           Data.Wedge (Wedge (..), wedge)
 import           Data.These (These (..), these)
+import qualified Data.List as List
 import           Data.Void (Void)
 
 -- Experiment based on:
@@ -99,6 +100,32 @@ asdf2e (DA (Predicate o₁) t₁) (DA (Predicate o₂) t₂) = DA o t
     --     r = getOp (contramap (liftA2 bimap (flip t₁) (flip t₂)) (Op id))
 
 -}
+
+-- TODO could probably clean this up a bit
+instance (Show q, Finite q, Show s, Finite s) ⇒ Show (DA q s) where
+  show ∷ DA q s → String
+  show m@(DA (Predicate o) t) = quoteWith "( " " )" $ List.intercalate "\n, "
+                                [ equation "Q"              ((show . Set' . qs   ) m)
+                                , equation "Σ"              ((show . Set' . sigma) m)
+                                -- TODO or S → S^A
+                                , quoteWith "t : Q → Σ → Q" formatt "\n"
+                                , quoteWith "o : Q → Bool"  formato "\n"
+                                ]
+    where
+      formatt ∷ String
+      formatt = List.intercalate "\n" ts
+        where
+          ts ∷ [String]
+          ts = fmap (\(q, s) → quoteWith ("  t" ++ quoteWith "(" ")" (show q) ++ quoteWith "(" ")" (show s)) (show (t q s)) " ↦ ") (asList ∷ [(q, s)])
+      formato ∷ String
+      formato = List.intercalate "\n" os
+        where
+          os ∷ [String]
+          os = fmap (\q → quoteWith ("  o" ++ quoteWith "(" ")" (show q)) (show (o q)) " ↦ ") (asList ∷ [q])
+
+instance (Show s, Finite s) ⇒ Show (SomeDA s) where
+  show ∷ SomeDA s → String
+  show (SomeDA m) = show m
 
 literal ∷ ∀ s . (Finite s) ⇒ s → (DA.DA Ordering s, Ordering)
 literal σ = (DA (Predicate (== EQ)) t, LT)
