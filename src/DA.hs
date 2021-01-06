@@ -8,16 +8,14 @@ module DA where
 import           Common (ContraThese, contrathese, ContraCan, contracan, ContraSmash, contrasmash, ContraWedge, contrawedge, (‥))
 import qualified Language
 import           Language (ℒ)
-import           Finite
-import           Data.Bool.Unicode
+import           Finite (Q (..), Σ (sigma), Finite (asList))
+import           Data.Bool.Unicode ((∧), (∨))
 import           Data.Functor.Contravariant (Contravariant, contramap, (>$$<), Predicate, Predicate (..))
 import           Data.Functor.Contravariant.Divisible (Divisible, divide, conquer, Decidable, lose, choose)
-import           Data.Can (Can, can)
-import           Data.Smash (Smash, smash)
-
-import           Data.Wedge (Wedge, wedge)
-
-import           Data.These (These, These (..), these)
+import           Data.Can   (Can   (..), can)
+import           Data.Smash (Smash (..), smash)
+import           Data.Wedge (Wedge (..), wedge)
+import           Data.These (These (..), these)
 import           Data.Void (Void)
 
 -- Experiment based on:
