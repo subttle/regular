@@ -620,3 +620,6 @@ cardsByColor = equating' toColor'
 
 suitsByColor ∷ Equivalence Suit
 suitsByColor = equating' toColor'
+
+byRotation ∷ Equivalence (:🎲)
+byRotation = equating' rotate90
