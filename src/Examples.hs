@@ -618,8 +618,12 @@ cardsByRank = equating' rank
 cardsByColor ∷ Equivalence Card
 cardsByColor = equating' toColor'
 
+-- >>> suitsByColor
+-- [[♠,♣],[♥,♦]]
 suitsByColor ∷ Equivalence Suit
 suitsByColor = equating' toColor'
 
+-- >>> byRotation
+-- [[⚀,⚅],[⚁,⚄],[⚂,⚃]]
 byRotation ∷ Equivalence (:🎲)
 byRotation = equating' rotate90
