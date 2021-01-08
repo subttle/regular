@@ -16,7 +16,7 @@ import qualified Language
 import           Common
 import           Finite
 import           Examples (by3, by5, by5', minimal, ab, cd)
-import           Data.Set (Set, singleton)
+import           Data.Set (Set, singleton, fromAscList)
 import           Config
 import           Numeric.Natural.Unicode (ℕ)
 import           Control.Applicative (liftA2)
@@ -45,6 +45,7 @@ suite = tests [ scope "main.FizzBuzz"              testFizzBuzz
               , scope "DFA.invhomimage"            testDFAinvhomimage
               , scope "DFA.perfectShuffle"         testDFAPerfectShuffle
               , scope "NFA.shuffle"                testNFAshuffle
+              , scope "NFA.permutations"           testNFAPermutations
               , scope "RE.>>="                     testRESubstitution
               , scope "RE.dropout"                 testREDropout
               , scope "bisim"                      testBisimSubset
@@ -65,9 +66,9 @@ testFizzBuzz = expectEqual woDFA wDFA
     woDFA = fmap fizzbuzz [1 .. 100]
       where
         fizz ∷ ℕ → Bool
-        fizz = (==) 0 . (flip mod 3)
+        fizz = (==) 0 . (`mod` 3)
         buzz ∷ ℕ → Bool
-        buzz = (==) 0 . (flip mod 5)
+        buzz = (==) 0 . (`mod` 5)
         fbzz ∷ ℕ → Bool
         fbzz = liftA2 (∧) fizz buzz
         fizzbuzz ∷ ℕ → String
@@ -329,6 +330,35 @@ testNFAshuffle = expectEqual ab_cd shuffled
                , [C, A, D, B]
                , [C, D, A, B]
                ]
+
+-- Test that the `NFA.permutations` function generates the same set of words
+-- as the GHC `List.permutatations` function does (after the `List.permutations` result is sorted).
+testNFAPermutations ∷ Test ()
+testNFAPermutations = tests [test₁, test₂, test₃]
+  where
+    -- ℒ(permutations {0, 1, 2}) ≟ {"012", "021", "102", "120", "201", "210"}
+    test₁ ∷ Test ()
+    test₁ = expectEqual (Config.language m) (List.sort (List.permutations asList))
+      where
+        m ∷ NFA (Set Fin₃) Fin₃
+        m = NFA.permutations (asSet ∷ Set Fin₃)
+    -- ℒ(NFA.permutations {1}) ≟ {"1"}
+    test₂ ∷ Test ()
+    test₂ = expectEqual (Config.language m) (List.sort (List.permutations asList))
+      where
+        m ∷ NFA (Set ()) ()
+        m = NFA.permutations (asSet ∷ Set ())
+    -- ℒ(NFA.permutations {0, 3}) ≟ {"03", "30"}
+    test₃ ∷ Test ()
+    test₃ = expectEqual (Config.language m) (List.sort (List.permutations list))
+      where
+        list ∷ [Fin₄]
+        list = [0, 3]
+        m ∷ NFA (Set Fin₄) Fin₄
+        m = NFA.permutations s
+          where
+            s ∷ Set Fin₄
+            s = fromAscList list
 
 -- Coinductive bisimulation (partial)
 -- Either the bisimulation will succeed (on the given subset) or
