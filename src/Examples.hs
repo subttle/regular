@@ -619,11 +619,33 @@ cardsByColor ∷ Equivalence Card
 cardsByColor = equating' toColor'
 
 -- >>> suitsByColor
--- [[♠,♣],[♥,♦]]
+-- [[♠, ♣], [♥, ♦]]
 suitsByColor ∷ Equivalence Suit
 suitsByColor = equating' toColor'
 
 -- >>> byRotation
--- [[⚀,⚅],[⚁,⚄],[⚂,⚃]]
+-- [[⚀, ⚅], [⚁, ⚄], [⚂, ⚃]]
+-- >>> getPredicate lawful byRotation
+-- True
 byRotation ∷ Equivalence (:🎲)
 byRotation = equating' rotate90
+
+{-
+-- N.B. even though this appears the same as above for this particular `Show` instance...
+-- e.g.:
+-- >>> byFlipped
+-- [[⚀, ⚅], [⚁, ⚄], [⚂, ⚃]]
+-- >>> getPredicate lawful byFlipped
+-- False
+--- byFlipped ∷ Equivalence (:🎲)
+--- byFlipped = Equivalence ((==) . flipped)
+-- because everytime we check for equality between two die,
+-- we are first flipping one of the given die upside down, so therefore we have:
+-- >>> getPredicate sym  byFlipped
+-- True
+-- But:
+-- >>> getPredicate trans  byFlipped
+-- False
+-- >>> getPredicate refl  byFlipped
+-- False
+-}
