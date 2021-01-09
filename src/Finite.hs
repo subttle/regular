@@ -2815,6 +2815,34 @@ octant _ _  _   _  _ vi _   _    O₆ = vi
 octant _ _  _   _  _ _  vii _    O₇ = vii
 octant _ _  _   _  _ _  _   viii O₈ = viii
 
+data Checker where
+  (:⛀) ∷ Checker
+  (:⛁) ∷ Checker
+  (:⛂) ∷ Checker
+  (:⛃) ∷ Checker
+  deriving (Eq, Enum, Ord, Bounded)
+instance U.Universe Checker
+instance U.Finite   Checker
+instance Finite     Checker
+instance Fancy      Checker where
+  unicode ∷ Checker → Char
+  unicode (:⛀) = '⛀'
+  unicode (:⛁) = '⛁'
+  unicode (:⛂) = '⛂'
+  unicode (:⛃) = '⛃'
+  plain ∷ Checker → String
+  plain (:⛀) = "(:⛀)"
+  plain (:⛁) = "(:⛁)"
+  plain (:⛂) = "(:⛂)"
+  plain (:⛃) = "(:⛃)"
+  named ∷ Checker → String
+  named = const "Checker"
+instance Show Checker where
+  show ∷ Checker → String
+  show (:⛀) = toColor (show' (:⛀)) (toColor' (:⛀))
+  show (:⛁) = toColor (show' (:⛁)) (toColor' (:⛁))
+  show (:⛂) = toColor (show' (:⛂)) (toColor' (:⛂))
+  show (:⛃) = toColor (show' (:⛃)) (toColor' (:⛃))
 
 data Suit where
   Spade   ∷ Suit
@@ -3110,6 +3138,13 @@ instance HasDisplayColor Suit where
   toColor' Heart   = Red
   toColor' Diamond = Red
   toColor' Club    = Black
+
+instance HasDisplayColor Checker where
+  toColor' ∷ Checker → DisplayColor
+  toColor' (:⛀) = Red
+  toColor' (:⛁) = Red
+  toColor' (:⛂) = Black
+  toColor' (:⛃) = Black
 
 instance HasDisplayColor Card where
   toColor' ∷ Card → DisplayColor
