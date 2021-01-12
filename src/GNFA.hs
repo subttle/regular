@@ -7,15 +7,15 @@
 module GNFA where
 
 import           Prelude hiding ((*), (+))
-import           Common
-import           Finite
+import           Common (Set' (Set'), equation, format, quoteWith)
+import           Finite (Q (..), Σ (..), Finite (..), Final (..), Init (..))
 import           Language (ℒ)
 import           RegExp (RegExp, zero, (*), (+), star)
 import qualified RegExp as RE
 import           Control.Applicative (liftA2)
 import           Control.Selective (Selective, select, (<*?))
 import qualified Data.List as List
-import           Data.Set as Set
+import           Data.Set as Set (Set, foldl)
 import           Data.Bifunctor (bimap)
 import           Data.Bool.Unicode ((∨))
 import qualified Data.Map as Map (fromList)
@@ -73,7 +73,7 @@ instance (Show q, Finite q, Show s, Finite s)
   show m = quoteWith "(" ")" . List.intercalate "," . fmap (quoteWith " " "\n") $
            [ equation "Q"  (show (Set' (qs    m)))
            , equation "Σ"  (show (Set' (sigma m)))
-           , "δ : (Q ∖ {qᶠ}) × (Q ∖ {qᵢ}) → Regular Expression\n" ++ (format . Map.fromList . table) m
+           , quoteWith "δ : (Q ∖ {qᶠ}) × (Q ∖ {qᵢ}) → Regular Expression" ((format . Map.fromList . table) m) "\n"
            , equation "qᵢ" (show (Init  ())      )
            , equation "qᶠ" (show (Final ())      )
            ]
