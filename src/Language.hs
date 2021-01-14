@@ -3,12 +3,13 @@
 
 module Language where
 
-import           Common
-import           Finite
-import           Data.Bool.Unicode
-import           Data.List
+import           Common (partitions)
+import           Finite (Finite, Σ (sigmaStar))
+import           Data.Bool.Unicode ((∧), (∨))
+import           Data.List (inits, tails)
 import qualified Data.List.NonEmpty as NE
-import           Data.Functor.Contravariant
+import           Data.Function ((&))
+import           Data.Functor.Contravariant (Contravariant (contramap), Predicate (..), (>$$<))
 import           Data.Foldable.Unicode ((∋))
 
 -- N.B. This is /not/ the type for regular languages (but I am adding it to help test some properties)
@@ -31,7 +32,8 @@ accepts = getPredicate
 
 -- iff ε ∈ ℒ
 nullable ∷ ℒ s → Bool
-nullable (Predicate ℓ) = ℓ []
+-- nullable (Predicate ℓ) = ℓ []
+nullable = (&) [] . getPredicate
 
 -- the language which accepts no strings
 empty ∷ ℒ s
