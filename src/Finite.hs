@@ -142,6 +142,9 @@ instance NotEmpty ℤ where
   wit ∷ ℤ
   wit = 0
 
+instance NotEmpty Char where
+  wit ∷ Char
+  wit = '\NUL'
 instance NotEmpty Alpha where
   wit ∷ Alpha
   wit = A
@@ -234,6 +237,9 @@ instance NEF Quadrant where
 instance NEF Octant where
   asNE ∷ NonEmpty Octant
   asNE = O₁ :| [O₂, O₃, O₄, O₅, O₆, O₇, O₈]
+instance NEF Char where
+  asNE ∷ NonEmpty Char
+  asNE = '\NUL' :| genericDrop (1 ∷ ℕ) (asList @ Char)
 instance NEF (:🎲) where
   asNE ∷ NonEmpty (:🎲)
   asNE = (⚀) :| [(⚁), (⚂), (⚃), (⚄), (⚅)]
