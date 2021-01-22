@@ -1383,7 +1383,7 @@ instance (Finite a)
 instance (Finite a)
        ⇒ Eq (RGS a) where
   (==) ∷ RGS a → RGS a → Bool
-  (==) (RGS rgs₁) (RGS rgs₂) = rgs₁ == rgs₂
+  (==) = (==) `on` getRGS
 
 instance (Finite a) ⇒ Ord (RGS a) where
   -- TODO this is correct but I will have to think if there is more efficient way to do this directly
