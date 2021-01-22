@@ -23,6 +23,7 @@ import           Control.Applicative (liftA2)
 import           Data.Bool (bool)
 import           Data.Bool.Unicode ((∧))
 import           Data.Eq.Unicode ((≠))
+import           Data.Fin (toNatural)
 import           Data.Functor.Contravariant (contramap, Equivalence (..), Comparison (..), Predicate (..))
 import qualified Data.Group as G
 import           EasyTest (Test, tests, scope, expect, run, expectEqual)
@@ -460,7 +461,7 @@ testCycles = tests [test₁, test₂, test₃]
 -- and
 -- aᵢ₊₁ ≤ 1 + max (a₁, a₂, ..., aᵢ)
 testRestrictedPredicate ∷ Test ()
-testRestrictedPredicate = tests [test₁, test₂, test₃]
+testRestrictedPredicate = tests [test₁, test₂]
   where
     p ∷ RGS Fin₄ → Bool
     p = getPredicate restricted . NE.fromList . getRGS
@@ -482,22 +483,20 @@ testRestrictedPredicate = tests [test₁, test₂, test₃]
     [0,1,2,2]
     [0,1,2,3]
     -}
+    -- test that all automatically generated RGS are valid
     test₁ ∷ Test ()
     test₁ = expect (all p (asList @ (RGS Fin₄)))
-    -- test that the purposefully bad "RGS" fails
+    -- partition the entire space into valid/invalid by use of `p`
     test₂ ∷ Test ()
-    test₂ = expectEqual False (p bad)
+    test₂ = expect (all p valid ∧ none p invalid)
       where
-        -- N.B. purposefully constructed unlawful RGS (all RGS must start with `0`)
-        bad ∷ RGS Fin4
-        bad = RGS [2, 0, 0, 0]
-    -- test that the purposefully bad "RGS" fails
-    test₃ ∷ Test ()
-    test₃ = expectEqual False (p bad)
-      where
-        -- N.B. purposefully constructed unlawful RGS (the `3` here violates the restricted condition)
-        bad ∷ RGS Fin4
-        bad = RGS [0, 1, 3, 2]
+        (valid, invalid) = List.partition p (fmap (RGS . fmap toNatural) ws) ∷ ([RGS Fin₄], [RGS Fin₄])
+          where
+            -- any possible string, w, where Σ = {0, 1, 2 ,3} s.t. length w == 4
+            -- i.e. [0,0,0,0], [0,0,0,1], ..., [3,3,3,3]
+            -- TODO probably better way to do this with vec, but this works for now
+            ws ∷ [[Fin₄]]
+            ws = upToLength 5 (freeMonoidFrom 4 (asList @ Fin₄))
 
 -- "For example, the restricted growth function 0,1,1,2,0,3,1 defines the set partition {{1,5}, {2,3,7}, {4}, {6}}"
 -- https://www8.cs.umu.se/kurser/TDBAfl/VT06/algorithms/BOOK/BOOK4/NODE153.HTM
