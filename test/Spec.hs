@@ -52,6 +52,7 @@ suite = tests [ scope "main.FizzBuzz"              testFizzBuzz
               , scope "Comparison.Compose"         testComposeC
               , scope "Comparison.Invert"          testGroupInvert
               , scope "Comparison.Cycles"          testCycles
+              , scope "RGS.restricted"             testRestrictedPredicate  -- FIXME better name?
               , scope "Equivalence.OpenersClosers" testOpenersClosers
               , scope "Equivalence.toRGS"          testEquivalencetoRGS
               , scope "Equivalence.bijection"      testEquivalenceBijection
@@ -451,6 +452,52 @@ testCycles = tests [test₁, test₂, test₃]
     test₂ = expect (getPredicate lawful (cycles c₁))
     test₃ ∷ Test ()
     test₃ = expectEqual (cycles c₁) (toEquivalence [0 NE.:| [2, 3], 1 NE.:| [4]])
+
+-- Some tests for the `restricted` predicate.
+-- Recall:
+-- Checks the following two conditions:
+-- a₁ = 0
+-- and
+-- aᵢ₊₁ ≤ 1 + max (a₁, a₂, ..., aᵢ)
+testRestrictedPredicate ∷ Test ()
+testRestrictedPredicate = tests [test₁, test₂, test₃]
+  where
+    p ∷ RGS Fin₄ → Bool
+    p = getPredicate restricted . NE.fromList . getRGS
+    {-
+    λ> mapM_ print (asList @ (RGS Fin₄))
+    [0,0,0,0]
+    [0,0,0,1]
+    [0,0,1,0]
+    [0,0,1,1]
+    [0,0,1,2]
+    [0,1,0,0]
+    [0,1,0,1]
+    [0,1,0,2]
+    [0,1,1,0]
+    [0,1,1,1]
+    [0,1,1,2]
+    [0,1,2,0]
+    [0,1,2,1]
+    [0,1,2,2]
+    [0,1,2,3]
+    -}
+    test₁ ∷ Test ()
+    test₁ = expect (all p (asList @ (RGS Fin₄)))
+    -- test that the purposefully bad "RGS" fails
+    test₂ ∷ Test ()
+    test₂ = expectEqual False (p bad)
+      where
+        -- N.B. purposefully constructed unlawful RGS (all RGS must start with `0`)
+        bad ∷ RGS Fin4
+        bad = RGS [2, 0, 0, 0]
+    -- test that the purposefully bad "RGS" fails
+    test₃ ∷ Test ()
+    test₃ = expectEqual False (p bad)
+      where
+        -- N.B. purposefully constructed unlawful RGS (the `3` here violates the restricted condition)
+        bad ∷ RGS Fin4
+        bad = RGS [0, 1, 3, 2]
 
 -- "For example, the restricted growth function 0,1,1,2,0,3,1 defines the set partition {{1,5}, {2,3,7}, {4}, {6}}"
 -- https://www8.cs.umu.se/kurser/TDBAfl/VT06/algorithms/BOOK/BOOK4/NODE153.HTM
