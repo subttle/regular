@@ -94,6 +94,7 @@ test-suite regular-test
                      , easytest >= 0.1
                      , base-unicode-symbols
                      , groups
+                     , fin
   ghc-options:         -threaded
   default-language:    Haskell2010
   default-extensions: UnicodeSyntax
