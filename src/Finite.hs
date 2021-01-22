@@ -1360,6 +1360,9 @@ instance (Finite a)
 data RGS a where
   RGS ∷ (Finite a) ⇒ [ℕ] → RGS a
 
+getRGS ∷ (Finite a) ⇒ RGS a → [ℕ]
+getRGS (RGS rgs) = rgs
+
 instance Show (RGS a) where
   show ∷ RGS a → String
   show (RGS rgs) = show rgs
