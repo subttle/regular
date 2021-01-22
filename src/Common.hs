@@ -619,6 +619,9 @@ intersectBy' (Equivalence (≡)) = intersectBy (≡) `on` toList
 deleteFirstsBy' ∷ (Foldable f) ⇒ Equivalence a → f a → f a → [a]
 deleteFirstsBy' (Equivalence (≡)) = deleteFirstsBy (≡) `on` toList
 
+none ∷ (Foldable f) ⇒ (a → Bool) → f a → Bool
+none = not ‥ any
+
 -- Intuitively this is just like `elem` from `Data.List` but with
 -- user supplied equivalence relation.
 elemBy ∷ (Foldable f) ⇒ Equivalence a → a → f a → Bool
