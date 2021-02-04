@@ -3044,7 +3044,16 @@ instance Fancy      Octant where
   named    = const "Octant"
 instance Show Octant where
   show ∷ Octant → String
-  show = show'
+  show = show₂
+    where
+      show₁ ∷ Octant → String
+      show₁ = show'
+      -- https://en.wikipedia.org/wiki/Octant_(solid_geometry)
+      -- "The Roman enumeration of the quadrants is in Gray code order, so the corresponding Gray code is also shown for the octants."
+      -- (±,±,±)
+      show₂ ∷ Octant → String
+      show₂ = octant "(+; +; +)" "(-; +; +)" "(-; -; +)" "(+; -; +)" "(+; -; -)" "(-; -; -)" "(-; +; -)" "(+; +; -)"
+
 -- non unicode aliases for convenience
 type O1 = 'O₁
 type O2 = 'O₂
