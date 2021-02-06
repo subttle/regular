@@ -43,6 +43,7 @@ import           Data.Void (Void, absurd)
 import           Data.Bifunctor (bimap)
 import           Prelude.Unicode (ℤ, ℚ, π)
 import           Numeric.Natural.Unicode (ℕ)
+import           GHC.Float (int2Float, int2Double)
 
 -- Tau: the true circle constant :]
 -- whereas π = C∕D
@@ -50,6 +51,12 @@ import           Numeric.Natural.Unicode (ℕ)
 -- tau = 2 * pi = 6.283185...
 τ ∷ (Floating a) ⇒ a
 τ = 2 * π
+
+nat2Double ∷ ℕ → Double
+nat2Double = int2Double . fromIntegral
+
+nat2Float ∷ ℕ → Float
+nat2Float = int2Float . fromIntegral
 
 -- type level flip
 newtype Flip t b a = Flip { unFlip ∷ t a b }
