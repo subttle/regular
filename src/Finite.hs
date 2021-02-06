@@ -3050,9 +3050,17 @@ instance Show Octant where
       show₁ = show'
       -- https://en.wikipedia.org/wiki/Octant_(solid_geometry)
       -- "The Roman enumeration of the quadrants is in Gray code order, so the corresponding Gray code is also shown for the octants."
-      -- (±,±,±)
+      -- TODO other possible enumerations
       show₂ ∷ Octant → String
       show₂ = octant "(+; +; +)" "(-; +; +)" "(-; -; +)" "(+; -; +)" "(+; -; -)" "(-; -; -)" "(-; +; -)" "(+; +; -)"
+      -- https://en.wikipedia.org/wiki/Octant_(plane_geometry)
+      show₃ ∷ Octant → String
+      show₃ = getOp (contramap toFin (Op (fin₈ "N" "NE" "E" "SE" "S" "SW" "W" "NW")))
+        where
+          fromFin ∷ Fin₈ → Octant
+          fromFin = fin₈ O₁ O₂ O₃ O₄ O₅ O₆ O₇ O₈
+          toFin ∷ Octant → Fin₈
+          toFin = octant 0 1 2 3 4 5 6 7
 
 -- non unicode aliases for convenience
 type O1 = 'O₁
