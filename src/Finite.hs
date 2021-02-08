@@ -1914,6 +1914,65 @@ data Alpha where
 instance U.Universe Alpha
 instance U.Finite   Alpha
 instance Finite     Alpha
+instance Fancy      Alpha where
+  unicode ∷ Alpha → Char
+  unicode A = 'A'
+  unicode B = 'B'
+  unicode C = 'C'
+  unicode D = 'D'
+  unicode E = 'E'
+  unicode F = 'F'
+  unicode G = 'G'
+  unicode H = 'H'
+  unicode I = 'I'
+  unicode J = 'J'
+  unicode K = 'K'
+  unicode L = 'L'
+  unicode M = 'M'
+  unicode N = 'N'
+  unicode O = 'O'
+  unicode P = 'P'
+  unicode Q = 'Q'
+  unicode R = 'R'
+  unicode S = 'S'
+  unicode T = 'T'
+  unicode U = 'U'
+  unicode V = 'V'
+  unicode W = 'W'
+  unicode X = 'X'
+  unicode Y = 'Y'
+  unicode Z = 'Z'
+  unicode' ∷ Alpha → Char
+  unicode' A = 'a'
+  unicode' B = 'b'
+  unicode' C = 'c'
+  unicode' D = 'd'
+  unicode' E = 'e'
+  unicode' F = 'f'
+  unicode' G = 'g'
+  unicode' H = 'h'
+  unicode' I = 'i'
+  unicode' J = 'j'
+  unicode' K = 'k'
+  unicode' L = 'l'
+  unicode' M = 'm'
+  unicode' N = 'n'
+  unicode' O = 'o'
+  unicode' P = 'p'
+  unicode' Q = 'q'
+  unicode' R = 'r'
+  unicode' S = 's'
+  unicode' T = 't'
+  unicode' U = 'u'
+  unicode' V = 'v'
+  unicode' W = 'w'
+  unicode' X = 'x'
+  unicode' Y = 'y'
+  unicode' Z = 'z'
+  plain ∷ Alpha → String
+  plain = charToString . unicode
+  named ∷ Alpha → String
+  named = const "Alpha"
 
 data DNA = Adenine | Cytosine | Guanine | Thymine deriving (Eq, Ord, Bounded, Enum)
 instance Show DNA where
