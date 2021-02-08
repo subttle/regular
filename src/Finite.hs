@@ -8,6 +8,7 @@
 module Finite where
 
 import           Data.Bool (bool)
+import           Data.Char (toLower)
 import           Data.Set as Set
 import           Data.Set.Unicode ((∅))
 import           Data.Set.Ordered (OSet)
@@ -1943,32 +1944,7 @@ instance Fancy      Alpha where
   unicode Y = 'Y'
   unicode Z = 'Z'
   unicode' ∷ Alpha → Char
-  unicode' A = 'a'
-  unicode' B = 'b'
-  unicode' C = 'c'
-  unicode' D = 'd'
-  unicode' E = 'e'
-  unicode' F = 'f'
-  unicode' G = 'g'
-  unicode' H = 'h'
-  unicode' I = 'i'
-  unicode' J = 'j'
-  unicode' K = 'k'
-  unicode' L = 'l'
-  unicode' M = 'm'
-  unicode' N = 'n'
-  unicode' O = 'o'
-  unicode' P = 'p'
-  unicode' Q = 'q'
-  unicode' R = 'r'
-  unicode' S = 's'
-  unicode' T = 't'
-  unicode' U = 'u'
-  unicode' V = 'v'
-  unicode' W = 'w'
-  unicode' X = 'x'
-  unicode' Y = 'y'
-  unicode' Z = 'z'
+  unicode' = toLower . unicode
   plain ∷ Alpha → String
   plain = charToString . unicode
   named ∷ Alpha → String
