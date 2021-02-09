@@ -4,11 +4,12 @@ module Config where
 
 import           Common (fixedPoint, intersects, upToLength, size', (‥))
 import           Finite (Q, Σ, asList, qs, sigmaStar)
+import qualified Language
+import           Data.Bool.Unicode ((∧))
+import           Data.Eq.Unicode ((≠))
 import qualified Data.List as List
 import           Data.Set as Set (Set, filter, singleton, insert, disjoint)
 import           Data.Set.Unicode ((∩), (∖), (∋), (⊆))
-import           Data.Eq.Unicode ((≠))
-import           Data.Bool.Unicode ((∧))
 import           Numeric.Natural.Unicode (ℕ)
 import qualified TransitionGraph as TG
 
@@ -188,3 +189,6 @@ class (Q (automaton q s) q, Σ (automaton q s) s, Eq occupy) ⇒ Configuration a
         strings' ∷ [[s]]
         strings' | finite m  = upToLength (size' (useful m)) (sigmaStar m)
                  | otherwise = sigmaStar m -- otherwise just filter `accepts` predicate over Σ★
+
+    toLanguage ∷ automaton q s → Language.ℒ s
+    toLanguage = Language.fromLang . language
