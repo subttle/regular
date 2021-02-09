@@ -40,7 +40,7 @@ instance (Finite s) ⇒ Σ (ExREF s a) s
 
 -- TODO the precedence values are in the correct order but their actual values are subject to change
 -- TODO because I want to have consistency across RE, (RE, Intersection), and (RE, Intersection, Complement)
--- TODO and while I think cemplement will have the highest precedence, I also want to see about leaving space
+-- TODO and while I think complement will have the highest precedence, I also want to see about leaving space
 -- TODO between them (a lot of other regular operations are possible), etc.
 instance (Show s) ⇒ Show (ExRE s) where
   showsPrec ∷ Show s ⇒ Int → ExRE s → ShowS
