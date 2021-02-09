@@ -1,18 +1,16 @@
 {-# LANGUAGE PostfixOperators      #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances     #-}
-{-# LANGUAGE DeriveFunctor         #-}
-{-# LANGUAGE DeriveFoldable        #-}
 {-# LANGUAGE DeriveTraversable     #-}
 
 module ERE where
 
-import           Control.Monad
-import           Numeric.Natural.Unicode
-import           Data.Pointed
-import           Data.Ord.Unicode
 import           Finite (Finite, Σ)
 import qualified Language
+import           Control.Monad (ap)
+import           Data.Ord.Unicode ((≥))
+import           Data.Pointed (Pointed (..))
+import           Numeric.Natural.Unicode (ℕ)
 
 -- Extended Regular Expressions (extended with intersection operation)
 -- α, β ⩴ ∅ | ε | σ | α|β | α·β | α&β | α★
