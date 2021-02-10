@@ -27,7 +27,7 @@ deriving instance Traversable NatF
 
 instance (Show a) ⇒ Show (NatF a) where
   show ∷ NatF a → String
-  show = natf "ZeroF" ((quoteWith "(SuccF " ")") . show)
+  show = natf "ZeroF" (quoteWith "(SuccF " ")" . show)
 
 instance Applicative NatF where
   pure ∷ a → NatF a
@@ -38,7 +38,7 @@ instance Alternative NatF where
   empty ∷ NatF a
   empty = ZeroF
   (<|>) ∷ NatF a → NatF a → NatF a
-  (<|>) = natf id (flip const)
+  (<|>) = natf id (const id)
 instance Monad NatF where
   (>>=) ∷ NatF a → (a → NatF b) → NatF b
   (>>=) = natf (const ZeroF) (&)
