@@ -7,8 +7,9 @@ module IntBase where
 
 import           Control.Applicative (empty, (<|>), Alternative)
 import           Control.Monad (ap) -- TODO (liftM4, ap)
+import           Data.Fix (Fix (..))
 import           Data.Functor ((<&>))
-import           Data.Functor.Foldable (Fix (..), Recursive, Corecursive, Base, project, embed)
+import           Data.Functor.Foldable (Recursive, Corecursive, Base, project, embed)
 import           Data.Function (on)
 import           Data.Group (Group, invert)
 import           Data.List (unfoldr)

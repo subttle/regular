@@ -31,10 +31,11 @@ import qualified Data.Type.Nat as Nat
 import           Data.Fin (Fin)
 import           Data.Char (digitToInt)
 import           Data.Either (lefts, rights, partitionEithers, fromLeft, fromRight, isLeft, isRight)
+import           Data.Fix (Fix (..))
 import           Data.Foldable as Foldable (Foldable (toList, foldl, foldr), maximumBy, minimumBy)
 import           Data.Functor.Contravariant.Divisible (Divisible, Decidable, divide, divided, conquer, choose, chosen, lose)
 import           Data.Functor.Contravariant (Contravariant, Op (..), Predicate (..), Comparison (..), Equivalence (..), defaultComparison, defaultEquivalence, contramap, (>$<), (>$$<))
-import           Data.Functor.Foldable (Fix (..), unfix, ListF (..))
+import           Data.Functor.Foldable (ListF (..))
 import           Data.Function (on, fix, (&))
 import           Data.Semigroup.Foldable (Foldable1, toNonEmpty)
 import           Data.Semigroup.Traversable (Traversable1)
@@ -70,11 +71,11 @@ newtype   MAlgebra f t =   MAlgebra (∀ a . (a → t) → (f a → t))
 
 -- Mendler-style Catamorphism
 mcata ∷ MAlgebra f c → Fix f → c
-mcata (MAlgebra φ) = φ (mcata (MAlgebra φ)) . unfix
+mcata (MAlgebra φ) = φ (mcata (MAlgebra φ)) . unFix
 
 -- Catamorphism
 cata ∷ (Functor f) ⇒ Algebra f a → Fix f → a
-cata (Algebra φ) = φ . fmap (cata (Algebra φ)) . unfix
+cata (Algebra φ) = φ . fmap (cata (Algebra φ)) . unFix
 
 -- Anamorphism
 ana ∷ (Functor f) ⇒ CoAlgebra f a → a → Fix f
@@ -82,7 +83,7 @@ ana (CoAlgebra ψ) = Fix . fmap (ana (CoAlgebra ψ)) . ψ
 
 -- Paramorphism
 para ∷ (Functor f) ⇒ RAlgebra f a → Fix f → a
-para (RAlgebra φ) = φ . fmap (\t → (t, para (RAlgebra φ) t)) . unfix
+para (RAlgebra φ) = φ . fmap (\t → (t, para (RAlgebra φ) t)) . unFix
 
 -- Apomorphism
 apo ∷ (Functor f) ⇒ RCoAlgebra f a → a → Fix f
