@@ -1,8 +1,6 @@
 {-# LANGUAGE FlexibleContexts          #-}
 {-# LANGUAGE FlexibleInstances         #-}
 {-# LANGUAGE MultiParamTypeClasses     #-}
-{-# LANGUAGE DeriveFunctor             #-}
-{-# LANGUAGE DeriveFoldable            #-}
 {-# LANGUAGE DeriveTraversable         #-}
 {-# LANGUAGE DeriveGeneric             #-}
 {-# OPTIONS_GHC -Wall                  #-}
@@ -59,20 +57,20 @@ module RegExp
   ) where
 
 import           Common (Algebra (..), impossible, (‥))
-import           Finite
+import           Finite (Finite (..), Σ (..))
 import qualified Language
 import           Prelude hiding ((+), (*), last, map)
-import           Data.Function (on)
 import           Control.Selective (Selective, select, selectM)
 import           Control.Monad (ap)
-import           Data.List as List hiding (last, map)
+import           Data.List as List (foldl, (\\), genericLength, unfoldr)
 import           Data.Set as Set (Set, map, insert, singleton, toList)
 import           Data.Set.Unicode ((∅), (∉), (∪)) -- (∈)
 import           Data.Bool.Unicode ((∧), (∨))
 import           Data.Bool (bool)
-import           Data.Ord.Unicode ((≥))
+import           Data.Fix (Fix (..))
 import           Data.Foldable (toList)
-import           Data.Functor.Foldable (Fix (..))
+import           Data.Function (on)
+import           Data.Ord.Unicode ((≥))
 import           Data.Pointed (Pointed, point)
 import           Numeric.Natural.Unicode (ℕ)
 import           Numeric.Additive.Class (Additive, (+), Idempotent, Abelian)
