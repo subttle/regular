@@ -86,6 +86,19 @@ height (α :& β) = max (height α) (height β)
 height (α :. β) = max (height α) (height β)
 height (Star α) = 1 + height α
 
+-- https://arxiv.org/pdf/0802.2869.pdf
+-- "We define the size of an extended regular expression r over Σ, denoted by |r|, as
+-- the number of Σ-symbols and operators occurring in r disregarding parentheses. This is
+-- equivalent to the length of its (parenthesis-free) reverse Polish form"
+size ∷ ExRE s → ℕ
+size Zero     = 1
+size One      = 1
+size (Lit  _) = 1
+size (α :| β) = 1 + size α + size β
+size (α :& β) = 1 + size α + size β
+size (α :. β) = 1 + size α + size β
+size (Star α) = 1 + size α
+
 toLanguage ∷ (Eq s) ⇒ ExRE s → Language.ℒ s
 toLanguage Zero     = Language.empty
 toLanguage One      = Language.epsilon
