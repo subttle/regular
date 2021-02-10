@@ -1,5 +1,5 @@
 {-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE DeriveFunctor, DeriveFoldable, DeriveTraversable #-}
+{-# LANGUAGE DeriveTraversable  #-}
 
 module NatBase where
 
