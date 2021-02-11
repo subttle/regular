@@ -4,6 +4,7 @@
 module NatBase where
 
 import           Control.Applicative (Alternative, empty, (<|>))
+import           Control.Selective (Selective (..), selectM)
 import           Control.Monad.Fix
 import           Data.Function (on, (&))
 import           Data.Functor.Contravariant (contramap, Predicate (..), Op (..))
@@ -34,11 +35,17 @@ instance Applicative NatF where
   pure = SuccF
   (<*>) ∷ NatF (a → b) → NatF a → NatF b
   (<*>) = natf (const ZeroF) fmap
+
 instance Alternative NatF where
   empty ∷ NatF a
   empty = ZeroF
   (<|>) ∷ NatF a → NatF a → NatF a
   (<|>) = natf id (const id)
+
+instance Selective NatF where
+  select ∷ NatF (Either a b) → NatF (a → b) → NatF b
+  select = selectM
+
 instance Monad NatF where
   (>>=) ∷ NatF a → (a → NatF b) → NatF b
   (>>=) = natf (const ZeroF) (&)
