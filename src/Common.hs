@@ -308,6 +308,15 @@ lteq = equating' (≠ GT)
 gteq ∷ Equivalence Ordering
 gteq = equating' (≠ LT)
 
+-- case analysis for list
+-- list
+--   ∷             b
+--   → (a → ([a] → b))
+--   →      ([a] → b)
+list ∷ a → (b → [b] → a) → [b] → a
+list nil _    []         = nil
+list _   cons ((:) a as) = cons a as
+
 -- case analysis for `Ordering` type
 ordering ∷ a → a → a → Ordering → a
 ordering lt _  _  LT = lt
