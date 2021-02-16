@@ -47,6 +47,7 @@ library
                      , these
                      , selective
                      , universe
+                     , universe-base
                      , universe-instances-extended
                      , tagged
                      , ordered-containers

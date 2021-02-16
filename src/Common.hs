@@ -40,6 +40,7 @@ import           Data.Function (on, fix, (&))
 import           Data.Semigroup.Foldable (Foldable1, toNonEmpty)
 import           Data.Semigroup.Traversable (Traversable1)
 import           Data.Tree (Forest, Tree (..), unfoldTree)
+import           Data.Universe.Helpers (diagonal)
 import           Data.Void (Void, absurd)
 import           Data.Bifunctor (bimap)
 import           Prelude.Unicode (ℤ, ℚ, π)
@@ -471,6 +472,12 @@ generate''' restriction = unfoldTree c ((0, 2), 0)
               where
                 ns ∷ [ℕ]
                 ns = bool ((:) (succ n) (genericReplicate (pred n) n)) [] ((==) l restriction)
+
+-- based on `paths` from https://stackoverflow.com/a/33135646
+-- TODO should update furthermore to `paths ∷ Tree a → NonEmpty (NonEmpty a)` but this works for now
+paths ∷ Tree a → [NonEmpty a]
+paths (Node a []) = pure (pure a)
+paths (Node a ts) = (a ⊲) <$> diagonal (paths <$> ts)
 
 -- partitions of a list
 -- partitions [0..2] = [ [[0],[1],[2]]
