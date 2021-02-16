@@ -1,10 +1,11 @@
 flags: {}
 extra-package-dbs: []
 packages:
-resolver: lts-17.2
+resolver: lts-17.4
 extra-deps:
 - algebra-4.3.1@sha256:38b3e2e7f1058b8f51dcb97c906d4e9871876fd82029a316970ee613fcca130f
 - containers-unicode-symbols-0.3.1.1@sha256:2f8e14cf2ec9c5f65614d3a3113b047c623729993dd12365b737b9d93ea30da2
+- tree-traversals-0.1.1.0@sha256:ff7bc9d4623a2e43d28745acc19001abab857081d1268a13220b3eec17796cec
 - github: unisonweb/unison
   commit: 7eb4645d23d425fbc8e868ab4edc07cb2fe30142
   subdirs:
