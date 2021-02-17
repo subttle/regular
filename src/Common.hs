@@ -19,7 +19,7 @@ import           Data.Bool.Unicode ((∧))
 import           Data.Bool (bool)
 import           Data.Ord.Unicode ((≤), (≥))
 import           Data.Eq.Unicode ((≠))
-import           Data.List as List (filter, transpose, sortBy, find, delete, deleteBy, deleteFirstsBy, elemIndex, elemIndices, findIndex, findIndices, genericDrop, genericLength, genericReplicate, genericTake, intercalate, intersectBy, tails, unfoldr, mapAccumL)
+import           Data.List as List (filter, transpose, sortBy, find, delete, deleteBy, deleteFirstsBy, elemIndex, elemIndices, findIndex, findIndices, genericDrop, genericIndex, genericLength, genericReplicate, genericTake, intercalate, intersectBy, tails, unfoldr, mapAccumL)
 import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)), (<|))
 import qualified Data.List.NonEmpty as NE
 import           Data.These (These (..), partitionEithersNE, partitionThese, these)
@@ -478,6 +478,13 @@ generate''' restriction = unfoldTree c ((0, 2), 0)
 paths ∷ Tree a → [NonEmpty a]
 paths (Node a []) = pure (pure a)
 paths (Node a ts) = (a ⊲) <$> diagonal (paths <$> ts)
+
+-- FIXME, for now this is the unsafe version; may need to fix the type, e.g.
+-- FIXME `walk ∷ Tree a → [ℕ] → Maybe a`
+-- FIXME or instead return a zip of the path while scanning or something
+-- FIXME (or just move to a scope where this version is guaranteed safe by the context)
+walk ∷ Tree a → [ℕ] → a
+walk (Node a ts) = list a (walk . genericIndex ts)
 
 -- partitions of a list
 -- partitions [0..2] = [ [[0],[1],[2]]
