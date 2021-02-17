@@ -505,7 +505,21 @@ testEquivalencetoRGS = expectEqual (toRGS (toEquivalence [0 NE.:| [4], 1 NE.:| [
                                    (RGS [0, 1, 1, 2, 0, 3, 1] ∷ RGS Fin₇)
 
 testEquivalenceBijection ∷ Test ()
-testEquivalenceBijection = expect (bijection (toRGS @ Suit) (fromRGS @ Suit)) -- bijection (toRGS ∷ Equivalence Suit → RGS Suit) (fromRGS ∷ RGS Suit → Equivalence Suit)
+testEquivalenceBijection = tests [test₀, test₁, test₂, test₃, test₄, test₅]
+  where
+    -- bijection (toRGS ∷ Equivalence () → RGS ()) (fromRGS ∷ RGS () → Equivalence ())
+    test₀ ∷ Test ()
+    test₀ = expect (bijection (toRGS   @ ())   (fromRGS @ ()))
+    test₁ ∷ Test ()
+    test₁ = expect (bijection (toRGS   @ Suit) (fromRGS @ Suit))
+    test₂ ∷ Test ()
+    test₂ = expect (bijection (toRGS   @ Fin₅) (fromRGS @ Fin₅))
+    test₃ ∷ Test ()
+    test₃ = expect (bijection (fromRGS @ ())   (toRGS   @ ()))
+    test₄ ∷ Test ()
+    test₄ = expect (bijection (fromRGS @ Suit) (toRGS   @ Suit))
+    test₅ ∷ Test ()
+    test₅ = expect (bijection (fromRGS @ Fin₅) (toRGS   @ Fin₅))
 
 -- https://arxiv.org/abs/0904.1097
 -- Pg 3. Crossings and nestings in set partitions of classical types (v2)
