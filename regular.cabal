@@ -58,6 +58,7 @@ library
                      , adjunctions
                      , smash
                      , data-fix
+                     , tree-traversals
   default-language:    Haskell2010
   default-extensions: UnicodeSyntax
                       ScopedTypeVariables
