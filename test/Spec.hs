@@ -193,7 +193,7 @@ testDFAinvhomimage = expect same
             δ (1, 0) = 0
             δ (1, 1) = 2
             δ (2, 0) = 0
-            δ (2, 1) = 1        
+            δ (2, 1) = 1
         h ∷ Bool → [Fin₂]
         h False = [0,1]
         h True  = []
@@ -353,15 +353,15 @@ testNFAPermutations = tests [test₁, test₂, test₃]
         m = NFA.permutations (asSet ∷ Set ())
     -- ℒ(NFA.permutations {0, 3}) ≟ {"03", "30"}
     test₃ ∷ Test ()
-    test₃ = expectEqual (Config.language m) (List.sort (List.permutations list))
+    test₃ = expectEqual (Config.language m) (List.sort (List.permutations l))
       where
-        list ∷ [Fin₄]
-        list = [0, 3]
+        l ∷ [Fin₄]
+        l = [0, 3]
         m ∷ NFA (Set Fin₄) Fin₄
         m = NFA.permutations s
           where
             s ∷ Set Fin₄
-            s = fromAscList list
+            s = fromAscList l
 
 -- Coinductive bisimulation (partial)
 -- Either the bisimulation will succeed (on the given subset) or
