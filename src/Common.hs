@@ -388,29 +388,10 @@ generateNE = NE.unfoldr c (pure 2)
             f ∷ ℕ → NonEmpty ℕ
             f n = NE.fromList (List.genericReplicate (n - 1) n) ⋄ pure (n + 1)
             {-
-            -- TODO in opposite order
+            -- in opposite order, avoids the O(n) time of snoc
             f ∷ ℕ → NonEmpty ℕ
-            -- f n = (n + 1) :| (genericReplicate (n - 1) n)
-            -- f n = (:|) (n + 1) (genericReplicate (n - 1) n)
-            -- f n = (:|) ((+ 1) n) (genericReplicate (n - 1) n)
-            -- f n = (:|) (succ n) (genericReplicate (pred n) n)
-            -- f = liftA2 (:|) succ (genericReplicate =<< pred)
-            -- f = liftA2 (:|) succ (pred >>= genericReplicate)
             f = liftA2 (:|) succ (pred >>= genericReplicate)
             -}
-{-
-import           Control.Monad (join, replicateM)
-
--- generate set partitions tree (using nonempty lists)
-generate ∷ NonEmpty (NonEmpty ℕ)
-generate = NE.unfoldr c (pure 2)
-  where
-    c ∷ NonEmpty ℕ → (NonEmpty ℕ, Maybe (NonEmpty ℕ))
-    c = fmap Just . (bimap f f . join (,))
-      where
-        f ∷ NonEmpty ℕ → NonEmpty ℕ
-        f = (=<<) (liftA2 (:|) succ (pred >>= genericReplicate))
--}
 
 -- N.B. this does not terminate!
 -- unfold the set partitions tree
@@ -421,57 +402,8 @@ generate' = unfoldTree c 2
   where
     c ∷ ℕ → (ℕ, [ℕ])
     c n = (n, List.genericReplicate (n - 1) n ⋄ pure (n + 1))
-{-
--- TODO
-generate' ∷ Tree ℕ
-generate' = unfoldTree c 2
-  where
-    c ∷ ℕ → (ℕ, [ℕ])
-    c = (,) <*> (liftA2 (:) succ (pred >>= genericReplicate))
--- or
-generate' ∷ Tree ℕ
-generate' = unfoldTree ((,) <*> (liftA2 (:) succ (pred >>= genericReplicate))) 2
--}
-
--- TODO
-generate'' ∷ ℕ → Tree (ℕ, ℕ)
-generate'' restriction = unfoldTree c (0, 2)
-  where
-    c ∷ (ℕ, ℕ) → ((ℕ, ℕ), [(ℕ, ℕ)])
-    c (l, n) = (,) (l + 1, n) (bool (fmap (bimap (+ 1) id . ((,) l)) ns) mempty ((==) l restriction))
-      where
-        ns ∷ [ℕ]
-        ns = List.genericReplicate (n - 1) n ⋄ pure (n + 1)
-{-
-generate'' ∷ ℕ → Tree (ℕ, ℕ)
-generate'' restriction = unfoldTree c (0, 2)
-  where
-    c ∷ (ℕ, ℕ) → ((ℕ, ℕ), [(ℕ, ℕ)])
-    c (l, n) = (,) ((,) (succ l)  $  n )
-                   ((,) (succ l) <$> ns)
-      where
-        ns ∷ [ℕ]
-        ns = bool ((:) (succ n) (genericReplicate (pred n) n)) [] ((==) l restriction)
--}
-
--- TODO have a few variants of this but this is the main theme
-generate''' ∷ ℕ → Tree ((ℕ, ℕ), ℕ)
-generate''' restriction = unfoldTree c ((0, 2), 0)
-  where
-    c ∷ ((ℕ, ℕ), ℕ) → (((ℕ, ℕ), ℕ), [((ℕ, ℕ), ℕ)])
-    c ((l, n), i) = (((succ l, n), i), ns'')
-      where
-        -- N.B. this is backwards :P
-        -- add index
-        ns'' ∷ [((ℕ, ℕ), ℕ)]
-        ns'' = indexed ns'
-          where
-            -- add level
-            ns' ∷ [(ℕ, ℕ)]
-            ns' = (,) (succ l) <$> ns
-              where
-                ns ∷ [ℕ]
-                ns = bool ((:) (succ n) (genericReplicate (pred n) n)) [] ((==) l restriction)
+    -- in opposite order, avoids the O(n) time of snoc
+    -- c = (,) <*> (liftA2 (:) succ (pred >>= genericReplicate))
 
 -- based on `paths` from https://stackoverflow.com/a/33135646
 -- TODO should update furthermore to `paths ∷ Tree a → NonEmpty (NonEmpty a)` but this works for now
