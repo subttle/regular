@@ -567,7 +567,7 @@ include = flip filter'
 
 -- Discards elements which match the predicate
 exclude ∷ (Foldable f) ⇒ f a → Predicate a → [a]
-exclude list (Predicate p) = List.filter (not . p) (toList list)
+exclude l (Predicate p) = List.filter (not . p) (toList l)
 
 -- A wrapper for `deleteBy` which uses `Equivalence` type.
 deleteBy' ∷ (Foldable f) ⇒ Equivalence a → a → f a → [a]
