@@ -54,6 +54,7 @@ suite = tests [ scope "main.FizzBuzz"              testFizzBuzz
               , scope "Comparison.Invert"          testGroupInvert
               , scope "Comparison.Cycles"          testCycles
               , scope "RGS.restricted"             testRestrictedPredicate  -- FIXME better name?
+              , scope "paths"                      testRestrictedPaths      -- FIXME better name
               , scope "Equivalence.OpenersClosers" testOpenersClosers
               , scope "Equivalence.toRGS"          testEquivalencetoRGS
               , scope "Equivalence.bijection"      testEquivalenceBijection
@@ -497,6 +498,16 @@ testRestrictedPredicate = tests [test₁, test₂]
             -- TODO probably better way to do this with vec, but this works for now
             ws ∷ [[Fin₄]]
             ws = upToLength 5 (freeMonoidFrom 4 (asList @ Fin₄))
+
+-- TODO update with actual RGS use instead
+-- Test that all paths in the generated index tree are restricted
+testRestrictedPaths ∷ Test ()
+testRestrictedPaths = tests [test₁, test₂]
+  where
+    test₁ ∷ Test ()
+    test₁ = expect (all (getPredicate restricted) (paths (generateᵢ 3)))
+    test₂ ∷ Test ()
+    test₂ = expect (all (getPredicate restricted) (paths (generateᵢ 4)))
 
 -- "For example, the restricted growth function 0,1,1,2,0,3,1 defines the set partition {{1,5}, {2,3,7}, {4}, {6}}"
 -- https://www8.cs.umu.se/kurser/TDBAfl/VT06/algorithms/BOOK/BOOK4/NODE153.HTM
