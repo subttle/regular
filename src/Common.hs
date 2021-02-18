@@ -374,6 +374,60 @@ unionLefts  = Set.mapMonotonic (fromLeft  undefined) . Set.filter isRight -- Set
 unionRights ∷ (Ord b) ⇒ Set (Either a b) → Set b
 unionRights = Set.mapMonotonic (fromRight undefined) . Set.filter isLeft  -- Set.dropWhileAntitone isLeft -- TODO can I use `dropWhileAntitone` here to improve efficiency? is ordering needed on `Either a b`?
 
+-- generate a finite set partition tree (`limit` levels deep)
+generate ∷ ℕ → Tree ((ℕ, ℕ), ℕ)
+generate limit = unfoldTree c ((0, 2), 0)
+  where
+    c ∷ ((ℕ, ℕ), ℕ) → (((ℕ, ℕ), ℕ), [((ℕ, ℕ), ℕ)])
+    c ((ℓ, n), i) = (((succ ℓ, n), i), indexed ((,) (succ ℓ) <$> bool (List.genericReplicate (pred n) n ⋄ pure (succ n)) [] (ℓ == limit)))
+
+-- λ> printTree (generateₗ 4)
+-- 1────────────┬───────────────────────────────────────────────────────┐
+--              │                                                       │
+--  2─────┬─────┴──────────┐            2──────────┬────────────────────┴─┬─────────────────────────────┐
+--        │                │                       │                      │                             │
+--   3──┬─┴───┐  3───┬─────┴┬───────┐    3───┬─────┴┬───────┐   3───┬─────┴┬───────┐   3────┬────────┬──┴─────┬─────────┐
+--      │     │      │      │       │        │      │       │       │      │       │        │        │        │         │
+--    4┬┴┐ 4┬─┼─┐ 4┬─┼─┐ 4┬─┼─┐ 4┬─┬┴┬─┐  4┬─┼─┐ 4┬─┼─┐ 4┬─┬┴┬─┐ 4┬─┼─┐ 4┬─┼─┐ 4┬─┬┴┬─┐ 4┬─┬┴┬─┐ 4┬─┬┴┬─┐ 4┬─┬┴┬─┐ 4┬─┬─┼─┬─┐
+--     │ │  │ │ │  │ │ │  │ │ │  │ │ │ │   │ │ │  │ │ │  │ │ │ │  │ │ │  │ │ │  │ │ │ │  │ │ │ │  │ │ │ │  │ │ │ │  │ │ │ │ │
+--     5 5  5 5 5  5 5 5  5 5 5  5 5 5 5   5 5 5  5 5 5  5 5 5 5  5 5 5  5 5 5  5 5 5 5  5 5 5 5  5 5 5 5  5 5 5 5  5 5 5 5 5
+generateₗ ∷ ℕ → Tree ℕ
+generateₗ = fmap (fst . fst) . generate
+
+-- λ> printTree (generateₙ 4)
+-- 2────────────┬───────────────────────────────────────────────────────┐
+--              │                                                       │
+--  2─────┬─────┴──────────┐            3──────────┬────────────────────┴─┬─────────────────────────────┐
+--        │                │                       │                      │                             │
+--   2──┬─┴───┐  3───┬─────┴┬───────┐    3───┬─────┴┬───────┐   3───┬─────┴┬───────┐   4────┬────────┬──┴─────┬─────────┐
+--      │     │      │      │       │        │      │       │       │      │       │        │        │        │         │
+--    2┬┴┐ 3┬─┼─┐ 3┬─┼─┐ 3┬─┼─┐ 4┬─┬┴┬─┐  3┬─┼─┐ 3┬─┼─┐ 4┬─┬┴┬─┐ 3┬─┼─┐ 3┬─┼─┐ 4┬─┬┴┬─┐ 4┬─┬┴┬─┐ 4┬─┬┴┬─┐ 4┬─┬┴┬─┐ 5┬─┬─┼─┬─┐
+--     │ │  │ │ │  │ │ │  │ │ │  │ │ │ │   │ │ │  │ │ │  │ │ │ │  │ │ │  │ │ │  │ │ │ │  │ │ │ │  │ │ │ │  │ │ │ │  │ │ │ │ │
+--     2 3  3 3 4  3 3 4  3 3 4  4 4 4 5   3 3 4  3 3 4  4 4 4 5  3 3 4  3 3 4  4 4 4 5  4 4 4 5  4 4 4 5  4 4 4 5  5 5 5 5 6
+generateₙ ∷ ℕ → Tree ℕ
+generateₙ = fmap (snd . fst) . generate
+
+-- λ> printTree (generateᵢ 4)
+-- 0────────────┬───────────────────────────────────────────────────────┐
+--              │                                                       │
+--  0─────┬─────┴──────────┐            1──────────┬────────────────────┴─┬─────────────────────────────┐
+--        │                │                       │                      │                             │
+--   0──┬─┴───┐  1───┬─────┴┬───────┐    0───┬─────┴┬───────┐   1───┬─────┴┬───────┐   2────┬────────┬──┴─────┬─────────┐
+--      │     │      │      │       │        │      │       │       │      │       │        │        │        │         │
+--    0┬┴┐ 1┬─┼─┐ 0┬─┼─┐ 1┬─┼─┐ 2┬─┬┴┬─┐  0┬─┼─┐ 1┬─┼─┐ 2┬─┬┴┬─┐ 0┬─┼─┐ 1┬─┼─┐ 2┬─┬┴┬─┐ 0┬─┬┴┬─┐ 1┬─┬┴┬─┐ 2┬─┬┴┬─┐ 3┬─┬─┼─┬─┐
+--     │ │  │ │ │  │ │ │  │ │ │  │ │ │ │   │ │ │  │ │ │  │ │ │ │  │ │ │  │ │ │  │ │ │ │  │ │ │ │  │ │ │ │  │ │ │ │  │ │ │ │ │
+--     0 1  0 1 2  0 1 2  0 1 2  0 1 2 3   0 1 2  0 1 2  0 1 2 3  0 1 2  0 1 2  0 1 2 3  0 1 2 3  0 1 2 3  0 1 2 3  0 1 2 3 4
+generateᵢ  ∷ ℕ → Tree ℕ
+generateᵢ = fmap  snd        . generate
+
+-- Non-unicode alias for conveniences
+generateL ∷ ℕ → Tree ℕ
+generateL = generateₗ
+generateN ∷ ℕ → Tree ℕ
+generateN = generateₙ
+generateI  ∷ ℕ → Tree ℕ
+generateI = generateᵢ
+
 -- generate set partitions tree (using nonempty lists)
 generateNE ∷ NonEmpty (NonEmpty ℕ)
 generateNE = NE.unfoldr c (pure 2)
@@ -387,11 +441,8 @@ generateNE = NE.unfoldr c (pure 2)
             -- TODO memoize me, clean up tree version and use that
             f ∷ ℕ → NonEmpty ℕ
             f n = NE.fromList (List.genericReplicate (n - 1) n) ⋄ pure (n + 1)
-            {-
             -- in opposite order, avoids the O(n) time of snoc
-            f ∷ ℕ → NonEmpty ℕ
-            f = liftA2 (:|) succ (pred >>= genericReplicate)
-            -}
+            -- f = liftA2 (:|) succ (pred >>= genericReplicate)
 
 -- N.B. this does not terminate!
 -- unfold the set partitions tree
