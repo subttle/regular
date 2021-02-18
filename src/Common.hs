@@ -375,8 +375,8 @@ unionRights ∷ (Ord b) ⇒ Set (Either a b) → Set b
 unionRights = Set.mapMonotonic (fromRight undefined) . Set.filter isLeft  -- Set.dropWhileAntitone isLeft -- TODO can I use `dropWhileAntitone` here to improve efficiency? is ordering needed on `Either a b`?
 
 -- generate set partitions tree (using nonempty lists)
-generate ∷ NonEmpty (NonEmpty ℕ)
-generate = NE.unfoldr c (pure 2)
+generateNE ∷ NonEmpty (NonEmpty ℕ)
+generateNE = NE.unfoldr c (pure 2)
   where
     c ∷ NonEmpty ℕ → (NonEmpty ℕ, Maybe (NonEmpty ℕ))
     c ns = (ns', Just ns')
