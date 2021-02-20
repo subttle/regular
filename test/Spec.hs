@@ -274,30 +274,29 @@ testRESubstitution = expectEqual result expected -- N.B. the use of structural e
             :.  Star (         RE.fromList [2, 3]))
 
 -- Example from: https://courses.engr.illinois.edu/cs373/fa2010/Exams/midterm1sol.pdf
+-- Test that:
+-- perfectShuffle {"11"} {"00"} = {"1010"}
 testDFAPerfectShuffle ∷ Test ()
-testDFAPerfectShuffle = expectEqual l expected
-  where    
-    -- {"1010"}
-    l ∷ [[Fin₂]]
-    l = Config.language ab
+testDFAPerfectShuffle = expectEqual (Config.language shuffled) expected
+  where
+    -- perfectShuffle {"11"} {"00"}
+    shuffled ∷ DFA (Set (Either Bool Bool), Set (Either Bool Bool), Bool) Fin₂
+    shuffled = DFA.perfectShuffle aa bb
       where
-        ab ∷ DFA (Set (Either Bool Bool), Set (Either Bool Bool), Bool) Fin₂
-        ab = DFA.perfectShuffle a b
+        -- {"11"}
+        aa ∷ DFA (Set (Either Bool Bool)) Fin₂
+        aa = DFA.fromNFA (NFA.concatenate a a)
           where
-            -- A = {"11"}
-            a ∷ DFA (Set (Either Bool Bool)) Fin₂
-            a = DFA.fromNFA (NFA.concatenate a' a')
-              where
-                -- {"1"}
-                a' ∷ NFA Bool Fin₂
-                a' = NFA.literal 1
-            -- B = {"00"}
-            b ∷ DFA (Set (Either Bool Bool)) Fin₂
-            b = DFA.fromNFA (NFA.concatenate b' b')
-              where
-                -- {"0"}
-                b' ∷ NFA Bool Fin₂
-                b' = NFA.literal 0
+            -- {"1"}
+            a ∷ NFA Bool Fin₂
+            a = NFA.literal 1
+        -- {"00"}
+        bb ∷ DFA (Set (Either Bool Bool)) Fin₂
+        bb = DFA.fromNFA (NFA.concatenate b b)
+          where
+            -- {"0"}
+            b ∷ NFA Bool Fin₂
+            b = NFA.literal 0
     -- {"1010"}
     expected ∷ [[Fin₂]]
     expected = [[1, 0, 1, 0]]
