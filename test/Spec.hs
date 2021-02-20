@@ -11,26 +11,26 @@ import qualified NFA
 -- import qualified GFA
 import           RegExp (RegExp (..))
 import qualified RegExp as RE hiding (RegExp (..))
+import           Common
+import           Config
+import           Finite
 import           Language (ℒ)
 import qualified Language
-import           Common
-import           Finite
 import           Examples (by3, by5, by5', minimal, ab, cd)
-import           Data.Set (Set, singleton, fromAscList)
-import           Config
-import           Numeric.Natural.Unicode (ℕ)
 import           Control.Applicative (liftA2)
 import           Data.Bool (bool)
 import           Data.Bool.Unicode ((∧))
+import           Data.Either (isRight, isLeft, lefts)
 import           Data.Eq.Unicode ((≠))
 import           Data.Fin (toNatural)
-import           Data.Functor.Contravariant (contramap, Equivalence (..), Comparison (..), Predicate (..))
+import           Data.Functor.Contravariant (Equivalence (..), Comparison (..), Predicate (..), contramap)
 import qualified Data.Group as G
-import           EasyTest (Test, tests, scope, expect, run, expectEqual)
 import qualified Data.List as List
 import qualified Data.List.NonEmpty as NE (NonEmpty (..), fromList)
-import           Data.Either (isRight, isLeft, lefts)
+import           Data.Set (Set, singleton, fromAscList)
 import           Data.Tree
+import           EasyTest (Test, tests, scope, expect, run, expectEqual)
+import           Numeric.Natural.Unicode (ℕ)
 
 main ∷ IO ()
 main = run suite
