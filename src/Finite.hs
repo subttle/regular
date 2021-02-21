@@ -17,7 +17,7 @@ import           Data.Bool.Unicode ((∧), (∨))
 import           Data.Eq.Unicode ((≠))
 import           Data.Foldable.Unicode ((∈), (∋))
 import           Data.Ord.Unicode ((≤))
-import           Control.Monad
+import           Control.Monad (liftM4, liftM5, void)
 import           Control.Applicative
 import           Data.Group (Group, invert)
 import           Data.List as List
@@ -1845,6 +1845,9 @@ instance (Show a, Finite a) ⇒ Show (Equivalence a) where
         where
           parts ∷ [[a]]
           parts = fmap NE.toList (fromEquivalence e)
+
+ferrers ∷ (Finite a) ⇒ Equivalence a → [NonEmpty ()]
+ferrers = sortOn (Down . length') . fmap void . fromEquivalence
 
 -- TODO probably going to be lots of room for optimization in these instance defs, but for now I want to focus on correctness
 instance (Finite a)
