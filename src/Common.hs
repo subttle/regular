@@ -130,7 +130,8 @@ andAlg = Algebra φ
 
 -- appends an element, O(n)
 snoc ∷ [a] → a → [a]
-snoc as a = (++) as (pure a)
+-- snoc as = (++) as . pure
+snoc = flip (.) pure . (⋄)
 
 -- TODO precedence
 -- TODO infixl 8 ‥ -- …
