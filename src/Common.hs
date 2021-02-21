@@ -128,6 +128,10 @@ andAlg = Algebra φ
 (⊳) ∷ NonEmpty a → a → NonEmpty a
 (⊳) = (|>)
 
+-- appends an element, O(n)
+snoc ∷ [a] → a → [a]
+snoc as a = (++) as (pure a)
+
 -- TODO precedence
 -- TODO infixl 8 ‥ -- …
 (‥) ∷ (a → b) → (c → d     → a) → (c → d     → b)
