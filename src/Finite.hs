@@ -1495,6 +1495,34 @@ shape = sort . fmap length' . fromEquivalence
 byShape ∷ (Finite a) ⇒ Equivalence (Equivalence a)
 byShape = equating' shape
 
+-- TODO consider moving to src/Common.hs
+byCan ∷ Equivalence (Can a b)
+byCan = Equivalence (≡)
+  where
+    (≡) ∷ Can a b → Can a b → Bool
+    (≡) (C.Non    ) (C.Non    ) = True
+    (≡) (C.One   _) (C.One   _) = True
+    (≡) (C.Eno   _) (C.Eno   _) = True
+    (≡) (C.Two _ _) (C.Two _ _) = True
+    (≡) _           _           = False
+
+bySmash ∷ Equivalence (Smash a b)
+bySmash = Equivalence (≡)
+  where
+    (≡) ∷ Smash a b → Smash a b → Bool
+    (≡) (Nada     ) (Nada     ) = True
+    (≡) (Smash _ _) (Smash _ _) = True
+    (≡) _           _           = False
+
+byWedge ∷ Equivalence (Wedge a b)
+byWedge = Equivalence (≡)
+  where
+    (≡) ∷ Wedge a b → Wedge a b → Bool
+    (≡) (Nowhere  ) (Nowhere  ) = True
+    (≡) (Here    _) (Here    _) = True
+    (≡) (There   _) (There   _) = True
+    (≡) _           _           = False
+
 byThese ∷ Equivalence (These a b)
 byThese = Equivalence (≡)
   where
