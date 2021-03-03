@@ -3067,7 +3067,14 @@ instance Fancy      Quadrant where
   named    = const "Quadrant"
 instance Show Quadrant where
   show ∷ Quadrant → String
-  show = quadrant "(+; +)" "(−; +)" "(−; −)" "(+; −)"
+  show = show₂
+    where
+      show₁ ∷ Quadrant → String
+      show₁ = show'
+      show₂ ∷ Quadrant → String
+      show₂ = quadrant "(+; +)" "(−; +)" "(−; −)" "(+; −)"
+      show₃ ∷ Quadrant → String
+      show₃ q = toColor (show₂ q) (toColor' q)
 -- non unicode aliases for convenience
 type Q1 = 'Q₁
 type Q2 = 'Q₂
