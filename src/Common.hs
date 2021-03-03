@@ -270,14 +270,14 @@ replicateTree 0 a = Node a []
 replicateTree n a = Node a forest
   where
     forest ∷ Forest a
-    forest = bool ((replicateTree ((n - 1) -  m * lm) a : genericReplicate lm (replicateTree m a)))
-                  (                                       genericReplicate lm (replicateTree m a) )
-                                  ((n - 1) == m * lm)
+    forest = bool (replicateTree ((n - 1) -  m * lm) a : genericReplicate lm (replicateTree m a))
+                  (                                      genericReplicate lm (replicateTree m a))
+                                 ((n - 1) == m * lm)
       where
         m ∷ ℕ
-        m = head [y | y ← [1 ..],  (n - 1) ≤  y * y]
+        m = head [y | y ← [1 ..], (n - 1) ≤  y * y]
         lm ∷ ℕ
-        lm =                       (n - 1) `div` m
+        lm =                      (n - 1) `div` m
 
 -- `replicateM` with parameter of type ℕ (instead of parameter of type ℤ)
 -- TODO replicateM' = natf (const (pure [])) ((<*>) (liftA2 (:)) . replicateM' . pred)
@@ -430,7 +430,7 @@ generateL ∷ ℕ → Tree ℕ
 generateL = generateₗ
 generateN ∷ ℕ → Tree ℕ
 generateN = generateₙ
-generateI  ∷ ℕ → Tree ℕ
+generateI ∷ ℕ → Tree ℕ
 generateI = generateᵢ
 
 -- generate set partitions tree (using nonempty lists)
