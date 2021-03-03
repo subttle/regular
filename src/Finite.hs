@@ -3087,6 +3087,21 @@ quadrant _ ii _   _  Q₂ = ii
 quadrant _ _  iii _  Q₃ = iii
 quadrant _ _  _   iv Q₄ = iv
 
+-- TODO consider type signature
+-- TODO quadrants ∷ ∀ a b . (Num a, Ord a, Num b, Ord b) ⇒ Equivalence (a, b)
+-- TODO may want to explore proofs for that scenario, however.
+-- TODO e.g. 1/1 as a different number than 1, etc.
+-- TODO also this doesn't need to be in src/Finite.hs
+quadrants ∷ ∀ a . (Num a, Ord a) ⇒ Equivalence (a, a)
+quadrants = Equivalence ((==) `on` getQuadrant)
+  where
+    -- https://mathworld.wolfram.com/Quadrant.html
+    getQuadrant ∷ (a, a) → Maybe Quadrant
+    getQuadrant (a₁, a₂) | a₁ > 0 ∧ a₂ > 0 = Just Q₁
+                         | a₁ < 0 ∧ a₂ > 0 = Just Q₂
+                         | a₁ < 0 ∧ a₂ < 0 = Just Q₃
+                         | a₁ > 0 ∧ a₂ < 0 = Just Q₄
+                         | otherwise       = Nothing
 
 -- https://en.wikipedia.org/wiki/Octant_(solid_geometry)
 data Octant where
