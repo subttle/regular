@@ -3103,6 +3103,16 @@ quadrants = Equivalence ((==) `on` getQuadrant)
                          | a₁ > 0 ∧ a₂ < 0 = Just Q₄
                          | otherwise       = Nothing
 
+-- TODO better name?
+graphComponents ∷ ∀ a . (Num a, Ord a) ⇒ Equivalence (a, a)
+graphComponents = contramap getComponents byCan
+  where
+    getComponents ∷ (a, a) → Can a a
+    getComponents (0,  0 ) = C.Non       -- origin
+    getComponents (a₁, 0 ) = C.One a₁    -- x-axis
+    getComponents (0,  a₂) = C.Eno    a₂ -- y-axis
+    getComponents (a₁, a₂) = C.Two a₁ a₂ -- quadrant
+
 -- https://en.wikipedia.org/wiki/Octant_(solid_geometry)
 data Octant where
   O₁ ∷ Octant
