@@ -133,6 +133,9 @@ snoc ∷ [a] → a → [a]
 -- snoc as = (++) as . pure
 snoc = flip (.) pure . (⋄)
 
+watermark ∷ (Ord a) ⇒ NonEmpty a → NonEmpty a
+watermark = NE.scanl1 max
+
 -- TODO precedence
 -- TODO infixl 8 ‥ -- …
 (‥) ∷ (a → b) → (c → d     → a) → (c → d     → b)
