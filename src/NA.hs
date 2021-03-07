@@ -4,12 +4,14 @@
 
 module NA where
 
+
+-- import           Data.Bool.Unicode
+import           Data.Functor.Contravariant (Contravariant (..), Predicate (..))
+-- import           Data.Void (Void)
+import           Finite
 -- import qualified Language
 -- import           Language (ℒ)
-import           Finite
--- import           Data.Bool.Unicode
-import           Data.Functor.Contravariant (Contravariant, contramap, Predicate, Predicate (..))
--- import           Data.Void (Void)
+
 
 -- Experiment based on:
 -- http://www.few.vu.nl/~cgr600/linkedfiles/swansea_slides.pdf

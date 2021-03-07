@@ -5,19 +5,19 @@
 
 module DA where
 
-import           Common (Set' (..), equation, quoteWith, ContraThese, contrathese, ContraCan, contracan, ContraSmash, contrasmash, ContraWedge, contrawedge, (‥))
+import           Data.Bool.Unicode ((∧), (∨))
+import           Data.Can   (Can   (..), can)
+import           Data.Functor.Contravariant (Contravariant (..), Predicate (..), (>$$<))
+import           Data.Functor.Contravariant.Divisible (Divisible (..), Decidable (..))
+import qualified Data.List as List
+import           Data.Smash (Smash (..), smash)
+import           Data.These (These (..), these)
+import           Data.Void (Void)
+import           Data.Wedge (Wedge (..), wedge)
+import           Common (ContraCan (..), ContraSmash (..), ContraThese (..), ContraWedge (..), Set' (..), equation, quoteWith, (‥))
+import           Finite (Finite (..), Q (..), Σ (..))
 import qualified Language
 import           Language (ℒ)
-import           Finite (Q (..), Σ (sigma), Finite (asList))
-import           Data.Bool.Unicode ((∧), (∨))
-import           Data.Functor.Contravariant (Contravariant, contramap, (>$$<), Predicate, Predicate (..))
-import           Data.Functor.Contravariant.Divisible (Divisible, divide, conquer, Decidable, lose, choose)
-import           Data.Can   (Can   (..), can)
-import           Data.Smash (Smash (..), smash)
-import           Data.Wedge (Wedge (..), wedge)
-import           Data.These (These (..), these)
-import qualified Data.List as List
-import           Data.Void (Void)
 
 -- Experiment based on:
 -- http://www.few.vu.nl/~cgr600/linkedfiles/swansea_slides.pdf

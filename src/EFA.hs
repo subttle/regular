@@ -6,21 +6,21 @@
 
 module EFA where
 
-import           Data.Functor.Contravariant
-import           Data.Map            as Map (Map, fromList)
-import qualified Data.Map            as Map (fromSet, toAscList)
-import           Prelude             hiding (map)
-import           Data.Set            as Set hiding (foldl)
-import           Data.Set.Unicode
+import           Data.Functor.Contravariant (Contravariant (..))
 import qualified Data.List           as List
 import qualified Data.List.NonEmpty  as NE
-import           Finite
-import           Common
-import qualified TransitionGraph as TG
+import           Data.Map            as Map (Map)
+import qualified Data.Map            as Map (fromList, fromSet, toAscList)
+import           Data.Set            as Set (Set, fromList, insert, map, singleton)
+import           Data.Set.Unicode ((∅), (∈), (∪))
+import           Prelude             hiding (map)
+import           Common (Set' (..), equation, fixedPoint, format'', quoteWith, (×), (⊎))
+import           Config (Configuration (..))
+import           Finite (Finite (..), Q (..), Σ (..))
 import qualified FA
-import qualified RegExp as RE
-import qualified ERE as Ex
-import           Config
+import qualified RegExp              as RE
+import qualified ERE                 as Ex
+import qualified TransitionGraph     as TG
 
 -- Nondeterministic Finite Automaton with ε-transitions
 data EFA q s =

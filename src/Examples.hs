@@ -3,21 +3,21 @@
 
 module Examples where
 
-import           DFA
+import           Data.Bool.Unicode ((∨), (∧))
+import           Data.Either (fromRight)
+import           Data.Eq.Unicode ((≠))
+import           Data.Functor.Contravariant (Contravariant (..), Predicate (..), Equivalence (..))
+import           Data.Ord.Unicode ((≤), (≥))
+import           Data.Set (Set, singleton, fromList)
+import           Data.Set.Unicode ((∅))
+import qualified Data.Universe as U (Universe, Finite)
+import           DFA (DFA (..), intersection)
 import qualified NFA
 import qualified EFA
 -- import qualified GFA
 import qualified RegExp as RE
-import           Finite
-import           Data.Set (Set, singleton, fromList)
-import           Data.Set.Unicode ((∅))
-import           Data.Bool.Unicode ((∨), (∧))
-import           Data.Eq.Unicode ((≠))
-import           Data.Ord.Unicode ((≤), (≥))
 import           Common (toColor', (≰), equating')
-import           Data.Either (fromRight)
-import           Data.Functor.Contravariant (contramap, Predicate (..), Equivalence (..))
-import qualified Data.Universe as U (Universe, Finite)
+import           Finite (Finite (..), Card(..), Suit(..), (:🎲), DNA (..), Alpha (..), Fin₂, Fin₃, Fin₄, Fin₅, Fin₆, Fin₇, Fin₈, Fin₉, Fin₁₀, fin₂, rotate90)
 
 -- A DFA which accepts all binary strings ending in "1"
 endsWith1 ∷ DFA Bool Fin₂

@@ -5,20 +5,20 @@
 
 module FA where
 
-import qualified Data.List as List
-import           Data.Set as Set
-import           Data.Set.Unicode ((∅), (∈))
+import           Algebra.Graph.Relation (postSet, stars)
 import           Data.Bool.Unicode ((∧))
-import           Data.Ord.Unicode ((≤), (≥))
+import           Data.Functor.Contravariant (Contravariant (..))
+import qualified Data.List as List
 import           Data.Map (Map)
 import qualified Data.Map as Map
-import           Data.Functor.Contravariant
-import           Common
-import           Config hiding (initial, final)
-import qualified Config
-import           Finite
+import           Data.Ord.Unicode ((≤), (≥))
+import           Data.Set as Set (Set, filter, map, powerSet, singleton, toList)
+import           Data.Set.Unicode ((∅), (∈))
 import qualified TransitionGraph as TG
-import           Algebra.Graph.Relation (postSet, stars)
+import           Common (Set' (..), (×), (⊎), intersects, size', quoteWith, equation, format')
+import           Config (Configuration (toGraph, eval, delta', deltaD, accessible, (⊢), occupied, complete, codeterministic, deterministic, reachable, delta''))
+import qualified Config
+import           Finite (Finite (..), Q (..), Σ (..))
 
 -- This is essentially an NFA with multiple start states
 -- Having this type simplifies some algorithms (such as Brzozowski minimization)

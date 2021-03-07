@@ -4,6 +4,20 @@
 {-# LANGUAGE UnicodeSyntax              #-}
 {-# LANGUAGE OverloadedStrings          #-}
 
+import           Control.Applicative (Applicative (..))
+import           Data.Bool (bool)
+import           Data.Bool.Unicode ((∧))
+import           Data.Either (isRight, isLeft, lefts)
+import           Data.Eq.Unicode ((≠))
+import           Data.Fin (toNatural)
+import           Data.Functor.Contravariant (Contravariant (..), Equivalence (..), Comparison (..), Predicate (..))
+import qualified Data.Group as G
+import qualified Data.List as List
+import qualified Data.List.NonEmpty as NE (NonEmpty (..), fromList)
+import           Data.Set (Set, singleton, fromAscList)
+import           Data.Tree
+import           EasyTest (Test, tests, scope, expect, run, expectEqual)
+import           Numeric.Natural.Unicode (ℕ)
 import           DFA
 import           NFA (NFA)
 import qualified NFA
@@ -17,20 +31,6 @@ import           Finite
 import           Language (ℒ)
 import qualified Language
 import           Examples (by3, by5, by5', minimal, ab, cd)
-import           Control.Applicative (liftA2)
-import           Data.Bool (bool)
-import           Data.Bool.Unicode ((∧))
-import           Data.Either (isRight, isLeft, lefts)
-import           Data.Eq.Unicode ((≠))
-import           Data.Fin (toNatural)
-import           Data.Functor.Contravariant (Equivalence (..), Comparison (..), Predicate (..), contramap)
-import qualified Data.Group as G
-import qualified Data.List as List
-import qualified Data.List.NonEmpty as NE (NonEmpty (..), fromList)
-import           Data.Set (Set, singleton, fromAscList)
-import           Data.Tree
-import           EasyTest (Test, tests, scope, expect, run, expectEqual)
-import           Numeric.Natural.Unicode (ℕ)
 
 main ∷ IO ()
 main = run suite

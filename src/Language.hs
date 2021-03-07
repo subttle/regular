@@ -3,14 +3,14 @@
 
 module Language where
 
-import           Common (partitions)
-import           Finite (Finite, Σ (sigmaStar))
 import           Data.Bool.Unicode ((∧), (∨))
+import           Data.Foldable.Unicode ((∋))
+import           Data.Function ((&))
+import           Data.Functor.Contravariant (Contravariant (..), Predicate (..), (>$$<))
 import           Data.List (inits, tails)
 import qualified Data.List.NonEmpty as NE
-import           Data.Function ((&))
-import           Data.Functor.Contravariant (Contravariant (contramap), Predicate (..), (>$$<))
-import           Data.Foldable.Unicode ((∋))
+import           Common (partitions)
+import           Finite (Finite (..), Σ (..))
 
 -- N.B. This is /not/ the type for regular languages (but I am adding it to help test some properties)
 -- In Agda (with termination checking) this can be used as a type for decidable languages, and while this

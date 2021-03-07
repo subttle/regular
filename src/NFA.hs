@@ -5,24 +5,25 @@
 
 module NFA where
 
-import           Common
-import           Data.Map            as Map (Map, fromList)
-import qualified Data.Map            as Map (fromSet, toAscList)
-import           Data.Set            as Set hiding (foldl)
-import qualified Data.List           as List
-import qualified Data.List.NonEmpty  as NE
-import           Data.Set.Unicode ((∅), (∈), (∉))
-import           Data.Ord.Unicode ((≥), (≤))
+import           Algebra.Graph.Relation as Relation (postSet, stars)
 import           Data.Bool.Unicode ((∧), (∨))
-import qualified EFA
-import qualified FA
-import qualified TransitionGraph as TG
-import           Finite
-import           Data.Functor.Contravariant (Contravariant, contramap)
+import           Data.Foldable (Foldable (..))
+import           Data.Functor.Contravariant (Contravariant (..))
 -- import           Data.Functor.Invariant
 -- import           Data.Functor.Contravariant.Divisible
-import           Algebra.Graph.Relation as Relation hiding (domain)
-import           Config
+import qualified Data.List              as List
+import qualified Data.List.NonEmpty     as NE
+import           Data.Map               as Map (Map)
+import qualified Data.Map               as Map (fromList, fromSet, toAscList)
+import           Data.Ord.Unicode ((≥), (≤))
+import           Data.Set               as Set (Set, elemAt, filter, insert, map, powerSet, singleton)
+import           Data.Set.Unicode ((∅), (∈), (∉))
+import qualified EFA
+import qualified FA
+import           Common (Set' (..), equation, format', intersects, quoteWith, size', (×), (⊎))
+import           Config (Configuration (..))
+import           Finite (Finite (..), Q (..), Σ (..))
+import qualified TransitionGraph        as TG
 
 -- Nondeterministic Finite Automaton
 data NFA q s =
@@ -106,7 +107,7 @@ instance (Finite q, Finite s) ⇒ Configuration NFA q s (Set q) where
   eval m@(NFA _ q₀ _) w = delta' m (q₀, w)
 
   toGraph ∷ NFA q s → TG.TG q s
-  toGraph (NFA δ _ _) = TG.TG (\s → stars (fmap (\q → (q, Set.toList (δ (q, s)))) asList))
+  toGraph (NFA δ _ _) = TG.TG (\s → stars (fmap (\q → (q, toList (δ (q, s)))) asList))
 
 domain ∷ (Finite q, Finite s) ⇒ NFA q s → Set (q, s)
 domain m = qs m × sigma m
@@ -154,8 +155,8 @@ permutations s = NFA δ (∅) (singleton s)
     δ ∷ (Set s, s) → Set (Set s)
     δ (q, σ) | σ ∈ s
              ∧ σ ∉ q
-             ∨ Set.null s = singleton (σ `insert` q)
-    δ _                   = (∅)
+             ∨ null s = singleton (σ `insert` q)
+    δ _               = (∅)
 
 -- TODO Could just use `fromRE` instead... Confirm this way is better?
 fromList ∷ (Eq s) ⇒ [s] → SomeNFA s

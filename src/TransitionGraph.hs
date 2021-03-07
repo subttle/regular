@@ -3,9 +3,9 @@
 
 module TransitionGraph where
 
-import           Finite
-import           Algebra.Graph.Relation as Relation
-import           Data.Functor.Contravariant
+import           Algebra.Graph.Relation as Relation (Relation, gmap, transpose)
+import           Data.Functor.Contravariant (Contravariant (..))
+import           Finite (Finite (..), Q (..), Σ (..))
 
 -- Transition Graph of an automaton
 newtype  TG q s =  TG (      s → Relation q)

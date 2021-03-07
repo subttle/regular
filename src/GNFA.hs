@@ -6,22 +6,22 @@
 
 module GNFA where
 
+import           Control.Applicative (Applicative (..))
+import           Control.Selective (Selective (..), (<*?))
+import           Data.Bifunctor (Bifunctor (..))
+import           Data.Bool.Unicode ((∨))
+import qualified Data.List as List
+import qualified Data.Map as Map (fromList)
+import           Data.Pointed (Pointed (..))
+import           Data.Profunctor (Profunctor (..))
+import           Data.Set as Set (Set, foldl)
+import           Data.Void (Void, absurd)
 import           Prelude hiding ((*), (+))
-import           Common (Set' (Set'), equation, format, quoteWith)
-import           Finite (Q (..), Σ (..), Finite (..), Final (..), Init (..))
+import           Common (Set' (..), equation, format, quoteWith)
+import           Finite (Finite (..), Q (..), Σ (..), Init (..), Final (..))
 import           Language (ℒ)
 import           RegExp (RegExp, zero, (*), (+), star)
 import qualified RegExp as RE
-import           Control.Applicative (liftA2)
-import           Control.Selective (Selective, select, (<*?))
-import qualified Data.List as List
-import           Data.Set as Set (Set, foldl)
-import           Data.Bifunctor (bimap)
-import           Data.Bool.Unicode ((∨))
-import qualified Data.Map as Map (fromList)
-import           Data.Pointed (Pointed, point)
-import           Data.Profunctor (Profunctor, lmap, rmap)
-import           Data.Void (Void, absurd)
 
 -- Generalization of Nondeterministic Finite Automaton with ε-transitions
 

@@ -5,12 +5,12 @@
 
 module ERE where
 
-import           Finite (Finite, Σ)
-import qualified Language
 import           Control.Monad (ap)
 import           Data.Ord.Unicode ((≥))
 import           Data.Pointed (Pointed (..))
 import           Numeric.Natural.Unicode (ℕ)
+import           Finite (Finite (..), Σ (..))
+import qualified Language
 
 -- Extended Regular Expressions (extended with intersection operation)
 -- α, β ⩴ ∅ | ε | σ | α|β | α·β | α&β | α★

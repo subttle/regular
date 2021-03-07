@@ -7,47 +7,47 @@
 
 module Finite where
 
+import           Control.Applicative (Applicative (..), Const (..), liftA3)
+import           Control.Monad (liftM4, liftM5, void)
 import           Data.Bool (bool)
+import           Data.Can (Can)
+import qualified Data.Can as C
 import           Data.Char (toLower)
-import           Data.Set as Set
+import           Data.Set as Set (Set, disjoint, filter, fromDistinctAscList, insert, map, mapMonotonic, powerSet, singleton, toList)
 import           Data.Set.Unicode ((∅))
 import           Data.Set.Ordered (OSet)
 import qualified Data.Set.Ordered as OSet
 import           Data.Bool.Unicode ((∧), (∨))
 import           Data.Eq.Unicode ((≠))
-import           Data.Foldable.Unicode ((∈), (∋))
-import           Data.Ord.Unicode ((≤))
-import           Control.Monad (liftM4, liftM5, void)
-import           Control.Applicative
-import           Data.Group (Group, invert)
-import           Data.List as List
-import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)))
-import qualified Data.List.NonEmpty as NE
-import           Data.Maybe (fromJust)
-import           Data.These (These, These(..))
-import           Data.These.Combinators (catThese)
-import           Data.Void (Void, absurd)
-import qualified Data.Foldable as F
-import           Data.Function (on)
-import           Data.Functor ((<&>))
-import           Data.Functor.Const (Const (..))
-import           Data.Functor.Contravariant
-import           Data.Functor.Contravariant.Divisible (conquer)
-import           Data.Functor.Identity (Identity (..))
-import           Data.Ord (Down (..))
-import           Data.Can (Can)
-import qualified Data.Can as C
-import           Data.Smash
-import           Data.Wedge
-import           Common
-import           GHC.Enum (boundedEnumFrom)
 import           Data.Fin (Fin)
 import qualified Data.Fin as Fin (absurd, toNatural)
+import qualified Data.Foldable as F
+import           Data.Foldable.Unicode ((∈), (∋))
+import           Data.Function (on)
+import           Data.Functor ((<&>))
+import           Data.Functor.Contravariant (Contravariant (..), Op (..), Comparison(..), Equivalence (..), Predicate (..), (>$$<), defaultComparison, defaultEquivalence)
+import           Data.Functor.Contravariant.Divisible (Divisible (..))
+import           Data.Functor.Identity (Identity (..))
+import           Data.Group (Group, invert)
+import           Data.List as List (filter, foldl, foldr, elemIndex, genericDrop, genericIndex, genericLength, genericReplicate, genericTake, nubBy, partition, permutations, sort, sortBy, sortOn, subsequences, unfoldr)
+import           Data.List.NonEmpty (NonEmpty (..))
+import qualified Data.List.NonEmpty as NE
+import           Data.Maybe (fromJust)
+import           Data.Ord.Unicode ((≤))
+import           Data.Ord (Down (..))
+import           Data.Smash (Smash (..), toSmash)
+import           Data.Tagged (Tagged (..), retag)
+import           Data.These (These (..))
+import           Data.These.Combinators (catThese)
 import qualified Data.Type.Nat as Nat
-import           Prelude.Unicode (ℤ)
-import           Numeric.Natural.Unicode (ℕ)
-import           Data.Tagged (Tagged, unTagged, retag)
 import qualified Data.Universe as U
+import           Data.Void (Void, absurd)
+import           Data.Wedge (Wedge (..), toWedge)
+import           GHC.Enum (boundedEnumFrom)
+import           Numeric.Natural.Unicode (ℕ)
+import           Prelude.Unicode (ℤ)
+import           Common (DisplayColor (..), HasDisplayColor (..), Fancy (..), Set' (..), charToString, choose', comparing', elemIndex', equating', factorial, filter', freeMonoid, freeSemigroup, fromEnum', implies, impossible, lefts', length', partitions', quoteWith, replicateM', rights', toColor, toThese, (×), (‥), (⊎), (⋄))
+
 
 -- An imperfect, somewhat practical, representation of a Finite type constraint
 -- The poor Haskeller's version of a Finite type constraint without reaching for dependent types

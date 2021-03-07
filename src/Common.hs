@@ -7,45 +7,44 @@
 
 module Common where
 
-import           Control.Applicative (liftA2, liftA3, getZipList, ZipList (..))
+import           Control.Applicative (Applicative (..), ZipList (..), liftA3)
 import           Control.Arrow ((|||), (&&&))
 import           Control.Monad (replicateM)
+import           Data.Bifunctor (Bifunctor (..))
+import           Data.Bool (bool)
+import           Data.Bool.Unicode ((∧))
+import           Data.Can (Can (..), can)
+import           Data.Char (digitToInt)
+import           Data.Either (lefts, rights, partitionEithers, fromLeft, fromRight, isLeft, isRight)
+import           Data.Eq.Unicode ((≠))
+import           Data.Fin (Fin)
+import           Data.Fix (Fix (..))
+import           Data.Foldable as Foldable (Foldable (..), maximumBy, minimumBy)
+import           Data.Functor.Contravariant.Divisible (Divisible (..), Decidable (..), divided, chosen)
+import           Data.Functor.Contravariant (Contravariant (..), Op (..), Predicate (..), Comparison (..), Equivalence (..), defaultComparison, defaultEquivalence, (>$<), (>$$<))
+import           Data.Functor.Foldable (ListF (..))
+import           Data.Function (on, fix, (&))
+import           Data.List as List (filter, transpose, sortBy, find, delete, deleteBy, deleteFirstsBy, elemIndex, elemIndices, findIndex, findIndices, genericDrop, genericIndex, genericLength, genericReplicate, genericTake, intercalate, intersectBy, tails, unfoldr, mapAccumL)
+import           Data.List.NonEmpty (NonEmpty (..), (<|))
+import qualified Data.List.NonEmpty as NE
 import           Data.Maybe as Maybe (catMaybes, fromJust, isNothing)
-import           Data.Map as Map (Map, null, empty, unionsWith, singleton, insert, mapWithKey, foldlWithKey, insertWith, foldrWithKey)
+import           Data.Map as Map (Map, unionsWith, singleton, insert, mapWithKey, foldlWithKey, insertWith, foldrWithKey)
+import           Data.Ord.Unicode ((≤), (≥))
+import           Data.Semigroup.Foldable (Foldable1 (..))
+import           Data.Semigroup.Traversable (Traversable1)
 import           Data.Set (Set)
 import qualified Data.Set as Set
 import           Data.Set.Unicode ((∪))
-import           Data.Bool.Unicode ((∧))
-import           Data.Bool (bool)
-import           Data.Ord.Unicode ((≤), (≥))
-import           Data.Eq.Unicode ((≠))
-import           Data.List as List (filter, transpose, sortBy, find, delete, deleteBy, deleteFirstsBy, elemIndex, elemIndices, findIndex, findIndices, genericDrop, genericIndex, genericLength, genericReplicate, genericTake, intercalate, intersectBy, tails, unfoldr, mapAccumL)
-import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)), (<|))
-import qualified Data.List.NonEmpty as NE
-import           Data.These (These (..), partitionEithersNE, partitionThese, these)
-import           Data.Can (Can (..), can)
--- import qualified Data.Can as C
 import           Data.Smash (Smash (..), smash)
-import           Data.Wedge (Wedge (..), wedge)
-import qualified Data.Type.Nat as Nat
-import           Data.Fin (Fin)
-import           Data.Char (digitToInt)
-import           Data.Either (lefts, rights, partitionEithers, fromLeft, fromRight, isLeft, isRight)
-import           Data.Fix (Fix (..))
-import           Data.Foldable as Foldable (Foldable (toList, foldl, foldr), maximumBy, minimumBy)
-import           Data.Functor.Contravariant.Divisible (Divisible, Decidable, divide, divided, conquer, choose, chosen, lose)
-import           Data.Functor.Contravariant (Contravariant, Op (..), Predicate (..), Comparison (..), Equivalence (..), defaultComparison, defaultEquivalence, contramap, (>$<), (>$$<))
-import           Data.Functor.Foldable (ListF (..))
-import           Data.Function (on, fix, (&))
-import           Data.Semigroup.Foldable (Foldable1, toNonEmpty)
-import           Data.Semigroup.Traversable (Traversable1)
+import           Data.These (These (..), these, partitionEithersNE, partitionThese)
 import           Data.Tree (Forest, Tree (..), unfoldTree)
+import qualified Data.Type.Nat as Nat
 import           Data.Universe.Helpers (diagonal)
 import           Data.Void (Void, absurd)
-import           Data.Bifunctor (bimap)
-import           Prelude.Unicode (ℤ, ℚ, π)
+import           Data.Wedge (Wedge (..), wedge)
+import           GHC.Float (int2Double, int2Float)
 import           Numeric.Natural.Unicode (ℕ)
-import           GHC.Float (int2Float, int2Double)
+import           Prelude.Unicode (ℤ, ℚ, π)
 
 -- Tau: the true circle constant :]
 -- whereas π = C∕D
@@ -196,7 +195,7 @@ ntContraCoyoneda ∷ (∀ c . (f c → g c)) → ContraCoyoneda f a → ContraCo
 ntContraCoyoneda η (CCoyoneda h fb) = CCoyoneda h (η fb)
 
 foldableToSet ∷ (Foldable t, Ord a) ⇒ t a → Set a
-foldableToSet = Set.fromList . Foldable.toList
+foldableToSet = Set.fromList . toList
 
 -- requires containers-0.5.11 or newer
 -- TODO deleteme after this is closed: https://github.com/roelvandijk/containers-unicode-symbols/issues/6
@@ -735,17 +734,17 @@ format' ∷ ∀ c r . (Show c, Show r) ⇒ Map c (Set r) → String
 format' = go -- .  Map.filter (not . Set.null)
   where
     go ∷ Map c (Set r) → String
-    go m | Map.null m = "  δ _ ↦ ∅"
-    go m              = foldl1 (\a b → a ++ "\n" ++ b)  -- manually intercalate the Map with newlines.
-                        (mapWithKey (\k v → "  δ " ++ show k ++ " ↦ " ++ show (Set' v)) m)
+    go m | null m = "  δ _ ↦ ∅"
+    go m          = foldl1 (\a b → a ++ "\n" ++ b)  -- manually intercalate the Map with newlines.
+                    (mapWithKey (\k v → "  δ " ++ show k ++ " ↦ " ++ show (Set' v)) m)
 
 format'' ∷ ∀ q s r . (Show q, Show s, Show r) ⇒ Map (q, Maybe s) (Set r) → String
 format'' = go -- .  Map.filter (not . Set.null)
   where
     go ∷ Map (q, Maybe s) (Set r) → String
-    go m | Map.null m = "  δ _ ↦ ∅"
-    go m              = foldl1 (\a b → a ++ "\n" ++ b )  -- manually intercalate the Map with newlines.
-                        (mapWithKey (\k v → "  δ " ++ show'' k ++ " ↦ " ++ show (Set' v)) m)
+    go m | null m = "  δ _ ↦ ∅"
+    go m          = foldl1 (\a b → a ++ "\n" ++ b )  -- manually intercalate the Map with newlines.
+                    (mapWithKey (\k v → "  δ " ++ show'' k ++ " ↦ " ++ show (Set' v)) m)
     show'' ∷ (q, Maybe s) → String
     show'' (q, σ) = quoteWith "(" ")" (quoteWith (show q) (maybe "ε" show σ) (","))
 
@@ -790,13 +789,13 @@ catMaybes ∷ (Ord a) ⇒ Set (Maybe a) → Set a
 catMaybes = Set.mapMonotonic fromJust . Set.dropWhileAntitone isNothing
 
 invertMap ∷ (Ord k, Ord v) ⇒ Map k v → Map v (Set k)
-invertMap = foldlWithKey (\acc k v → insertWith (∪) v (Set.singleton k) acc) Map.empty
+invertMap = foldlWithKey (\acc k v → insertWith (∪) v (Set.singleton k) acc) mempty
 
 flattenKeys ∷ (Ord k, Ord v, Foldable t) ⇒ Map (t k) v → Map k (Set v)
-flattenKeys = foldlWithKey (\acc k v → Map.unionsWith Set.union (acc : fmap (`Map.singleton` Set.singleton v) (Foldable.toList k))) Map.empty
+flattenKeys = foldlWithKey (\acc k v → Map.unionsWith Set.union (acc : fmap (`Map.singleton` Set.singleton v) (toList k))) mempty
 
 invertBijection ∷ (Ord k, Ord v) ⇒ Map k v → Map v k
-invertBijection = foldrWithKey (flip Map.insert) Map.empty
+invertBijection = foldrWithKey (flip Map.insert) mempty
 
 palindrome ∷ (Eq a) ⇒ [a] → Bool
 palindrome w = w == reverse w

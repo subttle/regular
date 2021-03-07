@@ -3,11 +3,11 @@
 
 module NatBase where
 
-import           Control.Applicative (Alternative, empty, (<|>))
+import           Control.Applicative (Alternative (..))
 import           Control.Selective (Selective (..), selectM)
-import           Control.Monad.Fix
+import           Control.Monad.Fix (MonadFix (..))
 import           Data.Function (on, (&))
-import           Data.Functor.Contravariant (contramap, Predicate (..), Op (..))
+import           Data.Functor.Contravariant (Contravariant (..), Predicate (..), Op (..))
 import           Numeric.Natural (Natural)
 import           Prelude hiding (even, odd)
 import           Common (quoteWith)

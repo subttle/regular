@@ -5,15 +5,15 @@
 
 module IntBase where
 
-import           Control.Applicative (empty, (<|>), Alternative)
-import           Control.Monad (ap) -- TODO (liftM4, ap)
+import           Control.Applicative (Alternative (..))
+import           Control.Monad (ap) -- TODO (ap, liftM4)
 import           Data.Fix (Fix (..))
 import           Data.Functor ((<&>))
-import           Data.Functor.Foldable (Recursive, Corecursive, Base, project, embed)
+import           Data.Functor.Foldable (Base, Recursive (..), Corecursive (..))
 import           Data.Function (on)
 import           Data.Group (Group, invert)
 import           Data.List (unfoldr)
-import           Data.List.NonEmpty (NonEmpty, NonEmpty ((:|)), (<|))
+import           Data.List.NonEmpty (NonEmpty (..))
 import qualified Data.List.NonEmpty as NE
 import           GHC.Real (reduce)
 import           Common ((⊲), (⋄), (‥), ordering, quoteWith)

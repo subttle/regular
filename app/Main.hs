@@ -1,6 +1,6 @@
-import DFA (intersection)
 import Common (toDigits)
 import Config (accepts)
+import DFA (intersection)
 import Examples (by3, by5)
 import Finite (Fin₁₀)
 

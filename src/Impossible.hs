@@ -1,18 +1,18 @@
 module Impossible where
 
-import           Control.Applicative                  (liftA2)
+import           Control.Applicative                  (Applicative (..))
 import           Control.Comonad
 import           Control.Monad                        (ap)
 import           Data.Bool                            (bool)
 import           Data.Bool.Unicode                    ((∧), (∨))
 import           Data.Functor.Contravariant
-import           Data.Functor.Contravariant.Divisible (conquer)
+import           Data.Functor.Contravariant.Divisible (Divisible (..))
 import           Data.Functor                         ((<&>))
 import           Data.Function                        (on)
 import           Data.Eq.Unicode                      ((≠))
 import           Data.Ord.Unicode                     ((≤), (≥))
-import           Data.Pointed                         (Pointed, point)
-import           Common                               (implies, (‥), DisplayColor, toColor)
+import           Data.Pointed                         (Pointed (..))
+import           Common                               (DisplayColor, implies, (‥), toColor)
 import           Finite
 import           NatBase  -- import           Numeric.Natural.Unicode        (ℕ)
 

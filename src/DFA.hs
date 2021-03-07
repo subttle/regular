@@ -6,30 +6,30 @@
 
 module DFA where
 
-import           Algebra.Graph.Relation as Relation hiding (domain)
+import           Algebra.Graph.Relation as Relation (stars)
 import           Data.Bool (bool)
-import           Data.Functor.Contravariant (Contravariant, contramap, Equivalence (..), Predicate (..))
+import           Data.Bool.Unicode ((∧), (∨))
+import           Data.Functor.Contravariant (Contravariant (..), Equivalence (..), Predicate (..))
 import           Data.Function (on)
 import           Data.List.NonEmpty (NonEmpty)
-import qualified Data.List.NonEmpty  as NE
-import qualified Data.List           as List
-import qualified Data.Map            as Map
-import           Data.Set            as Set hiding (foldl, intersection)
+import qualified Data.List.NonEmpty     as NE
+import qualified Data.List              as List
+import qualified Data.Map               as Map
+import           Data.Set               as Set (Set, delete, elemAt, filter, map, powerSet, singleton)
 import           Data.Set.Unicode ((∅), (∈), (∉), (∖), (∪))
-import           Data.Bool.Unicode ((∧), (∨))
 import           Numeric.Algebra.Class (sumWith)
-import           Prelude             hiding (map)
-import           Common
-import           Finite
-import           Config
-import qualified TransitionGraph as TG
+import           Prelude                hiding (map)
+import           Common (Set' (..), (×), (‥), equation, format, implies, intersects, palindrome, quoteWith, size', upToLength)
+import           Config (Configuration (..))
+import           Finite (Finite (..), Q (..), Σ (..), Init (..), Final (..), predicateToSet, representative)
 import qualified NFA
 import qualified EFA
 import qualified GNFA
 import qualified FA
 import qualified DA
-import qualified RegExp as RE
+import qualified RegExp                 as RE
 import           Language (ℒ)
+import qualified TransitionGraph        as TG
 
 -- Deterministic Finite Automaton
 data DFA q s =                 -- q is the set of states, Q
