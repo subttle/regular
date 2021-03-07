@@ -437,6 +437,7 @@ generateI ∷ ℕ → Tree ℕ
 generateI = generateᵢ
 
 -- generate set partitions tree (using nonempty lists)
+-- N.B. this does not terminate!
 generateNE ∷ NonEmpty (NonEmpty ℕ)
 generateNE = NE.unfoldr c (pure 2)
   where
