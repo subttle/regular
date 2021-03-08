@@ -35,7 +35,7 @@ import qualified Data.List.NonEmpty as NE
 import           Data.Maybe (fromJust, maybe)
 import           Data.Ord.Unicode ((≤))
 import           Data.Ord (Down (..))
-import           Data.Smash (Smash (..), toSmash)
+import           Data.Smash (Smash (..), smash, toSmash)
 import           Data.Tagged (Tagged (..), retag)
 import           Data.These (These (..))
 import           Data.These.Combinators (catThese)
@@ -626,21 +626,24 @@ instance (Finite a, Finite b)
   toEnum   ∷ Int → Smash a b
   toEnum   = (asList !!)
   fromEnum ∷ Smash a b → Int
-  fromEnum = fromJust . flip elemIndex asList
+  -- fromEnum = fromJust . flip elemIndex asList
+  -- fromEnum = smash 0 (\a b → succ (fromEnum (a, b)))
+  fromEnum = smash 0 (succ ‥ (fromEnum ‥ (,)))
   enumFrom ∷ Smash a b → [Smash a b]
   enumFrom = boundedEnumFrom
 instance (Finite a, Finite b)
        ⇒ U.Finite (Smash a b) where
   -- 1 + ab
   cardinality ∷ Tagged (Smash a b) ℕ
-  cardinality = liftA2 (\a b → 1 + a * b) (retag (U.cardinality ∷ Tagged a ℕ)) (retag (U.cardinality ∷ Tagged b ℕ))
-  -- cardinality = liftA2 (succ ‥ (*)) (retag (U.cardinality ∷ Tagged a ℕ)) (retag (U.cardinality ∷ Tagged b ℕ))
+  -- cardinality = liftA2 (\a b → 1 + a * b) (retag (U.cardinality ∷ Tagged a ℕ)) (retag (U.cardinality ∷ Tagged b ℕ))
+  cardinality = liftA2 (succ ‥ (*)) (retag (U.cardinality ∷ Tagged a ℕ)) (retag (U.cardinality ∷ Tagged b ℕ))
 instance (Finite a, Finite b, U.Universe a, U.Universe b)
        ⇒ U.Universe (Smash a b)
 instance (Finite a, Finite b)
        ⇒ Finite (Smash a b) where
   asList ∷ [Smash a b]
-  asList = toList asSet
+  -- asList = Nada : fmap (toSmash . Just) (asList @ (a, b))
+  asList = fmap toSmash asList
   asSet ∷ Set (Smash a b)
   asSet = Set.map toSmash asSet
 
