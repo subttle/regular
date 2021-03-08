@@ -356,7 +356,7 @@ unzipWith      = unzip            ‥ fmap
 
 -- A more general version of `partitionEithers` from `Data.Either`
 partitionEithers' ∷ (Foldable t) ⇒ t (Either a b) → ([a], [b])
-partitionEithers' = partitionEithers . Foldable.toList
+partitionEithers' = partitionEithers . toList
 
 -- allNoneSome' ∷ Predicate a → Op (These (NonEmpty a) (NonEmpty a)) (NonEmpty a)
 -- allNoneSome' (Predicate p) = contramap (fmap (liftA3 bool Left Right p))) (Op partitionEithersNE)
@@ -369,11 +369,11 @@ allNoneSome = partitionEithersNE ‥ filter''
 
 -- A more general version of `lefts` from `Data.Either`
 lefts' ∷ (Foldable t) ⇒ t (Either a b) → [a]
-lefts' = lefts . Foldable.toList
+lefts' = lefts . toList
 
 -- A more general version of `rights` from `Data.Either`
 rights' ∷ (Foldable t) ⇒ t (Either a b) → [b]
-rights' = rights . Foldable.toList
+rights' = rights . toList
 
 unionLefts ∷ (Ord a) ⇒ Set (Either a b) → Set a
 unionLefts  = Set.mapMonotonic (fromLeft  undefined) . Set.filter isRight -- Set.dropWhileAntitone isRight -- TODO can I use `dropWhileAntitone` here to improve efficiency? is ordering needed on `Either a b`?
@@ -746,7 +746,7 @@ format'' = go -- .  Map.filter (not . Set.null)
     go m          = foldl1 (\a b → a ++ "\n" ++ b )  -- manually intercalate the Map with newlines.
                     (mapWithKey (\k v → "  δ " ++ show'' k ++ " ↦ " ++ show (Set' v)) m)
     show'' ∷ (q, Maybe s) → String
-    show'' (q, σ) = quoteWith "(" ")" (quoteWith (show q) (maybe "ε" show σ) (","))
+    show'' (q, σ) = quoteWith "(" ")" (quoteWith (show q) (maybe "ε" show σ) ",")
 
 -- Some helper functions for nicely displaying languages
 toStrings ∷ (Show s) ⇒ [[s]] → [String]
@@ -772,12 +772,12 @@ interleave = concat . transpose
 -- Sliding window of exactly size n
 windowed ∷ (Foldable t) ⇒ ℕ → t a → [[a]]
 windowed 0 = const []
-windowed n = getZipList . traverse ZipList . genericTake n . tails . Foldable.toList
+windowed n = getZipList . traverse ZipList . genericTake n . tails . toList
 
 -- Slide a two-element-wide window over a list, one element at a time,
 -- generating a list of pairs
 windowed' ∷ ∀ t a . (Foldable t) ⇒ t a → [(a, a)]
-windowed' = List.unfoldr pairs . Foldable.toList
+windowed' = List.unfoldr pairs . toList
   where
     pairs ∷ [a] → Maybe ((a, a), [a])
     pairs []            = Nothing
