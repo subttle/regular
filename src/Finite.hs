@@ -505,9 +505,9 @@ instance (Finite a, Finite b)
   toEnum   = (asList !!)
   fromEnum ∷ Either a b → Int
   fromEnum = either fromEnum ((+) (fromIntegral cardinality_a) . fromEnum)
-      where
-          cardinality_a ∷ ℕ
-          cardinality_a = unTagged (U.cardinality ∷ Tagged a ℕ)
+    where
+      cardinality_a ∷ ℕ
+      cardinality_a = unTagged (U.cardinality ∷ Tagged a ℕ)
   enumFrom ∷ Either a b → [Either a b]
   enumFrom = boundedEnumFrom
 instance (Finite a, Finite b)
