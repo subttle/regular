@@ -13,7 +13,7 @@ import           Data.Bool (bool)
 import           Data.Can (Can)
 import qualified Data.Can as C
 import           Data.Char (toLower)
-import           Data.Set as Set (Set, disjoint, filter, fromDistinctAscList, insert, map, mapMonotonic, powerSet, singleton, toList)
+import           Data.Set as Set (Set, disjoint, filter, fromDistinctAscList, insert, map, mapMonotonic, powerSet, singleton)
 import           Data.Set.Unicode ((∅))
 import           Data.Set.Ordered (OSet)
 import qualified Data.Set.Ordered as OSet
@@ -21,7 +21,7 @@ import           Data.Bool.Unicode ((∧), (∨))
 import           Data.Eq.Unicode ((≠))
 import           Data.Fin (Fin)
 import qualified Data.Fin as Fin (absurd, toNatural)
-import qualified Data.Foldable as F
+import           Data.Foldable (Foldable (..))
 import           Data.Foldable.Unicode ((∈), (∋))
 import           Data.Function (on)
 import           Data.Functor ((<&>))
@@ -29,7 +29,7 @@ import           Data.Functor.Contravariant (Contravariant (..), Op (..), Compar
 import           Data.Functor.Contravariant.Divisible (Divisible (..))
 import           Data.Functor.Identity (Identity (..))
 import           Data.Group (Group, invert)
-import           Data.List as List (filter, foldl, foldr, elemIndex, genericDrop, genericIndex, genericLength, genericReplicate, genericTake, nubBy, partition, permutations, sort, sortBy, sortOn, subsequences, unfoldr)
+import           Data.List as List (filter, elemIndex, genericDrop, genericIndex, genericLength, genericReplicate, genericTake, nubBy, partition, permutations, sort, sortBy, sortOn, subsequences, unfoldr)
 import           Data.List.NonEmpty (NonEmpty (..))
 import qualified Data.List.NonEmpty as NE
 import           Data.Maybe (fromJust)
@@ -429,7 +429,7 @@ instance (Finite a)
 instance (Finite a)
        ⇒ Finite (Set a) where
   asList ∷ [Set a]
-  asList = Set.toList (powerSet asSet)
+  asList = toList (powerSet asSet)
   asSet ∷ Set (Set a)
   asSet  = powerSet asSet
 
@@ -1069,7 +1069,7 @@ fin₁₆ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _  = impossible -- add unreachable cas
 -- FIXME finish idea about partition₀
 
 partition₁ ∷ ∀ f a . (Foldable f) ⇒ (a → Fin₁) → f a → ([a])
-partition₁ cmp = List.foldr select' ([]) . F.toList
+partition₁ cmp = foldr select' ([]) . toList
   where
     select' ∷ a → ([a]) → ([a])
     select' a ~(eq) = fin₁
@@ -1077,7 +1077,7 @@ partition₁ cmp = List.foldr select' ([]) . F.toList
                       (cmp a)
 
 partition₂ ∷ ∀ f a . (Foldable f) ⇒ (a → Fin₂) → f a → ([a], [a])
-partition₂ cmp = List.foldr select' ([], []) . F.toList
+partition₂ cmp = foldr select' ([], []) . toList
   where
     select' ∷ a → ([a], [a]) → ([a], [a])
     select' a ~(lt, gt) = fin₂
@@ -1086,7 +1086,7 @@ partition₂ cmp = List.foldr select' ([], []) . F.toList
                           (cmp a)
 
 partition₃ ∷ ∀ f a . (Foldable f) ⇒ (a → Fin₃) → f a → ([a], [a], [a])
-partition₃ cmp = List.foldr select' ([], [], []) . F.toList
+partition₃ cmp = foldr select' ([], [], []) . toList
   where
     select' ∷ a → ([a], [a], [a]) → ([a], [a], [a])
     select' a ~(lt, eq, gt) = fin₃
@@ -1096,7 +1096,7 @@ partition₃ cmp = List.foldr select' ([], [], []) . F.toList
                               (cmp a)
 
 partition₄ ∷ ∀ f a . (Foldable f) ⇒ (a → Fin₄) → f a → ([a], [a], [a], [a])
-partition₄ cmp = List.foldr select' ([], [], [], []) . F.toList
+partition₄ cmp = foldr select' ([], [], [], []) . toList
   where
     select' ∷ a → ([a], [a], [a], [a]) → ([a], [a], [a], [a])
     select' a ~(i, ii, iii, iv) = fin₄
@@ -1107,7 +1107,7 @@ partition₄ cmp = List.foldr select' ([], [], [], []) . F.toList
                                   (cmp a)
 
 partition₅ ∷ ∀ f a . (Foldable f) ⇒ (a → Fin₅) → f a → ([a], [a], [a], [a], [a])
-partition₅ cmp = List.foldr select' ([], [], [], [], []) . F.toList
+partition₅ cmp = foldr select' ([], [], [], [], []) . toList
   where
     select' ∷ a → ([a], [a], [a], [a], [a]) → ([a], [a], [a], [a], [a])
     select' a ~(i, ii, iii, iv, v) = fin₅
@@ -1118,7 +1118,7 @@ partition₅ cmp = List.foldr select' ([], [], [], [], []) . F.toList
                                        (    i,     ii,     iii,     iv, a : v)
                                      (cmp a)
 partition₆ ∷ ∀ f a . (Foldable f) ⇒ (a → Fin₆) → f a → ([a], [a], [a], [a], [a], [a])
-partition₆ cmp = List.foldr select' ([], [], [], [], [], []) . F.toList
+partition₆ cmp = foldr select' ([], [], [], [], [], []) . toList
   where
     select' ∷ a → ([a], [a], [a], [a], [a], [a]) → ([a], [a], [a], [a], [a], [a])
     select' a ~(i, ii, iii, iv, v, vi) = fin₆
@@ -1131,7 +1131,7 @@ partition₆ cmp = List.foldr select' ([], [], [], [], [], []) . F.toList
                                          (cmp a)
 
 partition₇ ∷ ∀ f a . (Foldable f) ⇒ (a → Fin₇) → f a → ([a], [a], [a], [a], [a], [a], [a])
-partition₇ cmp = List.foldr select' ([], [], [], [], [], [], []) . F.toList
+partition₇ cmp = foldr select' ([], [], [], [], [], [], []) . toList
   where
     select' ∷ a → ([a], [a], [a], [a], [a], [a], [a]) → ([a], [a], [a], [a], [a], [a], [a])
     select' a ~(i, ii, iii, iv, v, vi, vii) = fin₇
@@ -1145,7 +1145,7 @@ partition₇ cmp = List.foldr select' ([], [], [], [], [], [], []) . F.toList
                                               (cmp a)
 
 partition₈ ∷ ∀ f a . (Foldable f) ⇒ (a → Fin₈) → f a → ([a], [a], [a], [a], [a], [a], [a], [a])
-partition₈ cmp = List.foldr select' ([], [], [], [], [], [], [], []) . F.toList
+partition₈ cmp = foldr select' ([], [], [], [], [], [], [], []) . toList
   where
     select' ∷ a → ([a], [a], [a], [a], [a], [a], [a], [a]) → ([a], [a], [a], [a], [a], [a], [a], [a])
     select' a ~(i, ii, iii, iv, v, vi, vii, viii) = fin₈
@@ -1426,14 +1426,14 @@ restricted = Predicate p
     p ∷ NonEmpty ℕ → Bool
     p (0 :| t) = res
       where
-        (res, _) = List.foldl check (True, 0) t
+        (res, _) = foldl check (True, 0) t
           where
             check ∷ (Bool, ℕ) → ℕ → (Bool, ℕ)
             check     (True,  maxₙ) n = (n ≤ maxₙ + 1, max maxₙ n)
             check ret@(False, _   ) _ = ret
     p (_ :| _) = False
     -- p ∷ NonEmpty ℕ → Bool
-    -- p (0 :| t) = fst (List.foldl (uncurry ((bool (const . ((,) False)) ((liftA2 (,) . (≥) . succ) <*> max)))) (True, 0) t)
+    -- p (0 :| t) = fst (foldl (uncurry ((bool (const . ((,) False)) ((liftA2 (,) . (≥) . succ) <*> max)))) (True, 0) t)
     -- p _        = False
 
 -- TODO https://proofwiki.org/wiki/Definition:Cycle_Decomposition
@@ -1462,7 +1462,7 @@ orbit cmp a₁ = NE.unfoldr c a₁
 -- https://en.wikipedia.org/wiki/Permutation#Permutation_order
 -- "It is the least common multiple of its cycles lengths. For example, the order of (1 3 2)(4 5) is 2 * 3 = 6."
 order ∷ (Finite a) ⇒ Comparison a → ℕ
-order = F.foldl lcm 1 . fmap length' . fromEquivalence . cycles
+order = foldl lcm 1 . fmap length' . fromEquivalence . cycles
 
 byOrder ∷ (Finite a) ⇒ Equivalence (Comparison a)
 byOrder = equating' order
@@ -1627,7 +1627,7 @@ listToComparison = comparing' . elemIndexTotal  -- FIXME will have to think abou
 -- TODO better name?
 -- TODO To be more accurate, this should probably use `NonEmpty`/`Foldable1`/`Finite1`?
 elemIndexTotal ∷ (Finite a, Foldable t) ⇒ t a → a → ℕ
-elemIndexTotal permutation a = fromJust (elemIndex' a (F.toList permutation))
+elemIndexTotal permutation a = fromJust (elemIndex' a (toList permutation))
 
 -- TODO add test that `fromEnumBy defaultComparison` is same as `fromEnum`
 fromEnumBy ∷ (Finite a) ⇒ Comparison a → a → ℕ
@@ -1845,8 +1845,8 @@ closers (≡) = List.filter (\a → a ≠ minimum (equivalenceClass (≡) a)) as
 -- https://arxiv.org/pdf/math/0601081.pdf
 -- neither minimal nor maximal elements of the blocks
 transients ∷ ∀ a . (Finite a) ⇒ Equivalence a → [a]
-transients (≡) = List.filter (\a → a ≠ (maximum (equivalenceClass (≡) a))
-                                 ∧ a ≠ (minimum (equivalenceClass (≡) a))) asList
+transients (≡) = List.filter (\a → a ≠ maximum (equivalenceClass (≡) a)
+                                 ∧ a ≠ minimum (equivalenceClass (≡) a)) asList
 
 -- TODO deleteme
 instance (Show a, Finite a) ⇒ Show (Equivalence a) where
