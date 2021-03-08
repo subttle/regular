@@ -42,7 +42,7 @@ import           Data.These.Combinators (catThese)
 import qualified Data.Type.Nat as Nat
 import qualified Data.Universe as U
 import           Data.Void (Void, absurd)
-import           Data.Wedge (Wedge (..), toWedge)
+import           Data.Wedge (Wedge (..), wedge, toWedge)
 import           GHC.Enum (boundedEnumFrom)
 import           Numeric.Natural.Unicode (ℕ)
 import           Prelude.Unicode (ℤ)
@@ -560,21 +560,23 @@ instance (Finite a, Finite b)
   toEnum   ∷ Int → Wedge a b
   toEnum   = (asList !!)
   fromEnum ∷ Wedge a b → Int
-  fromEnum = fromJust . flip elemIndex asList
+  fromEnum = wedge 0 (succ . fromEnum) (succ . (+) (fromIntegral cardinality_a) . fromEnum)
+    where
+      cardinality_a ∷ ℕ
+      cardinality_a = unTagged (U.cardinality ∷ Tagged a ℕ)
   enumFrom ∷ Wedge a b → [Wedge a b]
   enumFrom = boundedEnumFrom
 instance (Finite a, Finite b)
        ⇒ U.Finite (Wedge a b) where
   -- 1 + a + b
   cardinality ∷ Tagged (Wedge a b) ℕ
-  cardinality = liftA2 (\a b → 1 + a + b) (retag (U.cardinality ∷ Tagged a ℕ)) (retag (U.cardinality ∷ Tagged b ℕ))
-  -- cardinality = liftA2 (succ ‥ (+)) (retag (U.cardinality ∷ Tagged a ℕ)) (retag (U.cardinality ∷ Tagged b ℕ))
+  cardinality = liftA2 (succ ‥ (+)) (retag (U.cardinality ∷ Tagged a ℕ)) (retag (U.cardinality ∷ Tagged b ℕ))
 instance (Finite a, Finite b, U.Universe a, U.Universe b)
        ⇒ U.Universe (Wedge a b)
 instance (Finite a, Finite b)
        ⇒ Finite (Wedge a b) where
   asList ∷ [Wedge a b]
-  asList = toList asSet
+  asList = fmap toWedge asList
   asSet ∷ Set (Wedge a b)
   asSet = Set.map toWedge asSet
 
