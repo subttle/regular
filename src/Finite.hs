@@ -32,7 +32,7 @@ import           Data.Group (Group, invert)
 import           Data.List as List (filter, elemIndex, genericDrop, genericIndex, genericLength, genericReplicate, genericTake, nubBy, partition, permutations, sort, sortBy, sortOn, subsequences, unfoldr)
 import           Data.List.NonEmpty (NonEmpty (..))
 import qualified Data.List.NonEmpty as NE
-import           Data.Maybe (fromJust)
+import           Data.Maybe (fromJust, maybe)
 import           Data.Ord.Unicode ((≤))
 import           Data.Ord (Down (..))
 import           Data.Smash (Smash (..), toSmash)
@@ -481,11 +481,9 @@ instance (Finite a)
   toEnum 0 = Nothing
   toEnum n = Just (toEnum (n - 1))
   fromEnum ∷ Maybe a → Int
-  fromEnum Nothing  = 0
-  fromEnum (Just t) = fromEnum t + 1
+  fromEnum = maybe 0      (succ      . fromEnum)
   enumFrom ∷ Maybe a → [Maybe a]
-  enumFrom Nothing  = asList
-  enumFrom (Just t) = fmap Just (enumFrom t)
+  enumFrom = maybe asList (fmap Just . enumFrom)
 instance (Finite a)
        ⇒ Finite (Maybe a) where
   asList ∷ [Maybe a]
