@@ -487,7 +487,7 @@ instance (Finite a)
 instance (Finite a)
        ⇒ Finite (Maybe a) where
   asList ∷ [Maybe a]
-  asList = U.universeF
+  asList = Nothing : fmap Just asList
   asSet ∷ Set (Maybe a)
   asSet  = Set.insert Nothing (Set.mapMonotonic Just asSet)
 
