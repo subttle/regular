@@ -504,7 +504,10 @@ instance (Finite a, Finite b)
   toEnum   ∷ Int → Either a b
   toEnum   = (asList !!)
   fromEnum ∷ Either a b → Int
-  fromEnum = fromJust . flip elemIndex asList
+  fromEnum = either fromEnum ((+) (fromIntegral cardinality_a) . fromEnum)
+      where
+          cardinality_a ∷ ℕ
+          cardinality_a = unTagged (U.cardinality ∷ Tagged a ℕ)
   enumFrom ∷ Either a b → [Either a b]
   enumFrom = boundedEnumFrom
 instance (Finite a, Finite b)
@@ -628,7 +631,6 @@ instance (Finite a, Finite b)
   toEnum   ∷ Int → Smash a b
   toEnum   = (asList !!)
   fromEnum ∷ Smash a b → Int
-  -- fromEnum = fromJust . flip elemIndex asList
   -- fromEnum = smash 0 (\a b → succ (fromEnum (a, b)))
   fromEnum = smash 0 (succ ‥ (fromEnum ‥ (,)))
   enumFrom ∷ Smash a b → [Smash a b]
@@ -637,7 +639,6 @@ instance (Finite a, Finite b)
        ⇒ U.Finite (Smash a b) where
   -- 1 + ab
   cardinality ∷ Tagged (Smash a b) ℕ
-  -- cardinality = liftA2 (\a b → 1 + a * b) (retag (U.cardinality ∷ Tagged a ℕ)) (retag (U.cardinality ∷ Tagged b ℕ))
   cardinality = liftA2 (succ ‥ (*)) (retag (U.cardinality ∷ Tagged a ℕ)) (retag (U.cardinality ∷ Tagged b ℕ))
 instance (Finite a, Finite b, U.Universe a, U.Universe b)
        ⇒ U.Universe (Smash a b)
