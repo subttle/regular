@@ -37,7 +37,7 @@ import           Data.Ord.Unicode ((≤))
 import           Data.Ord (Down (..))
 import           Data.Smash (Smash (..), smash, toSmash)
 import           Data.Tagged (Tagged (..), retag)
-import           Data.These (These (..))
+import           Data.These (These (..), these)
 import           Data.These.Combinators (catThese)
 import qualified Data.Type.Nat as Nat
 import qualified Data.Universe as U
@@ -535,7 +535,12 @@ instance (Finite a, Finite b)
   toEnum   ∷ Int → These a b
   toEnum   = (asList !!)
   fromEnum ∷ These a b → Int
-  fromEnum = fromJust . flip elemIndex asList
+  fromEnum = these fromEnum ((+) (fromIntegral cardinality_a) . fromEnum) ((+) (((+) `on` fromIntegral) cardinality_a cardinality_b) ‥ (fromEnum ‥ (,)))
+    where
+      cardinality_a ∷ ℕ
+      cardinality_a = unTagged (U.cardinality ∷ Tagged a ℕ)
+      cardinality_b ∷ ℕ
+      cardinality_b = unTagged (U.cardinality ∷ Tagged b ℕ)
   enumFrom ∷ These a b → [These a b]
   enumFrom = boundedEnumFrom
 instance (Finite a, Finite b)
