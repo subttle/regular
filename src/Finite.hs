@@ -10,7 +10,7 @@ module Finite where
 import           Control.Applicative (Applicative (..), Const (..), liftA3)
 import           Control.Monad (liftM4, liftM5, void)
 import           Data.Bool (bool)
-import           Data.Can (Can)
+import           Data.Can (Can, can)
 import qualified Data.Can as C
 import           Data.Char (toLower)
 import           Data.Set as Set (Set, disjoint, filter, fromDistinctAscList, insert, map, mapMonotonic, powerSet, singleton)
@@ -607,7 +607,12 @@ instance (Finite a, Finite b)
   toEnum   ∷ Int → Can a b
   toEnum   = (asList !!)
   fromEnum ∷ Can a b → Int
-  fromEnum = fromJust . flip elemIndex asList
+  fromEnum = can 0 (succ . fromEnum) ((+) (fromIntegral (succ cardinality_a)) . fromEnum) ((+) (((+)`on` fromIntegral) (succ cardinality_a) cardinality_b) ‥ (fromEnum ‥ (,)))
+    where
+      cardinality_a ∷ ℕ
+      cardinality_a = unTagged (U.cardinality ∷ Tagged a ℕ)
+      cardinality_b ∷ ℕ
+      cardinality_b = unTagged (U.cardinality ∷ Tagged b ℕ)
   enumFrom ∷ Can a b → [Can a b]
   enumFrom = boundedEnumFrom
 instance (Finite a, Finite b)
