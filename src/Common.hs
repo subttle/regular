@@ -24,7 +24,7 @@ import           Data.Functor.Contravariant.Divisible (Divisible (..), Decidable
 import           Data.Functor.Contravariant (Contravariant (..), Op (..), Predicate (..), Comparison (..), Equivalence (..), defaultComparison, defaultEquivalence, (>$<), (>$$<))
 import           Data.Functor.Foldable (ListF (..))
 import           Data.Function (on, fix, (&))
-import           Data.List as List (filter, transpose, sortBy, find, delete, deleteBy, deleteFirstsBy, elemIndex, elemIndices, findIndex, findIndices, genericDrop, genericIndex, genericLength, genericReplicate, genericTake, intercalate, intersectBy, tails, unfoldr, mapAccumL)
+import           Data.List as List (filter, transpose, sortBy, find, delete, deleteBy, deleteFirstsBy, elemIndex, elemIndices, findIndex, findIndices, genericDrop, genericIndex, genericLength, genericReplicate, genericTake, intercalate, intersectBy, tails, unfoldr)
 import           Data.List.NonEmpty (NonEmpty (..), (<|))
 import qualified Data.List.NonEmpty as NE
 import           Data.Maybe as Maybe (catMaybes, fromJust, isNothing)
@@ -37,6 +37,7 @@ import qualified Data.Set as Set
 import           Data.Set.Unicode ((∪))
 import           Data.Smash (Smash (..), smash)
 import           Data.These (These (..), these, partitionEithersNE, partitionThese)
+import           Data.Traversable (mapAccumL, mapAccumR)
 import           Data.Tree (Forest, Tree (..), unfoldTree)
 import qualified Data.Type.Nat as Nat
 import           Data.Universe.Helpers (diagonal)
@@ -762,6 +763,11 @@ toStrings'' = fmap  (>>= either show show)
 -- imported would cause an import cycle, so avoid that by just inlining the type alias
 toDigits ∷ ℕ → [Fin ('Nat.S Nat.Nat9)]
 toDigits = fmap (toEnum . digitToInt) . show
+
+-- The type should be `[Fin₁₀] → ℕ` but that alias is defined in Finite.hs which if
+-- imported would cause an import cycle, so avoid that by just inlining the type alias
+fromDigits ∷ [Fin ('Nat.S Nat.Nat9)] → ℕ
+fromDigits = snd . fst . mapAccumR (\(i, acc) c → let next = fromEnum' c * 10 ^ i in ((succ i, acc + next), next)) (0 ∷ ℕ, 0 ∷ ℕ)
 
 upToLength ∷ ℕ → [[a]] → [[a]]
 upToLength n = takeWhile ((< n) . genericLength)
