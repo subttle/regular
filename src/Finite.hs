@@ -481,7 +481,7 @@ instance (Finite a)
   toEnum 0 = Nothing
   toEnum n = Just (toEnum (n - 1))
   fromEnum ∷ Maybe a → Int
-  fromEnum = maybe 0      (succ      . fromEnum)
+  fromEnum = maybe 0      (     succ . fromEnum)
   enumFrom ∷ Maybe a → [Maybe a]
   enumFrom = maybe asList (fmap Just . enumFrom)
 instance (Finite a)
@@ -499,10 +499,16 @@ instance (Bounded a, Bounded b)
   maxBound = Right maxBound
 -- For `(Either a b)` where types `a` and `b` are enumerable,
 -- enumerate as the concatenation of the enumerations of `Left` then `Right` types.
+-- FIXME I am able to relax these constraints because I'm not using `asList` anymore
+-- FIXME e.g. `instance (U.Finite a, Enum a, Bounded a, Enum b, Bounded b)`
+-- FIXME but I have yet to think about if that is indeed better.
 instance (Finite a, Finite b)
        ⇒ Enum (Either a b) where
   toEnum   ∷ Int → Either a b
-  toEnum   = (asList !!)
+  toEnum   = liftA3 bool (Left . toEnum) (Right . toEnum . flip (-) (fromIntegral cardinality_a)) ((≤) cardinality_a . fromIntegral)
+    where
+      cardinality_a ∷ ℕ
+      cardinality_a = unTagged (U.cardinality ∷ Tagged a ℕ)
   fromEnum ∷ Either a b → Int
   fromEnum = either fromEnum ((+) (fromIntegral cardinality_a) . fromEnum)
     where
@@ -513,7 +519,8 @@ instance (Finite a, Finite b)
 instance (Finite a, Finite b)
        ⇒ Finite (Either a b) where
   asList ∷ [Either a b]
-  asList = toList asSet
+  asList = (Left  <$> asList)
+         ⋄ (Right <$> asList)
   asSet ∷ Set (Either a b)
   asSet  = asSet ⊎ asSet
 
