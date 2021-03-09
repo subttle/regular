@@ -102,7 +102,7 @@ reduce = lmap absurd . flip (Set.foldl rip) asSet
 rip ∷ ∀ q s . (Eq q, Ord s) ⇒ GNFA q s → q → GNFA q s
 rip (GNFA δ) q = GNFA δ₁
   where
-    qᵣ ∷ Either a q
+    qᵣ ∷ ∀ a . Either a q
     qᵣ = Right q
     δ₁ ∷ (Either Init q, Either Final q) → RegExp s
     δ₁ (q₁, q₂) | (q₁ == qᵣ) ∨ (q₂ == qᵣ) = zero -- We are ripping qᵣ out, so if qᵣ is an arg to δ₁, return Zero
