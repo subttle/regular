@@ -1242,6 +1242,19 @@ instance U.Universe Fin₂
 instance U.Finite   Fin₂
 instance Finite     Fin₂
 
+-- https://proofwiki.org/wiki/Modulo_Addition/Cayley_Table/Modulo_3
+instance Semigroup Fin₃ where
+  (<>) ∷ Fin₃ → Fin₃ → Fin₃
+  (<>) = toEnum ‥ (fromIntegral ‥ (flip mod 3 ‥ ((+) `on` Fin.toNatural)))
+instance Monoid Fin₃ where
+  mempty ∷ Fin₃
+  mempty = 0
+-- 0 +₃ 0 = 0
+-- 1 +₃ 2 = 0
+-- 2 +₃ 1 = 0
+instance Group Fin₃ where
+  invert ∷ Fin₃ → Fin₃
+  invert = fin₃ 0 2 1
 instance U.Universe Fin₃
 instance U.Finite   Fin₃
 instance Finite     Fin₃
