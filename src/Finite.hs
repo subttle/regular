@@ -3056,7 +3056,7 @@ quadrants = Equivalence ((==) `on` getQuadrant)
                          | otherwise       = Nothing
 
 -- TODO better name?
-graphComponents ∷ ∀ a . (Num a, Ord a) ⇒ Equivalence (a, a)
+graphComponents ∷ ∀ a . (Num a, Eq a) ⇒ Equivalence (a, a)
 graphComponents = contramap getComponents byCan
   where
     getComponents ∷ (a, a) → Can a a
