@@ -1242,6 +1242,7 @@ instance U.Universe Fin₂
 instance U.Finite   Fin₂
 instance Finite     Fin₂
 
+-- Addition modulo 3
 -- https://proofwiki.org/wiki/Modulo_Addition/Cayley_Table/Modulo_3
 instance Semigroup Fin₃ where
   (<>) ∷ Fin₃ → Fin₃ → Fin₃
