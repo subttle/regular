@@ -7,9 +7,10 @@ import           Data.Functor.Contravariant (Contravariant (..), Op (..))
 import           Data.List (genericDrop)
 import           Data.List.NonEmpty as NE (NonEmpty (..))
 import           Numeric.Natural.Unicode (ℕ)
+import           Common ((⋄))
 import           Finite (Finite (..), NotEmpty (..),
                  Fin₁, Fin₂, Fin₃, Fin₄, Fin₅, Fin₆, Fin₇, Fin₈, Fin₉, Fin₁₀, Fin₁₁, Fin₁₂, Fin₁₃, Fin₁₄, Fin₁₅,
-                 Card (..), Rank (..), Suit (..), Quadrant (..), Octant (..), Month (..), DNA (..), Alpha (..),
+                 Quadrant (..), Octant (..), Month (..), DNA (..), Alpha (..),
                  (:🎲),
                  (⚀), (⚁), (⚂), (⚃), (⚄), (⚅),
                  type (🀰),
@@ -27,18 +28,42 @@ import           Finite (Finite (..), NotEmpty (..),
                  (🁸), (🁹), (🁺), (🁻), (🁼), (🁽), (🁾),
                  (🁿), (🂀), (🂁), (🂂), (🂃), (🂄), (🂅),
                  (🂆), (🂇), (🂈), (🂉), (🂊), (🂋), (🂌),
-                 (🂍), (🂎), (🂏), (🂐), (🂑), (🂒), (🂓))
-import           Common ((⋄))
+                 (🂍), (🂎), (🂏), (🂐), (🂑), (🂒), (🂓),
+                 Card (..), Rank (..), Suit (..),
+                 (🂢), (🂲), (🃂), (🃒),
+                 (🂣), (🂳), (🃃), (🃓),
+                 (🂤), (🂴), (🃄), (🃔),
+                 (🂥), (🂵), (🃅), (🃕),
+                 (🂦), (🂶), (🃆), (🃖),
+                 (🂧), (🂷), (🃇), (🃗),
+                 (🂨), (🂸), (🃈), (🃘),
+                 (🂩), (🂹), (🃉), (🃙),
+                 (🂪), (🂺), (🃊), (🃚),
+                 (🂫), (🂻), (🃋), (🃛),
+                 (🂭), (🂽), (🃍), (🃝),
+                 (🂮), (🂾), (🃎), (🃞),
+                 (🂡), (🂱), (🃁), (🃑),
+                 Checker (..),
+                 (⛀), (⛁), (⛂), (⛃),
+                 Init (..), Final (..))
 
 -- TODO experimental type class for types which are finite and not empty
 class (NotEmpty a, Finite a) ⇒ NEF a where
   asNE ∷ NonEmpty a
   -- FIXME For convenience this can be defined but it is certainly not recommended
-  -- asNE = NE.fromList asList
+  -- FIXME `asNE = NE.fromList asList`
+  -- FIXME or something like:
+  -- FIMXE `asNE = wit :| genericDrop (1 ∷ ℕ) asList`
 
 instance NEF () where
   asNE ∷ NonEmpty ()
   asNE = () :| []
+
+instance NEF Init where
+  asNE = Init () :| []
+
+instance NEF Final where
+  asNE = Final () :| []
 
 instance NEF Bool where
   asNE ∷ NonEmpty Bool
@@ -84,6 +109,45 @@ instance NEF (🀰) where
                   , (🁔), (🁕), (🁖), (🁗), (🁘), (🁙), (🁚)
                   , (🁛), (🁜), (🁝), (🁞), (🁟), (🁠), (🁡)
                   ]
+instance NEF Checker where
+  asNE ∷ NonEmpty Checker
+  asNE = (⛀) :| [(⛁), (⛂), (⛃)]
+instance NEF Card where
+  asNE ∷ NonEmpty Card
+  asNE = (🂢) :| [      (🂲), (🃂), (🃒)
+                , (🂣), (🂳), (🃃), (🃓)
+                , (🂤), (🂴), (🃄), (🃔)
+                , (🂥), (🂵), (🃅), (🃕)
+                , (🂦), (🂶), (🃆), (🃖)
+                , (🂧), (🂷), (🃇), (🃗)
+                , (🂨), (🂸), (🃈), (🃘)
+                , (🂩), (🂹), (🃉), (🃙)
+                , (🂪), (🂺), (🃊), (🃚)
+                , (🂫), (🂻), (🃋), (🃛)
+                , (🂭), (🂽), (🃍), (🃝)
+                , (🂮), (🂾), (🃎), (🃞)
+                , (🂡), (🂱), (🃁), (🃑)
+                ]
+
+instance NEF Rank where
+  asNE ∷ NonEmpty Rank
+  asNE = Two :| [Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King, Ace]
+
+instance NEF Suit where
+  asNE ∷ NonEmpty Suit
+  asNE = Spade :| [Heart, Diamond, Club]
+
+instance NEF DNA where
+  asNE ∷ NonEmpty DNA
+  asNE = Adenine :| [Cytosine, Guanine, Thymine]
+
+instance NEF Alpha where
+  asNE ∷ NonEmpty Alpha
+  asNE = A :| [B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z]
+
+instance NEF Month where
+  asNE ∷ NonEmpty Month
+  asNE = January :| [February, March, April, May, June, July, August, September, October, November, December]
 
 instance NEF Fin₁ where
   asNE ∷ NonEmpty Fin₁
@@ -146,9 +210,11 @@ instance NEF Fin₁₅ where
   -- asNE = 0 :| [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
   asNE = fmap (getOp (contramap fromEnum (Op toEnum))) (asNE @ Fin₁₄) ⋄ pure 14
 
+-- >>> asNE @ (Maybe Void)
+-- Nothing :| []
 instance (Finite a) ⇒ NEF (Maybe a) where
   asNE ∷ NonEmpty (Maybe a)
-  asNE = Nothing :| asList
+  asNE = Nothing :| genericDrop (1 ∷ ℕ) asList
 
 {-
 -- FIXME
