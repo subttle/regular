@@ -1260,14 +1260,62 @@ instance U.Universe Fin₃
 instance U.Finite   Fin₃
 instance Finite     Fin₃
 
+-- Addition modulo 4
+-- https://proofwiki.org/wiki/Modulo_Addition/Cayley_Table/Modulo_4
+instance Semigroup Fin₄ where
+  (<>) ∷ Fin₄ → Fin₄ → Fin₄
+  (<>) = toEnum ‥ (fromIntegral ‥ (flip mod 4 ‥ ((+) `on` Fin.toNatural)))
+instance Monoid Fin₄ where
+  mempty ∷ Fin₄
+  mempty = 0
+-- 0 +₄ 0 = 0
+-- 1 +₄ 3 = 0
+-- 2 +₄ 2 = 0
+-- 3 +₄ 1 = 0
+instance Group Fin₄ where
+  invert ∷ Fin₄ → Fin₄
+  invert = fin₄ 0 3 2 1
 instance U.Universe Fin₄
 instance U.Finite   Fin₄
 instance Finite     Fin₄
 
+-- Addition modulo 5
+-- https://proofwiki.org/wiki/Modulo_Addition/Cayley_Table/Modulo_5
+instance Semigroup Fin₅ where
+  (<>) ∷ Fin₅ → Fin₅ → Fin₅
+  (<>) = toEnum ‥ (fromIntegral ‥ (flip mod 5 ‥ ((+) `on` Fin.toNatural)))
+instance Monoid Fin₅ where
+  mempty ∷ Fin₅
+  mempty = 0
+-- 0 +₅ 0 = 0
+-- 1 +₅ 4 = 0
+-- 2 +₅ 3 = 0
+-- 3 +₅ 2 = 0
+-- 4 +₅ 1 = 0
+instance Group Fin₅ where
+  invert ∷ Fin₅ → Fin₅
+  invert = fin₅ 0 4 3 2 1
 instance U.Universe Fin₅
 instance U.Finite   Fin₅
 instance Finite     Fin₅
 
+-- Addition modulo 6
+-- https://proofwiki.org/wiki/Modulo_Addition/Cayley_Table/Modulo_6
+instance Semigroup Fin₆ where
+  (<>) ∷ Fin₆ → Fin₆ → Fin₆
+  (<>) = toEnum ‥ (fromIntegral ‥ (flip mod 6 ‥ ((+) `on` Fin.toNatural)))
+instance Monoid Fin₆ where
+  mempty ∷ Fin₆
+  mempty = 0
+-- 0 +₆ 0 = 0
+-- 1 +₆ 5 = 0
+-- 2 +₆ 4 = 0
+-- 3 +₆ 3 = 0
+-- 4 +₆ 2 = 0
+-- 5 +₆ 1 = 0
+instance Group Fin₆ where
+  invert ∷ Fin₆ → Fin₆
+  invert = fin₆ 0 5 4 3 2 1
 instance U.Universe Fin₆
 instance U.Finite   Fin₆
 instance Finite     Fin₆
