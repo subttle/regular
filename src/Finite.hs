@@ -75,6 +75,12 @@ class NotEmpty a where
 instance NotEmpty () where
   wit  ∷ ()
   wit  = ()
+instance NotEmpty Init where
+  wit  ∷ Init
+  wit  = Init ()
+instance NotEmpty Final where
+  wit  ∷ Final
+  wit  = Final ()
 instance NotEmpty Bool where
   wit  ∷ Bool
   wit  = False
@@ -166,6 +172,9 @@ instance NotEmpty (🁢) where
 instance NotEmpty (🀰) where
   wit ∷ (🀰)
   wit = (🀱)
+instance NotEmpty Checker where
+  wit ∷ Checker
+  wit = (⛀)
 instance NotEmpty Month where
   wit ∷ Month
   wit = January
@@ -3144,10 +3153,22 @@ instance Fancy      Checker where
   named = const "Checker"
 instance Show Checker where
   show ∷ Checker → String
-  show (:⛀) = toColor (show' (:⛀)) (toColor' (:⛀))
-  show (:⛁) = toColor (show' (:⛁)) (toColor' (:⛁))
-  show (:⛂) = toColor (show' (:⛂)) (toColor' (:⛂))
-  show (:⛃) = toColor (show' (:⛃)) (toColor' (:⛃))
+  show = show₁
+    where
+      show₁ ∷ Checker → String
+      show₁ = show'
+      show₂ ∷ Checker → String
+      show₂ c = toColor (show' c) (toColor' c)
+
+-- unicode aliases for convenience
+(⛀) ∷ Checker
+(⛀) = (:⛀)
+(⛁) ∷ Checker
+(⛁) = (:⛁)
+(⛂) ∷ Checker
+(⛂) = (:⛂)
+(⛃) ∷ Checker
+(⛃) = (:⛃)
 
 data Suit where
   Spade   ∷ Suit
