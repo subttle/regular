@@ -46,7 +46,7 @@ import           Data.Wedge (Wedge (..), wedge, toWedge)
 import           GHC.Enum (boundedEnumFrom)
 import           Numeric.Natural.Unicode (ℕ)
 import           Prelude.Unicode (ℤ)
-import           Common (DisplayColor (..), HasDisplayColor (..), Fancy (..), Set' (..), charToString, choose', comparing', elemIndex', equating', factorial, filter', freeMonoid, freeSemigroup, fromEnum', implies, impossible, lefts', length', partitions', quoteWith, replicateM', rights', toColor, toThese, (×), (‥), (⊎), (⋄))
+import           Common (DisplayColor (..), HasDisplayColor (..), Fancy (..), Set' (..), bell, charToString, choose', comparing', elemIndex', equating', factorial, filter', freeMonoid, freeSemigroup, fromEnum', implies, impossible, lefts', length', partitions', quoteWith, replicateM', rights', toColor, toThese, (×), (‥), (⊎), (⋄))
 
 
 -- An imperfect, somewhat practical, representation of a Finite type constraint
@@ -941,11 +941,15 @@ type Fin15 = Fin₁₅
 type Fin16 = Fin₁₆
 
 instance U.Universe Fin₁
-instance U.Finite   Fin₁
+instance U.Finite   Fin₁ where
+  cardinality ∷ Tagged Fin₁ ℕ
+  cardinality = Tagged 1
 instance Finite     Fin₁
 
 instance U.Universe Fin₂
-instance U.Finite   Fin₂
+instance U.Finite   Fin₂ where
+  cardinality ∷ Tagged Fin₂ ℕ
+  cardinality = Tagged 2
 instance Finite     Fin₂
 
 -- Addition modulo 3
@@ -963,7 +967,9 @@ instance Group Fin₃ where
   invert ∷ Fin₃ → Fin₃
   invert = fin₃ 0 2 1
 instance U.Universe Fin₃
-instance U.Finite   Fin₃
+instance U.Finite   Fin₃ where
+  cardinality ∷ Tagged Fin₃ ℕ
+  cardinality = Tagged 3
 instance Finite     Fin₃
 
 -- Addition modulo 4
@@ -982,7 +988,9 @@ instance Group Fin₄ where
   invert ∷ Fin₄ → Fin₄
   invert = fin₄ 0 3 2 1
 instance U.Universe Fin₄
-instance U.Finite   Fin₄
+instance U.Finite   Fin₄ where
+  cardinality ∷ Tagged Fin₄ ℕ
+  cardinality = Tagged 4
 instance Finite     Fin₄
 
 -- Addition modulo 5
@@ -1002,7 +1010,9 @@ instance Group Fin₅ where
   invert ∷ Fin₅ → Fin₅
   invert = fin₅ 0 4 3 2 1
 instance U.Universe Fin₅
-instance U.Finite   Fin₅
+instance U.Finite   Fin₅ where
+  cardinality ∷ Tagged Fin₅ ℕ
+  cardinality = Tagged 5
 instance Finite     Fin₅
 
 -- Addition modulo 6
@@ -1023,11 +1033,15 @@ instance Group Fin₆ where
   invert ∷ Fin₆ → Fin₆
   invert = fin₆ 0 5 4 3 2 1
 instance U.Universe Fin₆
-instance U.Finite   Fin₆
+instance U.Finite   Fin₆ where
+  cardinality ∷ Tagged Fin₆ ℕ
+  cardinality = Tagged 6
 instance Finite     Fin₆
 
 instance U.Universe Fin₇
-instance U.Finite   Fin₇
+instance U.Finite   Fin₇ where
+  cardinality ∷ Tagged Fin₇ ℕ
+  cardinality = Tagged 7
 instance Finite     Fin₇
 
 -- Addition modulo 8
@@ -1041,39 +1055,57 @@ instance Group Fin₈ where
   invert ∷ Fin₈ → Fin₈
   invert = fin₈ 0 7 6 5 4 3 2 1
 instance U.Universe Fin₈
-instance U.Finite   Fin₈
+instance U.Finite   Fin₈ where
+  cardinality ∷ Tagged Fin₈ ℕ
+  cardinality = Tagged 8
 instance Finite     Fin₈
 
 instance U.Universe Fin₉
-instance U.Finite   Fin₉
+instance U.Finite   Fin₉ where
+  cardinality ∷ Tagged Fin₉ ℕ
+  cardinality = Tagged 9
 instance Finite     Fin₉
 
 instance U.Universe Fin₁₀
-instance U.Finite   Fin₁₀
+instance U.Finite   Fin₁₀ where
+  cardinality ∷ Tagged Fin₁₀ ℕ
+  cardinality = Tagged 10
 instance Finite     Fin₁₀
 
 instance U.Universe Fin₁₁
-instance U.Finite   Fin₁₁
+instance U.Finite   Fin₁₁ where
+  cardinality ∷ Tagged Fin₁₁ ℕ
+  cardinality = Tagged 11
 instance Finite     Fin₁₁
 
 instance U.Universe Fin₁₂
-instance U.Finite   Fin₁₂
+instance U.Finite   Fin₁₂ where
+  cardinality ∷ Tagged Fin₁₂ ℕ
+  cardinality = Tagged 12
 instance Finite     Fin₁₂
 
 instance U.Universe Fin₁₃
-instance U.Finite   Fin₁₃
+instance U.Finite   Fin₁₃ where
+  cardinality ∷ Tagged Fin₁₃ ℕ
+  cardinality = Tagged 13
 instance Finite     Fin₁₃
 
 instance U.Universe Fin₁₄
-instance U.Finite   Fin₁₄
+instance U.Finite   Fin₁₄ where
+  cardinality ∷ Tagged Fin₁₄ ℕ
+  cardinality = Tagged 14
 instance Finite     Fin₁₄
 
 instance U.Universe Fin₁₅
-instance U.Finite   Fin₁₅
+instance U.Finite   Fin₁₅ where
+  cardinality ∷ Tagged Fin₁₅ ℕ
+  cardinality = Tagged 15
 instance Finite     Fin₁₅
 
 instance U.Universe Fin₁₆
-instance U.Finite   Fin₁₆
+instance U.Finite   Fin₁₆ where
+  cardinality ∷ Tagged Fin₁₆ ℕ
+  cardinality = Tagged 16
 instance Finite     Fin₁₆
 
 -- TODO deleteme
@@ -1695,7 +1727,9 @@ instance (Finite a)
 instance (Finite a)
        ⇒ U.Universe (Equivalence a)
 instance (Finite a)
-       ⇒ U.Finite (Equivalence a)
+       ⇒ U.Finite (Equivalence a) where
+  cardinality ∷ Tagged (Equivalence a) ℕ
+  cardinality = fmap bell (retag (U.cardinality ∷ Tagged a ℕ))
 instance (Finite a)
        ⇒ Finite (Equivalence a) where
   asList ∷ [Equivalence a]
@@ -1730,7 +1764,9 @@ data Alpha where
   Z ∷ Alpha
   deriving (Eq, Ord, Enum, Bounded, Show, Read)
 instance U.Universe Alpha
-instance U.Finite   Alpha
+instance U.Finite   Alpha where
+  cardinality ∷ Tagged Alpha ℕ
+  cardinality = Tagged 26
 instance Finite     Alpha
 instance Fancy      Alpha where
   unicode ∷ Alpha → Char
@@ -1775,8 +1811,10 @@ instance Show DNA where
   show Guanine  = "G"
   show Thymine  = "T"
 instance U.Universe DNA
-instance U.Finite   DNA
-instance Finite DNA
+instance U.Finite   DNA where
+  cardinality ∷ Tagged DNA ℕ
+  cardinality = Tagged 4
+instance Finite     DNA
 
 
 newtype Init = Init () deriving (Eq, Ord, Bounded, Enum)
@@ -1850,7 +1888,9 @@ instance Show (:🎲) where
   show = show'
 
 instance U.Universe (:🎲)
-instance U.Finite   (:🎲)
+instance U.Finite   (:🎲) where
+  cardinality ∷ Tagged (:🎲) ℕ
+  cardinality = Tagged 6
 instance Finite     (:🎲)
 
 instance Fancy (:🎲) where
@@ -1966,7 +2006,9 @@ data (🀰) where
   deriving (Eq, Ord, Bounded, Enum)
 
 instance U.Universe (🀰)
-instance U.Finite   (🀰)
+instance U.Finite   (🀰) where
+  cardinality ∷ Tagged (🀰) ℕ
+  cardinality = Tagged 49
 instance Finite     (🀰)
 
 instance Show (🀰) where
@@ -2350,7 +2392,9 @@ data (🁢) where
   deriving (Eq, Ord, Bounded, Enum)
 
 instance U.Universe (🁢)
-instance U.Finite   (🁢)
+instance U.Finite   (🁢) where
+  cardinality ∷ Tagged (🁢) ℕ
+  cardinality = Tagged 49
 instance Finite     (🁢)
 
 instance Show (🁢) where
@@ -2831,7 +2875,9 @@ data Month where
   deriving (Eq, Enum, Ord, Bounded)
 
 instance U.Universe Month
-instance U.Finite   Month
+instance U.Finite   Month where
+  cardinality ∷ Tagged Month ℕ
+  cardinality = Tagged 12
 instance Finite     Month
 
 -- https://en.wikipedia.org/wiki/Quadrant_(plane_geometry)
@@ -2843,7 +2889,9 @@ data Quadrant where
   deriving (Eq, Enum, Ord, Bounded)
 
 instance U.Universe Quadrant
-instance U.Finite   Quadrant
+instance U.Finite   Quadrant where
+  cardinality ∷ Tagged Quadrant ℕ
+  cardinality = Tagged 4
 instance Finite     Quadrant
 instance Fancy      Quadrant where
   unicode  ∷ Quadrant → Char
@@ -2915,7 +2963,9 @@ data Octant where
   deriving (Eq, Enum, Ord, Bounded)
 
 instance U.Universe Octant
-instance U.Finite   Octant
+instance U.Finite   Octant where
+  cardinality ∷ Tagged Octant ℕ
+  cardinality = Tagged 8
 instance Finite     Octant
 instance Fancy      Octant where
   unicode  ∷ Octant → Char
@@ -2973,7 +3023,9 @@ data Checker where
   (:⛃) ∷ Checker
   deriving (Eq, Enum, Ord, Bounded)
 instance U.Universe Checker
-instance U.Finite   Checker
+instance U.Finite   Checker where
+  cardinality ∷ Tagged Checker ℕ
+  cardinality = Tagged 4
 instance Finite     Checker
 instance Fancy      Checker where
   unicode ∷ Checker → Char
@@ -3015,7 +3067,9 @@ data Suit where
   deriving (Eq, Enum, Ord, Bounded)
 
 instance U.Universe Suit
-instance U.Finite   Suit
+instance U.Finite   Suit where
+  cardinality ∷ Tagged Suit ℕ
+  cardinality = Tagged 4
 instance Finite     Suit
 
 instance Fancy Suit where
@@ -3096,7 +3150,9 @@ instance Show Rank where
   show = show'
 
 instance U.Universe Rank
-instance U.Finite   Rank
+instance U.Finite   Rank where
+  cardinality ∷ Tagged Rank ℕ
+  cardinality = Tagged 13
 instance Finite     Rank
 
 data Card where
@@ -3112,7 +3168,9 @@ instance Enum Card where
   enumFrom = boundedEnumFrom
 
 instance U.Universe Card
-instance U.Finite   Card
+instance U.Finite   Card where
+  cardinality ∷ Tagged Card ℕ
+  cardinality = Tagged 52
 instance Finite     Card
 
 instance Fancy Card where
