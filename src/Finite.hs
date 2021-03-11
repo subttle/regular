@@ -227,7 +227,7 @@ instance (Finite a, Finite b)
   asList ∷ [Either a b]
   asList = (Left  <$> asList)
          ⋄ (Right <$> asList)
-  asSet ∷ Set (Either a b)
+  asSet  ∷ Set (Either a b)
   asSet  = asSet ⊎ asSet
 
 instance (Bounded a, Bounded b)
