@@ -585,6 +585,13 @@ factorials = fix ((⊲) 1 . NE.zipWith (*) (enumFrom' 1))
 factorial ∷ ℕ → ℕ
 factorial = product . enumFromTo 1
 
+-- "Bell or exponential numbers: number of ways to partition a set of n labeled elements."
+-- https://oeis.org/A000110
+-- 1, 1, 2, 5, 15, 52, 203, 877, 4140, 21147, 115975, 678570, 4213597, 27644437, 190899322, 1382958545, 10480142147, 82864869804, 682076806159, 5832742205057, 51724158235372, 474869816156751, 4506715738447323, 44152005855084346, 445958869294805289, 4638590332229999353, 49631246523618756274, ...
+-- TODO this works but might want to rewrite
+bells ∷ NonEmpty ℕ
+bells = fmap bell naturals
+
 -- Bell number
 -- Count the possible partitions of a set of the given cardinality
 -- bell ∷ ℕ → ℕ
