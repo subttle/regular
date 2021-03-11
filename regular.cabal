@@ -33,6 +33,7 @@ library
                      , IntBase
                      , NatBase
                      , Impossible
+                     , NotEmpty
                      , NEF
   build-depends:       base >= 4.8 && < 5
                      , base-unicode-symbols

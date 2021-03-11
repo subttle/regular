@@ -8,7 +8,7 @@ import           Data.List (genericDrop)
 import           Data.List.NonEmpty as NE (NonEmpty (..))
 import           Numeric.Natural.Unicode (ℕ)
 import           Common ((⋄))
-import           Finite (Finite (..), NotEmpty (..),
+import           Finite (Finite (..),
                  Fin₁, Fin₂, Fin₃, Fin₄, Fin₅, Fin₆, Fin₇, Fin₈, Fin₉, Fin₁₀, Fin₁₁, Fin₁₂, Fin₁₃, Fin₁₄, Fin₁₅,
                  Quadrant (..), Octant (..), Month (..), DNA (..), Alpha (..),
                  (:🎲),
@@ -46,6 +46,7 @@ import           Finite (Finite (..), NotEmpty (..),
                  Checker (..),
                  (⛀), (⛁), (⛂), (⛃),
                  Init (..), Final (..))
+import           NotEmpty (NotEmpty)
 
 -- TODO experimental type class for types which are finite and not empty
 class (NotEmpty a, Finite a) ⇒ NEF a where
