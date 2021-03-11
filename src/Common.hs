@@ -692,6 +692,10 @@ rotate n as = getOp (contramap (`mod` genericLength as) (Op (genericDrop ⋄ gen
 rotations ∷ [a] → [[a]]
 rotations as = fmap (\n → rotate n as) (skeleton as)
 
+-- A version of `toEnum` which returns a Natural rather than an `Int`
+toEnum'   ∷ (Enum a) ⇒ ℕ → a
+toEnum'   = toEnum       . fromIntegral
+
 -- A version of `fromEnum` which returns a Natural rather than an `Int`
 fromEnum' ∷ (Enum a) ⇒ a → ℕ
 fromEnum' = fromIntegral . fromEnum
