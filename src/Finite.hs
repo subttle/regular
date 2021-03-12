@@ -42,7 +42,7 @@ import           Data.These.Combinators (catThese)
 import qualified Data.Type.Nat as Nat
 import qualified Data.Universe as U
 import           Data.Void (Void, absurd)
-import           Data.Wedge (Wedge (..), wedge, toWedge)
+import           Data.Wedge (Wedge (..), wedge, toWedge, fromWedge)
 import           GHC.Enum (boundedEnumFrom)
 import           Numeric.Natural.Unicode (ℕ)
 import           Prelude.Unicode (ℤ)
@@ -101,7 +101,7 @@ class (Finite g) ⇒ Γ automaton g | automaton → g where
 instance Finite () where
   asList ∷ [()]
   asList = [()]
-  asSet ∷ Set ()
+  asSet  ∷ Set ()
   asSet  = Set.singleton ()
 instance Finite Bool where
   asList ∷ [Bool]
@@ -263,7 +263,7 @@ instance (Finite a, Finite b)
   asSet ∷ Set (These a b)
   asSet = Set.map toThese (products ⊎ sums)
     where
-      products ∷ Set (a, b)
+      products ∷ Set (a, b) 
       products = asSet
       sums ∷ Set (Either a b)
       sums = asSet
@@ -279,12 +279,9 @@ instance (Bounded a, Bounded b)
 instance (Finite a, Finite b)
        ⇒ Enum (Wedge a b) where
   toEnum   ∷ Int → Wedge a b
-  toEnum = toWedge . toEnum
+  toEnum   = toWedge . toEnum
   fromEnum ∷ Wedge a b → Int
-  fromEnum = wedge 0 (succ . fromEnum) (succ . (+) (fromIntegral cardinality_a) . fromEnum)
-    where
-      cardinality_a ∷ ℕ
-      cardinality_a = unTagged (U.cardinality ∷ Tagged a ℕ)
+  fromEnum = fromEnum . fromWedge
   enumFrom ∷ Wedge a b → [Wedge a b]
   enumFrom = boundedEnumFrom
 instance (Finite a, Finite b)
