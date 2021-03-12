@@ -35,7 +35,7 @@ import qualified Data.List.NonEmpty as NE
 import           Data.Maybe (fromJust, maybe)
 import           Data.Ord.Unicode ((≤))
 import           Data.Ord (Down (..))
-import           Data.Smash (Smash (..), smash, toSmash)
+import           Data.Smash (Smash (..), smash, toSmash, fromSmash)
 import           Data.Tagged (Tagged (..), retag)
 import           Data.These (These (..), these)
 import           Data.These.Combinators (catThese)
@@ -349,11 +349,11 @@ instance (Bounded a, Bounded b)
 instance (Finite a, Finite b)
        ⇒ Enum (Smash a b) where
   toEnum   ∷ Int → Smash a b
-  toEnum  0 = Nada
-  toEnum  i = uncurry Smash (toEnum (pred i))
+  toEnum   = toSmash . toEnum
   fromEnum ∷ Smash a b → Int
   -- fromEnum = smash 0 (\a b → succ (fromEnum (a, b)))
-  fromEnum = smash 0 (succ ‥ (fromEnum ‥ (,)))
+  -- fromEnum = smash 0 (succ ‥ (fromEnum ‥ (,)))
+  fromEnum = fromEnum . fromSmash
   enumFrom ∷ Smash a b → [Smash a b]
   enumFrom = boundedEnumFrom
 instance (Finite a, Finite b)
