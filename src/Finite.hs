@@ -263,7 +263,7 @@ instance (Finite a, Finite b)
   asSet ∷ Set (These a b)
   asSet = Set.map toThese (products ⊎ sums)
     where
-      products ∷ Set (a, b) 
+      products ∷ Set (a, b)
       products = asSet
       sums ∷ Set (Either a b)
       sums = asSet
@@ -273,9 +273,9 @@ instance (Finite a, Finite b)
 instance (Bounded a, Bounded b)
        ⇒ Bounded (Wedge a b) where
   minBound ∷ Wedge a b
-  minBound = Nowhere
+  minBound = toWedge minBound -- Nowhere
   maxBound ∷ Wedge a b
-  maxBound = There maxBound
+  maxBound = toWedge maxBound -- There maxBound
 instance (Finite a, Finite b)
        ⇒ Enum (Wedge a b) where
   toEnum   ∷ Int → Wedge a b
@@ -343,9 +343,9 @@ instance (Finite a, Finite b)
 instance (Bounded a, Bounded b)
        ⇒ Bounded (Smash a b) where
   minBound ∷ Smash a b
-  minBound = Nada
+  minBound = toSmash minBound -- Nada
   maxBound ∷ Smash a b
-  maxBound = Smash maxBound maxBound
+  maxBound = toSmash maxBound -- Smash maxBound maxBound
 instance (Finite a, Finite b)
        ⇒ Enum (Smash a b) where
   toEnum   ∷ Int → Smash a b
