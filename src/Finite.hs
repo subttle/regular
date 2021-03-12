@@ -263,7 +263,7 @@ instance (Finite a, Finite b)
   asSet ∷ Set (These a b)
   asSet = Set.map toThese (products ⊎ sums)
     where
-      products ∷ Set (a, b) 
+      products ∷ Set (a, b)
       products = asSet
       sums ∷ Set (Either a b)
       sums = asSet
@@ -279,7 +279,7 @@ instance (Bounded a, Bounded b)
 instance (Finite a, Finite b)
        ⇒ Enum (Wedge a b) where
   toEnum   ∷ Int → Wedge a b
-  toEnum   = (asList !!)
+  toEnum = toWedge . toEnum
   fromEnum ∷ Wedge a b → Int
   fromEnum = wedge 0 (succ . fromEnum) (succ . (+) (fromIntegral cardinality_a) . fromEnum)
     where
@@ -352,7 +352,6 @@ instance (Bounded a, Bounded b)
 instance (Finite a, Finite b)
        ⇒ Enum (Smash a b) where
   toEnum   ∷ Int → Smash a b
-  -- toEnum   = (asList !!)
   toEnum  0 = Nada
   toEnum  i = uncurry Smash (toEnum (pred i))
   fromEnum ∷ Smash a b → Int
