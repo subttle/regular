@@ -352,7 +352,9 @@ instance (Bounded a, Bounded b)
 instance (Finite a, Finite b)
        ⇒ Enum (Smash a b) where
   toEnum   ∷ Int → Smash a b
-  toEnum   = (asList !!)
+  -- toEnum   = (asList !!)
+  toEnum  0 = Nada
+  toEnum  i = uncurry Smash (toEnum (pred i))
   fromEnum ∷ Smash a b → Int
   -- fromEnum = smash 0 (\a b → succ (fromEnum (a, b)))
   fromEnum = smash 0 (succ ‥ (fromEnum ‥ (,)))
