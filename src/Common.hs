@@ -309,6 +309,12 @@ toThese   = either (uncurry These) (either This That)
 fromThese ∷ These a b                  → Either (a, b) (Either a b)
 fromThese = these (Right . Left) (Right . Right) (Left ‥ (,))
 
+toCan ∷ Maybe (These a b) → Can a b
+toCan = maybe Non (these One Eno Two)
+
+fromCan ∷ Can a b → Maybe (These a b)
+fromCan = can Nothing (Just . This) (Just . That) (Just ‥ These)
+
 -- Equivalence ((==) `on` (not . (==) GT))
 lteq ∷ Equivalence Ordering
 lteq = equating' (≠ GT)
