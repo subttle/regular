@@ -4,6 +4,7 @@
 :!cls
 :!clear
 import           Data.Can
+import           Data.Function (on, (&))
 import           Data.Functor.Contravariant
 import           Data.Functor.Contravariant.Divisible
 import qualified Data.List as List
