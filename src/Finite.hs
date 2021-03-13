@@ -46,7 +46,7 @@ import           Data.Wedge (Wedge (..), wedge, toWedge, fromWedge)
 import           GHC.Enum (boundedEnumFrom)
 import           Numeric.Natural.Unicode (ℕ)
 import           Prelude.Unicode (ℤ)
-import           Common (DisplayColor (..), HasDisplayColor (..), Fancy (..), Set' (..), bell, charToString, choose', comparing', elemIndex', equating', factorial, filter', freeMonoid, freeSemigroup, fromCan, fromEnum', implies, impossible, lefts', length', partitions', quoteWith, replicateM', rights', toColor, toCan, toThese, (×), (‥), (⊎), (⋄))
+import           Common (DisplayColor (..), HasDisplayColor (..), Fancy (..), Set' (..), bell, charToString, choose', comparing', elemIndex', equating', factorial, filter', freeMonoid, freeSemigroup, fromCan, fromEnum', implies, impossible, lefts', length', partitions', quoteWith, replicateM', rights', toColor, toCan, toEnum', toThese, (×), (‥), (⊎), (⋄))
 
 
 -- An imperfect, somewhat practical, representation of a Finite type constraint
@@ -942,7 +942,7 @@ instance Finite     Fin₂
 -- https://proofwiki.org/wiki/Modulo_Addition/Cayley_Table/Modulo_3
 instance Semigroup Fin₃ where
   (<>) ∷ Fin₃ → Fin₃ → Fin₃
-  (<>) = toEnum ‥ (fromIntegral ‥ (flip mod 3 ‥ ((+) `on` Fin.toNatural)))
+  (<>) = toEnum' ‥ (flip mod 3 ‥ ((+) `on` Fin.toNatural))
 instance Monoid Fin₃ where
   mempty ∷ Fin₃
   mempty = 0
@@ -962,7 +962,7 @@ instance Finite     Fin₃
 -- https://proofwiki.org/wiki/Modulo_Addition/Cayley_Table/Modulo_4
 instance Semigroup Fin₄ where
   (<>) ∷ Fin₄ → Fin₄ → Fin₄
-  (<>) = toEnum ‥ (fromIntegral ‥ (flip mod 4 ‥ ((+) `on` Fin.toNatural)))
+  (<>) = toEnum' ‥ (flip mod 4 ‥ ((+) `on` Fin.toNatural))
 instance Monoid Fin₄ where
   mempty ∷ Fin₄
   mempty = 0
@@ -983,7 +983,7 @@ instance Finite     Fin₄
 -- https://proofwiki.org/wiki/Modulo_Addition/Cayley_Table/Modulo_5
 instance Semigroup Fin₅ where
   (<>) ∷ Fin₅ → Fin₅ → Fin₅
-  (<>) = toEnum ‥ (fromIntegral ‥ (flip mod 5 ‥ ((+) `on` Fin.toNatural)))
+  (<>) = toEnum' ‥ (flip mod 5 ‥ ((+) `on` Fin.toNatural))
 instance Monoid Fin₅ where
   mempty ∷ Fin₅
   mempty = 0
@@ -1005,7 +1005,7 @@ instance Finite     Fin₅
 -- https://proofwiki.org/wiki/Modulo_Addition/Cayley_Table/Modulo_6
 instance Semigroup Fin₆ where
   (<>) ∷ Fin₆ → Fin₆ → Fin₆
-  (<>) = toEnum ‥ (fromIntegral ‥ (flip mod 6 ‥ ((+) `on` Fin.toNatural)))
+  (<>) = toEnum' ‥ (flip mod 6 ‥ ((+) `on` Fin.toNatural))
 instance Monoid Fin₆ where
   mempty ∷ Fin₆
   mempty = 0
@@ -1033,7 +1033,7 @@ instance Finite     Fin₇
 -- Addition modulo 8
 instance Semigroup Fin₈ where
   (<>) ∷ Fin₈ → Fin₈ → Fin₈
-  (<>) = toEnum ‥ (fromIntegral ‥ (flip mod 8 ‥ ((+) `on` Fin.toNatural)))
+  (<>) = toEnum' ‥ (flip mod 8 ‥ ((+) `on` Fin.toNatural))
 instance Monoid Fin₈ where
   mempty ∷ Fin₈
   mempty = 0
