@@ -1014,6 +1014,34 @@ instance ContraSmash Comparison where
       (⪥) (Smash b₁ c₁) (Smash b₂ c₂) = (b₁ ⪋ b₂) ⋄ (c₁ ⪌ c₂)
 -}
 
+-- Another experimental class
+class (Contravariant f) ⇒ ContraMaybe f where
+  contramaybe ∷ (a → Maybe b) → f b → f a
+contramaybed ∷ (ContraMaybe f) ⇒ f a → f (Maybe a)
+contramaybed = contramaybe id
+contramaybedJust ∷ (ContraMaybe f) ⇒ f a → f a
+contramaybedJust = contramaybe Just
+instance (Monoid m) ⇒ ContraMaybe (Op m) where
+  contramaybe ∷ (a → Maybe b) → Op m b → Op m a
+  contramaybe h = (>$<) h . Op . maybe mempty . getOp
+instance ContraMaybe Equivalence where
+  contramaybe ∷ ∀ a b . (a → Maybe b) → Equivalence b → Equivalence a
+  contramaybe h (Equivalence (≣)) = h >$< Equivalence (≡)
+    where
+      (≡) ∷ Maybe b → Maybe b → Bool
+      (≡) Nothing   Nothing   = True
+      (≡) (Just b₁) (Just b₂) = b₁ ≣ b₂
+      (≡) _         _         = False
+instance ContraMaybe Comparison where
+  contramaybe ∷ ∀ a b . (a → Maybe b) → Comparison b → Comparison a
+  contramaybe h (Comparison cmp) = h >$< Comparison (⪥)
+    where
+      (⪥) ∷ Maybe b → Maybe b → Ordering
+      (⪥) Nothing   (Just _)  = LT
+      (⪥) Nothing   Nothing   = EQ
+      (⪥) (Just _)  Nothing   = GT
+      (⪥) (Just b₁) (Just b₂) = b₁ `cmp` b₂
+
 -- Partial Equivalence Relation
 newtype PER a = PER { getPER ∷ a → a → Maybe Bool }
 newtype POR a = POR { getPOR ∷ a → a → Maybe Ordering }
