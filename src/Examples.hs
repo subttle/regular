@@ -1,3 +1,4 @@
+{-# LANGUAGE ExplicitNamespaces #-}
 -- Unfortunately, using Fin types breaks the warnings for incomplete patterns at this time
 {-# OPTIONS_GHC -fno-warn-incomplete-patterns #-}
 
@@ -17,7 +18,7 @@ import qualified EFA
 -- import qualified GFA
 import qualified RegExp as RE
 import           Common (toColor', (≰), equating')
-import           Finite (Finite (..), Card(..), Suit(..), (:🎲), DNA (..), Alpha (..), Fin₂, Fin₃, Fin₄, Fin₅, Fin₆, Fin₇, Fin₈, Fin₉, Fin₁₀, fin₂, rotate90)
+import           Finite (Finite (..), Card(..), Suit(..), (:🎲), DNA (..), Alpha (..), Fin₂, Fin₃, Fin₄, Fin₅, Fin₆, Fin₇, Fin₈, Fin₉, Fin₁₀, fin₂, rotate90, valBottom, valTop, type (🁢))
 
 -- A DFA which accepts all binary strings ending in "1"
 endsWith1 ∷ DFA Bool Fin₂
@@ -649,3 +650,13 @@ byRotation = equating' rotate90
 -- >>> getPredicate refl  byFlipped
 -- False
 -}
+
+-- Group the dominoes as the 28 unique pieces in the set (group the duplicates formed by 180 degree flipping)
+-- [[🁣],[🁤,🁪],[🁥,🁱],[🁦,🁸],[🁧,🁿],[🁨,🂆],[🁩,🂍],[🁫],[🁬,🁲],[🁭,🁹],[🁮,🂀],[🁯,🂇],[🁰,🂎],[🁳],[🁴,🁺],[🁵,🂁],[🁶,🂈],[🁷,🂏],[🁻],[🁼,🂂],[🁽,🂉],[🁾,🂐],[🂃],[🂄,🂊],[🂅,🂑],[🂋],[🂌,🂒],[🂓]]
+byPiece ∷ Equivalence (🁢)
+byPiece = Equivalence (≡)
+  where
+    (≡) ∷ (🁢) → (🁢) → Bool
+    (≡) d₁ d₂ = (==)            d₁             d₂
+              ∨ (==) (valTop    d₁) (valBottom d₂)
+              ∧ (==) (valBottom d₁) (valTop    d₂)
