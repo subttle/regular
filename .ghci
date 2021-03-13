@@ -3,10 +3,16 @@
 :set prompt-cont "\x03BB| "
 :!cls
 :!clear
-import Numeric.Natural
-import Data.Functor.Contravariant
-import Data.Functor.Contravariant.Divisible
+import           Data.Can
+import           Data.Functor.Contravariant
+import           Data.Functor.Contravariant.Divisible
 import qualified Data.List as List
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Set as Set
-import Data.Traversable.TreeLike
+import           Data.Smash
+import           Data.Traversable.TreeLike
+import           Data.These
+import qualified Data.Universe as U
+import           Data.Void
+import           Data.Wedge
+import           Numeric.Natural
