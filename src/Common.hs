@@ -303,11 +303,11 @@ freeSemigroup ∷ [a] → [[a]]
 freeSemigroup = freeMonoidFrom 1
 
 -- FIXME change name to avoid conflict with `Data.These.toThese`
-toThese   ∷ Either (a, b) (Either a b) → These a b
-toThese   = either (uncurry These) (either This That)
+toThese   ∷ Either (Either a b) (a, b) → These a b
+toThese   = either (either This That) (uncurry These)
 
-fromThese ∷ These a b                  → Either (a, b) (Either a b)
-fromThese = these (Right . Left) (Right . Right) (Left ‥ (,))
+fromThese ∷ These a b                  → Either (Either a b) (a, b)
+fromThese = these (Left . Left) (Left . Right) (Right ‥ (,))
 
 toCan ∷ Maybe (These a b) → Can a b
 toCan = maybe Non (these One Eno Two)
