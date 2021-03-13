@@ -1315,6 +1315,14 @@ byShape ∷ (Finite a) ⇒ Equivalence (Equivalence a)
 byShape = equating' shape
 
 -- TODO consider moving to src/Common.hs
+byMaybe ∷ Equivalence (Maybe a)
+byMaybe = Equivalence (≡)
+  where
+    (≡) ∷ Maybe a → Maybe a → Bool
+    (≡) Nothing  Nothing  = True
+    (≡) (Just _) (Just _) = True
+    (≡) _         _       = False
+
 byCan ∷ Equivalence (Can a b)
 byCan = Equivalence (≡)
   where
