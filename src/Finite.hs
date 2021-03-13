@@ -46,7 +46,7 @@ import           Data.Wedge (Wedge (..), wedge, toWedge, fromWedge)
 import           GHC.Enum (boundedEnumFrom)
 import           Numeric.Natural.Unicode (ℕ)
 import           Prelude.Unicode (ℤ)
-import           Common (DisplayColor (..), HasDisplayColor (..), Fancy (..), Set' (..), bell, charToString, choose', comparing', elemIndex', equating', factorial, filter', freeMonoid, freeSemigroup, fromEnum', implies, impossible, lefts', length', partitions', quoteWith, replicateM', rights', toColor, toThese, (×), (‥), (⊎), (⋄))
+import           Common (DisplayColor (..), HasDisplayColor (..), Fancy (..), Set' (..), bell, charToString, choose', comparing', elemIndex', equating', factorial, filter', freeMonoid, freeSemigroup, fromCan, fromEnum', implies, impossible, lefts', length', partitions', quoteWith, replicateM', rights', toColor, toCan, toThese, (×), (‥), (⊎), (⋄))
 
 
 -- An imperfect, somewhat practical, representation of a Finite type constraint
@@ -302,20 +302,15 @@ instance (Finite a, Finite b)
 instance (Bounded a, Bounded b)
        ⇒ Bounded (Can a b) where
   minBound ∷ Can a b
-  minBound = C.Non
+  minBound = toCan minBound -- Non
   maxBound ∷ Can a b
-  maxBound = C.Two maxBound maxBound
+  maxBound = toCan maxBound -- Two maxBound maxBound
 instance (Finite a, Finite b)
        ⇒ Enum (Can a b) where
   toEnum   ∷ Int → Can a b
-  toEnum   = (asList !!)
+  toEnum   = toCan . toEnum
   fromEnum ∷ Can a b → Int
-  fromEnum = can 0 (succ . fromEnum) ((+) (fromIntegral (succ cardinality_a)) . fromEnum) ((+) (((+)`on` fromIntegral) (succ cardinality_a) cardinality_b) ‥ (fromEnum ‥ (,)))
-    where
-      cardinality_a ∷ ℕ
-      cardinality_a = unTagged (U.cardinality ∷ Tagged a ℕ)
-      cardinality_b ∷ ℕ
-      cardinality_b = unTagged (U.cardinality ∷ Tagged b ℕ)
+  fromEnum = fromEnum . fromCan
   enumFrom ∷ Can a b → [Can a b]
   enumFrom = boundedEnumFrom
 instance (Finite a, Finite b)
@@ -328,16 +323,9 @@ instance (Finite a, Finite b, U.Universe a, U.Universe b)
 instance (Finite a, Finite b)
        ⇒ Finite (Can a b) where
   asList ∷ [Can a b]
-  asList = toList asSet
+  asList = fmap toCan asList
   asSet ∷ Set (Can a b)
   asSet = Set.map toCan asSet
-    where
-      -- toCan ∷ Maybe (These a b) → Can a b
-      toCan ∷ Maybe (Either (Either a b) (a, b)) → Can a b
-      toCan Nothing                  = C.Non
-      toCan (Just (Left  (Left  a))) = C.One a
-      toCan (Just (Left  (Right b))) = C.Eno   b
-      toCan (Just (Right (a, b)   )) = C.Two a b
 
 -- Smash
 instance (Bounded a, Bounded b)
