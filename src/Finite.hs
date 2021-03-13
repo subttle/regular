@@ -185,7 +185,7 @@ instance (Finite a)
        ⇒ Enum (Maybe a) where
   toEnum   ∷ Int     → Maybe a
   toEnum 0 = Nothing
-  toEnum n = Just (toEnum (n - 1))
+  toEnum n = Just (toEnum (pred n))
   fromEnum ∷ Maybe a → Int
   fromEnum = maybe 0      (     succ . fromEnum)
   enumFrom ∷ Maybe a → [Maybe a]
@@ -233,9 +233,9 @@ instance (Finite a, Finite b)
 instance (Bounded a, Bounded b)
        ⇒ Bounded (These a b) where
   minBound ∷ These a b
-  minBound = This  minBound
+  minBound = toThese minBound -- This  minBound
   maxBound ∷ These a b
-  maxBound = These maxBound maxBound
+  maxBound = toThese maxBound -- These maxBound maxBound
 instance (Finite a, Finite b)
        ⇒ Enum (These a b) where
   toEnum   ∷ Int → These a b
@@ -259,14 +259,9 @@ instance (Finite a, Finite b, U.Universe a, U.Universe b)
 instance (Finite a, Finite b)
        ⇒ Finite (These a b) where
   asList ∷ [These a b]
-  asList = toList asSet
+  asList = fmap toThese asList
   asSet ∷ Set (These a b)
-  asSet = Set.map toThese (products ⊎ sums)
-    where
-      products ∷ Set (a, b)
-      products = asSet
-      sums ∷ Set (Either a b)
-      sums = asSet
+  asSet = Set.map toThese asSet
 
 -- EXPERIMENTAL
 -- Wedge
