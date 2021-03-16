@@ -986,14 +986,34 @@ class (Decidable f) ⇒ ContraCan f where
 instance (Monoid m) ⇒ ContraCan (Op m) where
   contracan ∷ ∀ a b c . (a → Can b c) → Op m b → Op m c → Op m a
   contracan h (Op opᵇ) (Op opᶜ) = h >$< Op (can mempty opᵇ opᶜ (\b c → opᵇ b ⋄ opᶜ c))
+instance ContraCan Equivalence where
+  contracan ∷ ∀ a b c . (a → Can b c) → Equivalence b → Equivalence c → Equivalence a
+  contracan h (Equivalence (⮀)) (Equivalence (⮂)) = h >$< Equivalence (≡)
+    where
+      (≡) ∷ Can b c → Can b c → Bool
+      (≡) Non         Non         = True
+      (≡) (One b₁   ) (One b₂   ) = b₁ ⮀ b₂
+      (≡) (Eno    c₁) (Eno    c₂) =           c₁ ⮂ c₂
+      (≡) (Two b₁ c₁) (Two b₂ c₂) = b₁ ⮀ b₂ ∧ c₁ ⮂ c₂
+      (≡) _           _           = False
 
 -- Wedge
 -- 1 + a + b
+-- FIXME need to decide what the proper constraint(s) should be
 class (Decidable f) ⇒ ContraWedge f where
   contrawedge ∷ (a → Wedge b c) → f b → f c → f a
 instance (Monoid m) ⇒ ContraWedge (Op m) where
   contrawedge ∷ ∀ a b c . (a → Wedge b c) → Op m b → Op m c → Op m a
   contrawedge h (Op opᵇ) (Op opᶜ) = h >$< Op (wedge mempty opᵇ opᶜ)
+instance ContraWedge Equivalence where
+  contrawedge ∷ ∀ a b c . (a → Wedge b c) → Equivalence b → Equivalence c → Equivalence a
+  contrawedge h (Equivalence (⮀)) (Equivalence (⮂)) = h >$< Equivalence (≡)
+    where
+      (≡) ∷ Wedge b c → Wedge b c → Bool
+      (≡) Nowhere    Nowhere    = True
+      (≡) (Here  b₁) (Here  b₂) = b₁ ⮀ b₂
+      (≡) (There c₁) (There c₂) = c₁ ⮂ c₂
+      (≡) _          _          = False
 
 -- Smash
 -- 1 + ab
@@ -1014,6 +1034,14 @@ instance ContraSmash Comparison where
       (⪥) (Smash _  _ ) Nada          = GT
       (⪥) (Smash b₁ c₁) (Smash b₂ c₂) = (b₁ ⪋ b₂) ⋄ (c₁ ⪌ c₂)
 -}
+instance ContraSmash Equivalence where
+  contrasmash ∷ ∀ a b c . (a → Smash b c) → Equivalence b → Equivalence c → Equivalence a
+  contrasmash h (Equivalence (⮀)) (Equivalence (⮂)) = h >$< Equivalence (≡)
+    where
+      (≡) ∷ Smash b c → Smash b c → Bool
+      (≡) Nada          Nada          = True
+      (≡) (Smash b₁ c₁) (Smash b₂ c₂) = b₁ ⮀ b₂ ∧ c₁ ⮂ c₂
+      (≡) _             _             = False
 
 -- Another experimental class
 class (Contravariant f) ⇒ ContraMaybe f where
