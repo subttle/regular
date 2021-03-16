@@ -986,6 +986,27 @@ class (Decidable f) ⇒ ContraCan f where
 instance (Monoid m) ⇒ ContraCan (Op m) where
   contracan ∷ ∀ a b c . (a → Can b c) → Op m b → Op m c → Op m a
   contracan h (Op opᵇ) (Op opᶜ) = h >$< Op (can mempty opᵇ opᶜ (\b c → opᵇ b ⋄ opᶜ c))
+instance ContraCan Comparison where
+  contracan ∷ ∀ a b c . (a → Can b c) → Comparison b → Comparison c → Comparison a
+  contracan h (Comparison (⪋)) (Comparison (⪌)) = h >$< Comparison (⪥)
+    where
+      (⪥) ∷ Can b c → Can b c → Ordering
+      (⪥) Non          Non        = EQ
+      (⪥) Non         (One _    ) = LT
+      (⪥) Non         (Eno    _ ) = LT
+      (⪥) Non         (Two _  _ ) = LT
+      (⪥) (One _    )  Non        = GT
+      (⪥) (One b₁   ) (One b₂   ) = b₁ ⪋ b₂
+      (⪥) (One _    ) (Eno    _ ) = LT
+      (⪥) (One _    ) (Two _  _ ) = LT
+      (⪥) (Eno    _ )  Non        = GT
+      (⪥) (Eno    _ ) (One _    ) = GT
+      (⪥) (Eno    c₁) (Eno    c₂) = c₁ ⪌ c₂
+      (⪥) (Eno    _ ) (Two _  _ ) = LT
+      (⪥) (Two _  _ )  Non        = GT
+      (⪥) (Two _  _ ) (One _    ) = GT
+      (⪥) (Two _  _ ) (Eno    _ ) = GT
+      (⪥) (Two b₁ c₁) (Two b₂ c₂) = b₁ ⪋ b₂ ⋄ c₁ ⪌ c₂
 instance ContraCan Equivalence where
   contracan ∷ ∀ a b c . (a → Can b c) → Equivalence b → Equivalence c → Equivalence a
   contracan h (Equivalence (⮀)) (Equivalence (⮂)) = h >$< Equivalence (≡)
@@ -1005,6 +1026,20 @@ class (Decidable f) ⇒ ContraWedge f where
 instance (Monoid m) ⇒ ContraWedge (Op m) where
   contrawedge ∷ ∀ a b c . (a → Wedge b c) → Op m b → Op m c → Op m a
   contrawedge h (Op opᵇ) (Op opᶜ) = h >$< Op (wedge mempty opᵇ opᶜ)
+instance ContraWedge Comparison where
+  contrawedge ∷ ∀ a b c . (a → Wedge b c) → Comparison b → Comparison c → Comparison a
+  contrawedge h (Comparison (⪋)) (Comparison (⪌)) = h >$< Comparison (⪥)
+    where
+      (⪥) ∷ Wedge b c → Wedge b c → Ordering
+      (⪥) Nowhere       Nowhere       = EQ
+      (⪥) Nowhere       (Here  _    ) = LT
+      (⪥) Nowhere       (There    _ ) = LT
+      (⪥) (Here  _    ) Nowhere       = GT
+      (⪥) (Here  b₁   ) (Here  b₂   ) = b₁ ⪋ b₂
+      (⪥) (Here  _    ) (There    _ ) = LT
+      (⪥) (There    _ ) Nowhere       = GT
+      (⪥) (There    _ ) (Here  _    ) = GT
+      (⪥) (There    c₁) (There    c₂) = c₁ ⪌ c₂
 instance ContraWedge Equivalence where
   contrawedge ∷ ∀ a b c . (a → Wedge b c) → Equivalence b → Equivalence c → Equivalence a
   contrawedge h (Equivalence (⮀)) (Equivalence (⮂)) = h >$< Equivalence (≡)
@@ -1022,8 +1057,6 @@ class (Decidable f) ⇒ ContraSmash f where
 instance (Monoid m) ⇒ ContraSmash (Op m) where
   contrasmash ∷ ∀ a b c . (a → Smash b c) → Op m b → Op m c → Op m a
   contrasmash h (Op opᵇ) (Op opᶜ) = h >$< Op (smash mempty (\b c → opᵇ b ⋄ opᶜ c))
-{-
--- TODO untested
 instance ContraSmash Comparison where
   contrasmash ∷ ∀ a b c . (a → Smash b c) → Comparison b → Comparison c → Comparison a
   contrasmash h (Comparison (⪋)) (Comparison (⪌)) = h >$< Comparison (⪥)
@@ -1032,8 +1065,7 @@ instance ContraSmash Comparison where
       (⪥) Nada          Nada          = EQ
       (⪥) Nada          (Smash _  _ ) = LT
       (⪥) (Smash _  _ ) Nada          = GT
-      (⪥) (Smash b₁ c₁) (Smash b₂ c₂) = (b₁ ⪋ b₂) ⋄ (c₁ ⪌ c₂)
--}
+      (⪥) (Smash b₁ c₁) (Smash b₂ c₂) = b₁ ⪋ b₂ ⋄ c₁ ⪌ c₂
 instance ContraSmash Equivalence where
   contrasmash ∷ ∀ a b c . (a → Smash b c) → Equivalence b → Equivalence c → Equivalence a
   contrasmash h (Equivalence (⮀)) (Equivalence (⮂)) = h >$< Equivalence (≡)
@@ -1053,14 +1085,6 @@ contramaybedJust = contramaybe Just
 instance (Monoid m) ⇒ ContraMaybe (Op m) where
   contramaybe ∷ (a → Maybe b) → Op m b → Op m a
   contramaybe h = (>$<) h . Op . maybe mempty . getOp
-instance ContraMaybe Equivalence where
-  contramaybe ∷ ∀ a b . (a → Maybe b) → Equivalence b → Equivalence a
-  contramaybe h (Equivalence (≣)) = h >$< Equivalence (≡)
-    where
-      (≡) ∷ Maybe b → Maybe b → Bool
-      (≡) Nothing   Nothing   = True
-      (≡) (Just b₁) (Just b₂) = b₁ ≣ b₂
-      (≡) _         _         = False
 instance ContraMaybe Comparison where
   contramaybe ∷ ∀ a b . (a → Maybe b) → Comparison b → Comparison a
   contramaybe h (Comparison cmp) = h >$< Comparison (⪥)
@@ -1070,6 +1094,14 @@ instance ContraMaybe Comparison where
       (⪥) Nothing   Nothing   = EQ
       (⪥) (Just _)  Nothing   = GT
       (⪥) (Just b₁) (Just b₂) = b₁ `cmp` b₂
+instance ContraMaybe Equivalence where
+  contramaybe ∷ ∀ a b . (a → Maybe b) → Equivalence b → Equivalence a
+  contramaybe h (Equivalence (≣)) = h >$< Equivalence (≡)
+    where
+      (≡) ∷ Maybe b → Maybe b → Bool
+      (≡) Nothing   Nothing   = True
+      (≡) (Just b₁) (Just b₂) = b₁ ≣ b₂
+      (≡) _         _         = False
 
 -- Partial Equivalence Relation
 newtype PER a = PER { getPER ∷ a → a → Maybe Bool }
