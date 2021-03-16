@@ -111,6 +111,7 @@ andAlg = Algebra φ
     φ Nil        = True
     φ (Cons x y) = (∧) x y
 
+infixr 6 ⋄
 (⋄) ∷ (Semigroup m) ⇒ m → m → m
 (⋄) = (<>)
 
