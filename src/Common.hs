@@ -231,6 +231,11 @@ when' = bool Nothing . Just
 while ∷ (a → Bool) → (a → a) → a → a
 while p = until (not . p)
 
+infixl 4 >&<
+-- alias for `(>$$<)` (which is itself an alias for `flip contramap`)
+(>&<) ∷ (Contravariant f) ⇒ f b → (a → b) → f a
+(>&<) = flip contramap
+
 comparing' ∷ (Ord b) ⇒ (a → b) → Comparison a
 comparing' = (>$$<) defaultComparison
 
