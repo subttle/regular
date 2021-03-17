@@ -1096,6 +1096,9 @@ contramaybedJust = contramaybe Just
 instance (Monoid m) ⇒ ContraMaybe (Op m) where
   contramaybe ∷ (a → Maybe b) → Op m b → Op m a
   contramaybe h = (>$<) h . Op . maybe mempty . getOp
+instance ContraMaybe Predicate where
+  contramaybe ∷ ∀ a b . (a → Maybe b) → Predicate b → Predicate a
+  contramaybe h = (>$<) h . Predicate . maybe False . getPredicate
 instance ContraMaybe Comparison where
   contramaybe ∷ ∀ a b . (a → Maybe b) → Comparison b → Comparison a
   contramaybe h (Comparison cmp) = h >$< Comparison (⪥)
