@@ -1083,7 +1083,6 @@ instance U.Finite   Fin₁₆ where
   cardinality = Tagged 16
 instance Finite     Fin₁₆
 
--- TODO deleteme
 instance (Show a, Finite a) ⇒ Show (Predicate a) where
   show ∷ Predicate a → String
   show = showpredpart
@@ -1092,7 +1091,7 @@ instance (Show a, Finite a) ⇒ Show (Predicate a) where
       showpredbits ∷ ∀ a . (Finite a) ⇒ Predicate a → String
       showpredbits = (<&>) asList . (bool '0' '1' ‥ getPredicate)
       -- show predicate as a function
-      showpredf ∷ Predicate a → String -- ∷ ∀ a . (Show a, Finite a) ⇒ Predicate a → String
+      showpredf ∷ ∀ a . (Show a, Finite a) ⇒ Predicate a → String
       showpredf (Predicate p) = unlines (fmap (\(a, b) → quoteWith (show a) (show b) " ↦ ") graph)
         where
           graph ∷ [(a, Bool)]
