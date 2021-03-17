@@ -1093,14 +1093,15 @@ instance (Show a, Finite a) ⇒ Show (Predicate a) where
       showpredbits = (<&>) asList . (bool '0' '1' ‥ getPredicate)
       -- show predicate as a function
       showpredf ∷ Predicate a → String -- ∷ ∀ a . (Show a, Finite a) ⇒ Predicate a → String
-      showpredf (Predicate p) = unlines (fmap (\(a, b) → show a <> " ↦ " <> show b) graph)
+      showpredf (Predicate p) = unlines (fmap (\(a, b) → quoteWith (show a) (show b) " ↦ ") graph)
         where
-          domain ∷ [a]
-          domain = asList
-          image_ ∷ [Bool]
-          image_  = fmap p domain
           graph ∷ [(a, Bool)]
-          graph  = zip domain image_
+          graph = zip domain image
+            where
+              domain ∷ [a]
+              domain = asList
+              image ∷ [Bool]
+              image = fmap p domain
       -- show predicate as a set
       showpredset ∷ Predicate a → String -- ∷ ∀ a . (Show a, Finite a) ⇒ Predicate a → String
       showpredset = show . Set' . flip Set.filter asSet . getPredicate
@@ -1137,11 +1138,11 @@ instance (Finite a)
     where
       as ∷ [a]
       as = asList
-      bs ∷ [Bool]
-      bs = asList
       bits ∷ [[Bool]]
       bits = replicateM' cardinality_a bs
         where
+          bs ∷ [Bool]
+          bs = asList
           cardinality_a ∷ ℕ
           cardinality_a = unTagged (U.cardinality ∷ Tagged a ℕ)
       toFunction ∷ [(a, Bool)] → a → Bool
