@@ -21,7 +21,7 @@ import           Data.Fin (Fin)
 import           Data.Fix (Fix (..))
 import           Data.Foldable as Foldable (Foldable (..), maximumBy, minimumBy)
 import           Data.Functor.Contravariant.Divisible (Divisible (..), Decidable (..), divided, chosen)
-import           Data.Functor.Contravariant (Contravariant (..), Op (..), Predicate (..), Comparison (..), Equivalence (..), defaultComparison, defaultEquivalence, (>$<), (>$$<))
+import           Data.Functor.Contravariant (Contravariant (..), Op (..), Predicate (..), Comparison (..), Equivalence (..), defaultComparison, defaultEquivalence, (>$<))
 import           Data.Functor.Foldable (ListF (..))
 import           Data.Function (on, fix, (&))
 import           Data.List as List (filter, transpose, sortBy, find, delete, deleteBy, deleteFirstsBy, elemIndex, elemIndices, findIndex, findIndices, genericDrop, genericIndex, genericLength, genericReplicate, genericTake, intercalate, intersectBy, tails, unfoldr)
@@ -237,11 +237,11 @@ infixl 4 >&<
 (>&<) = flip contramap
 
 comparing' ∷ (Ord b) ⇒ (a → b) → Comparison a
-comparing' = (>$$<) defaultComparison
+comparing' = (>&<) defaultComparison
 
 -- ⭀
 equating' ∷ (Eq b) ⇒ (a → b) → Equivalence a
-equating' = (>$$<) defaultEquivalence
+equating' = (>&<) defaultEquivalence
 
 -- Boolean implication.
 implies ∷ Bool → Bool → Bool

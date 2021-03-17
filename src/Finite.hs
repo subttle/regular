@@ -25,7 +25,7 @@ import           Data.Foldable (Foldable (..))
 import           Data.Foldable.Unicode ((∈), (∋))
 import           Data.Function (on)
 import           Data.Functor ((<&>))
-import           Data.Functor.Contravariant (Contravariant (..), Op (..), Comparison(..), Equivalence (..), Predicate (..), (>$$<), defaultComparison, defaultEquivalence)
+import           Data.Functor.Contravariant (Contravariant (..), Op (..), Comparison(..), Equivalence (..), Predicate (..), defaultComparison, defaultEquivalence)
 import           Data.Functor.Contravariant.Divisible (Divisible (..))
 import           Data.Functor.Identity (Identity (..))
 import           Data.Group (Group, invert)
@@ -46,7 +46,7 @@ import           Data.Wedge (Wedge (..), wedge, toWedge, fromWedge)
 import           GHC.Enum (boundedEnumFrom)
 import           Numeric.Natural.Unicode (ℕ)
 import           Prelude.Unicode (ℤ)
-import           Common (DisplayColor (..), HasDisplayColor (..), Fancy (..), Set' (..), bell, charToString, choose', comparing', elemIndex', equating', factorial, filter', freeMonoid, freeSemigroup, fromCan, fromEnum', fromThese, implies, impossible, lefts', length', partitions', quoteWith, replicateM', rights', toColor, toCan, toEnum', toThese, (×), (‥), (⊎), (⋄))
+import           Common (DisplayColor (..), HasDisplayColor (..), Fancy (..), Set' (..), bell, charToString, choose', comparing', elemIndex', equating', factorial, filter', freeMonoid, freeSemigroup, fromCan, fromEnum', fromThese, implies, impossible, lefts', length', partitions', quoteWith, replicateM', rights', toColor, toCan, toEnum', toThese, (×), (‥), (⊎), (⋄), (>&<))
 
 
 -- An imperfect, somewhat practical, representation of a Finite type constraint
@@ -1287,7 +1287,7 @@ byLength = equating' length
 
 -- group "pieces of pie" (equivalence classes) which are the same size (length)
 byEqClassLength ∷ (Finite a) ⇒ Equivalence a → Equivalence a
-byEqClassLength = (>$$<) (byLength ∷ Equivalence (NonEmpty a)) . equivalenceClass
+byEqClassLength = (>&<) (byLength ∷ Equivalence (NonEmpty a)) . equivalenceClass
 
 shape ∷ (Finite a) ⇒ Equivalence a → [ℕ]
 shape = sort . fmap length' . fromEquivalence

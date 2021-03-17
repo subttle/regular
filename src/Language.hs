@@ -6,10 +6,10 @@ module Language where
 import           Data.Bool.Unicode ((∧), (∨))
 import           Data.Foldable.Unicode ((∋))
 import           Data.Function ((&))
-import           Data.Functor.Contravariant (Contravariant (..), Predicate (..), (>$$<))
+import           Data.Functor.Contravariant (Contravariant (..), Predicate (..))
 import           Data.List (inits, tails)
 import qualified Data.List.NonEmpty as NE
-import           Common (partitions)
+import           Common (partitions, (>&<))
 import           Finite (Finite (..), Σ (..))
 
 -- N.B. This is /not/ the type for regular languages (but I am adding it to help test some properties)
@@ -108,10 +108,10 @@ derivative ∷ ℒ s → s → ℒ s
 --
 -- derivative p s = contramap (s :) p
 -- derivative = flip (contramap . (:))
--- derivative p s = (>$$<) p (s :)
--- derivative p s = (>$$<) p ((:) s)
--- derivative p = (>$$<) p . (:)
-derivative = (. (:)) . (>$$<)
+-- derivative p s = (>&<) p (s :)
+-- derivative p s = (>&<) p ((:) s)
+-- derivative p = (>&<) p . (:)
+derivative = (. (:)) . (>&<)
 
 -- derivative with respect to some word ∈ Σ★
 derivative' ∷ ℒ s → [s] → ℒ s
@@ -120,16 +120,16 @@ derivative' ∷ ℒ s → [s] → ℒ s
 --
 -- derivative' p w = contramap (w ++) p
 -- derivative' = flip (contramap . (++))
-derivative' = (. (++)) . (>$$<)
+derivative' = (. (++)) . (>&<)
 
 -- FIXME untested, need to check
 antiderivative' ∷ ℒ s → [s] → ℒ s
 -- antiderivative' l w = contramap (w ++) (reversed l)
 -- antiderivative' = flip (contramap . (++)) . reversed
--- antiderivative' l w = (>$$<) (reversed l) (w ++)
--- antiderivative' l w = (>$$<) (reversed l) ((++) w)
--- antiderivative' l = (>$$<) (reversed l) . (++)
-antiderivative' = (. (++)) . (>$$<) . reversed
+-- antiderivative' l w = (>&<) (reversed l) (w ++)
+-- antiderivative' l w = (>&<) (reversed l) ((++) w)
+-- antiderivative' l = (>&<) (reversed l) . (++)
+antiderivative' = (. (++)) . (>&<) . reversed
 
 -- TODO experimental, probably has a more meaningful name too
 drop₁ ∷ ℒ s → ℒ s
