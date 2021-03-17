@@ -1811,7 +1811,9 @@ instance Finite     DNA
 
 newtype Init = Init () deriving (Eq, Ord, Bounded, Enum)
 instance U.Universe Init
-instance U.Finite   Init
+instance U.Finite   Init where
+  cardinality ∷ Tagged Init ℕ
+  cardinality = Tagged 1
 instance Finite Init where
   asList ∷ [Init]
   asList = [Init ()]
@@ -1822,8 +1824,10 @@ instance Show Init where
   show (Init ()) = "qᵢ"
 newtype Final = Final () deriving (Eq, Ord, Bounded, Enum)
 instance U.Universe Final
-instance U.Finite   Final
-instance Finite Final where
+instance U.Finite   Final where
+  cardinality ∷ Tagged Final ℕ
+  cardinality = Tagged 1
+instance Finite     Final where
   asList ∷ [Final]
   asList = [Final ()]
   asSet ∷ Set Final
