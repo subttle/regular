@@ -1116,8 +1116,7 @@ instance (Show a, Finite a) ⇒ Show (Predicate a) where
           -- `Left  a` ≢ p a
           -- `Right a` ≡ p a
           label ∷ (Finite a) ⇒ Predicate a → [Either a a]
-          -- label (Predicate p) = fmap (liftA3 bool Left Right p) asList
-          label = (asList <&>) . liftA3 bool Left Right . getPredicate
+          label = (<&>) asList . liftA3 bool Left Right . getPredicate
 
 instance (Finite a)
        ⇒ Eq (Predicate a) where
