@@ -884,6 +884,12 @@ class (Show a) ⇒ Fancy a where
 class HasDisplayColor a where
   toColor' ∷ a → DisplayColor
 
+class BoundedAbove a where
+  maximumBound ∷ a
+
+class BoundedBelow a where
+  minimumBound ∷ a
+
 -- Actions
 class (Semigroup s) ⇒ Act s a | a → s where
   act ∷ s → a → a
@@ -952,15 +958,6 @@ instance (Monoid m) ⇒ ContraThese (Op m) where
 instance ContraThese Predicate where
   contrathese ∷ (a → These b c) → Predicate b → Predicate c → Predicate a
   contrathese h (Predicate pᵇ) (Predicate pᶜ) = h >$< Predicate (these pᵇ pᶜ (\b c → pᵇ b ∧ pᶜ c))
-instance ContraThese Equivalence where
-  contrathese ∷ ∀ a b c . (a → These b c) → Equivalence b → Equivalence c → Equivalence a
-  contrathese h (Equivalence (⮀)) (Equivalence (⮂)) = h >$< Equivalence (≡)
-    where
-      (≡) ∷ These b c → These b c → Bool
-      (≡) (This  b₁   ) (This  b₂   ) = b₁ ⮀ b₂
-      (≡) (That     c₁) (That     c₂) =           c₁ ⮂ c₂
-      (≡) (These b₁ c₁) (These b₂ c₂) = b₁ ⮀ b₂ ∧ c₁ ⮂ c₂
-      (≡) _             _             = False
 instance ContraThese Comparison where
   contrathese ∷ ∀ a b c . (a → These b c) → Comparison b → Comparison c → Comparison a
   contrathese h (Comparison (⪋)) (Comparison (⪌)) = h >$< Comparison (⪥)
@@ -975,6 +972,15 @@ instance ContraThese Comparison where
       (⪥) (These _  _ ) (This  _    ) = GT
       (⪥) (These _  _ ) (That     _ ) = GT
       (⪥) (These b₁ c₁) (These b₂ c₂) = (b₁ ⪋ b₂) ⋄ (c₁ ⪌ c₂)
+instance ContraThese Equivalence where
+  contrathese ∷ ∀ a b c . (a → These b c) → Equivalence b → Equivalence c → Equivalence a
+  contrathese h (Equivalence (⮀)) (Equivalence (⮂)) = h >$< Equivalence (≡)
+    where
+      (≡) ∷ These b c → These b c → Bool
+      (≡) (This  b₁   ) (This  b₂   ) = b₁ ⮀ b₂
+      (≡) (That     c₁) (That     c₂) =           c₁ ⮂ c₂
+      (≡) (These b₁ c₁) (These b₂ c₂) = b₁ ⮀ b₂ ∧ c₁ ⮂ c₂
+      (≡) _             _             = False
 
 -- EXPERIMENTAL
 -- FIXME constraints need to be improved/corrected, this is just for a rough idea.

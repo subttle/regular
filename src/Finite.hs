@@ -59,12 +59,6 @@ class (Enum a, Bounded a, Ord a, U.Finite a) ⇒ Finite a where
   asSet ∷ Set a
   asSet = Set.fromDistinctAscList asList
 
-class BoundedBelow a where
-  minimumBound ∷ a
-
-class BoundedAbove a where
-  maximumBound ∷ a
-
 class (Finite sigma) ⇒ Σ formalism sigma | formalism → sigma where
   -- Σ, The alphabet of the formalism
   sigma ∷ formalism → Set sigma
