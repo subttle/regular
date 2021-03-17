@@ -46,7 +46,7 @@ import           Data.Wedge (Wedge (..), wedge, toWedge, fromWedge)
 import           GHC.Enum (boundedEnumFrom)
 import           Numeric.Natural.Unicode (ℕ)
 import           Prelude.Unicode (ℤ)
-import           Common (DisplayColor (..), HasDisplayColor (..), Fancy (..), Set' (..), bell, charToString, choose', comparing', elemIndex', equating', factorial, filter', freeMonoid, freeSemigroup, fromCan, fromEnum', implies, impossible, lefts', length', partitions', quoteWith, replicateM', rights', toColor, toCan, toEnum', toThese, (×), (‥), (⊎), (⋄))
+import           Common (DisplayColor (..), HasDisplayColor (..), Fancy (..), Set' (..), bell, charToString, choose', comparing', elemIndex', equating', factorial, filter', freeMonoid, freeSemigroup, fromCan, fromEnum', fromThese, implies, impossible, lefts', length', partitions', quoteWith, replicateM', rights', toColor, toCan, toEnum', toThese, (×), (‥), (⊎), (⋄))
 
 
 -- An imperfect, somewhat practical, representation of a Finite type constraint
@@ -233,14 +233,9 @@ instance (Bounded a, Bounded b)
 instance (Finite a, Finite b)
        ⇒ Enum (These a b) where
   toEnum   ∷ Int → These a b
-  toEnum   = (asList !!)
+  toEnum   = toThese . toEnum
   fromEnum ∷ These a b → Int
-  fromEnum = these fromEnum ((+) (fromIntegral cardinality_a) . fromEnum) ((+) (((+) `on` fromIntegral) cardinality_a cardinality_b) ‥ (fromEnum ‥ (,)))
-    where
-      cardinality_a ∷ ℕ
-      cardinality_a = unTagged (U.cardinality ∷ Tagged a ℕ)
-      cardinality_b ∷ ℕ
-      cardinality_b = unTagged (U.cardinality ∷ Tagged b ℕ)
+  fromEnum = fromEnum . fromThese
   enumFrom ∷ These a b → [These a b]
   enumFrom = boundedEnumFrom
 instance (Finite a, Finite b)
