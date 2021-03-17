@@ -29,7 +29,7 @@ import           Data.Functor.Contravariant (Contravariant (..), Op (..), Compar
 import           Data.Functor.Contravariant.Divisible (Divisible (..))
 import           Data.Functor.Identity (Identity (..))
 import           Data.Group (Group, invert)
-import           Data.List as List (filter, elemIndex, genericDrop, genericIndex, genericLength, genericReplicate, genericTake, nubBy, partition, permutations, sort, sortBy, sortOn, subsequences, unfoldr)
+import           Data.List as List (elemIndex, filter, genericDrop, genericIndex, genericLength, genericReplicate, genericTake, intercalate, nubBy, partition, permutations, sort, sortBy, sortOn, subsequences, unfoldr)
 import           Data.List.NonEmpty (NonEmpty (..))
 import qualified Data.List.NonEmpty as NE
 import           Data.Maybe (fromJust, maybe)
@@ -1086,10 +1086,10 @@ instance Finite     Fin₁₆
 -- TODO deleteme
 instance (Show a, Finite a) ⇒ Show (Predicate a) where
   show ∷ Predicate a → String
-  show = showcolors
+  show = showpredpart
     where
       -- show predicate as a bitstring
-      showpredbits ∷ Predicate a → String -- ∷ ∀ a . (Finite a) ⇒ Predicate a → String
+      showpredbits ∷ ∀ a . (Finite a) ⇒ Predicate a → String
       showpredbits = (<&>) asList . (bool '0' '1' ‥ getPredicate)
       -- show predicate as a function
       showpredf ∷ Predicate a → String -- ∷ ∀ a . (Show a, Finite a) ⇒ Predicate a → String
@@ -1103,12 +1103,22 @@ instance (Show a, Finite a) ⇒ Show (Predicate a) where
               image ∷ [Bool]
               image = fmap p domain
       -- show predicate as a set
-      showpredset ∷ Predicate a → String -- ∷ ∀ a . (Show a, Finite a) ⇒ Predicate a → String
+      showpredset ∷ ∀ a . (Show a, Finite a) ⇒ Predicate a → String
       showpredset = show . Set' . flip Set.filter asSet . getPredicate
       -- show the elements of 'a', with coloring determined by the predicate
-      showcolors ∷ Predicate a → String --  ∷ ∀ a . (Show a, Finite a) ⇒ Predicate a → String
+      showcolors ∷ ∀ a . (Show a, Finite a) ⇒ Predicate a → String
       -- showcolors (Predicate p) = concatMap (\a → bool ((flip toColor) Red (show a)) ((flip toColor) Green (show a)) (p a)) asList
       showcolors = (>>=) asList . liftA3 bool ((`toColor` Red) . show) ((`toColor` Green) . show) . getPredicate
+      -- show predicate as a partitioned set
+      showpredpart ∷ ∀ a . (Show a, Finite a) ⇒ Predicate a → String
+      showpredpart = quoteWith "{"  "}" . intercalate ", " . fmap (either ((`toColor` Red) . show) ((`toColor` Green) . show)) . label
+        where
+          -- label each `a` such that
+          -- `Left  a` ≢ p a
+          -- `Right a` ≡ p a
+          label ∷ (Finite a) ⇒ Predicate a → [Either a a]
+          -- label (Predicate p) = fmap (liftA3 bool Left Right p) asList
+          label = (asList <&>) . liftA3 bool Left Right . getPredicate
 
 instance (Finite a)
        ⇒ Eq (Predicate a) where
