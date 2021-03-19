@@ -1486,16 +1486,18 @@ instance (Show a, Finite a)
       -- 3 ↦ 1
       -- ⦍ 1 2 3 ⦐
       -- ⦏ 3 2 1 ⦎
-      -- TODO add cycle notation
-      _showp ∷ Comparison a → String -- ∷ ∀ a . (Show a, Finite a) ⇒ Comparison a → String
+      _showp ∷ ∀ a . (Show a, Finite a) ⇒ Comparison a → String
       _showp cmp = quoteWith (top asList) (bot (comparisonToList cmp)) "\n"
         where
           top ∷ [a] → String
           top = quoteWith "⦍" "⦐" . (=<<) show
           bot ∷ [a] → String
           bot = quoteWith "⦏" "⦎" . (=<<) show
+      -- FIXME add cycle notation
+      _showc ∷ ∀ a . (Show a, Finite a) ⇒ Comparison a → String
+      _showc = undefined
       -- show Comparison as a function
-      _showf ∷ Comparison a → String -- ∷ ∀ a . (Show a, Finite a) ⇒ Comparison a → String
+      _showf ∷ ∀ a . (Show a, Finite a) ⇒ Comparison a → String
       _showf (Comparison cmp) = unlines (fmap show'' graph)
         where
           graph  ∷ [(a, a, Ordering)]
