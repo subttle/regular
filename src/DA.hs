@@ -7,14 +7,14 @@ module DA where
 
 import           Data.Bool.Unicode ((∧), (∨))
 import           Data.Can   (Can   (..), can)
-import           Data.Functor.Contravariant (Contravariant (..), Predicate (..), (>$$<))
+import           Data.Functor.Contravariant (Contravariant (..), Predicate (..))
 import           Data.Functor.Contravariant.Divisible (Divisible (..), Decidable (..))
 import qualified Data.List as List
 import           Data.Smash (Smash (..), smash)
 import           Data.These (These (..), these)
 import           Data.Void (Void)
 import           Data.Wedge (Wedge (..), wedge)
-import           Common (ContraCan (..), ContraSmash (..), ContraThese (..), ContraWedge (..), Set' (..), equation, quoteWith, (‥))
+import           Common (ContraCan (..), ContraSmash (..), ContraThese (..), ContraWedge (..), Set' (..), equation, quoteWith, (‥), (>&<))
 import           Finite (Finite (..), Q (..), Σ (..))
 import qualified Language
 import           Language (ℒ)
@@ -135,7 +135,7 @@ literal σ = (DA (Predicate (== EQ)) t, LT)
     t _  _          = GT
 
 language ∷ DA q s → q → ℒ s
-language (DA o t) = (>$$<) o . foldl t
+language (DA o t) = (>&<) o . foldl t
 
 accepts ∷ DA q s → q → [s] → Bool
 accepts = getPredicate ‥ language
