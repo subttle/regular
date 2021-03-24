@@ -49,7 +49,7 @@ instance Contravariant (DA q) where
 -- FIXME: these instances (`Divisible`, `Decidable`, `ContraThese`, `ContraCan`, `ContraSmash`, and `ContraWedge`) are just experimental for now
 instance Divisible (DA q) where
   divide ∷ (s → (g₁, g₂)) → DA q g₁ → DA q g₂ → DA q s
-  divide h (DA o₁ t₁) (DA o₂ t₂) = DA (o₁ <> o₂) (\q → uncurry (t₂ . t₁ q) . h)
+  divide h (DA o₁ t₁) (DA o₂ t₂) = DA (divide (\q → (q, q)) o₁ o₂) (\q → uncurry (t₂ . t₁ q) . h)
 
   conquer ∷ DA q a
   conquer = DA conquer const
