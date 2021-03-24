@@ -69,22 +69,22 @@ asdf h (DA o₁ t₁) (DA o₂ t₂) = DA (o₁ <> o₂) _
 -}
 instance ContraThese (DA q) where
   contrathese ∷ (s → These g₁ g₂) → DA q g₁ → DA q g₂ → DA q s
-  contrathese h (DA o₁ t₁) (DA o₂ t₂) = DA (o₁ <> o₂) (\q → these (t₁ q) (t₂ q) (t₂ . t₁ q) . h)
+  contrathese h (DA _o₁ t₁) (DA _o₂ t₂) = DA undefined (\q → these (t₁ q) (t₂ q) (t₂ . t₁ q) . h)
 
 -- `Can` is basically `Maybe (Either (Either a b) (a, b))`
 instance ContraCan (DA q) where
   contracan ∷ (s → Can g₁ g₂) → DA q g₁ → DA q g₂ → DA q s
-  contracan h (DA o₁ t₁) (DA o₂ t₂) = DA undefined (\q → can q (t₁ q) (t₂ q) (t₂ . t₁ q) . h)
+  contracan h (DA _o₁ t₁) (DA _o₂ t₂) = DA undefined (\q → can q (t₁ q) (t₂ q) (t₂ . t₁ q) . h)
 
 -- `Smash` is basically `Maybe (a, b)`
 instance ContraSmash (DA q) where
   contrasmash ∷ (s → Smash g₁ g₂) → DA q g₁ → DA q g₂ → DA q s
-  contrasmash h (DA o₁ t₁) (DA o₂ t₂) = DA undefined (\q → smash q (t₂ . t₁ q) . h)
+  contrasmash h (DA _o₁ t₁) (DA _o₂ t₂) = DA undefined (\q → smash q (t₂ . t₁ q) . h)
 
 -- `Wedge` is basically `Maybe (Either a b)`
 instance ContraWedge (DA q) where
   contrawedge ∷ (s → Wedge g₁ g₂) → DA q g₁ → DA q g₂ → DA q s
-  contrawedge h (DA o₁ t₁) (DA o₂ t₂) = DA undefined (\q → wedge q (t₁ q) (t₂ q) . h)
+  contrawedge h (DA _o₁ t₁) (DA _o₂ t₂) = DA undefined (\q → wedge q (t₁ q) (t₂ q) . h)
 
 {-
 asdf2e ∷ ∀ q p s . DA q s → DA p s → DA (Either q p) s
