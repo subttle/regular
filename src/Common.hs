@@ -848,7 +848,7 @@ data DisplayColor where
   Magenta ∷ DisplayColor
   Cyan    ∷ DisplayColor
   White   ∷ DisplayColor
-  deriving (Eq, Bounded, Enum, Show)
+  deriving (Bounded, Enum, Eq, Ord)
 
 toColor ∷ String → DisplayColor → String
 toColor string color = (fgcolor color ++) ((++ reset) string)

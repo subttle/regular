@@ -3448,6 +3448,25 @@ instance Show Card where
 (🃒) ∷ Card
 (🃒) = Card Two   Club
 
+instance U.Universe      DisplayColor
+instance U.Finite        DisplayColor where
+  cardinality ∷ Tagged DisplayColor ℕ
+  cardinality = Tagged 8
+instance Finite          DisplayColor
+instance HasDisplayColor DisplayColor where
+  toColor' ∷ DisplayColor → DisplayColor
+  toColor' = id
+instance Show            DisplayColor where
+  show ∷ DisplayColor → String
+  show Black   = toColor "Black"   (toColor' Black)
+  show Red     = toColor "Red"     (toColor' Red)
+  show Green   = toColor "Green"   (toColor' Green)
+  show Yellow  = toColor "Yellow"  (toColor' Yellow)
+  show Blue    = toColor "Blue"    (toColor' Blue)
+  show Magenta = toColor "Magenta" (toColor' Magenta)
+  show Cyan    = toColor "Cyan"    (toColor' Cyan)
+  show White   = toColor "White"   (toColor' White)
+
 instance HasDisplayColor Suit where
   toColor' ∷ Suit → DisplayColor
   toColor' Spade   = Black
