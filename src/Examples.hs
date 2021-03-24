@@ -17,7 +17,7 @@ import qualified NFA
 import qualified EFA
 -- import qualified GFA
 import qualified RegExp as RE
-import           Common (toColor', (≰), equating')
+import           Common (DisplayColor (Black, Red), equating', toColor, toColor', (≰))
 import           Finite (Finite (..), Card(..), Suit(..), (:🎲), DNA (..), Alpha (..), Fin₂, Fin₃, Fin₄, Fin₅, Fin₆, Fin₇, Fin₈, Fin₉, Fin₁₀, fin₂, rotate90, type (🁢), valBottom, valTop, type (🀰), valRight, valLeft)
 
 -- A DFA which accepts all binary strings ending in "1"
@@ -279,42 +279,46 @@ startsWith0 = DFA δ 0 (singleton 1)
 
 -- Coursera Stanford Automata, NFA lecture
 -- http://spark-public.s3.amazonaws.com/automata/slides/4_fa3.pdf
-data RB = Red' | Black' deriving (Eq, Enum, Ord, Bounded, Show)
-instance U.Universe RB
-instance U.Finite   RB
-instance Finite     RB
-board ∷ NFA.NFA Fin₉ RB
+data BR = Black' | Red' deriving (Bounded, Enum, Eq, Ord)
+instance Show BR where
+  show ∷ BR → String
+  show Black' = toColor "B" Black
+  show Red'   = toColor "R" Red
+instance U.Universe BR
+instance U.Finite   BR
+instance Finite     BR
+board ∷ NFA.NFA Fin₉ BR
 board = NFA.NFA δ 0 (singleton 8)
   where
-    δ ∷ (Fin₉, RB) → Set Fin₉
-    δ (0,   Red') = fromList  [1, 3]
+    δ ∷ (Fin₉, BR) → Set Fin₉
     δ (0, Black') = singleton  4
-    δ (1,   Red') = fromList  [3, 5]
+    δ (0,   Red') = fromList  [1, 3]
     δ (1, Black') = fromList  [0, 2, 4]
-    δ (2,   Red') = fromList  [1, 5]
+    δ (1,   Red') = fromList  [3, 5]
     δ (2, Black') = singleton  4
-    δ (3,   Red') = fromList  [1, 7]
+    δ (2,   Red') = fromList  [1, 5]
     δ (3, Black') = fromList  [0, 4, 6]
-    δ (4,   Red') = fromList  [1, 3, 5, 7]
+    δ (3,   Red') = fromList  [1, 7]
     δ (4, Black') = fromList  [0, 2, 6, 8]
-    δ (5,   Red') = fromList  [1, 7]
+    δ (4,   Red') = fromList  [1, 3, 5, 7]
     δ (5, Black') = fromList  [2, 4, 8]
-    δ (6,   Red') = fromList  [3, 7]
+    δ (5,   Red') = fromList  [1, 7]
     δ (6, Black') = singleton  4
-    δ (7,   Red') = fromList  [3, 5]
+    δ (6,   Red') = fromList  [3, 7]
     δ (7, Black') = fromList  [4, 6, 8]
-    δ (8,   Red') = fromList  [5, 7]
+    δ (7,   Red') = fromList  [3, 5]
     δ (8, Black') = singleton  4
+    δ (8,   Red') = fromList  [5, 7]
 
-data Decimal = Plus | Minus | Period deriving (Eq, Ord, Enum, Bounded)
+data Decimal = Minus | Period | Plus deriving (Bounded, Enum, Eq, Ord)
 instance U.Universe Decimal
 instance U.Finite   Decimal
 instance Finite     Decimal
 instance Show Decimal where
   show ∷ Decimal → String
-  show Plus   = "+"
   show Minus  = "-"
   show Period = "."
+  show Plus   = "+"
 
 -- HMU Figure 2.18 Pg.73
 hmu218 ∷ EFA.EFA Fin₆ (Either Decimal Fin₁₀)
