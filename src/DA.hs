@@ -12,7 +12,7 @@ import           Data.Functor.Contravariant.Divisible (Divisible (..), Decidable
 import qualified Data.List as List
 import           Data.Smash (Smash (..), smash)
 import           Data.These (These (..), these)
-import           Data.Void (Void)
+import           Data.Void (Void, absurd)
 import           Data.Wedge (Wedge (..), wedge)
 import           Common (ContraCan (..), ContraSmash (..), ContraThese (..), ContraWedge (..), Set' (..), equation, quoteWith, (‥), (>&<))
 import           Finite (Finite (..), Q (..), Σ (..))
@@ -71,7 +71,7 @@ instance ContraThese (DA q) where
   contrathese ∷ (s → These g₁ g₂) → DA q g₁ → DA q g₂ → DA q s
   contrathese h (DA _o₁ t₁) (DA _o₂ t₂) = DA undefined (\q → these (t₁ q) (t₂ q) (t₂ . t₁ q) . h)
 
--- `Can` is basically `Maybe (Either (Either a b) (a, b))`
+-- `Can` is basically `Maybe (These a b)`
 instance ContraCan (DA q) where
   contracan ∷ (s → Can g₁ g₂) → DA q g₁ → DA q g₂ → DA q s
   contracan h (DA _o₁ t₁) (DA _o₂ t₂) = DA undefined (\q → can q (t₁ q) (t₂ q) (t₂ . t₁ q) . h)
@@ -142,6 +142,7 @@ accepts = getPredicate ‥ language
 
 nullable ∷ DA q s → q → Bool
 nullable m q = accepts m q []
+-- nullable = (&) [] ‥ accepts
 
 -- "automaton of languages" or "the final automaton of languages"
 -- "This automaton has the pleasing property that the language accepted by a state L in ℒ [the set of all languages] is precisely L itself."
@@ -151,6 +152,9 @@ automaton = DA (Predicate Language.nullable) Language.derivative
 
 empty ∷ DA q s
 empty = DA (Predicate (const False)) const
+
+emptyQ ∷ DA Void s
+emptyQ = DA (Predicate absurd) absurd
 
 complement ∷ DA q s → DA q s
 complement (DA (Predicate o) t) = DA (Predicate (not . o)) t
