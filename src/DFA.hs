@@ -440,7 +440,6 @@ toNFAMin m@(DFA δ _ f) = (toNFA m) { NFA.delta = δ₁ }
     δ₁ (q, _) | q ∈ f = (∅)  -- delete transitions out of final states
     δ₁ (q, σ)         = singleton (δ (q, σ))
 
--- TODO untested
 toNFAShuffle ∷ ∀ q p s . (Ord q, Ord p) ⇒ DFA q s → DFA p s → NFA.NFA (q, p) s
 toNFAShuffle (DFA δ₁ q₀ f₁) (DFA δ₂ p₀ f₂) = NFA.NFA δ (q₀, p₀) (f₁ × f₂)
   where

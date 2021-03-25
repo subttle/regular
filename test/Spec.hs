@@ -46,6 +46,7 @@ suite = tests [ scope "main.FizzBuzz"              testFizzBuzz
               , scope "DFA.rquotient"              testDFArquotient
               , scope "DFA.invhomimage"            testDFAinvhomimage
               , scope "DFA.perfectShuffle"         testDFAPerfectShuffle
+              , scope "DFA.toNFAShuffle"           testDFAtoNFAshuffle
               , scope "NFA.shuffle"                testNFAshuffle
               , scope "NFA.permutations"           testNFAPermutations
               , scope "RE.>>="                     testRESubstitution
@@ -303,6 +304,25 @@ testDFAPerfectShuffle = expectEqual (Config.language shuffled) expected
 
 testDFAtoRE ∷ Test ()
 testDFAtoRE = expect (RE.equivalent (toRE by5) by5')
+
+testDFAtoNFAshuffle ∷ Test ()
+testDFAtoNFAshuffle = expectEqual ℓ shuffled
+  where
+    ℓ ∷ [[Fin₄]]
+    ℓ = Config.language (DFA.toNFAShuffle ab' cd')
+      where
+        ab' ∷ DFA (Set Fin₃) Fin₄
+        ab' = contramap (toEnum . fromEnum) (DFA.fromNFA ab)
+        cd' ∷ DFA (Set Fin₃) Fin₄
+        cd' = contramap (toEnum . fromEnum) (DFA.fromNFA cd)
+    shuffled ∷ [[Fin₄]]
+    shuffled = [ [0, 1, 2, 3]
+               , [0, 2, 1, 3]
+               , [0, 2, 3, 1]
+               , [2, 0, 1, 3]
+               , [2, 0, 3, 1]
+               , [2, 3, 0, 1]
+               ]
 
 -- TODO
 -- Shuffle
