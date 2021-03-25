@@ -4,7 +4,9 @@
 module TransitionGraph where
 
 import           Algebra.Graph.Relation as Relation (Relation, gmap, transpose)
+import           Data.Foldable (Foldable (toList))
 import           Data.Functor.Contravariant (Contravariant (..))
+import           Common (quoteWith)
 import           Finite (Finite (..), Q (..), Σ (..))
 
 -- Transition Graph of an automaton
@@ -28,11 +30,11 @@ instance Contravariant (ETG q) where
 
 instance (Show q, Show s, Finite q, Finite s) ⇒ Show (TG q s) where
   show ∷ TG q s → String
-  show (TG m) = concatMap (\s → show s ++ " → " ++ show (m s) ++ "\n") (sigma (TG m))
+  show (TG m) = unlines (fmap (\s → quoteWith (show s) (show (m s)) " → ") (toList (sigma (TG m))))
 
 instance (Show q, Show s, Finite q, Finite s) ⇒ Show (ETG q s) where
   show ∷ ETG q s → String
-  show (ETG m) = concatMap (\s → show s ++ " → " ++ show (m s) ++ "\n") (sigma_ε (ETG m))
+  show (ETG m) = unlines (fmap (\s → quoteWith (show s) (show (m s)) " → ") (toList (sigma_ε (ETG m))))
 
 reverse ∷ (Ord q) ⇒ TG q s → TG q s
 reverse (TG g) = TG (Relation.transpose . g)
