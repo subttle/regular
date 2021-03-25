@@ -441,7 +441,7 @@ toNFAMin m@(DFA δ _ f) = (toNFA m) { NFA.delta = δ₁ }
     δ₁ (q, σ)         = singleton (δ (q, σ))
 
 -- TODO untested
-toNFAShuffle ∷ forall q p s . (Ord q, Ord p) ⇒ DFA q s → DFA p s → NFA.NFA (q, p) s
+toNFAShuffle ∷ ∀ q p s . (Ord q, Ord p) ⇒ DFA q s → DFA p s → NFA.NFA (q, p) s
 toNFAShuffle (DFA δ₁ q₀ f₁) (DFA δ₂ p₀ f₂) = NFA.NFA δ (q₀, p₀) (f₁ × f₂)
   where
     δ ∷ ((q, p), s) → Set (q, p)
@@ -452,7 +452,7 @@ toNFAShuffle (DFA δ₁ q₀ f₁) (DFA δ₂ p₀ f₂) = NFA.NFA δ (q₀, p�
 toEFA ∷ DFA q s → EFA.EFA q s
 toEFA = NFA.toEFA . toNFA
 
--- cycle(ℒ) = { xy | yx ∈ ℒ }
+-- cycle(ℒ) = { w₁·w₂ | w₂·w₁ ∈ ℒ }
 -- A Second Course in Formal Languages and Automata Theory pg. 60
 -- string conjugations
 toEFACycle ∷ ∀ q s . (Finite q) ⇒ DFA q s → EFA.EFA (Either () (q, q, Bool)) s
@@ -464,7 +464,7 @@ toEFACycle m@(DFA δ q₀ f) = EFA.EFA δ₁ (Left ()) (Set.map (\q → Right (q
     δ₁ (Right (q, p,     b), Just  σ)         = singleton (Right (δ (q, σ), p, b   )) -- Simulation
     δ₁ _                                      = (∅)
 
--- ½ℒ = { x ∈ Σ★ : there exists y ∈ Σ★ with |y| = |x| such that xy ∈ ℒ }.
+-- ½ℒ = { w₁ | ∃ w₂ such that |w₁| = |w₂| ∧ w₁·w₂ ∈ ℒ; w₁ ∈ Σ★, w₂ ∈ Σ★ }.
 -- A Second Course in Formal Languages and Automata Theory pg. 59
 -- for all even length strings w ∈ ℒ, take the first half of w, producing ½ℒ
 toEFAHalf ∷ ∀ q s . (Finite q, Finite s) ⇒ DFA q s → EFA.EFA (Either () (q, q, q)) s
