@@ -16,7 +16,7 @@ import           Data.Smash (Smash (..), smash)
 import           Data.These (These (..), these)
 import           Data.Void (Void, absurd)
 import           Data.Wedge (Wedge (..), wedge)
-import           Common (ContraCan (..), ContraSmash (..), ContraThese (..), ContraWedge (..), Set' (..), contrathesed, equation, quoteWith, (‥), (>&<))
+import           Common (ContraCan (..), ContraSmash (..), ContraThese (..), ContraWedge (..), Set' (..), contramaybe, contrathesed, equation, quoteWith, (‥), (>&<))
 import           Finite (Finite (..), Q (..), Σ (..))
 import qualified Language
 import           Language (ℒ)
@@ -88,57 +88,55 @@ instance ContraWedge (DA q) where
   contrawedge ∷ (s → Wedge g₁ g₂) → DA q g₁ → DA q g₂ → DA q s
   contrawedge h (DA _o₁ t₁) (DA _o₂ t₂) = DA undefined (\q → wedge q (t₁ q) (t₂ q) . h)
 
-{-
+-- FIXME some experimental functions to be renamed
 mm ∷ ∀ q s . DA q s → DA (Maybe q) s
-mm (DA o t) = DA (contramaybed o) (flip t')
+mm (DA o t) = DA (contramaybe id o) (flip t')
+-- mm (DA o t) = DA (contramaybed o) (flip t')
   where
-    --- t ∷ s → Either q p → Either q p
-    --- t = getOp (contramap (liftA2 bimap (flip t₁) (flip t₂)) (Op id))
     t' ∷ s → Maybe q → Maybe q
-    t' σ = maybe Nothing (Just . flip t σ)
+    -- t' σ = maybe Nothing (Just . (flip t σ))
+    -- t' σ = fmap (flip t σ)
+    t' = fmap . flip t
 
 ms ∷ ∀ q p s . DA q s → DA p s → DA (Smash q p) s
-ms (DA o₁ t₁) (DA o₂ t₂) = DA o (flip t)
+ms (DA o₁ t₁) (DA o₂ t₂) = DA (contrasmash id o₁ o₂) (flip t)
+-- ms (DA o₁ t₁) (DA o₂ t₂) = DA (contrasmashed o₁ o₂) (flip t)
   where
-    o ∷ Predicate (Smash q p)
-    o = contrasmashed o₁ o₂
     t ∷ s → Smash q p → Smash q p
     t = getOp (contramap (liftA2 bimap (flip t₁) (flip t₂)) (Op id))
 
 mw ∷ ∀ q p s . DA q s → DA p s → DA (Wedge q p) s
-mw (DA o₁ t₁) (DA o₂ t₂) = DA o (flip t)
+mw (DA o₁ t₁) (DA o₂ t₂) = DA (contrawedge id o₁ o₂) (flip t)
+-- mw (DA o₁ t₁) (DA o₂ t₂) = DA (contrawedged o₁ o₂) (flip t)
   where
-    o ∷ Predicate (Wedge q p)
-    o = contrawedged o₁ o₂
     t ∷ s → Wedge q p → Wedge q p
     -- t σ = wedge Nowhere (Here . flip t₁ σ) (There . flip t₂ σ)
     t = getOp (contramap (liftA2 bimap (flip t₁) (flip t₂)) (Op id))
 
 mc ∷ ∀ q p s . DA q s → DA p s → DA (Can q p) s
-mc (DA o₁ t₁) (DA o₂ t₂) = DA o (flip t)
+mc (DA o₁ t₁) (DA o₂ t₂) = DA (contracan id o₁ o₂) (flip t)
+-- mc (DA o₁ t₁) (DA o₂ t₂) = DA (contracanned o₁ o₂) (flip t)
   where
-    o ∷ Predicate (Can q p)
-    o = contracanned o₁ o₂
-    -- t' ∷ s → Can q p → Can q p
-    -- t' σ = can Non (One . flip t₁ σ) (Eno . flip t₂ σ) (\q p → Two (flip t₁ σ q) (flip t₂ σ p))
     t ∷ s → Can q p → Can q p
+    -- t σ = can Non (One . flip t₁ σ) (Eno . flip t₂ σ) (\q p → Two (flip t₁ σ q) (flip t₂ σ p))
     t = getOp (contramap (liftA2 bimap (flip t₁) (flip t₂)) (Op id))
--}
 
--- FIXME some experimental functions to be renamed
 me ∷ ∀ q p s . DA q s → DA p s → DA (Either q p) s
+-- me (DA o₁ t₁) (DA o₂ t₂) = DA (choose id o₁ o₂) (flip t)
 me (DA o₁ t₁) (DA o₂ t₂) = DA (chosen o₁ o₂) (flip t)
   where
     t ∷ s → Either q p → Either q p
     t = getOp (contramap (liftA2 bimap (flip t₁) (flip t₂)) (Op id))
 
 mp ∷ ∀ q p s . DA q s → DA p s → DA (q, p) s
+-- mp (DA o₁ t₁) (DA o₂ t₂) = DA (divide id o₁ o₂) (flip t)
 mp (DA o₁ t₁) (DA o₂ t₂) = DA (divided o₁ o₂) (flip t)
   where
     t ∷ s → (q, p) → (q, p)
     t = getOp (contramap (liftA2 bimap (flip t₁) (flip t₂)) (Op id))
---
+
 mt ∷ ∀ q p s . DA q s → DA p s → DA (These q p) s
+-- mt (DA o₁ t₁) (DA o₂ t₂) = DA (contrathese id o₁ o₂) (flip t)
 mt (DA o₁ t₁) (DA o₂ t₂) = DA (contrathesed o₁ o₂) (flip t)
   where
     t ∷ s → These q p → These q p
