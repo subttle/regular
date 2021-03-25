@@ -1,2 +1,10 @@
 cradle:
   stack:
+    - path: "./src"
+      component: "regular:lib"
+
+    - path: "./app/Main.hs"
+      component: "regular:exe:regular-exe"
+
+    - path: "./test"
+      component: "regular:test:regular-test"
