@@ -88,16 +88,13 @@ instance ContraWedge (DA q) where
 
 {-
 asdf2e ∷ ∀ q p s . DA q s → DA p s → DA (Either q p) s
-asdf2e (DA (Predicate o₁) t₁) (DA (Predicate o₂) t₂) = DA o t
+asdf2e (DA (Predicate o₁) t₁) (DA (Predicate o₂) t₂) = DA o (flip t)
   where
     o ∷ Predicate (Either q p)
     o = Predicate (either o₁ o₂)
-    t ∷ Either q p → s → Either q p
-    t c σ = either (Left . flip t₁ σ) (Right . flip t₂ σ) c
-    -- t = (flip r)
-    --   where
-    --     r ∷ s → Either q p → Either q p
-    --     r = getOp (contramap (liftA2 bimap (flip t₁) (flip t₂)) (Op id))
+    t ∷ s → Either q p → Either q p
+    t σ = either (Left . flip t₁ σ) (Right . flip t₂ σ)
+    -- t = getOp (contramap (liftA2 bimap (flip t₁) (flip t₂)) (Op id))
 
 -}
 
