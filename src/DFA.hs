@@ -85,7 +85,7 @@ instance (Finite q, Finite s) ⇒ Configuration DFA q s q where
   complete      ∷ DFA q s → Bool
   complete        = const True
 
-  occupied ∷ DFA q s → q → Set q 
+  occupied ∷ DFA q s → q → Set q
   occupied = const singleton
 
   deltaD  ∷ DFA q s → ((q, s) → q)

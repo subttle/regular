@@ -747,28 +747,29 @@ quotations ∷ String → String
 quotations = quoteWith "\"" "\""
 
 equation ∷ String → String → String
-equation lhs rhs = quoteWith lhs rhs (quoteWith " " " " ("="))
+equation lhs rhs = quoteWith lhs rhs (quoteWith " " " " "=")
 
 -- DFA q s → [((q, s), q)]
 format ∷ (Show c, Show r) ⇒ Map c r → String
 format = foldl1 ((&) "\n" ‥ quoteWith)  -- manually intercalate the Map with newlines.
-         . mapWithKey (\k v → "  δ " ++ show k ++ " ↦ " ++ show v)
+         . mapWithKey (\k v → "  δ " ++ quoteWith (show k) (show v) " ↦ ")
 
 format' ∷ ∀ c r . (Show c, Show r) ⇒ Map c (Set r) → String
-format' = go -- .  Map.filter (not . Set.null)
+format' = go -- . Map.filter (not . Set.null)
   where
     go ∷ Map c (Set r) → String
     go m | null m = "  δ _ ↦ ∅"
-    go m          = foldl1 (\a b → a ++ "\n" ++ b)  -- manually intercalate the Map with newlines.
-                    (mapWithKey (\k v → "  δ " ++ show k ++ " ↦ " ++ show (Set' v)) m)
+    go m          = foldl1 ((&) "\n" ‥ quoteWith)  -- manually intercalate the Map with newlines.
+                    -- (mapWithKey (\k v → "  δ " ++ quoteWith (show k) (show (toPredicate (v))) " ↦ ") m)
+                    (mapWithKey (\k v → "  δ " ++ quoteWith (show k) (show (Set' v)) " ↦ ") m)
 
 format'' ∷ ∀ q s r . (Show q, Show s, Show r) ⇒ Map (q, Maybe s) (Set r) → String
-format'' = go -- .  Map.filter (not . Set.null)
+format'' = go -- . Map.filter (not . Set.null)
   where
     go ∷ Map (q, Maybe s) (Set r) → String
     go m | null m = "  δ _ ↦ ∅"
-    go m          = foldl1 (\a b → a ++ "\n" ++ b )  -- manually intercalate the Map with newlines.
-                    (mapWithKey (\k v → "  δ " ++ show'' k ++ " ↦ " ++ show (Set' v)) m)
+    go m          = foldl1 ((&) "\n" ‥ quoteWith)  -- manually intercalate the Map with newlines.
+                    (mapWithKey (\k v → "  δ " ++ quoteWith (show'' k) (show (Set' v)) " ↦ ") m)
     show'' ∷ (q, Maybe s) → String
     show'' (q, σ) = quoteWith "(" ")" (quoteWith (show q) (maybe "ε" show σ) ",")
 
