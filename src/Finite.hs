@@ -506,7 +506,7 @@ instance (Finite a, Finite b, Finite c, Finite d, Finite e)
 
 instance (Finite a, Eq b) ⇒ Eq (a → b) where
   (==) ∷ (a → b) → (a → b) → Bool
-  (==) = flip all asList ‥ (liftA2 (==))
+  (==) = flip all asList ‥ liftA2 (==)
 
 instance (Bounded b) ⇒ Bounded (a → b) where
   minBound ∷ (a → b)
@@ -765,13 +765,13 @@ fin₁₆ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _  = impossible -- add unreachable cas
 
 -- FIXME finish idea about partition₀
 
-partition₁ ∷ ∀ f a . (Foldable f) ⇒ (a → Fin₁) → f a → ([a])
-partition₁ cmp = foldr select' ([]) . toList
+partition₁ ∷ ∀ f a . (Foldable f) ⇒ (a → Fin₁) → f a → [a]
+partition₁ cmp = foldr select' [] . toList
   where
-    select' ∷ a → ([a]) → ([a])
-    select' a ~(eq) = fin₁
-                        (a : eq)
-                      (cmp a)
+    select' ∷ a → [a] → [a]
+    select' a eq = fin₁
+                     (a : eq)
+                   (cmp a)
 
 partition₂ ∷ ∀ f a . (Foldable f) ⇒ (a → Fin₂) → f a → ([a], [a])
 partition₂ cmp = foldr select' ([], []) . toList
@@ -1264,75 +1264,75 @@ orbit cmp a₁ = NE.unfoldr c a₁
 order ∷ (Finite a) ⇒ Comparison a → ℕ
 order = foldl lcm 1 . fmap length' . fromEquivalence . cycles
 
-byOrder ∷ (Finite a) ⇒ Equivalence (Comparison a)
-byOrder = equating' order
+eqOrder ∷ (Finite a) ⇒ Equivalence (Comparison a)
+eqOrder = equating' order
 
 -- Count the number of elements for which the predicate returns `True`
 countImage ∷ (Finite a) ⇒ Predicate a → ℕ
 countImage = length' . flip filter' asList
 
 -- Something like `a`'s powerset grouped by size
-byCountingImage ∷ (Finite a) ⇒ Equivalence (Predicate a)
-byCountingImage = equating' countImage
+eqCountingImage ∷ (Finite a) ⇒ Equivalence (Predicate a)
+eqCountingImage = equating' countImage
 
 -- Count the parts of an equivalence
 countParts ∷ (Finite a) ⇒ Equivalence a → ℕ
 countParts = genericLength . fromEquivalence
 
-byCountingParts ∷ (Finite a) ⇒ Equivalence (Equivalence a)
-byCountingParts = equating' countParts
+eqCountingParts ∷ (Finite a) ⇒ Equivalence (Equivalence a)
+eqCountingParts = equating' countParts
 
-byLength ∷ (Foldable t) ⇒ Equivalence (t a)
-byLength = equating' length
+eqLength ∷ (Foldable t) ⇒ Equivalence (t a)
+eqLength = equating' length
 
 -- group "pieces of pie" (equivalence classes) which are the same size (length)
-byEqClassLength ∷ (Finite a) ⇒ Equivalence a → Equivalence a
-byEqClassLength = (>&<) (byLength ∷ Equivalence (NonEmpty a)) . equivalenceClass
+eqEqClassLength ∷ (Finite a) ⇒ Equivalence a → Equivalence a
+eqEqClassLength = (>&<) (eqLength ∷ Equivalence (NonEmpty a)) . equivalenceClass
 
 shape ∷ (Finite a) ⇒ Equivalence a → [ℕ]
 shape = sort . fmap length' . fromEquivalence
 
-byShape ∷ (Finite a) ⇒ Equivalence (Equivalence a)
-byShape = equating' shape
+eqShape ∷ (Finite a) ⇒ Equivalence (Equivalence a)
+eqShape = equating' shape
 
 -- TODO consider moving to src/Common.hs
-byMaybe ∷ Equivalence (Maybe a)
-byMaybe = Equivalence (≡)
+eqMaybe ∷ Equivalence (Maybe a)
+eqMaybe = Equivalence (≡)
   where
     (≡) ∷ Maybe a → Maybe a → Bool
     (≡) Nothing  Nothing  = True
     (≡) (Just _) (Just _) = True
     (≡) _         _       = False
 
-byCan ∷ Equivalence (Can a b)
-byCan = Equivalence (≡)
+eqCan ∷ Equivalence (Can a b)
+eqCan = Equivalence (≡)
   where
     (≡) ∷ Can a b → Can a b → Bool
-    (≡) (C.Non    ) (C.Non    ) = True
+    (≡) C.Non       C.Non       = True
     (≡) (C.One   _) (C.One   _) = True
     (≡) (C.Eno   _) (C.Eno   _) = True
     (≡) (C.Two _ _) (C.Two _ _) = True
     (≡) _           _           = False
 
-bySmash ∷ Equivalence (Smash a b)
-bySmash = Equivalence (≡)
+eqSmash ∷ Equivalence (Smash a b)
+eqSmash = Equivalence (≡)
   where
     (≡) ∷ Smash a b → Smash a b → Bool
-    (≡) (Nada     ) (Nada     ) = True
+    (≡) Nada        Nada        = True
     (≡) (Smash _ _) (Smash _ _) = True
     (≡) _           _           = False
 
-byWedge ∷ Equivalence (Wedge a b)
-byWedge = Equivalence (≡)
+eqWedge ∷ Equivalence (Wedge a b)
+eqWedge = Equivalence (≡)
   where
     (≡) ∷ Wedge a b → Wedge a b → Bool
-    (≡) (Nowhere  ) (Nowhere  ) = True
+    (≡) Nowhere     Nowhere     = True
     (≡) (Here    _) (Here    _) = True
     (≡) (There   _) (There   _) = True
     (≡) _           _           = False
 
-byThese ∷ Equivalence (These a b)
-byThese = Equivalence (≡)
+eqThese ∷ Equivalence (These a b)
+eqThese = Equivalence (≡)
   where
     (≡) ∷ These a b → These a b → Bool
     (≡) (This  _  ) (This  _  ) = True
@@ -1340,19 +1340,19 @@ byThese = Equivalence (≡)
     (≡) (These _ _) (These _ _) = True
     (≡) _           _           = False
 
-byEither ∷ Equivalence (Either a b)
-byEither = Equivalence (≡)
+eqEither ∷ Equivalence (Either a b)
+eqEither = Equivalence (≡)
   where
     (≡) ∷ Either a b → Either a b → Bool
     (≡) (Left  _) (Left  _) = True
     (≡) (Right _) (Right _) = True
     (≡) _         _         = False
 
-byLefts ∷ (Foldable t, Eq a) ⇒ Equivalence (t (Either a b))
-byLefts = equating' lefts'
+eqLefts ∷ (Foldable t, Eq a) ⇒ Equivalence (t (Either a b))
+eqLefts = equating' lefts'
 
-byRights ∷ (Foldable t, Eq b) ⇒ Equivalence (t (Either a b))
-byRights = equating' rights'
+eqRights ∷ (Foldable t, Eq b) ⇒ Equivalence (t (Either a b))
+eqRights = equating' rights'
 
 -- Reflexivity
 refl ∷ (Finite a) ⇒ Predicate (Equivalence a)
@@ -3037,7 +3037,7 @@ quadrants = Equivalence ((==) `on` getQuadrant)
 
 -- TODO better name?
 graphComponents ∷ ∀ a . (Num a, Eq a) ⇒ Equivalence (a, a)
-graphComponents = contramap getComponents byCan
+graphComponents = contramap getComponents eqCan
   where
     getComponents ∷ (a, a) → Can a a
     getComponents (0,  0 ) = C.Non       -- origin
