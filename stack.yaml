@@ -7,6 +7,6 @@ extra-deps:
 - containers-unicode-symbols-0.3.1.1@sha256:2f8e14cf2ec9c5f65614d3a3113b047c623729993dd12365b737b9d93ea30da2,1790
 - tree-traversals-0.1.1.0@sha256:ff7bc9d4623a2e43d28745acc19001abab857081d1268a13220b3eec17796cec,2818
 - github: unisonweb/unison
-  commit: 7eb4645d23d425fbc8e868ab4edc07cb2fe30142
+  commit: 49ca81753559417303f82dd684894765ab2c6456
   subdirs:
     - yaks/easytest
