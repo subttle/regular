@@ -36,14 +36,14 @@ import           Data.Semigroup.Traversable (Traversable1)
 import           Data.Set (Set)
 import qualified Data.Set as Set
 import           Data.Set.Unicode ((∪))
-import           Data.Smash (Smash (..), smash)
+import           Data.Smash (Smash (..), smash, fromSmash)
 import           Data.These (These (..), these, partitionEithersNE, partitionThese)
 import           Data.Traversable (mapAccumL, mapAccumR)
 import           Data.Tree (Forest, Tree (..), unfoldTree)
 import qualified Data.Type.Nat as Nat
 import           Data.Universe.Helpers (diagonal)
 import           Data.Void (Void, absurd)
-import           Data.Wedge (Wedge (..), wedge)
+import           Data.Wedge (Wedge (..), wedge, fromWedge)
 import           GHC.Float (int2Double, int2Float)
 import           Numeric.Natural.Unicode (ℕ)
 import           Prelude.Unicode (ℤ, ℚ, π)
@@ -175,17 +175,37 @@ instance Contravariant (ContraCoyoneda f) where
   contramap ∷ (b → a) → ContraCoyoneda f a → ContraCoyoneda f b
   contramap h (CCoyoneda f fb) = CCoyoneda (f . h) fb
 
+instance (ContraMaybe f) ⇒ ContraMaybe (ContraCoyoneda f) where
+  contramaybe ∷ (x → Maybe y) → ContraCoyoneda f y → ContraCoyoneda f x
+  contramaybe h (CCoyoneda yb fb) = CCoyoneda (fmap yb . h) (contramaybe id fb)
+
 instance (Divisible f) ⇒ Divisible (ContraCoyoneda f) where
   conquer ∷ ContraCoyoneda f x
   conquer = liftContraCoyoneda conquer
   divide ∷ (x → (y, z)) → ContraCoyoneda f y → ContraCoyoneda f z → ContraCoyoneda f x
-  divide h (CCoyoneda yb fb₁) (CCoyoneda zb fb₂) = CCoyoneda (bimap yb zb . h) (divided fb₁ fb₂)
+  divide h (CCoyoneda yb fb₁) (CCoyoneda zb fb₂) = CCoyoneda (bimap yb zb . h) (divide id fb₁ fb₂)
 
 instance (Decidable f) ⇒ Decidable (ContraCoyoneda f) where
   lose ∷ (x → Void) → ContraCoyoneda f x
   lose = liftContraCoyoneda . lose
   choose ∷ (x → Either y z) → ContraCoyoneda f y → ContraCoyoneda f z → ContraCoyoneda f x
-  choose h (CCoyoneda yb fb₁) (CCoyoneda zb fb₂) = CCoyoneda (bimap yb zb . h) (chosen fb₁ fb₂)
+  choose h (CCoyoneda yb fb₁) (CCoyoneda zb fb₂) = CCoyoneda (bimap yb zb . h) (choose id fb₁ fb₂)
+
+instance (ContraThese f) ⇒ ContraThese (ContraCoyoneda f) where
+  contrathese ∷ (x → These y z) → ContraCoyoneda f y → ContraCoyoneda f z → ContraCoyoneda f x
+  contrathese h (CCoyoneda yb fb₁) (CCoyoneda zb fb₂) = CCoyoneda (bimap yb zb . h) (contrathese id fb₁ fb₂)
+
+instance (ContraWedge f) ⇒ ContraWedge (ContraCoyoneda f) where
+  contrawedge ∷ (x → Wedge y z) → ContraCoyoneda f y → ContraCoyoneda f z → ContraCoyoneda f x
+  contrawedge h (CCoyoneda yb fb₁) (CCoyoneda zb fb₂) = CCoyoneda (bimap yb zb . h) (contrawedge id fb₁ fb₂)
+
+instance (ContraSmash f) ⇒ ContraSmash (ContraCoyoneda f) where
+  contrasmash ∷ (x → Smash y z) → ContraCoyoneda f y → ContraCoyoneda f z → ContraCoyoneda f x
+  contrasmash h (CCoyoneda yb fb₁) (CCoyoneda zb fb₂) = CCoyoneda (bimap yb zb . h) (contrasmash id fb₁ fb₂)
+
+instance (ContraCan f) ⇒ ContraCan (ContraCoyoneda f) where
+  contracan ∷ (x → Can y z) → ContraCoyoneda f y → ContraCoyoneda f z → ContraCoyoneda f x
+  contracan h (CCoyoneda yb fb₁) (CCoyoneda zb fb₂) = CCoyoneda (bimap yb zb . h) (contracan id fb₁ fb₂)
 
 liftContraCoyoneda ∷ f a → ContraCoyoneda f a
 liftContraCoyoneda = CCoyoneda id
@@ -236,6 +256,11 @@ infixl 4 >&<
 -- alias for `(>$$<)` (which is itself an alias for `flip contramap`)
 (>&<) ∷ (Contravariant f) ⇒ f b → (a → b) → f a
 (>&<) = flip contramap
+
+-- TODO infixl 4 >*<
+-- alias for `divided`
+(>*<) ∷ (Divisible f) ⇒ f a → f b → f (a, b)
+(>*<) = divided
 
 comparing' ∷ (Ord b) ⇒ (a → b) → Comparison a
 comparing' = (>&<) defaultComparison
@@ -996,9 +1021,16 @@ instance ContraThese Equivalence where
 -- 1 + a + b + ab
 class (Decidable f) ⇒ ContraCan f where
   contracan ∷ (a → Can b c) → f b → f c → f a
+contracanned ∷ (ContraCan f) ⇒ f b → f c → f (Can b c)
+contracanned = contracan id
 instance (Monoid m) ⇒ ContraCan (Op m) where
   contracan ∷ ∀ a b c . (a → Can b c) → Op m b → Op m c → Op m a
   contracan h (Op opᵇ) (Op opᶜ) = h >$< Op (can mempty opᵇ opᶜ (\b c → opᵇ b ⋄ opᶜ c))
+-- TODO pick a default Monoid over Bool
+instance ContraCan Predicate where
+  contracan ∷ ∀ a b c . (a → Can b c) → Predicate b → Predicate c → Predicate a
+  -- contracan h (Predicate pᵇ) (Predicate pᶜ) = h >$< Predicate (can _ pᵇ pᶜ (\b c → _ (pᵇ b) (pᶜ c))) -- ∨ ∧
+  contracan h = contramaybe (fmap fromCan h) ‥ contrathesed
 instance ContraCan Comparison where
   contracan ∷ ∀ a b c . (a → Can b c) → Comparison b → Comparison c → Comparison a
   contracan h (Comparison (⪋)) (Comparison (⪌)) = h >$< Comparison (⪥)
@@ -1036,9 +1068,16 @@ instance ContraCan Equivalence where
 -- FIXME need to decide what the proper constraint(s) should be
 class (Decidable f) ⇒ ContraWedge f where
   contrawedge ∷ (a → Wedge b c) → f b → f c → f a
+contrawedged ∷ (ContraWedge f) ⇒ f b → f c → f (Wedge b c)
+contrawedged = contrawedge id
 instance (Monoid m) ⇒ ContraWedge (Op m) where
   contrawedge ∷ ∀ a b c . (a → Wedge b c) → Op m b → Op m c → Op m a
   contrawedge h (Op opᵇ) (Op opᶜ) = h >$< Op (wedge mempty opᵇ opᶜ)
+-- TODO pick a default Monoid over Bool
+instance ContraWedge Predicate where
+  contrawedge ∷ ∀ a b c . (a → Wedge b c) → Predicate b → Predicate c → Predicate a
+  -- contrawedge h (Predicate pᵇ) (Predicate pᶜ) = h >$< Predicate (wedge _ pᵇ pᶜ)
+  contrawedge h = contramaybe (fmap fromWedge h) ‥ chosen
 instance ContraWedge Comparison where
   contrawedge ∷ ∀ a b c . (a → Wedge b c) → Comparison b → Comparison c → Comparison a
   contrawedge h (Comparison (⪋)) (Comparison (⪌)) = h >$< Comparison (⪥)
@@ -1067,9 +1106,17 @@ instance ContraWedge Equivalence where
 -- 1 + ab
 class (Decidable f) ⇒ ContraSmash f where
   contrasmash ∷ (a → Smash b c) → f b → f c → f a
+contrasmashed ∷ (ContraSmash f) ⇒ f b → f c → f (Smash b c)
+contrasmashed = contrasmash id
 instance (Monoid m) ⇒ ContraSmash (Op m) where
   contrasmash ∷ ∀ a b c . (a → Smash b c) → Op m b → Op m c → Op m a
   contrasmash h (Op opᵇ) (Op opᶜ) = h >$< Op (smash mempty (\b c → opᵇ b ⋄ opᶜ c))
+-- TODO pick a default Monoid over Bool
+instance ContraSmash Predicate where
+  contrasmash ∷ ∀ a b c . (a → Smash b c) → Predicate b → Predicate c → Predicate a
+  -- contrasmash h (Predicate pᵇ) (Predicate pᶜ) = h >$< Predicate (smash _ (\b c → _ (pᵇ b) (pᶜ c)))
+  -- contrasmash h pᵇ pᶜ = contramaybe (fmap fromSmash h) (divided pᵇ pᶜ)
+  contrasmash h = contramaybe (fmap fromSmash h) ‥ divided
 instance ContraSmash Comparison where
   contrasmash ∷ ∀ a b c . (a → Smash b c) → Comparison b → Comparison c → Comparison a
   contrasmash h (Comparison (⪋)) (Comparison (⪌)) = h >$< Comparison (⪥)
@@ -1098,6 +1145,7 @@ contramaybedJust = contramaybe Just
 instance (Monoid m) ⇒ ContraMaybe (Op m) where
   contramaybe ∷ (a → Maybe b) → Op m b → Op m a
   contramaybe h = (>$<) h . Op . maybe mempty . getOp
+-- TODO decide if I want to change this default
 instance ContraMaybe Predicate where
   contramaybe ∷ ∀ a b . (a → Maybe b) → Predicate b → Predicate a
   contramaybe h = (>$<) h . Predicate . maybe False . getPredicate
