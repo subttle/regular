@@ -2,8 +2,9 @@
 {-# LANGUAGE ConstraintKinds            #-}
 {-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE DerivingVia                #-}
-{-# LANGUAGE RankNTypes                 #-}
 {-# LANGUAGE FunctionalDependencies     #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE RankNTypes                 #-}
 
 module Common where
 
@@ -830,11 +831,11 @@ invertBijection = foldrWithKey (flip Map.insert) mempty
 palindrome ∷ (Eq a) ⇒ [a] → Bool
 palindrome w = w == reverse w
 
-newtype Set' a = Set' { unSet' ∷ Set a }
+newtype Set' a = Set' { unSet' ∷ Set a } deriving Foldable
 
 instance (Show a) ⇒ Show (Set' a) where
   show ∷ Set' a → String
-  show = quoteWith "{"  "}" . intercalate ", " . fmap show . Set.toList . unSet'
+  show = liftA2 (bool "∅") (quoteWith "{"  "}" . intercalate ", " . fmap show . toList) (not . null)
 
 -- Perhaps improving clarity in some spots
 charToString ∷ Char → String
