@@ -107,7 +107,7 @@ instance Semigroup ℕ where
   (<>) = (+)
 instance Monoid ℕ where
   mempty ∷ ℕ
-  mempty  = Zero
+  mempty = Zero
 
 instance Show ℕ where
   show ∷ ℕ → String
