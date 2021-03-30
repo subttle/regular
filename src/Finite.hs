@@ -25,7 +25,7 @@ import           Data.Foldable (Foldable (..))
 import           Data.Foldable.Unicode ((∈), (∋))
 import           Data.Function (on)
 import           Data.Functor ((<&>))
-import           Data.Functor.Contravariant (Contravariant (..), Op (..), Comparison(..), Equivalence (..), Predicate (..), defaultComparison, defaultEquivalence)
+import           Data.Functor.Contravariant (Contravariant (..), Op (..), Comparison(..), Equivalence (..), Predicate (..), comparisonEquivalence, defaultComparison, defaultEquivalence)
 import           Data.Functor.Contravariant.Divisible (Divisible (..))
 import           Data.Functor.Identity (Identity (..))
 import           Data.Group (Group, invert)
@@ -1399,10 +1399,12 @@ antisymC ∷ ∀ a . (Finite a) ⇒ Predicate (Comparison a)
 antisymC  = Predicate p
   where
     p ∷ Comparison a → Bool
-    p c = all (\(a₁, a₂) → ((a₁ ≤ a₂) ∧ (a₂ ≤ a₁)) `implies` (a₁ == a₂)) asSet
+    p c = all (\(a₁, a₂) → ((a₁ ≤ a₂) ∧ (a₂ ≤ a₁)) `implies` (a₁ ≡ a₂)) asSet
       where
         (≤) ∷ a → a → Bool
         (≤) = tolteq c
+        (≡) ∷ a → a → Bool
+        (≡) = getEquivalence (comparisonEquivalence c)
 
 -- TODO move to seperate module (and remove "C" from the name) or just think of better name?
 transC ∷ ∀ a . (Finite a) ⇒ Predicate (Comparison a)
