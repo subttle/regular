@@ -1296,6 +1296,8 @@ eqShape ∷ (Finite a) ⇒ Equivalence (Equivalence a)
 eqShape = equating' shape
 
 -- TODO consider moving to src/Common.hs
+-- Some equivalence relations formed by equating constructors.
+
 eqMaybe ∷ Equivalence (Maybe a)
 eqMaybe = Equivalence (≡)
   where
@@ -1353,6 +1355,83 @@ eqLefts = equating' lefts'
 
 eqRights ∷ (Foldable t, Eq b) ⇒ Equivalence (t (Either a b))
 eqRights = equating' rights'
+
+-- Some total orderings based on comparing constructors.
+cmpMaybe ∷ Comparison (Maybe a)
+cmpMaybe = Comparison c
+  where
+    c ∷ Maybe a → Maybe a → Ordering
+    c Nothing  Nothing  = EQ
+    c Nothing  (Just _) = LT
+    c (Just _) Nothing  = GT
+    c (Just _) (Just _) = EQ
+
+cmpCan ∷ Comparison (Can a b)
+cmpCan = Comparison c
+  where
+    c ∷ Can b c → Can b c → Ordering
+    c C.Non       C.Non       = EQ
+    c C.Non       (C.One _  ) = LT
+    c C.Non       (C.Eno   _) = LT
+    c C.Non       (C.Two _ _) = LT
+    c (C.One _  ) C.Non       = GT
+    c (C.One _  ) (C.One _  ) = EQ
+    c (C.One _  ) (C.Eno   _) = LT
+    c (C.One _  ) (C.Two _ _) = LT
+    c (C.Eno   _) C.Non       = GT
+    c (C.Eno   _) (C.One _  ) = GT
+    c (C.Eno   _) (C.Eno   _) = EQ
+    c (C.Eno   _) (C.Two _ _) = LT
+    c (C.Two _ _) C.Non       = GT
+    c (C.Two _ _) (C.One _  ) = GT
+    c (C.Two _ _) (C.Eno   _) = GT
+    c (C.Two _ _) (C.Two _ _) = EQ
+
+cmpSmash ∷ Comparison (Smash a b)
+cmpSmash = Comparison c
+  where
+    c ∷ Smash a b → Smash a b → Ordering
+    c Nada        Nada        = EQ
+    c Nada        (Smash _ _) = LT
+    c (Smash _ _) Nada        = GT
+    c (Smash _ _) (Smash _ _) = EQ
+
+cmpWedge ∷ Comparison (Wedge a b)
+cmpWedge = Comparison c
+  where
+    c ∷ Wedge a b → Wedge a b → Ordering
+    c Nowhere   Nowhere   = EQ
+    c Nowhere   (Here  _) = LT
+    c Nowhere   (There _) = LT
+    c (Here  _) Nowhere   = GT
+    c (Here  _) (Here  _) = EQ
+    c (Here  _) (There _) = LT
+    c (There _) Nowhere   = GT
+    c (There _) (Here  _) = GT
+    c (There _) (There _) = EQ
+
+cmpThese ∷ Comparison (These a b)
+cmpThese = Comparison c
+  where
+    c ∷ These a b → These a b → Ordering
+    c (This  _  ) (This  _  ) = EQ
+    c (This  _  ) (That    _) = LT
+    c (This  _  ) (These _ _) = LT
+    c (That    _) (This  _  ) = GT
+    c (That    _) (That    _) = EQ
+    c (That    _) (These _ _) = LT
+    c (These _ _) (This  _  ) = GT
+    c (These _ _) (That    _) = GT
+    c (These _ _) (These _ _) = EQ
+
+cmpEither ∷ Comparison (Either a b)
+cmpEither = Comparison c
+  where
+    c ∷ Either a b → Either a b → Ordering
+    c (Left  _) (Left  _) = EQ
+    c (Left  _) (Right _) = LT
+    c (Right _) (Right _) = EQ
+    c (Right _) (Left  _) = GT
 
 -- Reflexivity
 refl ∷ (Finite a) ⇒ Predicate (Equivalence a)
