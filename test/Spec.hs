@@ -618,167 +618,130 @@ testOpenersClosers = tests [test₀, test₁, test₂, test₃, test₄, test₅
     test₈ = expectEqual expectedSingletons (singletons figure₂)
 
 -- Test the `generateₙ` function against some known (and easy to check visually) inputs
--- there is obvious reuse we could use here, but for now this is manually expanded to illustrate
 testGenerateN ∷ Test ()
 testGenerateN = tests [test₀, test₁, test₂, test₃, test₄]
   where
     test₀ ∷ Test ()
     test₀ = expectEqual level₀ (generateₙ 0)
-      where
-        -- λ> printTree level₀
-        -- 2
-        level₀ ∷ Tree ℕ
-        level₀ = Node 2 []
     test₁ ∷ Test ()
     test₁ = expectEqual level₁ (generateₙ 1)
-      where
-        -- λ> printTree level₁
-        -- 2┬─┐
-        --  │ │
-        --  2 3
-        level₁ ∷ Tree ℕ
-        level₁ = Node 2 [ Node 2 []
-                        , Node 3 []
-                        ]
     test₂ ∷ Test ()
     test₂ = expectEqual level₂ (generateₙ 2)
-      where
-        -- λ> printTree level₂
-        -- 2──┬─────┐
-        --    │     │
-        --  2┬┴┐ 3┬─┼─┐
-        --   │ │  │ │ │
-        --   2 3  3 3 4
-        level₂ ∷ Tree ℕ
-        level₂ = Node 2 [ Node 2 [ Node 2 []
-                                 , Node 3 []
-                                 ]
-                        , Node 3 [ Node 3 []
-                                 , Node 3 []
-                                 , Node 4 []
-                                 ]
-                        ]
     test₃ ∷ Test ()
     test₃ = expectEqual level₃ (generateₙ 3)
-      where
-        -- λ> printTree level₃
-        -- 2─────┬────────────────┐
-        --       │                │
-        --  2──┬─┴───┐  3───┬─────┴┬───────┐
-        --     │     │      │      │       │
-        --   2┬┴┐ 3┬─┼─┐ 3┬─┼─┐ 3┬─┼─┐ 4┬─┬┴┬─┐
-        --    │ │  │ │ │  │ │ │  │ │ │  │ │ │ │
-        --    2 3  3 3 4  3 3 4  3 3 4  4 4 4 5
-        level₃ ∷ Tree ℕ
-        level₃ = Node 2 [ Node 2 [ Node 2 [ Node 2 []
-                                          , Node 3 []
-                                          ]
-                                 , Node 3 [ Node 3 []
-                                          , Node 3 []
-                                          , Node 4 []
-                                          ]
-                                 ]
-                        , Node 3 [ Node 3 [ Node 3 []
-                                          , Node 3 []
-                                          , Node 4 []
-                                          ]
-                                 , Node 3 [ Node 3 []
-                                          , Node 3 []
-                                          , Node 4 []
-                                          ]
-                                 , Node 4 [ Node 4 []
-                                          , Node 4 []
-                                          , Node 4 []
-                                          , Node 5 []
-                                          ]
-                                 ]
-                        ]
     test₄ ∷ Test ()
     test₄ = expectEqual level₄ (generateₙ 4)
-      where
-        -- λ> printTree level₄
-        -- 2────────────┬───────────────────────────────────────────────────────┐
-        --              │                                                       │
-        --  2─────┬─────┴──────────┐            3──────────┬────────────────────┴─┬─────────────────────────────┐
-        --        │                │                       │                      │                             │
-        --   2──┬─┴───┐  3───┬─────┴┬───────┐    3───┬─────┴┬───────┐   3───┬─────┴┬───────┐   4────┬────────┬──┴─────┬─────────┐
-        --      │     │      │      │       │        │      │       │       │      │       │        │        │        │         │
-        --    2┬┴┐ 3┬─┼─┐ 3┬─┼─┐ 3┬─┼─┐ 4┬─┬┴┬─┐  3┬─┼─┐ 3┬─┼─┐ 4┬─┬┴┬─┐ 3┬─┼─┐ 3┬─┼─┐ 4┬─┬┴┬─┐ 4┬─┬┴┬─┐ 4┬─┬┴┬─┐ 4┬─┬┴┬─┐ 5┬─┬─┼─┬─┐
-        --     │ │  │ │ │  │ │ │  │ │ │  │ │ │ │   │ │ │  │ │ │  │ │ │ │  │ │ │  │ │ │  │ │ │ │  │ │ │ │  │ │ │ │  │ │ │ │  │ │ │ │ │
-        --     2 3  3 3 4  3 3 4  3 3 4  4 4 4 5   3 3 4  3 3 4  4 4 4 5  3 3 4  3 3 4  4 4 4 5  4 4 4 5  4 4 4 5  4 4 4 5  5 5 5 5 6
-        level₄ ∷ Tree ℕ
-        level₄ = Node 2 [ Node 2 [ Node 2 [ Node 2 [ Node 2 []
-                                                   , Node 3 []
-                                                   ]
-                                          , Node 3 [ Node 3 []
-                                                   , Node 3 []
-                                                   , Node 4 []
-                                                   ]
-                                          ]
-                                 , Node 3 [ Node 3 [ Node 3 []
-                                                   , Node 3 []
-                                                   , Node 4 []
-                                                   ]
-                                          , Node 3 [ Node 3 []
-                                                   , Node 3 []
-                                                   , Node 4 []
-                                                   ]
-                                          , Node 4 [ Node 4 []
-                                                   , Node 4 []
-                                                   , Node 4 []
-                                                   , Node 5 []
-                                                   ]
-                                          ]
-                                 ]
-                        , Node 3 [ Node 3 [ Node 3 [ Node 3 []
-                                                   , Node 3 []
-                                                   , Node 4 []
-                                                   ]
-                                          , Node 3 [ Node 3 []
-                                                   , Node 3 []
-                                                   , Node 4 []
-                                                   ]
-                                          , Node 4 [ Node 4 []
-                                                   , Node 4 []
-                                                   , Node 4 []
-                                                   , Node 5 []
-                                                   ]
-                                          ]
-                                 , Node 3 [ Node 3 [ Node 3 []
-                                                   , Node 3 []
-                                                   , Node 4 []
-                                                   ]
-                                          , Node 3 [ Node 3 []
-                                                   , Node 3 []
-                                                   , Node 4 []
-                                                   ]
-                                          , Node 4 [ Node 4 []
-                                                   , Node 4 []
-                                                   , Node 4 []
-                                                   , Node 5 []
-                                                   ]
-                                          ]
-                                 , Node 4 [ Node 4 [ Node 4 []
-                                                   , Node 4 []
-                                                   , Node 4 []
-                                                   , Node 5 []
-                                                   ]
-                                          , Node 4 [ Node 4 []
-                                                   , Node 4 []
-                                                   , Node 4 []
-                                                   , Node 5 []
-                                                   ]
-                                          , Node 4 [ Node 4 []
-                                                   , Node 4 []
-                                                   , Node 4 []
-                                                   , Node 5 []
-                                                   ]
-                                          , Node 5 [ Node 5 []
-                                                   , Node 5 []
-                                                   , Node 5 []
-                                                   , Node 5 []
-                                                   , Node 6 []
-                                                   ]
-                                          ]
-                                    ]
-                            ]
+    -- λ> printTree level₀
+    -- 2
+    level₀ ∷ Tree ℕ
+    level₀ = pure 2
+    -- λ> printTree level₁
+    -- 2┬─┐
+    --  │ │
+    --  2 3
+    level₁ ∷ Tree ℕ
+    level₁ = Node 2 [ level₀
+                    , pure 3
+                    ]
+    -- λ> printTree level₂
+    -- 2──┬─────┐
+    --    │     │
+    --  2┬┴┐ 3┬─┼─┐
+    --   │ │  │ │ │
+    --   2 3  3 3 4
+    level₂ ∷ Tree ℕ
+    level₂ = Node 2 [ level₁
+                    , Node 3 [ pure 3
+                             , pure 3
+                             , pure 4
+                             ]
+                    ]
+    -- λ> printTree level₃
+    -- 2─────┬────────────────┐
+    --       │                │
+    --  2──┬─┴───┐  3───┬─────┴┬───────┐
+    --     │     │      │      │       │
+    --   2┬┴┐ 3┬─┼─┐ 3┬─┼─┐ 3┬─┼─┐ 4┬─┬┴┬─┐
+    --    │ │  │ │ │  │ │ │  │ │ │  │ │ │ │
+    --    2 3  3 3 4  3 3 4  3 3 4  4 4 4 5
+    level₃ ∷ Tree ℕ
+    level₃ = Node 2 [ level₂
+                    , Node 3 [ Node 3 [ pure 3
+                                      , pure 3
+                                      , pure 4
+                                      ]
+                             , Node 3 [ pure 3
+                                      , pure 3
+                                      , pure 4
+                                      ]
+                             , Node 4 [ pure 4
+                                      , pure 4
+                                      , pure 4
+                                      , pure 5
+                                      ]
+                             ]
+                    ]
+    -- λ> printTree level₄
+    -- 2────────────┬───────────────────────────────────────────────────────┐
+    --              │                                                       │
+    --  2─────┬─────┴──────────┐            3──────────┬────────────────────┴─┬─────────────────────────────┐
+    --        │                │                       │                      │                             │
+    --   2──┬─┴───┐  3───┬─────┴┬───────┐    3───┬─────┴┬───────┐   3───┬─────┴┬───────┐   4────┬────────┬──┴─────┬─────────┐
+    --      │     │      │      │       │        │      │       │       │      │       │        │        │        │         │
+    --    2┬┴┐ 3┬─┼─┐ 3┬─┼─┐ 3┬─┼─┐ 4┬─┬┴┬─┐  3┬─┼─┐ 3┬─┼─┐ 4┬─┬┴┬─┐ 3┬─┼─┐ 3┬─┼─┐ 4┬─┬┴┬─┐ 4┬─┬┴┬─┐ 4┬─┬┴┬─┐ 4┬─┬┴┬─┐ 5┬─┬─┼─┬─┐
+    --     │ │  │ │ │  │ │ │  │ │ │  │ │ │ │   │ │ │  │ │ │  │ │ │ │  │ │ │  │ │ │  │ │ │ │  │ │ │ │  │ │ │ │  │ │ │ │  │ │ │ │ │
+    --     2 3  3 3 4  3 3 4  3 3 4  4 4 4 5   3 3 4  3 3 4  4 4 4 5  3 3 4  3 3 4  4 4 4 5  4 4 4 5  4 4 4 5  4 4 4 5  5 5 5 5 6
+    level₄ ∷ Tree ℕ
+    level₄ = Node 2 [ level₃
+                    , Node 3 [ Node 3 [ Node 3 [ pure 3
+                                               , pure 3
+                                               , pure 4
+                                               ]
+                                      , Node 3 [ pure 3
+                                               , pure 3
+                                               , pure 4
+                                               ]
+                                      , Node 4 [ pure 4
+                                               , pure 4
+                                               , pure 4
+                                               , pure 5
+                                               ]
+                                      ]
+                             , Node 3 [ Node 3 [ pure 3
+                                               , pure 3
+                                               , pure 4
+                                               ]
+                                      , Node 3 [ pure 3
+                                               , pure 3
+                                               , pure 4
+                                               ]
+                                      , Node 4 [ pure 4
+                                               , pure 4
+                                               , pure 4
+                                               , pure 5
+                                               ]
+                                      ]
+                             , Node 4 [ Node 4 [ pure 4
+                                               , pure 4
+                                               , pure 4
+                                               , pure 5
+                                               ]
+                                      , Node 4 [ pure 4
+                                               , pure 4
+                                               , pure 4
+                                               , pure 5
+                                               ]
+                                      , Node 4 [ pure 4
+                                               , pure 4
+                                               , pure 4
+                                               , pure 5
+                                               ]
+                                      , Node 5 [ pure 5
+                                               , pure 5
+                                               , pure 5
+                                               , pure 5
+                                               , pure 6
+                                               ]
+                                      ]
+                                ]
+                        ]
