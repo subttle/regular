@@ -362,7 +362,7 @@ gteq = equating' (≠ LT)
 --   →      ([a] → b)
 list ∷ a → (b → [b] → a) → [b] → a
 list nil _    []         = nil
-list _   cons ((:) a as) = cons a as
+list _   cons ((:) b bs) = cons b bs
 
 -- case analysis for `Ordering` type
 ordering ∷ a → a → a → Ordering → a
