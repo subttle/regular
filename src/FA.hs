@@ -14,6 +14,7 @@ import qualified Data.Map as Map
 import           Data.Ord.Unicode ((≤), (≥))
 import           Data.Set as Set (Set, filter, map, powerSet, singleton, toList)
 import           Data.Set.Unicode ((∅), (∈))
+import           Prelude hiding (map)
 import qualified TransitionGraph as TG
 import           Common (Set' (..), (×), (⊎), intersects, size', quoteWith, equation, format')
 import           Config (Configuration (toGraph, eval, delta', deltaD, accessible, (⊢), occupied, complete, codeterministic, deterministic, reachable, delta''))
@@ -123,7 +124,7 @@ fromSet s = FA δ (singleton False) (singleton True)
 -- Given two FAs m₁ and m₂, return an FA which recognizes any string from
 -- m₁ immediately followed by any string from m₂
 concatenate ∷ ∀ q p s . (Ord q, Ord p) ⇒ FA q s → FA p s → FA (Either q p) s
-concatenate (FA δ₁ i₁ f₁) (FA δ₂ i₂ f₂) = FA δ (Set.map Left  i₁) (Set.map Right f₂)
+concatenate (FA δ₁ i₁ f₁) (FA δ₂ i₂ f₂) = FA δ (map Left  i₁) (map Right f₂)
   where
     δ ∷ (Either q p, s) → Set (Either q p)
     -- if this state, q, is a final state, merge q's transitions with p₀'s transitions
@@ -161,8 +162,8 @@ instance (Show q, Finite q, Show s, Finite s) ⇒ Show (FA q s) where
 
 -- Determinize the FA without transforming it to a DFA type
 determinization ∷ (Finite q) ⇒ FA q s → FA (Set q) s
-determinization m@(FA δ i f) = FA (\(states, σ) → Set.map (\q → δ (q, σ)) states)
-                                  (Set.map singleton i)
+determinization m@(FA δ i f) = FA (\(states, σ) → map (\q → δ (q, σ)) states)
+                                  (map singleton i)
                                   (Set.filter (intersects f) (powerSet (qs m)))
 
 -- Pg 32 https://www.dcc.fc.up.pt/~nam/web/resources/rafaelamsc.pdf
@@ -181,7 +182,7 @@ domain ∷ (Finite q, Finite s) ⇒ FA q s → Set (q, s)
 domain m = qs m × sigma m
 
 image ∷ (Finite q, Finite s) ⇒ FA q s → Set (Set q)
-image m@(FA δ _ _) = Set.map δ (domain m)
+image m@(FA δ _ _) = map δ (domain m)
 
 table ∷ (Finite q, Finite s) ⇒ FA q s → [((q, s), Set q)]
 table = Map.toAscList . deltaToMap
