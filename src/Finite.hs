@@ -1299,56 +1299,22 @@ eqShape = equating' shape
 -- Some equivalence relations formed by equating constructors.
 
 eqMaybe ∷ Equivalence (Maybe a)
-eqMaybe = Equivalence (≡)
-  where
-    (≡) ∷ Maybe a → Maybe a → Bool
-    (≡) Nothing  Nothing  = True
-    (≡) (Just _) (Just _) = True
-    (≡) _         _       = False
+eqMaybe = comparisonEquivalence cmpMaybe
 
 eqCan ∷ Equivalence (Can a b)
-eqCan = Equivalence (≡)
-  where
-    (≡) ∷ Can a b → Can a b → Bool
-    (≡) C.Non       C.Non       = True
-    (≡) (C.One   _) (C.One   _) = True
-    (≡) (C.Eno   _) (C.Eno   _) = True
-    (≡) (C.Two _ _) (C.Two _ _) = True
-    (≡) _           _           = False
+eqCan = comparisonEquivalence cmpCan
 
 eqSmash ∷ Equivalence (Smash a b)
-eqSmash = Equivalence (≡)
-  where
-    (≡) ∷ Smash a b → Smash a b → Bool
-    (≡) Nada        Nada        = True
-    (≡) (Smash _ _) (Smash _ _) = True
-    (≡) _           _           = False
+eqSmash = comparisonEquivalence cmpSmash
 
 eqWedge ∷ Equivalence (Wedge a b)
-eqWedge = Equivalence (≡)
-  where
-    (≡) ∷ Wedge a b → Wedge a b → Bool
-    (≡) Nowhere     Nowhere     = True
-    (≡) (Here    _) (Here    _) = True
-    (≡) (There   _) (There   _) = True
-    (≡) _           _           = False
+eqWedge = comparisonEquivalence cmpWedge
 
 eqThese ∷ Equivalence (These a b)
-eqThese = Equivalence (≡)
-  where
-    (≡) ∷ These a b → These a b → Bool
-    (≡) (This  _  ) (This  _  ) = True
-    (≡) (That    _) (That    _) = True
-    (≡) (These _ _) (These _ _) = True
-    (≡) _           _           = False
+eqThese = comparisonEquivalence cmpThese
 
 eqEither ∷ Equivalence (Either a b)
-eqEither = Equivalence (≡)
-  where
-    (≡) ∷ Either a b → Either a b → Bool
-    (≡) (Left  _) (Left  _) = True
-    (≡) (Right _) (Right _) = True
-    (≡) _         _         = False
+eqEither = comparisonEquivalence cmpEither
 
 eqLefts ∷ (Foldable t, Eq a) ⇒ Equivalence (t (Either a b))
 eqLefts = equating' lefts'
