@@ -70,7 +70,7 @@ instance Monad ExRE where
   (>>=) ∷ ExRE a → (a → ExRE b) → ExRE b
   (>>=) Zero     _ = Zero
   (>>=) One      _ = One
-  (>>=) (Lit  s) f = f s
+  (>>=) (Lit  σ) f = f σ
   (>>=) (α :| β) f = (α >>= f) :| (β >>= f)
   (>>=) (α :& β) f = (α >>= f) :& (β >>= f)
   (>>=) (α :. β) f = (α >>= f) :. (β >>= f)
@@ -137,7 +137,7 @@ derivative' = List.foldl derivative
 matches ∷ (Ord s) ⇒ ExRE s → [s] → Bool
 matches Zero       _ = False
 matches α         [] = constant α == One
-matches α    (a : w) = matches (derivative α a) w
+matches α    (σ : w) = matches (derivative α σ) w
 
 nullable ∷ (Ord s) ⇒ ExRE s → Bool
 nullable = nullable' . normalize
