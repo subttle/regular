@@ -71,21 +71,27 @@ instance (Finite q, Finite s) ⇒ Configuration EFA q s (Set q) where
   codeterministic = undefined  -- FIXME
 
   occupied ∷ EFA q s → Set q → Set q
-  occupied = const id
+  occupied = eclosure
 
   initial  ∷ EFA q s → Set q
   initial  = eclosure <*> (singleton . q0)
 
   final    ∷ EFA q s → Set q
-  final    = fs
+  final    = eclosure <*> fs
 
   -- Given an EFA, m, and a configuration, return what it yields in one step
   (⊢) ∷ EFA q s → (Set q, [s]) → (Set q, [s])
-  (⊢) _             (states,    []) = (states,                                                [])
-  (⊢) m@(EFA δ _ _) (states, σ : w) = (eclosure m (foldMap δ (states × singleton (Just σ))),  w )
+  (⊢) m             (states,    []) = (eclosure m                        states                       , [])
+  (⊢) m@(EFA δ _ _) (states, σ : w) = (eclosure m (foldMap δ (eclosure m states × singleton (Just σ))), w )
 
   accessible ∷ EFA q s → Set q
-  accessible m@(EFA _ q₀ _) = reachable m q₀
+  accessible m@(EFA _ q₀ _) = eclosure m (reachable m q₀)
+
+  adjacent ∷ EFA q s → q → Set q
+  adjacent m q = eclosure m (foldMap (\σ → delta'' m (singleton q, pure σ)) asList)
+
+  reachable ∷ EFA q s → q → Set q
+  reachable m = eclosure m . (reachable' m . singleton)
 
   -- FIXME untested, also, consider characteristics of eclosure placement
   deltaD ∷ EFA q s → (Set q, s) → Set q
