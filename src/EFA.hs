@@ -87,8 +87,9 @@ instance (Finite q, Finite s) ⇒ Configuration EFA q s (Set q) where
   accessible ∷ EFA q s → Set q
   accessible m@(EFA _ q₀ _) = eclosure m (reachable m q₀)
 
+  -- N.B. this doesn't take the ε-closure.
   adjacent ∷ EFA q s → q → Set q
-  adjacent m q = eclosure m (foldMap (\σ → delta'' m (singleton q, pure σ)) asList)
+  adjacent m@(EFA δ _ _) q = foldMap δ (singleton q × sigma_ε m)
 
   reachable ∷ EFA q s → q → Set q
   reachable m = eclosure m . (reachable' m . singleton)
