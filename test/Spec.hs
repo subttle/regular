@@ -55,12 +55,14 @@ suite = tests [ scope "main.FizzBuzz"              testFizzBuzz
               , scope "Comparison.Compose"         testComposeC
               , scope "Comparison.Invert"          testGroupInvert
               , scope "Comparison.Cycles"          testCycles
+              , scope "Comparisons.lawful"         testLawfulComparisons
               , scope "RGS.restricted"             testRestrictedPredicate  -- FIXME better name?
               , scope "paths"                      testRestrictedPaths      -- FIXME better name
               , scope "generateₙ"                  testGenerateN            -- FIXME better name
               , scope "Equivalence.OpenersClosers" testOpenersClosers
               , scope "Equivalence.toRGS"          testEquivalencetoRGS
               , scope "Equivalence.bijection"      testEquivalenceBijection
+              , scope "Equivalences.lawful"        testLawfulEquivalences
               ]
 
 -- Test that ordinary FizzBuzz has the same output as the FizzBuzz which uses DFA
@@ -745,3 +747,37 @@ testGenerateN = tests [test₀, test₁, test₂, test₃, test₄]
                                       ]
                                 ]
                         ]
+
+-- Test lawfulness of the generated equivalence relations (with some arbitrarily picked types).
+testLawfulEquivalences ∷ Test ()
+testLawfulEquivalences = tests [test₁, test₂, test₃, test₄, test₅, test₆]
+  where
+    test₁ ∷ Test ()
+    test₁ = scope "eqMaybe"  . expect . getPredicate lawful $ eqMaybe  @ Fin₄
+    test₂ ∷ Test ()
+    test₂ = scope "eqEither" . expect . getPredicate lawful $ eqEither @ Fin₄ @ Ordering
+    test₃ ∷ Test ()
+    test₃ = scope "eqThese"  . expect . getPredicate lawful $ eqThese  @ Fin₄ @ Ordering
+    test₄ ∷ Test ()
+    test₄ = scope "eqSmash"  . expect . getPredicate lawful $ eqSmash  @ Fin₄ @ Ordering
+    test₅ ∷ Test ()
+    test₅ = scope "eqCan"    . expect . getPredicate lawful $ eqCan    @ Fin₄ @ Ordering
+    test₆ ∷ Test ()
+    test₆ = scope "eqWedge"  . expect . getPredicate lawful $ eqWedge  @ Fin₄ @ Ordering
+
+-- Test lawfulness of the generated total orderings (with some arbitrarily picked types).
+testLawfulComparisons ∷ Test ()
+testLawfulComparisons = tests [test₁, test₂, test₃, test₄, test₅, test₆]
+  where
+    test₁ ∷ Test ()
+    test₁ = scope "cmpMaybe"  . expect . getPredicate lawfulComparison $ cmpMaybe  @ Fin₄
+    test₂ ∷ Test ()
+    test₂ = scope "cmpEither" . expect . getPredicate lawfulComparison $ cmpEither @ Fin₄ @ Ordering
+    test₃ ∷ Test ()
+    test₃ = scope "cmpThese"  . expect . getPredicate lawfulComparison $ cmpThese  @ Fin₄ @ Ordering
+    test₄ ∷ Test ()
+    test₄ = scope "cmpSmash"  . expect . getPredicate lawfulComparison $ cmpSmash  @ Fin₄ @ Ordering
+    test₅ ∷ Test ()
+    test₅ = scope "cmpCan"    . expect . getPredicate lawfulComparison $ cmpCan    @ Fin₄ @ Ordering
+    test₆ ∷ Test ()
+    test₆ = scope "cmpWedge"  . expect . getPredicate lawfulComparison $ cmpWedge  @ Fin₄ @ Ordering
