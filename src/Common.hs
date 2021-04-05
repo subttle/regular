@@ -615,6 +615,12 @@ powers n = fix ((⊲) 1 . fmap (* n))
 fibonacci ∷ NonEmpty ℕ
 fibonacci = fix ((⊲) 0 . NE.scanl (+) 1)
 
+-- Pascal's triangle (as a non-empty list)
+-- inspired by https://wiki.haskell.org/Blow_your_mind
+-- N.B. this does not terminate
+pascals ∷ NonEmpty (NonEmpty ℕ)
+pascals = fix ((⊲) (pure 1) . fmap (NE.zipWith (+) <$> (⋄) (pure 0) <*> flip (⋄) (pure 0)))
+
 -- Factorial numbers (as a non-empty list)
 -- http://oeis.org/A000142
 factorials ∷ NonEmpty ℕ
