@@ -58,7 +58,7 @@ suite = tests [ scope "main.FizzBuzz"              testFizzBuzz
               , scope "Comparisons.lawful"         testLawfulComparisons
               , scope "RGS.restricted"             testRestrictedPredicate  -- FIXME better name?
               , scope "paths"                      testRestrictedPaths      -- FIXME better name
-              , scope "generateₙ"                  testGenerateN            -- FIXME better name
+              , scope "generateₙ"                  testGenerateN
               , scope "Equivalence.OpenersClosers" testOpenersClosers
               , scope "Equivalence.toRGS"          testEquivalencetoRGS
               , scope "Equivalence.bijection"      testEquivalenceBijection
@@ -624,15 +624,15 @@ testGenerateN ∷ Test ()
 testGenerateN = tests [test₀, test₁, test₂, test₃, test₄]
   where
     test₀ ∷ Test ()
-    test₀ = expectEqual level₀ (generateₙ 0)
+    test₀ = scope "level₀" . expectEqual level₀ $ generateₙ 0
     test₁ ∷ Test ()
-    test₁ = expectEqual level₁ (generateₙ 1)
+    test₁ = scope "level₁" . expectEqual level₁ $ generateₙ 1
     test₂ ∷ Test ()
-    test₂ = expectEqual level₂ (generateₙ 2)
+    test₂ = scope "level₂" . expectEqual level₂ $ generateₙ 2
     test₃ ∷ Test ()
-    test₃ = expectEqual level₃ (generateₙ 3)
+    test₃ = scope "level₃" . expectEqual level₃ $ generateₙ 3
     test₄ ∷ Test ()
-    test₄ = expectEqual level₄ (generateₙ 4)
+    test₄ = scope "level₄" . expectEqual level₄ $ generateₙ 4
     -- λ> printTree level₀
     -- 2
     level₀ ∷ Tree ℕ
