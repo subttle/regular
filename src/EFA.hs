@@ -180,7 +180,6 @@ fromSet s = EFA δ False (singleton True)
 
 -- Avoid using `foldl` because the base case may introduce extra states
 fromList ∷ (Eq s) ⇒ [s] → SomeEFA s
--- fromList = list (SomeEFA epsilon) (\σ w → fromNE (σ NE.:| w))
 fromList = list (SomeEFA epsilon) (fromNE ‥ (NE.:|))
 
 fromNE ∷ (Eq s) ⇒ NE.NonEmpty s → SomeEFA s
@@ -188,7 +187,6 @@ fromNE = foldl1 (\(SomeEFA acc) (SomeEFA σ) → SomeEFA (concatenate acc σ)) .
 
 -- TODO not really tested
 fromLang ∷ (Eq s) ⇒ [[s]] → SomeEFA s
--- fromLang = list (SomeEFA empty) (\w ws → foldl1 (\(SomeEFA m₁) (SomeEFA m₂) → SomeEFA (EFA.union m₁ m₂)) (fmap EFA.fromList (w : ws)))
 fromLang = list (SomeEFA empty) (foldl1 (\(SomeEFA m₁) (SomeEFA m₂) → SomeEFA (EFA.union m₁ m₂)) ‥ (fmap EFA.fromList ‥ (:)))
 
 -- TODO deleteme
