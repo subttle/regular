@@ -14,7 +14,7 @@ import qualified Data.Map            as Map (fromList, fromSet, toAscList)
 import           Data.Set            as Set (Set, fromList, insert, map, singleton)
 import           Data.Set.Unicode ((∅), (∈), (∪))
 import           Prelude             hiding (map)
-import           Common (Set' (..), equation, fixedPoint, format'', quoteWith, (×), (⊎))
+import           Common (Set' (..), equation, fixedPoint, format'', list, quoteWith, (×), (⊎), (‥))
 import           Config (Configuration (..))
 import           Finite (Finite (..), Q (..), Σ (..))
 import qualified FA
@@ -180,16 +180,16 @@ fromSet s = EFA δ False (singleton True)
 
 -- Avoid using `foldl` because the base case may introduce extra states
 fromList ∷ (Eq s) ⇒ [s] → SomeEFA s
-fromList []      = SomeEFA epsilon
-fromList (σ : w) = fromNE (σ NE.:| w)
+-- fromList = list (SomeEFA epsilon) (\σ w → fromNE (σ NE.:| w))
+fromList = list (SomeEFA epsilon) (fromNE ‥ (NE.:|))
 
 fromNE ∷ (Eq s) ⇒ NE.NonEmpty s → SomeEFA s
 fromNE = foldl1 (\(SomeEFA acc) (SomeEFA σ) → SomeEFA (concatenate acc σ)) . fmap (SomeEFA . literal)
 
 -- TODO not really tested
 fromLang ∷ (Eq s) ⇒ [[s]] → SomeEFA s
-fromLang [] = SomeEFA EFA.empty
-fromLang ws = foldl1 (\(SomeEFA m₁) (SomeEFA m₂) → SomeEFA (EFA.union m₁ m₂)) (fmap EFA.fromList ws)
+-- fromLang = list (SomeEFA empty) (\w ws → foldl1 (\(SomeEFA m₁) (SomeEFA m₂) → SomeEFA (EFA.union m₁ m₂)) (fmap EFA.fromList (w : ws)))
+fromLang = list (SomeEFA empty) (foldl1 (\(SomeEFA m₁) (SomeEFA m₂) → SomeEFA (EFA.union m₁ m₂)) ‥ (fmap EFA.fromList ‥ (:)))
 
 -- TODO deleteme
 lang ∷ (Finite s) ⇒ SomeEFA s → [[s]]
