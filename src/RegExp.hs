@@ -35,6 +35,7 @@ module RegExp
   , RegExp.toList
   , fromWords
   , toLanguage
+  , toERE
   , partial
   , partial'
   , linear
@@ -79,6 +80,7 @@ import           Numeric.Order.Class (Order, (<~))
 import           Numeric.Semiring.ZeroProduct (ZeroProductSemiring)
 import           Prelude hiding ((+), (*), last, map)
 import           Common (Algebra (..), impossible, (‥))
+import qualified ERE
 import           Finite (Finite (..), Σ (..))
 import qualified Language
 
@@ -530,6 +532,14 @@ convert (Lit  σ) = Fix (LitF σ)
 convert (α :| β) = Fix (UnionF  (convert α) (convert β))
 convert (α :. β) = Fix (ConcatF (convert α) (convert β))
 convert (Star α) = Fix (StarF   (convert α))
+
+toERE ∷ (Ord s) ⇒ RegExp s → ERE.ExRE s
+toERE Zero     = ERE.Zero
+toERE One      = ERE.One
+toERE (Lit  σ) = ERE.Lit σ
+toERE (α :| β) = toERE α ERE.:| toERE β
+toERE (α :. β) = toERE α ERE.:. toERE β
+toERE (Star α) = ERE.Star (toERE α)
 
 finite ∷ (Ord s) ⇒ RegExp s → Bool
 finite = finite' . normalize
