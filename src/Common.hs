@@ -156,17 +156,7 @@ liftA4 ∷ (Applicative f) ⇒ (a → b → c → d → e) → f a → f b → f
 liftA4 = (<*>) ┈ liftA3
 
 liftA5 ∷ (Applicative f) ⇒ (a → b → c → d → e → g) → f a → f b → f c → f d → f e → f g
--- liftA5 f fa fb fc fd fe = liftA4 f fa fb fc fd <*> fe
--- liftA5 f fa fb fc fd fe = (<*>) (liftA4 f fa fb fc fd) fe
--- liftA5 f fa fb fc fd = (<*>) (liftA4 f fa fb fc fd)
--- liftA5 f fa fb fc = (<*>) . (liftA4 f fa fb fc)
--- liftA5 f fa fb = (<*>) ‥ (liftA4 f fa fb)
--- liftA5 f fa = (<*>) … (liftA4 f fa)
--- liftA5 f = (<*>) ┈ (liftA4 f)
--- liftA5 = (…) (<*>) ‥ (liftA4)
--- liftA5 = (‥) ((…) (<*>)) liftA4
--- liftA5 = (‥) ((…) (<*>)) liftA4
-liftA5 f = (<*>) ┈ (liftA4 f)
+liftA5 f = (<*>) ┈ liftA4 f
 
 -- https://vimeo.com/122708005  ← excellent video!!!
 -- Coyoneda f a ~ (∀ b . Coyoneda (b → a) → f b)
