@@ -6,7 +6,6 @@
 module ERE where
 
 import           Control.Monad (ap)
-import           Data.Ord.Unicode ((≥))
 import           Data.Pointed (Pointed (..))
 import           Numeric.Natural.Unicode (ℕ)
 import           Finite (Finite (..), Σ (..))
@@ -47,10 +46,10 @@ instance (Show s) ⇒ Show (ExRE s) where
   showsPrec _          Zero     = showChar '∅'
   showsPrec _          One      = showChar 'ε'
   showsPrec _          (Lit  σ) = shows σ
-  showsPrec precedence (α :| β) = showParen (precedence ≥ 6) (showsPrec 6 α . showChar '∣' . showsPrec 6 β)
-  showsPrec precedence (α :& β) = showParen (precedence ≥ 7) (showsPrec 7 α . showChar '&' . showsPrec 7 β)
-  showsPrec precedence (α :. β) = showParen (precedence ≥ 8) (showsPrec 8 α . showChar '·' . showsPrec 8 β)
-  showsPrec precedence (Star α) = showParen (precedence ≥ 9) (showsPrec 9 α . showChar '★')
+  showsPrec precedence (α :| β) = showParen (precedence > 6) (showsPrec 6 α . showChar '∣' . showsPrec 6 β)
+  showsPrec precedence (α :& β) = showParen (precedence > 7) (showsPrec 7 α . showChar '&' . showsPrec 7 β)
+  showsPrec precedence (α :. β) = showParen (precedence > 8) (showsPrec 8 α . showChar '·' . showsPrec 8 β)
+  showsPrec precedence (Star α) = showParen (precedence > 9) (showsPrec 9 α . showChar '★')
 
 instance Pointed ExRE where
   point ∷ s → ExRE s
