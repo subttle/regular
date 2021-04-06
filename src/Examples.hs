@@ -107,6 +107,20 @@ by3 = DFA δ (Left ()) (singleton (Right 0))
     δ ∷ (Either () Fin₃, Fin₁₀) → Either () Fin₃
     δ = Right . toEnum . (`mod` 3) . \(q, digit) → fromEnum (fromRight 0 q) + fromEnum digit
 
+-- https://en.wikipedia.org/wiki/Thompson%27s_construction
+-- https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Thompson%27s_construction_algorithm_applied_to_regular_expression_for_binary_multiples_of_3.gif/494px-Thompson%27s_construction_algorithm_applied_to_regular_expression_for_binary_multiples_of_3.gif
+-- "the regular expression (0|(1(01*(00)*0)*1)*)* that denotes the set of binary numbers that are multiples of 3"
+-- ℒ((0|(1·(0·1★·(0·0)★·0)★·1)★)★) = {ε, "0", "00", "11", "000", "011", "110", "0000", "0011", "0110", "1001", "1100", "1111", "00000", ...}
+-- >>> Prelude.take 14 $ RegExp.language by3'
+-- [[],[0],[0,0],[1,1],[0,0,0],[0,1,1],[1,1,0],[0,0,0,0],[0,0,1,1],[0,1,1,0],[1,0,0,1],[1,1,0,0],[1,1,1,1],[0,0,0,0,0]]
+by3' ∷ RE.RegExp Fin₂
+by3' = RE.star (z RE.+ (RE.star (o RE.* (RE.star (z RE.* (RE.star o) RE.* (RE.star (z RE.* z)) RE.* z)) RE.* o)))
+  where
+    z ∷ RE.RegExp Fin₂
+    z = RE.literal 0
+    o ∷ RE.RegExp Fin₂
+    o = RE.literal 1
+
 {-          Ross Ashby's "ghost taming" automaton [1]
  (example from "Synchronizing automata and the Černý conjecture" [2])
  "In each minute, each noise is either sounding or silent—
