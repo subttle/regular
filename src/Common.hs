@@ -138,13 +138,20 @@ snoc = flip (.) pure . (⋄)
 watermark ∷ (Ord a) ⇒ NonEmpty a → NonEmpty a
 watermark = NE.scanl1 max
 
+-- Just for consistency
+-- (∘) ∷ (a → b) → (c             → a) → (c             → b)
+-- (∘) = (.)
 -- TODO precedence
--- TODO infixl 8 ‥ -- …
-(‥) ∷ (a → b) → (c → d     → a) → (c → d     → b)
-(‥) = (.)    .    (.)
+-- TODO infixl 8 ‥ -- ‥ … ┄ ┈
+(‥) ∷ (a → b) → (c → d         → a) → (c → d         → b)
+(‥) = (.) . (.)
 
-(…) ∷ (a → b) → (c → d → e → a) → (c → d → e → b)
+-- TODO replace with (┄)?
+(…) ∷ (a → b) → (c → d → e     → a) → (c → d → e     → b)
 (…) = (.) . (.) . (.)
+
+(┈) ∷ (a → b) → (c → d → e → f → a) → (c → d → e → f → b)
+(┈) = (.) . (.) . (.) . (.)
 
 -- https://vimeo.com/122708005  ← excellent video!!!
 -- Coyoneda f a ~ (∀ b . Coyoneda (b → a) → f b)
