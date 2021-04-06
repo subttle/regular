@@ -10,6 +10,7 @@ module Common where
 
 import           Control.Applicative (Applicative (..), ZipList (..), liftA3)
 import           Control.Arrow ((|||), (&&&))
+import           Control.Monad ((>=>), (<=<))
 import           Data.Bifunctor (Bifunctor (..))
 import           Data.Bool (bool)
 import           Data.Bool.Unicode ((∧))
@@ -380,6 +381,11 @@ ordering ∷ a → a → a → Ordering → a
 ordering lt _  _  LT = lt
 ordering _  eq _  EQ = eq
 ordering _  _  gt GT = gt
+
+-- Greatest Common Divisor
+-- https://proofwiki.org/wiki/GCD_for_Negative_Integers
+gcd' ∷ (Integral a) ⇒ a → a → ℕ
+gcd' = liftA4 (liftA4 ordering) (subtract >=> flip gcd') (const . fromIntegral) (gcd' <=< flip subtract) compare `on` abs
 
 smashedCompare ∷ (Ord a) ⇒ a → a → Smash a a
 smashedCompare = smashedComparison defaultComparison
