@@ -153,6 +153,16 @@ watermark = NE.scanl1 max
 (┈) ∷ (a → b) → (c → d → e → f → a) → (c → d → e → f → b)
 (┈) = (.) . (.) . (.) . (.)
 
+liftA4 ∷ (Applicative f) ⇒ (a → b → c → d → e) → f a → f b → f c → f d → f e
+-- liftA4 f fa fb fc fd = liftA3 f fa fb fc <*> fd
+-- liftA4 f fa fb fc fd = (<*>) (liftA3 f fa fb fc) fd
+-- liftA4 f fa fb fc = (<*>) (liftA3 f fa fb fc)
+-- liftA4 f fa fb = (<*>) . (liftA3 f fa fb)
+-- liftA4 f fa = (<*>) ‥ (liftA3 f fa)
+-- liftA4 f = (<*>) … (liftA3 f)
+-- liftA4 f = (<*>) … liftA3 f
+liftA4 = (<*>) ┈ liftA3
+
 -- https://vimeo.com/122708005  ← excellent video!!!
 -- Coyoneda f a ~ (∀ b . Coyoneda (b → a) → f b)
 -- (lowerCoyoneda . liftCoyoneda) == fmap id == id
