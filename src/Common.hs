@@ -322,8 +322,7 @@ replicateM' n = (<*>) (liftA2 (:)) (replicateM' (pred n))
 
 -- Something like free monoid. Lazily generate all possible finite sequences over the given alphabet.
 freeMonoid ∷ [a] → [[a]]
-freeMonoid []       = pure []
-freeMonoid alphabet = concatMap (`replicateM` alphabet) [0 ..]
+freeMonoid = list (pure mempty) (([0 ..] >>=) ‥ (flip replicateM' ‥ (:)))
 
 -- FIXME test, comment etc.
 freeMonoidFrom ∷ ℕ → [s] → [[s]]
