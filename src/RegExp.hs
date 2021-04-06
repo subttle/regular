@@ -66,7 +66,6 @@ import           Data.Set.Unicode ((∅), (∉), (∪)) -- (∈)
 import           Data.Fix (Fix (..))
 import           Data.Foldable (toList)
 import           Data.Function (on)
-import           Data.Ord.Unicode ((≥))
 import           Data.Pointed (Pointed (..))
 import           GHC.Generics (Generic1)
 import           Numeric.Additive.Class (Additive (..), Idempotent, Abelian)
@@ -76,7 +75,7 @@ import           Numeric.Algebra.Unital (Unital (..))
 import           Numeric.Decidable.Zero (DecidableZero (..))
 import           Numeric.Dioid.Class (Dioid)
 import           Numeric.Natural.Unicode (ℕ)
-import           Numeric.Order.Class (Order (..))
+import           Numeric.Order.Class (Order, (<~))
 import           Numeric.Semiring.ZeroProduct (ZeroProductSemiring)
 import           Prelude hiding ((+), (*), last, map)
 import           Common (Algebra (..), impossible, (‥))
@@ -245,9 +244,9 @@ instance (Show s) ⇒ Show (RegExp s) where
   showsPrec _          Zero     = showChar '∅'
   showsPrec _          One      = showChar 'ε'
   showsPrec _          (Lit  σ) = shows σ
-  showsPrec precedence (α :| β) = showParen (precedence ≥ 6) (showsPrec 6 α . showChar '∣' . showsPrec 6 β)
-  showsPrec precedence (α :. β) = showParen (precedence ≥ 7) (showsPrec 7 α . showChar '·' . showsPrec 7 β)
-  showsPrec precedence (Star α) = showParen (precedence ≥ 8) (showsPrec 8 α . showChar '★')
+  showsPrec precedence (α :| β) = showParen (precedence > 6) (showsPrec 6 α . showChar '∣' . showsPrec 6 β)
+  showsPrec precedence (α :. β) = showParen (precedence > 7) (showsPrec 7 α . showChar '·' . showsPrec 7 β)
+  showsPrec precedence (Star α) = showParen (precedence > 8) (showsPrec 8 α . showChar '★')
 
 instance Pointed RegExp where
   point ∷ s → RegExp s
