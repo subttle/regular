@@ -273,7 +273,7 @@ instance Monad RegExp where
   (>>=) ∷ RegExp s → (s → RegExp g) → RegExp g
   (>>=) Zero     _ = Zero
   (>>=) One      _ = One
-  (>>=) (Lit  s) f = f s
+  (>>=) (Lit  σ) f = f σ
   (>>=) (α :| β) f = (α >>= f) :| (β >>= f)
   (>>=) (α :. β) f = (α >>= f) :. (β >>= f)
   (>>=) (Star α) f = Star (α >>= f)
@@ -282,10 +282,10 @@ instance Monad RegExp where
   (>>=) ∷ RegExp s → (s → RegExp g) → RegExp g
   (>>=) Zero     = const Zero
   (>>=) One      = const One
-  (>>=) (Lit  s) = ($ s)
-  (>>=) (α :| β) = (:|) . (>>=) α <*> (>>=) β
-  (>>=) (α :. β) = (:.) . (>>=) α <*> (>>=) β
-  (>>=) (Star α) = Star . (>>=) α
+  (>>=) (Lit  σ) = ($ σ) -- (&) σ
+  (>>=) (α :| β) = (:|) <$> (>>=) α <*> (>>=) β
+  (>>=) (α :. β) = (:.) <$> (>>=) α <*> (>>=) β
+  (>>=) (Star α) = Star <$> (>>=) α
 -}
 
 -- "character class"
