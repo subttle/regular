@@ -130,7 +130,7 @@ instance (Finite a)
        ⇒ Finite (Set a) where
   asList ∷ [Set a]
   asList = toList (powerSet asSet)
-  asSet ∷ Set (Set a)
+  asSet  ∷ Set (Set a)
   asSet  = powerSet asSet
 
 instance (Finite a)
@@ -188,7 +188,7 @@ instance (Finite a)
        ⇒ Finite (Maybe a) where
   asList ∷ [Maybe a]
   asList = Nothing : fmap Just asList
-  asSet ∷ Set (Maybe a)
+  asSet  ∷ Set (Maybe a)
   asSet  = Set.insert Nothing (Set.mapMonotonic Just asSet)
 
 instance (Bounded a, Bounded b)
@@ -249,8 +249,8 @@ instance (Finite a, Finite b)
        ⇒ Finite (These a b) where
   asList ∷ [These a b]
   asList = fmap toThese asList
-  asSet ∷ Set (These a b)
-  asSet = Set.map toThese asSet
+  asSet  ∷ Set (These a b)
+  asSet  = Set.map toThese asSet
 
 -- EXPERIMENTAL
 -- Wedge
@@ -279,8 +279,8 @@ instance (Finite a, Finite b)
        ⇒ Finite (Wedge a b) where
   asList ∷ [Wedge a b]
   asList = fmap toWedge asList
-  asSet ∷ Set (Wedge a b)
-  asSet = Set.map toWedge asSet
+  asSet  ∷ Set (Wedge a b)
+  asSet  = Set.map toWedge asSet
 
 -- Can
 instance (Bounded a, Bounded b)
@@ -308,8 +308,8 @@ instance (Finite a, Finite b)
        ⇒ Finite (Can a b) where
   asList ∷ [Can a b]
   asList = fmap toCan asList
-  asSet ∷ Set (Can a b)
-  asSet = Set.map toCan asSet
+  asSet  ∷ Set (Can a b)
+  asSet  = Set.map toCan asSet
 
 -- Smash
 instance (Bounded a, Bounded b)
@@ -340,8 +340,8 @@ instance (Finite a, Finite b)
   asList ∷ [Smash a b]
   -- asList = Nada : fmap (toSmash . Just) (asList @ (a, b))
   asList = fmap toSmash asList
-  asSet ∷ Set (Smash a b)
-  asSet = Set.map toSmash asSet
+  asSet  ∷ Set (Smash a b)
+  asSet  = Set.map toSmash asSet
 
 -- For tuples where types `a` and `b` are enumerable, allow the tuple to be enumerated as `a` × `b`
 instance (Finite a, Finite b)
@@ -369,7 +369,7 @@ instance (Finite a, Finite b)
 
 instance (Finite a, Finite b)
        ⇒ Finite (a, b) where
-  asSet ∷ Set (a, b)
+  asSet  ∷ Set (a, b)
   asSet  = asSet × asSet
   asList ∷ [(a, b)]
   asList = liftA2 (,) asList asList
@@ -516,8 +516,8 @@ instance (Bounded b) ⇒ Bounded (a → b) where
 
 -- Something like Fin₀
 instance Enum Void where
-  toEnum ∷ Int → Void
-  toEnum = undefined
+  toEnum   ∷ Int → Void
+  toEnum   = undefined
   fromEnum ∷ Void → Int
   fromEnum = absurd
 -- Easier to do this than write "BoundedOrEmpty" class because Enum and Bounded are everywhere :)
@@ -529,7 +529,7 @@ instance Bounded Void where
 instance Finite Void where
   asList ∷ [Void]
   asList = []
-  asSet ∷ Set Void
+  asSet  ∷ Set Void
   asSet  = (∅)
 
 type Nat10  = 'Nat.S Nat.Nat9
@@ -1603,7 +1603,7 @@ instance (Finite a)
 -- a union of some of the equivalence classes of r₁.
 -- The finer-than relation reflexive, transitive, and antisymmetric (a partial order)
 finer ∷ (Finite a) ⇒ Equivalence a → Equivalence a → Bool
-finer (Equivalence (⮀)) (Equivalence (⮂)) = all (\(x, y) → (x ⮀ y) `implies` (x ⮂ y)) asList
+finer (Equivalence (⮀)) (Equivalence (⮂)) = all (\(a₁, a₂) → (a₁ ⮀ a₂) `implies` (a₁ ⮂ a₂)) asList
 
 coarser ∷ (Finite a) ⇒ Equivalence a → Equivalence a → Bool
 coarser = flip finer
