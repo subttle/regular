@@ -89,7 +89,7 @@ by5 = DFA δ q₀ f
 
 -- A regular expression to match the language of the `by5` DFA
 -- [0-9]★[0+5]
--- ((0+(1+(2+(3+(4+(5+(6+(7+(8+9))))))))))★·(0+5)
+-- (0∣1∣2∣3∣4∣5∣6∣7∣8∣9)★·(0∣5)
 by5' ∷ RE.RegExp Fin₁₀
 by5' = RE.star RE.dot RE.* RE.fromSet (fromList [0, 5])
 
@@ -114,7 +114,7 @@ by3 = DFA δ (Left ()) (singleton (Right 0))
 -- >>> Prelude.take 14 $ RegExp.language by3'
 -- [[],[0],[0,0],[1,1],[0,0,0],[0,1,1],[1,1,0],[0,0,0,0],[0,0,1,1],[0,1,1,0],[1,0,0,1],[1,1,0,0],[1,1,1,1],[0,0,0,0,0]]
 by3' ∷ RE.RegExp Fin₂
-by3' = RE.star (z RE.+ (RE.star (o RE.* (RE.star (z RE.* (RE.star o) RE.* (RE.star (z RE.* z)) RE.* z)) RE.* o)))
+by3' = RE.star (z RE.+ RE.star (o RE.* RE.star (z RE.* RE.star o RE.* RE.star (z RE.* z) RE.* z) RE.* o))
   where
     z ∷ RE.RegExp Fin₂
     z = RE.literal 0
