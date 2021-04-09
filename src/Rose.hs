@@ -4,11 +4,12 @@
 
 module Rose where
 
+import           Control.Applicative (Applicative (..))
 import           Control.Comonad (Comonad (..))
 import           Control.Monad (ap)
+import           Control.Monad.Zip (MonadZip (..))
 import           Data.Bool (bool)
 import           Data.Foldable (fold)
-import           Data.Function ((&))
 import           Data.Functor.Identity (Identity (..))
 import           Data.Maybe (fromMaybe, listToMaybe, maybeToList)
 import           Data.Pointed (Pointed (..))
@@ -47,8 +48,13 @@ instance (Functor f) ⇒ Functor (Rose f) where
 
 instance Pointed (Rose f) where
   point ∷ a → Rose f a
-  -- point a = Rose a Nothing
   point = flip Rose Nothing
+
+instance (Functor f) ⇒ Comonad (Rose f) where
+  extract ∷ Rose f a → a
+  extract = rose const
+  duplicate ∷ Rose f a → Rose f (Rose f a)
+  duplicate (Rose a f) = Rose (Rose a f) (fmap (fmap duplicate) f)
 
 instance (Functor f) ⇒ Applicative (Rose f) where
   pure ∷ a → Rose f a
@@ -66,13 +72,13 @@ instance (Functor f) ⇒ Monad (Rose f) where
       -- TODO
       f' ∷ Rose f b → Rose f b
       f' (Rose b bs) = Rose b (listToMaybe (maybeToList bs <> fmap (fmap (>>= f)) (maybeToList as)))
+instance (MonadZip f) ⇒ MonadZip (Rose f) where
+  mzipWith ∷ (a → b → c) → Rose f a → Rose f b → Rose f c
+  mzipWith f (Rose a as) (Rose b bs) = Rose (f a b) (mzipWith (mzipWith (mzipWith f)) as bs)
+instance (Traversable f) ⇒ Traversable (Rose f) where
+  traverse ∷ (Applicative t) ⇒ (a → t b) → Rose f a → t (Rose f b)
+  traverse f (Rose a as) = liftA2 Rose (f a) (traverse (traverse (traverse f)) as)
 
 instance (Functor f, Foldable f) ⇒ Foldable (Rose f) where
   foldMap ∷ (Monoid m) ⇒ (a → m) → Rose f a → m
   foldMap = rose . (flip (.) (maybe mempty fold) ‥ (mappend ‥ ($)))
-
-instance (Functor f) ⇒ Comonad (Rose f) where
-  extract ∷ Rose f a → a
-  extract = rose const
-  duplicate ∷ Rose f a → Rose f (Rose f a)
-  duplicate (Rose a f) = Rose (Rose a f) (fmap (fmap duplicate) f)
