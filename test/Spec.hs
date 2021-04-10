@@ -15,7 +15,7 @@ import qualified Data.Group as G
 import qualified Data.List as List
 import qualified Data.List.NonEmpty as NE (NonEmpty (..), fromList)
 import           Data.Set (Set, singleton, fromAscList)
-import           Data.Tree
+import           Data.Tree (Tree (..))
 import           EasyTest (Test, tests, scope, expect, run, expectEqual)
 import           Numeric.Natural.Unicode (ℕ)
 import           DFA
@@ -188,37 +188,34 @@ testDFAinvhomimage = tests [test₁, test₂]
   where
     -- slide 22 http://infolab.stanford.edu/~ullman/ialc/spr10/slides/rs2.pdf
     test₁ ∷ Test ()
-    test₁ = expect same
+    test₁ = expect (expected `DFA.equal` DFA.invhomimage h m)
       where
-       same ∷ Bool
-       same = expected `DFA.equal` DFA.invhomimage h m
-         where
-           m ∷ DFA Fin₃ Fin₂
-           m = DFA δ 0 (singleton 2)
-             where
-               δ (0, 0) = 1
-               δ (0, 1) = 2
-               δ (1, 0) = 0
-               δ (1, 1) = 2
-               δ (2, 0) = 0
-               δ (2, 1) = 1
-           -- h(0) ↦ ab
-           -- h(1) ↦ ε
-           h ∷ Bool → [Fin₂]
-           h False = [0,1]
-           h True  = []
-           expected ∷ DFA Fin₃ Bool
-           expected = DFA δ 0 (singleton 2)
-            where
-              δ ∷ (Fin₃, Bool) → Fin₃
-              δ (0, False) = 2
-              δ (0, True ) = 0
-              δ (1, False) = 2
-              δ (1, True ) = 1
-              δ (2, False) = 2
-              δ (2, True ) = 2
+        m ∷ DFA Fin₃ Fin₂
+        m = DFA δ 0 (singleton 2)
+          where
+            δ (0, 0) = 1
+            δ (0, 1) = 2
+            δ (1, 0) = 0
+            δ (1, 1) = 2
+            δ (2, 0) = 0
+            δ (2, 1) = 1
+        -- h(0) ↦ ab
+        -- h(1) ↦ ε
+        h ∷ Bool → [Fin₂]
+        h False = [0, 1]
+        h True  = []
+        expected ∷ DFA Fin₃ Bool
+        expected = DFA δ 0 (singleton 2)
+          where
+            δ ∷ (Fin₃, Bool) → Fin₃
+            δ (0, False) = 2
+            δ (0, True ) = 0
+            δ (1, False) = 2
+            δ (1, True ) = 1
+            δ (2, False) = 2
+            δ (2, True ) = 2
     -- A Second Course in Formal Languages and Automata Theory, Example 3.3.7
-    -- h⁻¹({aba}) = c*ac*bc*ac*
+    -- h⁻¹({aba}) ≟ c*ac*bc*ac*
     test₂ ∷ Test ()
     test₂ = expect (expected == r)
       where
