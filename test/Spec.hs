@@ -184,34 +184,83 @@ testDFArquotient = tests e₃Tests
               ]
 
 testDFAinvhomimage ∷ Test ()
-testDFAinvhomimage = expect same
+testDFAinvhomimage = tests [test₁, test₂]
   where
-    same ∷ Bool
-    same = DFA.invhomimage h slide22 `DFA.equal` expected
+    -- slide 22 http://infolab.stanford.edu/~ullman/ialc/spr10/slides/rs2.pdf
+    test₁ ∷ Test ()
+    test₁ = expect same
       where
-        -- slide 22 http://infolab.stanford.edu/~ullman/ialc/spr10/slides/rs2.pdf
-        slide22 ∷ DFA Fin₃ Fin₂
-        slide22 = DFA δ 0 (singleton 2)
+       same ∷ Bool
+       same = expected `DFA.equal` DFA.invhomimage h m
+         where
+           m ∷ DFA Fin₃ Fin₂
+           m = DFA δ 0 (singleton 2)
+             where
+               δ (0, 0) = 1
+               δ (0, 1) = 2
+               δ (1, 0) = 0
+               δ (1, 1) = 2
+               δ (2, 0) = 0
+               δ (2, 1) = 1
+           -- h(0) ↦ ab
+           -- h(1) ↦ ε
+           h ∷ Bool → [Fin₂]
+           h False = [0,1]
+           h True  = []
+           expected ∷ DFA Fin₃ Bool
+           expected = DFA δ 0 (singleton 2)
+            where
+              δ ∷ (Fin₃, Bool) → Fin₃
+              δ (0, False) = 2
+              δ (0, True ) = 0
+              δ (1, False) = 2
+              δ (1, True ) = 1
+              δ (2, False) = 2
+              δ (2, True ) = 2
+    -- A Second Course in Formal Languages and Automata Theory, Example 3.3.7
+    -- h⁻¹({aba}) = c*ac*bc*ac*
+    test₂ ∷ Test ()
+    test₂ = expect (expected == r)
+      where
+        -- c★·a·c★·b·c★·a·c★
+        expected ∷ RegExp Fin₃
+        expected = Star c :. (a :. (Star c :. (b :. (Star c :. (a :. Star c)))))
           where
-            δ (0, 0) = 1
-            δ (0, 1) = 2
-            δ (1, 0) = 0
-            δ (1, 1) = 2
-            δ (2, 0) = 0
-            δ (2, 1) = 1
-        h ∷ Bool → [Fin₂]
-        h False = [0,1]
-        h True  = []
-        expected ∷ DFA Fin₃ Bool
-        expected = DFA δ 0 (singleton 2)
+            a ∷ RegExp Fin₃
+            a = Lit 0
+            b ∷ RegExp Fin₃
+            b = Lit 1
+            c ∷ RegExp Fin₃
+            c = Lit 2
+        -- 2★·0·2★·1·2★·0·2★
+        r ∷ RegExp Fin₃
+        r = DFA.toRE m'
           where
-            δ ∷ (Fin₃, Bool) → Fin₃
-            δ (0, False) = 2
-            δ (0, True ) = 0
-            δ (1, False) = 2
-            δ (1, True ) = 1
-            δ (2, False) = 2
-            δ (2, True ) = 2
+            m' ∷ DFA Fin₅ Fin₃
+            m' = DFA.invhomimage h m
+              where
+                -- h(a) ↦ a
+                -- h(b) ↦ b
+                -- h(c) ↦ ε
+                h ∷ Fin₃ → [Fin₂]
+                h 0 = [0]
+                h 1 = [1]
+                h 2 = []
+                -- ℒ(m) = {"aba"}
+                m ∷ DFA Fin₅ Fin₂
+                m = DFA δ 0 (singleton 3)
+                  where
+                    δ ∷ (Fin₅, Fin₂) → Fin₅
+                    δ (0, 0) = 1
+                    δ (0, 1) = 4
+                    δ (1, 0) = 4
+                    δ (1, 1) = 2
+                    δ (2, 0) = 3
+                    δ (2, 1) = 4
+                    δ (3, 0) = 4
+                    δ (3, 1) = 4
+                    δ (4, 0) = 4
+                    δ (4, 1) = 4
 
 testREDropout ∷ Test ()
 testREDropout = tests [test₁, test₂]
@@ -256,7 +305,7 @@ testREDropout = tests [test₁, test₂]
                    ]
 
 -- Substitution
--- A Second Course in Formal Languages and Automata Theory (Pg 55, Example 3.3.4)
+-- A Second Course in Formal Languages and Automata Theory, Example 3.3.4
 -- s(101) = (cd)*(a+ab)*(cd)*
 testRESubstitution ∷ Test ()
 testRESubstitution = expectEqual result expected -- N.B. the use of structural equality is intentional here
