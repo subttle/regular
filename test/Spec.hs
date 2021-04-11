@@ -51,6 +51,7 @@ suite = tests [ scope "main.FizzBuzz"              testFizzBuzz
               , scope "NFA.permutations"           testNFAPermutations
               , scope "RE.>>="                     testRESubstitution
               , scope "RE.dropout"                 testREDropout
+              , scope "Language.onlyLength"        testLanguageOnlyLength
               , scope "bisim"                      testBisimSubset
               , scope "Comparison.Compose"         testComposeC
               , scope "Comparison.Invert"          testGroupInvert
@@ -523,6 +524,41 @@ testCycles = tests [test₁, test₂, test₃]
     test₂ = expect (getPredicate lawful (cycles c₁))
     test₃ ∷ Test ()
     test₃ = expectEqual (cycles c₁) (toEquivalence [0 NE.:| [2, 3], 1 NE.:| [4]])
+
+-- TODO can improve but this works for now
+testLanguageOnlyLength ∷ Test ()
+testLanguageOnlyLength = tests [test₁, test₂, test₃]
+  where
+    -- {ε, "a", "ab", "abc", "abcd"} `onlyLength` 3 ≟ {"abc"}
+    test₁ ∷ Test ()
+    test₁ = expectEqual expected (Prelude.take 1 (Language.language (ℓ `Language.onlyLength` 3)))
+      where
+        -- {ε, "a", "ab", "abc", "abcd"}
+        ℓ ∷ ℒ Alpha
+        ℓ = Language.fromLang [[], [A], [A, B], [A, B, C], [A, B, C, D]]
+        -- {"abc"}
+        expected ∷ [[Alpha]]
+        expected = [[A, B, C]]
+    -- {ε, "a", "ab", "abc", "abcd"} `onlyLength` 0 ≟ {ε}
+    test₂ ∷ Test ()
+    test₂ = expectEqual expected (Prelude.take 1 (Language.language (ℓ `Language.onlyLength` 0)))
+      where
+        -- {ε, "a", "ab", "abc", "abcd"}
+        ℓ ∷ ℒ Alpha
+        ℓ = Language.fromLang [[], [A], [A, B], [A, B, C], [A, B, C, D]]
+        -- {ε}
+        expected ∷ [[Alpha]]
+        expected = [[]]
+    -- {"0", "1", "2", "3", "10", "11", "12", "13", "20", "21", "22", "23"} `onlyLength` 1 ≟ {"0", "1", "2", "3"}
+    test₃ ∷ Test ()
+    test₃ = expectEqual expected (Prelude.take 4 (Language.language (ℓ `Language.onlyLength` 1)))
+      where
+        -- {"0", "1", "2", "3", "10", "11", "12", "13", "20", "21", "22", "23"}
+        ℓ ∷ ℒ Fin₄
+        ℓ = Language.fromLang [[0], [1], [2], [3], [1, 0], [1, 1], [1, 2], [1, 3], [2, 0], [2, 1], [2, 2], [2, 3]]
+        -- {"0", "1", "2", "3"}
+        expected ∷ [[Fin₄]]
+        expected = [[0], [1], [2], [3]]
 
 -- Some tests for the `restricted` predicate.
 -- Recall:
