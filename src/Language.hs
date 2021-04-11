@@ -12,7 +12,7 @@ import           Data.List (inits, tails, genericLength)
 import qualified Data.List.NonEmpty as NE
 import           Numeric.Natural.Unicode (ℕ)
 import           Common (list, partitions, (>&<), (‥))
-import           Finite (Finite (..), Σ (..))
+import           Finite (Finite (..), Σ (..), restricted)
 
 -- N.B. This is /not/ the type for regular languages (but I am adding it to help test some properties)
 -- In Agda (with termination checking) this can be used as a type for decidable languages, and while this
@@ -157,3 +157,12 @@ predicate (Predicate ℓ) = Predicate ℓ -- ℒ.ℒ -- TODO lol
 -- N.B. this is a convenience function, it does not terminate even for finite languages!
 language ∷ (Finite s) ⇒ ℒ s → [[s]]
 language (Predicate ℓ) = filter ℓ (sigmaStar ℓ)
+
+-- TODO
+bellₗ ∷ ℒ ℕ
+bellₗ = contramap NE.fromList restricted
+
+-- ℒ (bellₙ 3) = {"000", "001", "010", "011", "012"}
+-- c.f. `asList @ (RGS Fin₃)` :)
+bellₙ ∷ ℕ → ℒ ℕ
+bellₙ = onlyLength bellₗ
