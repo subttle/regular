@@ -66,6 +66,7 @@ onlyLength = Predicate ‥ (\ℓ n w → accepts ℓ w ∧ n == genericLength w)
 
 complement ∷ ℒ s → ℒ s
 -- complement = Predicate . (not ‥ getPredicate)
+-- complement = Predicate . (not ‥ accepts)
 complement (Predicate ℓ) = Predicate (not . ℓ)
 
 reversed ∷ ℒ s → ℒ s
@@ -76,6 +77,10 @@ union        (Predicate ℓ₁) (Predicate ℓ₂) = Predicate (\w → ℓ₁ w 
 
 intersection ∷ ℒ s → ℒ s → ℒ s
 intersection (Predicate ℓ₁) (Predicate ℓ₂) = Predicate (\w → ℓ₁ w ∧ ℓ₂ w)
+-- intersection = Predicate ‥ (\ℓ₁ ℓ₂ w → accepts ℓ₁ w ∧ accepts ℓ₂ w)
+-- intersection = Predicate ‥ (\ℓ₁ ℓ₂ → liftA2 (∧) (accepts ℓ₁) (accepts ℓ₂))
+-- intersection = Predicate ‥ (\ℓ₁ ℓ₂ → (∧) <$> accepts ℓ₁ <*> accepts ℓ₂)
+-- intersection = Predicate ‥ (\ℓ₁ ℓ₂ → (∧) <$> accepts ℓ₁ <*> accepts ℓ₂)
 -- intersection = (<>) -- :P
 
 concatenate ∷ ℒ s → ℒ s → ℒ s
@@ -98,6 +103,7 @@ invhomimageEpsFree ∷ (s → NE.NonEmpty g) → ℒ g → ℒ s
 invhomimageEpsFree h = invhomimage (toList . h)
 
 invhomimagew ∷ (Eq g) ⇒ (s → [g]) → [g] → ℒ s
+-- invhomimagew = Predicate ‥ (\h w₁ w₂ → w₁ == concatMap h w₂)
 invhomimagew h w = Predicate ((w ==) . concatMap h)
 
 -- TODO leaving in refactor as comments for now, will delete later
@@ -121,6 +127,8 @@ derivative = (. (:)) . (>&<)
 derivative' ∷ ℒ s → [s] → ℒ s
 -- derivative' (Predicate ℓ) w₁ = Predicate (\w₂ → ℓ (w₁ ++ w₂))
 -- derivative' (Predicate ℓ) = Predicate . (ℓ ‥ (++))
+-- derivative' = Predicate ‥ (\ℓ w₁ w₂ → accepts ℓ (w₁ ++ w₂))
+-- derivative' = Predicate ‥ (\ℓ → accepts ℓ ‥ (++))
 --
 -- derivative' p w = contramap (w ++) p
 -- derivative' = flip (contramap . (++))
