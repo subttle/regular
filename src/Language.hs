@@ -108,18 +108,21 @@ invhomimagew h w = Predicate ((w ==) . concatMap h)
 
 -- TODO leaving in refactor as comments for now, will delete later
 
--- derivative with respect to some symbol in Σ
+-- derivative with respect to some symbol σ ∈ Σ
 derivative ∷ ℒ s → s → ℒ s
--- derivative (Predicate ℓ) a = Predicate (\w → ℓ (a : w))
--- derivative (Predicate ℓ) a = Predicate (\w → ℓ ((:) a w))
--- derivative (Predicate ℓ) a = Predicate (ℓ . ((:) a))
--- derivative (Predicate ℓ) a = Predicate (ℓ . (:) a)
+-- derivative (Predicate ℓ) σ = Predicate (\w → ℓ (σ : w))
+-- derivative (Predicate ℓ) σ = Predicate (\w → ℓ ((:) σ w))
+-- derivative (Predicate ℓ) σ = Predicate (ℓ . ((:) σ))
+-- derivative (Predicate ℓ) σ = Predicate (ℓ . (:) σ)
 -- derivative (Predicate ℓ) = Predicate . (ℓ ‥ (:))
+-- derivative = Predicate ‥ (\ℓ σ w → accepts ℓ (σ : w))
+-- derivative = Predicate ‥ (\ℓ → accepts ℓ ‥ (:))
+-- derivative = Predicate ‥ (\ℓ → accepts ℓ ‥ (:))
 --
--- derivative p s = contramap (s :) p
+-- derivative p σ = contramap (σ :) p
 -- derivative = flip (contramap . (:))
--- derivative p s = (>&<) p (s :)
--- derivative p s = (>&<) p ((:) s)
+-- derivative p σ = (>&<) p (σ :)
+-- derivative p σ = (>&<) p ((:) σ)
 -- derivative p = (>&<) p . (:)
 derivative = (. (:)) . (>&<)
 
