@@ -166,3 +166,7 @@ bellₗ = contramap NE.fromList restricted
 -- c.f. `asList @ (RGS Fin₃)` :)
 bellₙ ∷ ℕ → ℒ ℕ
 bellₙ = onlyLength bellₗ
+
+-- FIXME just for illustrative purposes for now
+-- language' ∷ ℒ ℕ → [[ℕ]]
+-- language' (Predicate ℓ) = filter ℓ (freeSemigroup [0 .. 9])
