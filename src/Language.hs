@@ -4,13 +4,14 @@
 module Language where
 
 import           Data.Bool.Unicode ((∧), (∨))
+import           Data.Foldable (toList)
 import           Data.Foldable.Unicode ((∋))
 import           Data.Function ((&))
 import           Data.Functor.Contravariant (Contravariant (..), Predicate (..))
 import           Data.List (inits, tails, genericLength)
 import qualified Data.List.NonEmpty as NE
 import           Numeric.Natural.Unicode (ℕ)
-import           Common (partitions, (>&<), (‥))
+import           Common (list, partitions, (>&<), (‥))
 import           Finite (Finite (..), Σ (..))
 
 -- N.B. This is /not/ the type for regular languages (but I am adding it to help test some properties)
@@ -33,9 +34,7 @@ accepts = getPredicate
 
 -- iff ε ∈ ℒ
 nullable ∷ ℒ s → Bool
--- nullable (Predicate ℓ) = ℓ []
--- nullable = (&) [] . getPredicate
-nullable = (&) [] . accepts
+nullable = flip accepts []
 
 -- the language which accepts no strings
 empty ∷ ℒ s
@@ -84,12 +83,7 @@ concatenate  (Predicate ℓ₁) (Predicate ℓ₂) = Predicate (\w → any (\(w�
 
 -- Kleene star
 star ∷ ∀ s . ℒ s → ℒ s
-star (Predicate ℓ) = Predicate p
-  where
-    -- TODO express in terms of `epsilon + any ...`?
-    p ∷ [s] → Bool
-    p [] = True
-    p w  = any (all (ℓ . NE.toList)) (partitions w)
+star = Predicate . (\ℓ → list True (any (all (accepts ℓ . toList)) ‥ (partitions ‥ (:))))
 
 -- inverse homomorphism
 invhom ∷ ([s] → [g]) → ℒ g → ℒ s
@@ -101,7 +95,7 @@ invhomimage = contramap . concatMap
 
 -- ε-free inverse homomorphic image of ℓ under h
 invhomimageEpsFree ∷ (s → NE.NonEmpty g) → ℒ g → ℒ s
-invhomimageEpsFree h = invhomimage (NE.toList . h)
+invhomimageEpsFree h = invhomimage (toList . h)
 
 invhomimagew ∷ (Eq g) ⇒ (s → [g]) → [g] → ℒ s
 invhomimagew h w = Predicate ((w ==) . concatMap h)
