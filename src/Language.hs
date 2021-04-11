@@ -7,9 +7,10 @@ import           Data.Bool.Unicode ((∧), (∨))
 import           Data.Foldable.Unicode ((∋))
 import           Data.Function ((&))
 import           Data.Functor.Contravariant (Contravariant (..), Predicate (..))
-import           Data.List (inits, tails)
+import           Data.List (inits, tails, genericLength)
 import qualified Data.List.NonEmpty as NE
-import           Common (partitions, (>&<))
+import           Numeric.Natural.Unicode (ℕ)
+import           Common (partitions, (>&<), (‥))
 import           Finite (Finite (..), Σ (..))
 
 -- N.B. This is /not/ the type for regular languages (but I am adding it to help test some properties)
@@ -33,7 +34,8 @@ accepts = getPredicate
 -- iff ε ∈ ℒ
 nullable ∷ ℒ s → Bool
 -- nullable (Predicate ℓ) = ℓ []
-nullable = (&) [] . getPredicate
+-- nullable = (&) [] . getPredicate
+nullable = (&) [] . accepts
 
 -- the language which accepts no strings
 empty ∷ ℒ s
@@ -56,7 +58,15 @@ lit σ = Predicate p
 fromLang ∷ (Eq s) ⇒ [[s]] → ℒ s
 fromLang = Predicate . (∋)
 
+-- remove all strings in ℒ that are not of the specified length
+-- e.g. {"", "a", "ab", "abc", "abcd"} `onlyLength` 3 = {"abc"}
+-- TODO consider renaming `ofLength`? I like the exactness of `only`, however
+onlyLength ∷ ℒ a → ℕ → ℒ a
+-- onlyLength ℓ n = Predicate (\w → accepts ℓ w ∧ genericLength w == n)
+onlyLength = Predicate ‥ (\ℓ n w → accepts ℓ w ∧ n == genericLength w)
+
 complement ∷ ℒ s → ℒ s
+-- complement = Predicate . (not ‥ getPredicate)
 complement (Predicate ℓ) = Predicate (not . ℓ)
 
 reversed ∷ ℒ s → ℒ s
