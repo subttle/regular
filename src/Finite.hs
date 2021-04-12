@@ -1470,6 +1470,11 @@ reverseC (Comparison c) = Comparison (flip c)
 -- reverseC c = Comparison (flip (getComparison c))
 -- reverseC = Comparison . flip . getComparison
 
+-- Checks to make sure no two indices match between the two total orders
+-- https://mathworld.wolfram.com/Derangement.html
+derangement ∷ (Finite a) ⇒ Comparison a → Comparison a → Bool
+derangement c₁ c₂ = and (zipWith (≠) (comparisonToList c₁) (comparisonToList c₂))
+
 -- TODO this works for now but think if it is possible to do this but without throwing away information every time, by which I mean an implementation
 -- TODO which could search a smaller list after each find (i.e. delete the elements from the list as we find results for them)
 listToComparison ∷ (Finite a, Foldable t) ⇒ t a → Comparison a
