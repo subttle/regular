@@ -14,6 +14,7 @@ import           Data.Functor.Contravariant (Contravariant (..), Equivalence (..
 import qualified Data.Group as G
 import qualified Data.List as List
 import qualified Data.List.NonEmpty as NE (NonEmpty (..), fromList)
+import qualified Data.Set as Set (fromList)
 import           Data.Set (Set, singleton, fromAscList)
 import           Data.Tree (Tree (..))
 import           EasyTest (Test, tests, scope, expect, run, expectEqual)
@@ -51,6 +52,7 @@ suite = tests [ scope "main.FizzBuzz"              testFizzBuzz
               , scope "NFA.permutations"           testNFAPermutations
               , scope "RE.>>="                     testRESubstitution
               , scope "RE.dropout"                 testREDropout
+              , scope "RE.derivative"              testREDerivative
               , scope "Language.onlyLength"        testLanguageOnlyLength
               , scope "bisim"                      testBisimSubset
               , scope "Comparison.Compose"         testComposeC
@@ -301,6 +303,43 @@ testREDropout = tests [test₁, test₂]
                    , [E]
                    , [F]
                    ]
+
+-- Test a few regular expression derivatives
+testREDerivative ∷ Test ()
+testREDerivative = tests [test₁, test₂, test₃, test₄]
+  where
+    -- ∂₀(0·1★) ≟ 1★
+    test₁ ∷ Test ()
+    test₁ = expectEqual expected (RE.derivative r 0)
+      where
+        r ∷ RegExp Fin₂
+        r = RE.literal 0 RE.* RE.star (RE.literal 1)
+        expected ∷ RegExp Fin₂
+        expected = RE.star (RE.literal 1)
+    -- ∂₀(0) ≟ ε
+    test₂ ∷ Test ()
+    test₂ = expectEqual expected (RE.derivative r 0)
+      where
+        r ∷ RegExp Fin₂
+        r = RE.literal 0
+        expected ∷ RegExp Fin₂
+        expected = RE.one
+    -- ∂₀(4∣5∣6) ≟ ∅
+    test₃ ∷ Test ()
+    test₃ = expectEqual expected (RE.derivative r 0)
+      where
+        r ∷ RegExp Fin₉
+        r = RE.fromSet (Set.fromList [4, 5, 6])
+        expected ∷ RegExp Fin₉
+        expected = RE.zero
+    -- ∂₅(4∣5∣6) ≟ ε
+    test₄ ∷ Test ()
+    test₄ = expectEqual expected (RE.derivative r 5)
+      where
+        r ∷ RegExp Fin₉
+        r = RE.fromSet (Set.fromList [4, 5, 6])
+        expected ∷ RegExp Fin₉
+        expected = RE.one
 
 -- Substitution
 -- A Second Course in Formal Languages and Automata Theory, Example 3.3.4
