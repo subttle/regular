@@ -7,7 +7,7 @@
 module GNFA where
 
 import           Control.Applicative (Applicative (..))
-import           Control.Selective (Selective (..), (<*?))
+import           Control.Selective (Selective (..), selectA)
 import           Data.Bifunctor (Bifunctor (..))
 import           Data.Bool.Unicode ((∨))
 import qualified Data.List as List
@@ -59,7 +59,8 @@ instance Applicative (GNFA q) where
 instance Selective (GNFA q) where
   select ∷ GNFA q (Either s g) → GNFA q (s → g) → GNFA q g
   -- select (GNFA δ₁) (GNFA δ₂) = GNFA (\(q₁, q₂) → δ₁ (q₁, q₂) <*? δ₂ (q₁, q₂))
-  select (GNFA δ₁) (GNFA δ₂) = GNFA (liftA2 (<*?) δ₁ δ₂)
+  -- select (GNFA δ₁) (GNFA δ₂) = GNFA (liftA2 (<*?) δ₁ δ₂)
+  select = selectA
 
 instance Profunctor GNFA where
   rmap ∷ (s → g) → GNFA q s → GNFA q g
