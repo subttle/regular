@@ -150,6 +150,10 @@ watermark = NE.scanl1 max
 (…) ∷ (a → b) → (c → d → e     → a) → (c → d → e     → b)
 (…) = (.) . (.) . (.)
 
+-- TODO adding both for now to start transitioning
+(┄) ∷ (a → b) → (c → d → e     → a) → (c → d → e     → b)
+(┄) = (.) . (.) . (.)
+
 (┈) ∷ (a → b) → (c → d → e → f → a) → (c → d → e → f → b)
 (┈) = (.) . (.) . (.) . (.)
 
