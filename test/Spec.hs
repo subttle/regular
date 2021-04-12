@@ -10,14 +10,14 @@ import           Data.Bool.Unicode ((∧))
 import           Data.Either (isRight, isLeft, lefts)
 import           Data.Eq.Unicode ((≠))
 import           Data.Fin (toNatural)
-import           Data.Functor.Contravariant (Contravariant (..), Equivalence (..), Comparison (..), Predicate (..))
+import           Data.Functor.Contravariant (Contravariant (..), Equivalence (..), Comparison (..), Predicate (..), defaultComparison)
 import qualified Data.Group as G
 import qualified Data.List as List
 import qualified Data.List.NonEmpty as NE (NonEmpty (..), fromList)
 import qualified Data.Set as Set (fromList)
 import           Data.Set (Set, singleton, fromAscList)
 import           Data.Tree (Tree (..))
-import           EasyTest (Test, tests, scope, expect, run, expectEqual)
+import           EasyTest (Test, expect, expectEqual, pick, run, scope, tests)
 import           Numeric.Natural.Unicode (ℕ)
 import           DFA
 import           NFA (NFA)
@@ -58,6 +58,7 @@ suite = tests [ scope "main.FizzBuzz"              testFizzBuzz
               , scope "Comparison.Compose"         testComposeC
               , scope "Comparison.Invert"          testGroupInvert
               , scope "Comparison.Cycles"          testCycles
+              , scope "Comparison.derangement"     testDerangement
               , scope "Comparisons.lawful"         testLawfulComparisons
               , scope "RGS.restricted"             testRestrictedPredicate  -- FIXME better name?
               , scope "paths"                      testRestrictedPaths      -- FIXME better name
@@ -563,6 +564,31 @@ testCycles = tests [test₁, test₂, test₃]
     test₂ = expect (getPredicate lawful (cycles c₁))
     test₃ ∷ Test ()
     test₃ = expectEqual (cycles c₁) (toEquivalence [0 NE.:| [2, 3], 1 NE.:| [4]])
+
+testDerangement ∷ Test ()
+testDerangement = tests [test₁, test₂]
+  where
+    -- see example given https://mathworld.wolfram.com/Derangement.html
+    test₁ ∷ Test ()
+    test₁ = expectEqual expected (List.filter (derangement (defaultComparison @ Fin₄)) (asList @ (Comparison Fin₄)))
+      where
+        expected ∷ [Comparison Fin₄] -- cf. 0, 1, 2, 3
+        expected = fmap listToComparison [ [1, 0, 3, 2]
+                                         , [1, 2, 3, 0]
+                                         , [1, 3, 0, 2]
+                                         , [2, 0, 3, 1]
+                                         , [2, 3, 0, 1]
+                                         , [2, 3, 1, 0]
+                                         , [3, 0, 1, 2]
+                                         , [3, 2, 0, 1]
+                                         , [3, 2, 1, 0]
+                                         ]
+    -- Test that the reverse of an any arbitrarly picked permutation is a derangement of the original permutation
+    -- N.B. This test is meant only for permutations on finite sets with cardinality > 1.
+    test₂ ∷ Test ()
+    test₂ = do
+      c ← pick (asList @ (Comparison D6))
+      expect (derangement c (reverseC c))
 
 -- TODO can improve but this works for now
 testLanguageOnlyLength ∷ Test ()
