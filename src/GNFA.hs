@@ -10,8 +10,9 @@ import           Control.Applicative (Applicative (..))
 import           Control.Selective (Selective (..), selectA)
 import           Data.Bifunctor (Bifunctor (..))
 import           Data.Bool.Unicode ((∨))
+import           Data.Eq.Unicode ((≠))
 import qualified Data.List as List
-import qualified Data.Map as Map (fromList)
+import qualified Data.Map as Map (filter, fromList)
 import           Data.Pointed (Pointed (..))
 import           Data.Profunctor (Profunctor (..))
 import           Data.Set as Set (Set, foldl)
@@ -74,7 +75,7 @@ instance (Show q, Finite q, Show s, Finite s)
   show m = quoteWith "(" ")" . List.intercalate "," . fmap (quoteWith " " "\n") $
            [ equation "Q"  (show (Set' (qs    m)))
            , equation "Σ"  (show (Set' (sigma m)))
-           , quoteWith "δ : (Q ∖ {qᶠ}) × (Q ∖ {qᵢ}) → Regular Expression" ((format . Map.fromList . table) m) "\n"
+           , quoteWith "δ : (Q ∖ {qᶠ}) × (Q ∖ {qᵢ}) → Regular Expression" ((format . Map.filter (≠ RE.zero) . Map.fromList . table) m) "\n"
            , equation "qᵢ" (show (Init  ())      )
            , equation "qᶠ" (show (Final ())      )
            ]
