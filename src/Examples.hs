@@ -17,7 +17,7 @@ import qualified NFA
 import qualified EFA
 -- import qualified GFA
 import qualified RegExp as RE
-import           Common (DisplayColor (Black, Red), equating', toColor, toColor', (≰))
+import           Common (DisplayColor (Black, Red), equating', impossible, toColor, toColor', (≰))
 import           Finite (Finite (..), Card(..), Suit(..), (:🎲), DNA (..), Alpha (..), Fin₂, Fin₃, Fin₄, Fin₅, Fin₆, Fin₇, Fin₈, Fin₉, Fin₁₀, fin₂, rotate90, type (🁢), valBottom, valTop, type (🀰), valRight, valLeft)
 
 -- A DFA which accepts all binary strings ending in "1"
@@ -71,6 +71,56 @@ even0or1 = EFA.EFA δ 0 (fromList [1, 3])
     δ (4, Just  0) = singleton 4
     δ (4, Just  1) = singleton 3
     δ (_, _      ) = (∅)
+
+-- |ℒ(b₂)| = 2
+-- ℒ(b₂) = {"00", "01"}
+b₂ ∷ DFA Fin₄ Fin₂
+b₂ = DFA δ q₀ f
+  where
+    δ ∷ (Fin₄, Fin₂) → Fin₄
+    δ (0, 0) = 1
+    δ (0, 1) = 3
+    δ (1, 0) = 2
+    δ (1, 1) = 2
+    δ (2, 0) = 3
+    δ (2, 1) = 3
+    δ (3, 0) = 3
+    δ (3, 1) = 3
+    δ _      = impossible
+    q₀ ∷ Fin₄
+    q₀ = minBound
+    f ∷ Set Fin₄
+    f = singleton 2
+
+-- |ℒ(b₃)| = 5
+-- ℒ(b₃) = {"000", "001", "010", "011", "012"}
+b₃ ∷ DFA Fin₆ Fin₃
+b₃ = DFA δ q₀ f
+  where
+    δ ∷ (Fin₆, Fin₃) → Fin₆
+    δ (0, 0) = 1
+    δ (0, 1) = 5
+    δ (0, 2) = 5
+    δ (1, 0) = 2
+    δ (1, 1) = 3
+    δ (1, 2) = 5
+    δ (2, 0) = 4
+    δ (2, 1) = 4
+    δ (2, 2) = 5
+    δ (3, 0) = 4
+    δ (3, 1) = 4
+    δ (3, 2) = 4
+    δ (4, 0) = 5
+    δ (4, 1) = 5
+    δ (4, 2) = 5
+    δ (5, 0) = 5
+    δ (5, 1) = 5
+    δ (5, 2) = 5
+    δ _      = impossible
+    q₀ ∷ Fin₆
+    q₀ = minBound
+    f ∷ Set Fin₆
+    f = singleton 4
 
 -- A DFA which accepts numbers (as a string of digits) only when
 -- they are evenly divisible by 5.
