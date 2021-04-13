@@ -514,29 +514,49 @@ testBisimSubset' (m, ℓ) subset = isBisim
 testBisimSubset ∷ Test ()
 testBisimSubset = expect (testBisimSubset' (by5, DFA.toLanguage by5) (List.take 101 (freeMonoid asList)))
 
--- Composition of permutations
+-- Some tests for composition of permutations
+-- Note, the examples are converted to zero-based indices, but I leave the original one-based indices in the comments
 testComposeC ∷ Test ()
-testComposeC = tests [test₁, test₂, test₃]
+testComposeC = tests [test₁, test₂]
   where
     -- https://en.wikipedia.org/wiki/Permutation_group#Composition_of_permutations%E2%80%93the_group_product
-    (p, q) = (listToComparison [1, 3, 0, 2, 4], listToComparison [4, 3, 2, 1, 0]) ∷ (Comparison Fin₅, Comparison Fin₅)
-
-    -- https://youtu.be/3aNeCWRjh8I?t=211
-    c₁ ∷ Comparison Fin₄ -- 1 3 4 2
-    c₁ = listToComparison [0, 2, 3, 1]
-    c₂ ∷ Comparison Fin₄ -- 4 3 2 1
-    c₂ = listToComparison [3, 2, 1, 0]
-    c₃ ∷ Comparison Fin₄ -- 2 4 3 1
-    c₃ = c₁ `composeC` c₂
-    c₄ ∷ Comparison Fin₄ -- 4 2 1 3
-    c₄ = c₂ `composeC` c₁
-
+    -- 4 2 5 3 1 ≟ 5 4 3 2 1 ∘ 2 4 1 3 5
     test₁ ∷ Test ()
-    test₁ = expectEqual (q `composeC` p) (listToComparison [3, 1, 4, 2, 0]) -- 4 2 5 3 1
+    test₁ = expectEqual expected (q `composeC` p)
+      where
+        -- 4 2 5 3 1
+        expected ∷ Comparison Fin₅
+        expected = listToComparison [3, 1, 4, 2, 0]
+        -- 5 4 3 2 1
+        q ∷ Comparison Fin₅
+        q = listToComparison [4, 3, 2, 1, 0]
+        -- 2 4 1 3 5
+        p ∷ Comparison Fin₅
+        p = listToComparison [1, 3, 0, 2, 4]
+    -- https://youtu.be/3aNeCWRjh8I?t=211
     test₂ ∷ Test ()
-    test₂ = expectEqual (comparisonToList c₃) [1, 3, 2, 0]
-    test₃ ∷ Test ()
-    test₃ = expectEqual (comparisonToList c₄) [3, 1, 0, 2]
+    test₂ = tests [test₃, test₄]
+      where
+        -- 1 3 4 2
+        c₁ ∷ Comparison Fin₄
+        c₁ = listToComparison [0, 2, 3, 1]
+        -- 4 3 2 1
+        c₂ ∷ Comparison Fin₄
+        c₂ = listToComparison [3, 2, 1, 0]
+        -- 2 4 3 1 ≟ 1 3 4 2 ∘ 4 3 2 1
+        test₃ ∷ Test ()
+        test₃ = expectEqual expected (c₁ `composeC` c₂)
+          where
+            -- 2 4 3 1
+            expected ∷ Comparison Fin₄
+            expected = listToComparison [1, 3, 2, 0]
+        -- 4 2 1 3 ≟ 4 3 2 1 ∘ 1 3 4 2
+        test₄ ∷ Test ()
+        test₄ = expectEqual expected (c₂ `composeC` c₁)
+          where
+            -- 4 2 1 3
+            expected ∷ Comparison Fin₄
+            expected = listToComparison [3, 1, 0, 2]
 
 -- test laws of group invert function
 testGroupInvert ∷ Test ()
