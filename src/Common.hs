@@ -317,7 +317,7 @@ fixedPoint' (Equivalence (≡)) f a           = fixedPoint' (Equivalence (≡)) 
 
 -- inspired by `Agda.Utils.Either.groupByEither`
 -- >>> groupByLR [Left LT, Left EQ, Right (), Right (), Right (), Left GT]
--- [Left [LT,EQ],Right [(),(),()],Left [GT]]
+-- [Left (LT :| [EQ]),Right (() :| [(),()]),Left (GT :| [])]
 groupByLR ∷ ∀ a b . [Either a b] → [Either (NonEmpty a) (NonEmpty b)]
 groupByLR = unfoldr c
   where
