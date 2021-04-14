@@ -25,7 +25,7 @@ import           Data.Functor.Contravariant.Divisible (Divisible (..), Decidable
 import           Data.Functor.Contravariant (Contravariant (..), Op (..), Predicate (..), Comparison (..), Equivalence (..), defaultComparison, defaultEquivalence, (>$<))
 import           Data.Functor.Foldable (ListF (..))
 import           Data.Function (on, fix, (&))
-import           Data.List as List (filter, transpose, sortBy, find, delete, deleteBy, deleteFirstsBy, elemIndex, elemIndices, findIndex, findIndices, genericDrop, genericIndex, genericLength, genericReplicate, genericTake, intercalate, intersectBy, tails, unfoldr)
+import           Data.List as List (delete, deleteBy, deleteFirstsBy, elemIndex, elemIndices, filter, find, findIndex, findIndices, genericDrop, genericIndex, genericLength, genericReplicate, genericTake, intercalate, intersectBy, sortBy, span, tails, transpose, unfoldr)
 import           Data.List.NonEmpty (NonEmpty (..), (<|))
 import qualified Data.List.NonEmpty as NE
 import           Data.Maybe as Maybe (catMaybes, fromJust, isNothing)
@@ -314,6 +314,16 @@ fixedPoint f a            = fixedPoint f (f a)
 fixedPoint' ∷ Equivalence a → (a → a) → a → a
 fixedPoint' (Equivalence (≡)) f a | f a ≡ a = a
 fixedPoint' (Equivalence (≡)) f a           = fixedPoint' (Equivalence (≡)) f (f a)
+
+-- inspired by `Agda.Utils.Either.groupByEither`
+-- >>> groupByLR [Left LT, Left EQ, Right (), Right (), Right (), Left GT]
+-- [Left [LT,EQ],Right [(),(),()],Left [GT]]
+groupByLR ∷ ∀ a b . [Either a b] → [Either [a] [b]]
+groupByLR = List.unfoldr c
+  where
+    c ∷ [Either a b] → Maybe (Either [a] [b], [Either a b])
+    c = list Nothing (Just ‥ either (\a → first (Left  . ((:) a . concatMap (either pure (const [])))) . span isLeft)
+                                    (\b → first (Right . ((:) b . concatMap (either (const []) pure))) . span isRight))
 
 -- Based on `replicateTree` from http://hackage.haskell.org/package/type-indexed-queues
 -- TODO still can clean this up a bit, but left this way for now on purpose
