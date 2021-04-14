@@ -318,12 +318,12 @@ fixedPoint' (Equivalence (≡)) f a           = fixedPoint' (Equivalence (≡)) 
 -- inspired by `Agda.Utils.Either.groupByEither`
 -- >>> groupByLR [Left LT, Left EQ, Right (), Right (), Right (), Left GT]
 -- [Left [LT,EQ],Right [(),(),()],Left [GT]]
-groupByLR ∷ ∀ a b . [Either a b] → [Either (NE.NonEmpty a) (NE.NonEmpty b)]
+groupByLR ∷ ∀ a b . [Either a b] → [Either (NonEmpty a) (NonEmpty b)]
 groupByLR = unfoldr c
   where
-    c ∷ [Either a b] → Smash (Either (NE.NonEmpty a) (NE.NonEmpty b)) [Either a b]
-    c = list Nada (uncurry Smash ‥ either (\a → first (Left  . ((NE.:|) a . concatMap (either pure (const [])))) . span isLeft)
-                                          (\b → first (Right . ((NE.:|) b . concatMap (either (const []) pure))) . span isRight))
+    c ∷ [Either a b] → Smash (Either (NonEmpty a) (NonEmpty b)) [Either a b]
+    c = list Nada (uncurry Smash ‥ either (\a → first (Left  . ((:|) a . concatMap (either pure (const [])))) . span isLeft)
+                                          (\b → first (Right . ((:|) b . concatMap (either (const []) pure))) . span isRight))
 
 -- Based on `replicateTree` from http://hackage.haskell.org/package/type-indexed-queues
 -- TODO still can clean this up a bit, but left this way for now on purpose
