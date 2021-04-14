@@ -25,7 +25,7 @@ import           Data.Functor.Contravariant.Divisible (Divisible (..), Decidable
 import           Data.Functor.Contravariant (Contravariant (..), Op (..), Predicate (..), Comparison (..), Equivalence (..), defaultComparison, defaultEquivalence, (>$<))
 import           Data.Functor.Foldable (ListF (..))
 import           Data.Function (on, fix, (&))
-import           Data.List as List (delete, deleteBy, deleteFirstsBy, elemIndex, elemIndices, filter, find, findIndex, findIndices, genericDrop, genericIndex, genericLength, genericReplicate, genericTake, intercalate, intersectBy, sortBy, span, tails, transpose, unfoldr)
+import           Data.List as List (delete, deleteBy, deleteFirstsBy, elemIndex, elemIndices, filter, find, findIndex, findIndices, genericDrop, genericIndex, genericLength, genericReplicate, genericTake, intercalate, intersectBy, sortBy, tails, transpose, unfoldr)
 import           Data.List.NonEmpty (NonEmpty (..), (<|))
 import qualified Data.List.NonEmpty as NE
 import           Data.Maybe as Maybe (catMaybes, fromJust, isNothing)
