@@ -25,7 +25,7 @@ import           Data.Functor.Contravariant.Divisible (Divisible (..), Decidable
 import           Data.Functor.Contravariant (Contravariant (..), Op (..), Predicate (..), Comparison (..), Equivalence (..), defaultComparison, defaultEquivalence, (>$<))
 import           Data.Functor.Foldable (ListF (..))
 import           Data.Function (on, fix, (&))
-import           Data.List as List (delete, deleteBy, deleteFirstsBy, elemIndex, elemIndices, filter, find, findIndex, findIndices, genericDrop, genericIndex, genericLength, genericReplicate, genericTake, intercalate, intersectBy, sortBy, tails, transpose, unfoldr)
+import           Data.List as List (delete, deleteBy, deleteFirstsBy, elemIndex, elemIndices, filter, find, findIndex, findIndices, genericDrop, genericIndex, genericLength, genericReplicate, genericTake, intercalate, intersectBy, sortBy, tails, transpose)
 import           Data.List.NonEmpty (NonEmpty (..), (<|))
 import qualified Data.List.NonEmpty as NE
 import           Data.Maybe as Maybe (catMaybes, fromJust, isNothing)
@@ -36,7 +36,7 @@ import           Data.Semigroup.Traversable (Traversable1)
 import           Data.Set (Set)
 import qualified Data.Set as Set
 import           Data.Set.Unicode ((∪))
-import           Data.Smash (Smash (..), smash, fromSmash)
+import           Data.Smash (Smash (..), smash, fromSmash, unfoldr)
 import           Data.These (These (..), these, partitionEithersNE, partitionThese)
 import           Data.Traversable (mapAccumL, mapAccumR)
 import           Data.Tree (Forest, Tree (..), unfoldTree)
@@ -318,12 +318,12 @@ fixedPoint' (Equivalence (≡)) f a           = fixedPoint' (Equivalence (≡)) 
 -- inspired by `Agda.Utils.Either.groupByEither`
 -- >>> groupByLR [Left LT, Left EQ, Right (), Right (), Right (), Left GT]
 -- [Left [LT,EQ],Right [(),(),()],Left [GT]]
-groupByLR ∷ ∀ a b . [Either a b] → [Either [a] [b]]
-groupByLR = List.unfoldr c
+groupByLR ∷ ∀ a b . [Either a b] → [Either (NE.NonEmpty a) (NE.NonEmpty b)]
+groupByLR = unfoldr c
   where
-    c ∷ [Either a b] → Maybe (Either [a] [b], [Either a b])
-    c = list Nothing (Just ‥ either (\a → first (Left  . ((:) a . concatMap (either pure (const [])))) . span isLeft)
-                                    (\b → first (Right . ((:) b . concatMap (either (const []) pure))) . span isRight))
+    c ∷ [Either a b] → Smash (Either (NE.NonEmpty a) (NE.NonEmpty b)) [Either a b]
+    c = list Nada (uncurry Smash ‥ either (\a → first (Left  . ((NE.:|) a . concatMap (either pure (const [])))) . span isLeft)
+                                          (\b → first (Right . ((NE.:|) b . concatMap (either (const []) pure))) . span isRight))
 
 -- Based on `replicateTree` from http://hackage.haskell.org/package/type-indexed-queues
 -- TODO still can clean this up a bit, but left this way for now on purpose
@@ -870,12 +870,12 @@ windowed n = getZipList . traverse ZipList . genericTake n . tails . toList
 -- Slide a two-element-wide window over a list, one element at a time,
 -- generating a list of pairs
 windowed' ∷ ∀ t a . (Foldable t) ⇒ t a → [(a, a)]
-windowed' = List.unfoldr pairs . toList
+windowed' = unfoldr pairs . toList
   where
-    pairs ∷ [a] → Maybe ((a, a), [a])
-    pairs []            = Nothing
-    pairs [_]           = Nothing
-    pairs (a₁ : a₂ : t) = Just ((a₁, a₂), a₂ : t)
+    pairs ∷ [a] → Smash (a, a) [a]
+    pairs []             = Nada
+    pairs [_]            = Nada
+    pairs (a₁ : a₂ : as) = Smash (a₁, a₂) (a₂ : as)
 
 -- from https://github.com/haskell/containers/issues/346
 catMaybes ∷ (Ord a) ⇒ Set (Maybe a) → Set a
