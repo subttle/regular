@@ -38,15 +38,18 @@ toNatural = nat1 1 succ
 
 -- FIXME TODO
 instance Num ℕ¹ where
-  -- FIXME TODO
+  -- FIXME add tests
   (+) ∷ ℕ¹ → ℕ¹ → ℕ¹
-  (+) = undefined
+  (+) = flip nat1 Suc . Suc
   -- FIXME TODO
   (*) ∷ ℕ¹ → ℕ¹ → ℕ¹
   (*) = undefined
   abs ∷ ℕ¹ → ℕ¹
   -- abs    = nat1 One Suc
   abs = id
+  -- FIXME TODO
+  fromInteger ∷ Integer → ℕ¹
+  fromInteger = undefined
   signum ∷ ℕ¹ → ℕ¹
   -- signum = nat1 One (const One)
   signum =              const One
