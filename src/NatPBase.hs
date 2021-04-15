@@ -38,8 +38,27 @@ toNatural = nat1 1 succ
 
 -- FIXME TODO
 instance Num ℕ¹ where
+  -- FIXME TODO
+  (+) ∷ ℕ¹ → ℕ¹ → ℕ¹
+  (+) = undefined
+  -- FIXME TODO
+  (*) ∷ ℕ¹ → ℕ¹ → ℕ¹
+  (*) = undefined
   abs ∷ ℕ¹ → ℕ¹
+  -- abs    = nat1 One Suc
   abs = id
+  signum ∷ ℕ¹ → ℕ¹
+  -- signum = nat1 One (const One)
+  signum =              const One
+  negate ∷ ℕ¹ → ℕ¹
+  negate = error "negate"
+
+instance Semigroup ℕ¹ where
+  (<>) ∷ ℕ¹ → ℕ¹ → ℕ¹
+  (<>) = (*)
+instance Monoid ℕ¹ where
+  mempty ∷ ℕ¹
+  mempty = One
 
 instance Show ℕ¹ where
   show ∷ ℕ¹ → String
@@ -70,3 +89,7 @@ even = Predicate (nat1 False not)
 
 odd ∷ Predicate ℕ¹
 odd = Predicate (nat1 True not)
+
+positive ∷ Predicate ℕ¹
+-- positive = Predicate (nat1 True (const True))
+positive = Predicate (const True)

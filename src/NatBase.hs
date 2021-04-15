@@ -10,7 +10,7 @@ import           Data.Function (on, (&))
 import           Data.Functor.Contravariant (Contravariant (..), Predicate (..), Op (..))
 import           Numeric.Natural (Natural)
 import           Prelude hiding (even, odd)
-import           Common (quoteWith)
+import           Common (ordering, quoteWith)
 
 -- N.B. this entire file is currently experimental/untested/WIP!
 
@@ -67,7 +67,7 @@ nat z _ Zero     = z
 nat z s (Succ n) = s (nat z s n)
 
 -- N.B. `maybe ∷ b → (a → b) → Maybe a → b`
-natf ∷ b
+natf ∷           b
      → (     a → b)
      → (NatF a → b)
 natf z _ ZeroF     = z
@@ -94,9 +94,7 @@ instance Num ℕ where
   signum ∷ ℕ → ℕ
   signum = nat Zero (const (Succ Zero))
   fromInteger ∷ Integer → ℕ
-  fromInteger i | i == 0 = Zero
-                | i >  0 = Succ (fromInteger (i - 1))
-                | i <  0 = error "fromInteger"
+  fromInteger i = ordering (error "fromInteger") Zero (Succ (fromInteger (pred i))) (compare i 0)
   negate ∷ ℕ → ℕ
   negate = error "negate"
   (-) ∷ ℕ → ℕ → ℕ
@@ -138,3 +136,7 @@ even = Predicate (nat True not)
 
 odd ∷ Predicate ℕ
 odd = Predicate (nat False not)
+
+positive ∷ Predicate ℕ
+-- positive = Predicate (nat False (const True))
+positive = Predicate (> 0)
