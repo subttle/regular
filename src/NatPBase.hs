@@ -7,6 +7,7 @@ import           Data.Function (on)
 import           Data.Functor.Contravariant (Predicate (..))
 import           Numeric.Natural (Natural)
 import           Prelude hiding (even, odd)
+import           Common (ordering)
 
 
 -- N.B. this entire file is currently experimental/untested/WIP!
@@ -43,13 +44,16 @@ instance Num ℕ¹ where
   (+) = flip nat1 Suc . Suc
   -- FIXME TODO
   (*) ∷ ℕ¹ → ℕ¹ → ℕ¹
-  (*) = undefined
+  -- (*) One     One     = One
+  (*) n       One     = n
+  (*) One     m       = m
+  (*) (Suc n) (Suc m) = Suc (n * m + n + m)
   abs ∷ ℕ¹ → ℕ¹
   -- abs    = nat1 One Suc
   abs = id
   -- FIXME TODO
   fromInteger ∷ Integer → ℕ¹
-  fromInteger = undefined
+  fromInteger i = ordering (error "fromInteger") One (Suc (fromInteger (pred i))) (compare i 1)
   signum ∷ ℕ¹ → ℕ¹
   -- signum = nat1 One (const One)
   signum =              const One
