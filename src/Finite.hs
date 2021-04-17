@@ -360,7 +360,7 @@ instance (Finite a, Finite b)
   asSet  = Set.map toSmash asSet
 
 -- For tuples where types `a` and `b` are enumerable, allow the tuple to be enumerated as `a` × `b`
-instance (Finite a, Finite b)
+instance (Bounded a, Enum a, U.Finite a, Bounded b, Enum b, U.Finite b)
        ⇒ Enum (a, b) where
   toEnum ∷ Int → (a, b)
   toEnum i₀ = (toEnum aᵢ, toEnum bᵢ)
@@ -391,7 +391,7 @@ instance (Finite a, Finite b)
   asList = liftA2 (,) asList asList
 
 -- For tuples where types `a`, `b`, and `c` are enumerable, allow the tuple to be enumerated as `a` × `b` × `c`
-instance (Finite a, Finite b, Finite c)
+instance (Bounded a, Enum a, U.Finite a, Bounded b, Enum b, U.Finite b, Bounded c, Enum c, U.Finite c)
        ⇒ Enum (a, b, c) where
   toEnum ∷ Int → (a, b, c)
   toEnum i₀ = (toEnum aᵢ, toEnum bᵢ, toEnum cᵢ)
@@ -427,7 +427,7 @@ instance (Finite a, Finite b, Finite c)
   asList = liftA3 (,,) asList asList asList
 
 -- For tuples where types `a`, `b`, `c` and `d` are enumerable, allow the tuple to be enumerated as `a` × `b` × `c` × `d`
-instance (Finite a, Finite b, Finite c, Finite d)
+instance (Bounded a, Enum a, U.Finite a, Bounded b, Enum b, U.Finite b, Bounded c, Enum c, U.Finite c, Bounded d, Enum d, U.Finite d)
        ⇒ Enum (a, b, c, d) where
   toEnum ∷ Int → (a, b, c, d)
   toEnum i₀ = (toEnum aᵢ, toEnum bᵢ, toEnum cᵢ, toEnum dᵢ)
@@ -470,7 +470,7 @@ instance (Finite a, Finite b, Finite c, Finite d)
   asList = liftM4 (,,,)  asList asList asList asList
 
 -- For tuples where types `a`, `b`, `c` and `d` are enumerable, allow the tuple to be enumerated as `a` × `b` × `c` × `d`
-instance (Finite a, Finite b, Finite c, Finite d, Finite e)
+instance (Bounded a, Enum a, U.Finite a, Bounded b, Enum b, U.Finite b, Bounded c, Enum c, U.Finite c, Bounded d, Enum d, U.Finite d, Bounded e, Enum e, U.Finite e)
        ⇒ Enum (a, b, c, d, e) where
   toEnum ∷ Int → (a, b, c, d, e)
   toEnum i₀ = (toEnum aᵢ, toEnum bᵢ, toEnum cᵢ, toEnum dᵢ, toEnum eᵢ)
