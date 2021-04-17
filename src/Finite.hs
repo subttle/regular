@@ -238,13 +238,17 @@ instance (Finite a, Finite b)
   fromEnum = fromEnum . fromThese
   enumFrom ∷ These a b → [These a b]
   enumFrom = boundedEnumFrom
-instance (Finite a, Finite b)
+instance (U.Universe a, U.Universe b)
+       ⇒ U.Universe (These a b) where
+  universe ∷ [These a b]
+  universe = fmap toThese U.universe
+instance (U.Finite a, U.Finite b)
        ⇒ U.Finite (These a b) where
   -- a + b + ab
   cardinality ∷ Tagged (These a b) ℕ
   cardinality = liftA2 (\a b → a + b + a * b) (retag (U.cardinality ∷ Tagged a ℕ)) (retag (U.cardinality ∷ Tagged b ℕ))
-instance (Finite a, Finite b, U.Universe a, U.Universe b)
-       ⇒ U.Universe (These a b)
+  universeF ∷ [These a b]
+  universeF = fmap toThese U.universeF
 instance (Finite a, Finite b)
        ⇒ Finite (These a b) where
   asList ∷ [These a b]
@@ -268,13 +272,17 @@ instance (Finite a, Finite b)
   fromEnum = fromEnum . fromWedge
   enumFrom ∷ Wedge a b → [Wedge a b]
   enumFrom = boundedEnumFrom
-instance (Finite a, Finite b)
+instance (U.Universe a, U.Universe b)
+       ⇒ U.Universe (Wedge a b) where
+  universe ∷ [Wedge a b]
+  universe = fmap toWedge U.universe
+instance (U.Finite a, U.Finite b)
        ⇒ U.Finite (Wedge a b) where
   -- 1 + a + b
   cardinality ∷ Tagged (Wedge a b) ℕ
-  cardinality = liftA2 (succ ‥ (+)) (retag (U.cardinality ∷ Tagged a ℕ)) (retag (U.cardinality ∷ Tagged b ℕ))
-instance (Finite a, Finite b, U.Universe a, U.Universe b)
-       ⇒ U.Universe (Wedge a b)
+  cardinality = liftA2 (\a b → 1 + a + b) (retag (U.cardinality ∷ Tagged a ℕ)) (retag (U.cardinality ∷ Tagged b ℕ))
+  universeF ∷ [Wedge a b]
+  universeF = fmap toWedge U.universeF
 instance (Finite a, Finite b)
        ⇒ Finite (Wedge a b) where
   asList ∷ [Wedge a b]
@@ -297,13 +305,17 @@ instance (Finite a, Finite b)
   fromEnum = fromEnum . fromCan
   enumFrom ∷ Can a b → [Can a b]
   enumFrom = boundedEnumFrom
-instance (Finite a, Finite b)
+instance (U.Universe a, U.Universe b)
+       ⇒ U.Universe (Can a b) where
+  universe ∷ [Can a b]
+  universe = fmap toCan U.universe
+instance (U.Finite a, U.Finite b)
        ⇒ U.Finite (Can a b) where
   -- 1 + a + b + ab
   cardinality ∷ Tagged (Can a b) ℕ
   cardinality = liftA2 (\a b → 1 + a + b + a * b) (retag (U.cardinality ∷ Tagged a ℕ)) (retag (U.cardinality ∷ Tagged b ℕ))
-instance (Finite a, Finite b, U.Universe a, U.Universe b)
-       ⇒ U.Universe (Can a b)
+  universeF ∷ [Can a b]
+  universeF = fmap toCan U.universeF
 instance (Finite a, Finite b)
        ⇒ Finite (Can a b) where
   asList ∷ [Can a b]
@@ -328,13 +340,17 @@ instance (Finite a, Finite b)
   fromEnum = fromEnum . fromSmash
   enumFrom ∷ Smash a b → [Smash a b]
   enumFrom = boundedEnumFrom
-instance (Finite a, Finite b)
+instance (U.Universe a, U.Universe b)
+       ⇒ U.Universe (Smash a b) where
+  universe ∷ [Smash a b]
+  universe = fmap toSmash U.universe
+instance (U.Finite a, U.Finite b)
        ⇒ U.Finite (Smash a b) where
   -- 1 + ab
   cardinality ∷ Tagged (Smash a b) ℕ
-  cardinality = liftA2 (succ ‥ (*)) (retag (U.cardinality ∷ Tagged a ℕ)) (retag (U.cardinality ∷ Tagged b ℕ))
-instance (Finite a, Finite b, U.Universe a, U.Universe b)
-       ⇒ U.Universe (Smash a b)
+  cardinality = liftA2 (\a b → 1 + a * b) (retag (U.cardinality ∷ Tagged a ℕ)) (retag (U.cardinality ∷ Tagged b ℕ))
+  universeF ∷ [Smash a b]
+  universeF = fmap toSmash U.universeF
 instance (Finite a, Finite b)
        ⇒ Finite (Smash a b) where
   asList ∷ [Smash a b]
