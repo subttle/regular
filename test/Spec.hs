@@ -202,7 +202,7 @@ testDFArquotient = tests [example₃, example₄]
     example₄ ∷ Test ()
     example₄ = scope "Example 4" $ tests [test₁, test₂, test₃]
       where
-        -- ℒ₁ ≟ {"012","312"}
+        -- ℒ₁ ≟ {"012", "312"}
         test₁ ∷ Test ()
         test₁ = expectEqual expected (Config.language ℓ₁)
           where
@@ -223,7 +223,7 @@ testDFArquotient = tests [example₃, example₄]
             -- ℒ = ℒ₁ / ℒ₂ = {"0", "3", "01", "31"}
             ℓ ∷ DFA Fin₅ Fin₄
             ℓ = DFA.rquotient ℓ₁ ℓ₂
-        -- ℒ₁ = {"012","312"}
+        -- ℒ₁ = {"012", "312"}
         ℓ₁ ∷ DFA Fin₅ Fin₄
         ℓ₁ = DFA δ 0 (singleton 3)
           where

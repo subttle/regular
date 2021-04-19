@@ -75,14 +75,14 @@ instance (Show s, Finite s) ⇒ Show (SomeDFA s) where
 
 instance (Finite q, Finite s) ⇒ Configuration DFA q s q where
   -- By construction of a DFA type this will be `True`
-  deterministic ∷ DFA q s → Bool
+  deterministic   ∷ DFA q s → Bool
   deterministic   = const True
 
   codeterministic ∷ DFA q s → Bool
   codeterministic = deterministic . FA.reversal . toFA
 
   -- By construction of a DFA type this will be `True`
-  complete      ∷ DFA q s → Bool
+  complete        ∷ DFA q s → Bool
   complete        = const True
 
   occupied ∷ DFA q s → q → Set q
@@ -325,7 +325,7 @@ xor m₁ m₂ = DFA.difference m₁ m₂ `DFA.union` DFA.difference m₂ m₁
 reversal ∷ (Finite q, Finite s) ⇒ DFA q s → DFA (Set q) s
 reversal = DFA.fromFA . FA.reversal . toFA
 
--- ℒ(m₁)/ℒ(m₂) = { w | wx ∈ ℒ(m₁)  ∧  x ∈ ℒ(m₂) }
+-- ℒ(m₁) / ℒ(m₂) = { w | w · x ∈ ℒ(m₁)  ∧  x ∈ ℒ(m₂) }
 rquotient ∷ (Finite q, Finite p, Finite s) ⇒ DFA q s → DFA p s → DFA q s
 rquotient m₁ m₂ = m₁ { fs = Set.filter (DFA.intersects m₂ . right m₁) (qs m₁) }
 
