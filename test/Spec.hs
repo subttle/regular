@@ -156,11 +156,11 @@ testDFAquotient = tests [test₁, test₂]
     test₂ = expect ((<)       (size' (useful (quotient minimal))) (size' (useful minimal)))
 
 testDFArquotient ∷ Test ()
-testDFArquotient = tests [example₃]
+testDFArquotient = tests [example₃, example₄]
   where
     -- See "Example 3" of https://math.stackexchange.com/questions/871662/finding-right-quotient-of-languages
     example₃ ∷ Test ()
-    example₃ = tests [test₁, test₂, test₃, test₄, test₅, test₆]
+    example₃ = scope "Example 3" $ tests [test₁, test₂, test₃, test₄, test₅, test₆]
       where
         -- ℒ₁ = {"carrot"}
         ℓ₁ ∷ DFA Fin₈ Alpha
@@ -198,6 +198,59 @@ testDFArquotient = tests [example₃]
         --      "t" ∈?      ℒ₂
         test₆ ∷ Test ()
         test₆ = expect      (Config.accepts ℓ₂ [               T])
+    -- See "Example 4" of https://math.stackexchange.com/questions/871662/finding-right-quotient-of-languages
+    example₄ ∷ Test ()
+    example₄ = scope "Example 4" $ tests [test₁, test₂, test₃]
+      where
+        -- ℒ₁ ≟ {"012","312"}
+        test₁ ∷ Test ()
+        test₁ = expectEqual expected (Config.language ℓ₁)
+          where
+            expected ∷ [[Fin₄]]
+            expected = [[0, 1, 2], [3, 1, 2]]
+        -- ℒ₂ ≟ {"2", "12"}
+        test₂ ∷ Test ()
+        test₂ = expectEqual expected (Config.language ℓ₂)
+          where
+            expected ∷ [[Fin₄]]
+            expected = [[2], [1, 2]]
+        -- ℒ ≟ {"0", "3", "01", "31"}
+        test₃ ∷ Test ()
+        test₃ = expectEqual expected (Config.language ℓ)
+          where
+            expected ∷ [[Fin₄]]
+            expected = [[0], [3], [0, 1], [3, 1]]
+            -- ℒ = ℒ₁ / ℒ₂ = {"0", "3", "01", "31"}
+            ℓ ∷ DFA Fin₅ Fin₄
+            ℓ = DFA.rquotient ℓ₁ ℓ₂
+        -- ℒ₁ = {"012","312"}
+        ℓ₁ ∷ DFA Fin₅ Fin₄
+        ℓ₁ = DFA δ 0 (singleton 3)
+          where
+            δ ∷ (Fin₅, Fin₄) → Fin₅
+            δ (0, 0) = 1
+            δ (0, 3) = 1
+            δ (1, 1) = 2
+            δ (2, 2) = 3
+            δ _      = 4
+        -- ℒ₂ = {"2", "12"}
+        ℓ₂ ∷ DFA Fin₄ Fin₄
+        ℓ₂ = contramap (toEnum . fromEnum) (DFA δ 0 (singleton 2))
+          where
+            δ ∷ (Fin₄, Fin₃) → Fin₄
+            δ (0, 0) = 3
+            δ (0, 1) = 1
+            δ (0, 2) = 2
+            δ (1, 0) = 3
+            δ (1, 1) = 3
+            δ (1, 2) = 2
+            δ (2, 0) = 3
+            δ (2, 1) = 3
+            δ (2, 2) = 3
+            δ (3, 0) = 3
+            δ (3, 1) = 3
+            δ (3, 2) = 3
+            δ _      = 3 -- impossible
 
 testDFAinvhomimage ∷ Test ()
 testDFAinvhomimage = tests [test₁, test₂]
