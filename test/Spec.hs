@@ -155,37 +155,49 @@ testDFAquotient = tests [test₁, test₂]
     test₂ ∷ Test ()
     test₂ = expect ((<)       (size' (useful (quotient minimal))) (size' (useful minimal)))
 
--- https://math.stackexchange.com/questions/871662/finding-right-quotient-of-languages
 testDFArquotient ∷ Test ()
-testDFArquotient = tests e₃Tests
+testDFArquotient = tests [example₃]
   where
-    -- L₁ = {"carrot"}
-    e₃L₁ ∷ DFA Fin₈ Alpha
-    e₃L₁   = DFA δ 0 (singleton 6)
+    -- See "Example 3" of https://math.stackexchange.com/questions/871662/finding-right-quotient-of-languages
+    example₃ ∷ Test ()
+    example₃ = tests [test₁, test₂, test₃, test₄, test₅, test₆]
       where
-        δ ∷ (Fin₈, Alpha) → Fin₈
-        δ (0, C) = 1
-        δ (1, A) = 2
-        δ (2, R) = 3
-        δ (3, R) = 4
-        δ (4, O) = 5
-        δ (5, T) = 6
-        δ _      = 7
-    -- L₂ = {"t"} ∪ {"ot"} = {"t", "ot"}
-    e₃L₂ ∷ DFA (Fin₈, Fin₈) Alpha
-    e₃L₂   = DFA.union (right e₃L₁ 5) (right e₃L₁ 4)
-    -- L₁/L₂ = {"carro", "carr"}
-    e₃L₁L₂ ∷ DFA Fin₈ Alpha
-    e₃L₁L₂ = DFA.rquotient e₃L₁ e₃L₂
-    -- {"carrot"} / {"t", "ot"} = {"carro", "carr"}
-    e₃Tests ∷ [Test ()]
-    e₃Tests = [ expect      (Config.accepts e₃L₁   [C, A, R, R, O, T])                  -- test that "carrot" ∈ L₁
-              , expect      (Config.accepts e₃L₂   [O, T])                              -- test that     "ot" ∈    L₂
-              , expect      (Config.accepts e₃L₂   [T])                                 -- test that      "t" ∈    L₂
-              , expect      (Config.accepts e₃L₁L₂ [C, A, R, R, O])                     -- test that "carro"  ∈ L₁/L₂
-              , expect      (Config.accepts e₃L₁L₂ [C, A, R, R])                        -- test that "carr"   ∈ L₁/L₂
-              , expectEqual (Prelude.take 2 (Config.language e₃L₁L₂)) [[C, A, R, R], [C, A, R, R, O]]
-              ]
+        -- ℒ₁ = {"carrot"}
+        ℓ₁ ∷ DFA Fin₈ Alpha
+        ℓ₁ = DFA δ 0 (singleton 6)
+          where
+            δ ∷ (Fin₈, Alpha) → Fin₈
+            δ (0, C) = 1
+            δ (1, A) = 2
+            δ (2, R) = 3
+            δ (3, R) = 4
+            δ (4, O) = 5
+            δ (5, T) = 6
+            δ _      = 7
+        -- ℒ₂ = {"ot"} ∪ {"t"} = {"ot", "t"}
+        ℓ₂ ∷ DFA (Fin₈, Fin₈) Alpha
+        ℓ₂ = DFA.union (right ℓ₁ 5) (right ℓ₁ 4)
+        -- ℒ = ℒ₁ / ℒ₂ = {"carrot"} / {"ot", "t"} = {"carr", "carro"}
+        ℓ ∷ DFA Fin₈ Alpha
+        ℓ = DFA.rquotient ℓ₁ ℓ₂
+        -- ℒ ≟ {"carr", "carro"}
+        test₁ ∷ Test ()
+        test₁ = expectEqual (Prelude.take 2 (Config.language ℓ)) [[C, A, R, R], [C, A, R, R, O]]
+        -- "carro"  ∈? ℒ₁ / ℒ₂
+        test₂ ∷ Test ()
+        test₂ = expect      (Config.accepts ℓ  [C, A, R, R, O   ])
+        -- "carr"   ∈? ℒ₁ / ℒ₂
+        test₃ ∷ Test ()
+        test₃ = expect      (Config.accepts ℓ  [C, A, R, R      ])
+        -- "carrot" ∈? ℒ₁
+        test₄ ∷ Test ()
+        test₄ = expect      (Config.accepts ℓ₁ [C, A, R, R, O, T])
+        --     "ot" ∈?      ℒ₂
+        test₅ ∷ Test ()
+        test₅ = expect      (Config.accepts ℓ₂ [            O, T])
+        --      "t" ∈?      ℒ₂
+        test₆ ∷ Test ()
+        test₆ = expect      (Config.accepts ℓ₂ [               T])
 
 testDFAinvhomimage ∷ Test ()
 testDFAinvhomimage = tests [test₁, test₂]
