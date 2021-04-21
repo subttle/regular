@@ -262,6 +262,7 @@ testDFAinvhomimage = tests [test₁, test₂]
         m ∷ DFA Fin₃ Fin₂
         m = DFA δ 0 (singleton 2)
           where
+            δ ∷ (Fin₃, Fin₂) → Fin₃
             δ (0, 0) = 1
             δ (0, 1) = 2
             δ (1, 0) = 0
@@ -360,7 +361,7 @@ testREDropout = tests [test₁, test₂]
             -- ℒ (D ∣ (A·(B·C) ∣ E·F)) = {"ABC", "D", "EF"}
             expression  ∷ RegExp Alpha
             expression  = RE.fromWords [[A, B, C], [D], [E, F]]
-        -- {"", "AB", "AC", "BC", "E", "F"}
+        -- {ε, "AB", "AC", "BC", "E", "F"}
         expected ∷ [[Alpha]]
         expected = [ []
                    , [A, B]
