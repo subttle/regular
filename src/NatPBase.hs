@@ -43,7 +43,7 @@ instance Num ℕ¹ where
   (+) ∷ ℕ¹ → ℕ¹ → ℕ¹
   (+) = flip nat1 Suc . Suc
   (*) ∷ ℕ¹ → ℕ¹ → ℕ¹
-  (*) = nat1 id ((=<<) (+))
+  (*) = nat1 id ((<*>) (+))
   abs ∷ ℕ¹ → ℕ¹
   -- abs    = nat1 One Suc
   abs = id
@@ -72,11 +72,9 @@ instance Show ℕ¹ where
 -- N.B. this is not a bijection!
 instance Enum ℕ¹ where
   toEnum ∷ Int → ℕ¹
-  toEnum i | i == 1 = One
-           | i >  1 = Suc (toEnum (i - 1))
-           | i <  1 = error "toEnum"
+  toEnum = liftA4 ordering (Suc . toEnum . pred) (const One) (error "toEnum") (compare 0)
   fromEnum ∷ ℕ¹ → Int
-  fromEnum = nat1 1 succ
+  fromEnum = nat1 0 succ
   succ ∷ ℕ¹ → ℕ¹
   succ = Suc
   pred ∷ ℕ¹ → ℕ¹
