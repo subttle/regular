@@ -7,7 +7,7 @@ import           Data.Function (on)
 import           Data.Functor.Contravariant (Predicate (..))
 import           Numeric.Natural (Natural)
 import           Prelude hiding (even, odd)
-import           Common (ordering)
+import           Common (liftA4, ordering)
 
 
 -- N.B. this entire file is currently experimental/untested/WIP!
@@ -47,14 +47,16 @@ instance Num ℕ¹ where
   abs ∷ ℕ¹ → ℕ¹
   -- abs    = nat1 One Suc
   abs = id
-  -- FIXME TODO
   fromInteger ∷ Integer → ℕ¹
-  fromInteger i = ordering (error "fromInteger") One (Suc (fromInteger (pred i))) (compare i 1)
+  fromInteger = liftA4 ordering (Suc . fromInteger . pred) (const One) (error "fromInteger") (compare 1)
   signum ∷ ℕ¹ → ℕ¹
   -- signum = nat1 One (const One)
   signum =              const One
   negate ∷ ℕ¹ → ℕ¹
   negate = error "negate"
+  -- FIXME TODO
+  -- (-) ∷ ℕ¹ → ℕ¹ → ℕ¹
+  -- (-) = undefined
 
 instance Semigroup ℕ¹ where
   (<>) ∷ ℕ¹ → ℕ¹ → ℕ¹
