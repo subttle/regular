@@ -42,10 +42,8 @@ instance Num ℕ¹ where
   -- FIXME add tests
   (+) ∷ ℕ¹ → ℕ¹ → ℕ¹
   (+) = flip nat1 Suc . Suc
-  -- FIXME TODO
   (*) ∷ ℕ¹ → ℕ¹ → ℕ¹
-  (*) One     = id
-  (*) (Suc n) = nat1 (Suc n) (\m → Suc (n + m))
+  (*) = nat1 id ((=<<) (+))
   abs ∷ ℕ¹ → ℕ¹
   -- abs    = nat1 One Suc
   abs = id
