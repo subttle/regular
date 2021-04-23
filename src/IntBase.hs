@@ -6,7 +6,7 @@
 module IntBase where
 
 import           Control.Applicative (Alternative (..))
-import           Control.Monad (ap) -- TODO (ap, liftM4)
+import           Control.Monad (ap)
 import           Data.Fix (Fix (..))
 import           Data.Functor ((<&>))
 import           Data.Functor.Foldable (Base, Recursive (..), Corecursive (..))
@@ -16,7 +16,7 @@ import           Data.List (unfoldr)
 import           Data.List.NonEmpty (NonEmpty (..))
 import qualified Data.List.NonEmpty as NE
 import           GHC.Real (reduce)
-import           Common ((⊲), (⋄), (‥), ordering, quoteWith)
+import           Common ((⊲), (⋄), (‥), liftA4, ordering, quoteWith)
 
 -- N.B. this entire file is currently experimental/untested/WIP!
 
@@ -68,11 +68,8 @@ instance Num ℤ where
   negate ∷ ℤ → ℤ
   negate = invert
   fromInteger ∷ Integer → ℤ
-  -- TODO
-  -- fromInteger = liftM4 ordering (Prev . fromInteger . succ) (const Zero) (Next . fromInteger . pred) (compare 0)
-  fromInteger i | i < 0 = Prev (fromInteger (1 + i    ))
-  fromInteger 0         = Zero
-  fromInteger i | i > 0 = Next (fromInteger (    i - 1))
+  -- fromInteger = liftM4 ordering (Prev . fromInteger . succ) (const Zero) (Next . fromInteger . pred) (flip compare 0)
+  fromInteger = liftA4 ordering (Next . fromInteger . pred) (const Zero) (Prev . fromInteger . succ) (compare 0)
   abs ∷ ℤ → ℤ
   abs = undefined    -- FIXME implement
   signum ∷ ℤ → ℤ
