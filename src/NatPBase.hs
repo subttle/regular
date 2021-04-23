@@ -44,10 +44,8 @@ instance Num ℕ¹ where
   (+) = flip nat1 Suc . Suc
   -- FIXME TODO
   (*) ∷ ℕ¹ → ℕ¹ → ℕ¹
-  -- (*) One     One     = One
-  (*) n       One     = n
-  (*) One     m       = m
-  (*) (Suc n) (Suc m) = Suc (n * m + n + m)
+  (*) One     = id
+  (*) (Suc n) = nat1 (Suc n) (\m → Suc (n + m))
   abs ∷ ℕ¹ → ℕ¹
   -- abs    = nat1 One Suc
   abs = id
