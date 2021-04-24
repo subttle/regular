@@ -3,14 +3,16 @@
 
 module NatBase where
 
-import           Control.Applicative (Alternative (..))
+import           Control.Applicative (Alternative (..), Applicative (..))
 import           Control.Selective (Selective (..), selectM)
 import           Control.Monad.Fix (MonadFix (..))
 import           Data.Function (on, (&))
 import           Data.Functor.Contravariant (Contravariant (..), Predicate (..), Op (..))
+import           Data.List.NonEmpty (NonEmpty (..))
+import qualified Data.List.NonEmpty as NE (reverse)
 import           Numeric.Natural (Natural)
 import           Prelude hiding (even, odd)
-import           Common (ordering, quoteWith)
+import           Common ((⋄), ordering, quoteWith)
 
 -- N.B. this entire file is currently experimental/untested/WIP!
 
@@ -140,3 +142,7 @@ odd = Predicate (nat False not)
 positive ∷ Predicate ℕ
 -- positive = Predicate (nat False (const True))
 positive = Predicate (> 0)
+
+-- TODO
+brgc ∷ ℕ → NonEmpty [Bool]
+brgc = nat (pure mempty) (liftA2 (⋄) (fmap (False :)) (fmap (True :) . NE.reverse))
