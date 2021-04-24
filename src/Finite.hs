@@ -46,7 +46,7 @@ import           Data.Wedge (Wedge (..), wedge, toWedge, fromWedge)
 import           GHC.Enum (boundedEnumFrom)
 import           Numeric.Natural.Unicode (ℕ)
 import           Prelude.Unicode (ℤ)
-import           Common (DisplayColor (..), HasDisplayColor (..), Fancy (..), Set' (..), bell, charToString, choose', comparing', elemIndex', equating', factorial, filter', freeMonoid, freeSemigroup, fromCan, fromEnum', fromThese, implies, impossible, lefts', length', partitions', quoteWith, replicateM', rights', toColor, toCan, toEnum', toThese, (×), (‥), (⊎), (⋄), (>&<))
+import           Common (DisplayColor (..), HasDisplayColor (..), Fancy (..), Set' (..), bell, charToString, choose', comparing', elemIndex', equating', factorial, filter', freeMonoid, freeSemigroup, fromCan, fromEnum', fromThese, indexed, implies, impossible, lefts', length', partitions', quoteWith, replicateM', rights', toColor, toCan, toEnum', toThese, (×), (‥), (⊎), (⋄), (>&<))
 
 
 -- An imperfect, somewhat practical, representation of a Finite type constraint
@@ -1228,6 +1228,14 @@ toRGS (≡) = RGS (fmap (fromEnumBy' (≡) . representative (≡)) asList)
 
 fromRGS ∷ (Finite a) ⇒ RGS a → Equivalence a
 fromRGS (RGS rgs) = equating' (genericIndex rgs . fromEnum')
+
+-- TODO lots of room for improvement here, but this works for now
+-- This function takes two RGSs over the same finite type `a`, and returns a list of all indices
+-- for which the element of `a` gets sent to differing blocks (a /block/ is a disjoint part of a set partition).
+-- It is perhaps worth noting that the implemented `restricted` condition always requires a₁ = 0, so two `RGS` should
+-- never disagree at index 0.
+disagreements ∷ (Finite a) ⇒ RGS a → RGS a → [ℕ]
+disagreements (RGS rgs₁) (RGS rgs₂) = fmap snd (List.filter ((≠) EQ . fst) (indexed (zipWith compare rgs₁ rgs₂)))
 
 -- TODO I think I tested this version in GHCI earlier but still need to add to test suit
 -- TODO a lot to rework/clean up here but this works for now
