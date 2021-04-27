@@ -381,6 +381,9 @@ lteq = equating' (≠ GT)
 gteq ∷ Equivalence Ordering
 gteq = equating' (≠ LT)
 
+(≢) ∷ Equivalence Ordering
+(≢) = equating' (≠ EQ)
+
 -- case analysis for list
 -- list
 --   ∷             b
