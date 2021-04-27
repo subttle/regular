@@ -1203,9 +1203,8 @@ instance (Finite a)
   (==) = (==) `on` getRGS
 
 instance (Finite a) ⇒ Ord (RGS a) where
-  -- TODO this is correct but I will have to think if there is more efficient way to do this directly
   compare ∷ RGS a → RGS a → Ordering
-  compare = compare `on` fromRGS
+  compare = compare `on` getRGS
 
 instance (Finite a)
        ⇒ Enum (RGS a) where
