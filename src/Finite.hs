@@ -8,7 +8,7 @@
 module Finite where
 
 import           Control.Applicative (Applicative (..), Const (..), liftA3)
-import           Control.Monad (liftM4, liftM5, void)
+import           Control.Monad (void)
 import           Data.Bool (bool)
 import           Data.Can (Can, can)
 import qualified Data.Can as C
@@ -46,7 +46,7 @@ import           Data.Wedge (Wedge (..), wedge, toWedge, fromWedge)
 import           GHC.Enum (boundedEnumFrom)
 import           Numeric.Natural.Unicode (ℕ)
 import           Prelude.Unicode (ℤ)
-import           Common (DisplayColor (..), HasDisplayColor (..), Fancy (..), Set' (..), bell, charToString, choose', comparing', elemIndex', equating', factorial, filter', freeMonoid, freeSemigroup, fromCan, fromEnum', fromThese, indexed, implies, impossible, lefts', length', partitions', quoteWith, replicateM', rights', toColor, toCan, toEnum', toThese, (×), (‥), (⊎), (⋄), (>&<))
+import           Common (DisplayColor (..), HasDisplayColor (..), Fancy (..), Set' (..), bell, charToString, choose', comparing', elemIndex', equating', factorial, filter', freeMonoid, freeSemigroup, fromCan, fromEnum', fromThese, indexed, implies, impossible, liftA4, liftA5, lefts', length', partitions', quoteWith, replicateM', rights', toColor, toCan, toEnum', toThese, (×), (‥), (⊎), (⋄), (>&<))
 
 
 -- An imperfect, somewhat practical, representation of a Finite type constraint
@@ -467,7 +467,7 @@ instance (Bounded a, Enum a, U.Finite a, Bounded b, Enum b, U.Finite b, Bounded 
 instance (Finite a, Finite b, Finite c, Finite d)
        ⇒ Finite (a, b, c, d) where
   asList ∷ [(a, b, c, d)]
-  asList = liftM4 (,,,)  asList asList asList asList
+  asList = liftA4 (,,,) asList asList asList asList
 
 -- For tuples where types `a`, `b`, `c` and `d` are enumerable, allow the tuple to be enumerated as `a` × `b` × `c` × `d`
 instance (Bounded a, Enum a, U.Finite a, Bounded b, Enum b, U.Finite b, Bounded c, Enum c, U.Finite c, Bounded d, Enum d, U.Finite d, Bounded e, Enum e, U.Finite e)
@@ -518,7 +518,7 @@ instance (Finite a, Finite b, Finite c, Finite d, Finite e)
        ⇒ Finite (a, b, c, d, e)
    where
   asList ∷ [(a, b, c, d, e)]
-  asList = liftM5 (,,,,) asList asList asList asList asList
+  asList = liftA5 (,,,,) asList asList asList asList asList
 
 instance (Finite a, Eq b) ⇒ Eq (a → b) where
   (==) ∷ (a → b) → (a → b) → Bool
