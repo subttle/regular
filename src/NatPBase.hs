@@ -3,11 +3,14 @@
 
 module NatPBase where
 
+import           Control.Applicative (liftA2)
 import           Data.Function (on)
 import           Data.Functor.Contravariant (Predicate (..))
+import           Data.List.NonEmpty (NonEmpty (..))
+import qualified Data.List.NonEmpty as NE (reverse)
 import           Numeric.Natural (Natural)
 import           Prelude hiding (even, odd)
-import           Common (liftA4, ordering)
+import           Common ((⋄), (⊲), liftA4, ordering)
 
 
 -- N.B. this entire file is currently experimental/untested/WIP!
@@ -93,6 +96,12 @@ even = Predicate (nat1 False not)
 odd ∷ Predicate ℕ¹
 odd = Predicate (nat1 True not)
 
+-- Some call this "strictly positive" but I consider it just "positive".
 positive ∷ Predicate ℕ¹
 -- positive = Predicate (nat1 True (const True))
 positive = Predicate (const True)
+
+-- TODO
+brgc1 ∷ ℕ¹ → NonEmpty (NonEmpty Bool)
+brgc1 = nat1 (       (⋄) (pure (pure False)) (pure (pure True)             ))
+             (liftA2 (⋄) (fmap ((⊲)  False)) (fmap ((⊲)  True) . NE.reverse))
