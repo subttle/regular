@@ -926,6 +926,13 @@ type Fin14 = Fin₁₄
 type Fin15 = Fin₁₅
 type Fin16 = Fin₁₆
 
+instance U.Universe Fin₀ where
+  universe ∷ [Fin₀]
+  universe = []
+instance U.Finite Fin₀ where
+  cardinality ∷ Tagged Fin₀ ℕ
+  cardinality = Tagged 0
+
 instance U.Universe Fin₁
 instance U.Finite   Fin₁ where
   cardinality ∷ Tagged Fin₁ ℕ
