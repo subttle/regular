@@ -381,6 +381,7 @@ lteq = equating' (≠ GT)
 gteq ∷ Equivalence Ordering
 gteq = equating' (≠ LT)
 
+-- Equivalence ((==) `on` (not . (==) EQ))
 (≢) ∷ Equivalence Ordering
 (≢) = equating' (≠ EQ)
 
