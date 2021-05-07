@@ -12,7 +12,7 @@ import           Data.List.NonEmpty (NonEmpty (..))
 import qualified Data.List.NonEmpty as NE (reverse)
 import           Numeric.Natural (Natural)
 import           Prelude hiding (even, odd)
-import           Common ((⋄), ordering, quoteWith)
+import           Common ((⋄), liftA4, ordering, quoteWith)
 
 -- N.B. this entire file is currently experimental/untested/WIP!
 
@@ -96,7 +96,7 @@ instance Num ℕ where
   signum ∷ ℕ → ℕ
   signum = nat Zero (const (Succ Zero))
   fromInteger ∷ Integer → ℕ
-  fromInteger i = ordering (error "fromInteger") Zero (Succ (fromInteger (pred i))) (compare i 0)
+  fromInteger = liftA4 ordering (Succ . fromInteger . pred) (const Zero) (error "fromInteger") (compare 0)
   negate ∷ ℕ → ℕ
   negate = error "negate"
   (-) ∷ ℕ → ℕ → ℕ
@@ -116,9 +116,7 @@ instance Show ℕ where
 -- N.B. this is not a bijection!
 instance Enum ℕ where
   toEnum ∷ Int → ℕ
-  toEnum i | i == 0 = Zero
-           | i >  0 = Succ (toEnum (i - 1))
-           | i <  0 = error "toEnum"
+  toEnum = liftA4 ordering (Succ . toEnum . pred) (const Zero) (error "toEnum") (compare 0)
   fromEnum ∷ ℕ → Int
   fromEnum = nat 0 succ
   succ ∷ ℕ → ℕ
