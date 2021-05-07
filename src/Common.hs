@@ -637,7 +637,7 @@ rationals ∷ NonEmpty ℚ
 rationals = fix ((⊲) 1 . (=<<) (\q → pure (1 + q) ⋄ pure (1 / (1 + q))))
 
 -- Natural numbers (as a non-empty list)
--- http://oeis.org/A001477
+-- https://oeis.org/A001477
 naturals ∷ NonEmpty ℕ
 -- naturals = NE.iterate (+1) 0
 naturals = fix ((⊲) 0 . fmap (+ 1))
@@ -646,7 +646,7 @@ powers ∷ ℕ → NonEmpty ℕ
 powers n = fix ((⊲) 1 . fmap (* n))
 
 -- Fibonacci numbers (as a non-empty list)
--- http://oeis.org/A000045
+-- https://oeis.org/A000045
 fibonacci ∷ NonEmpty ℕ
 fibonacci = fix ((⊲) 0 . NE.scanl (+) 1)
 
@@ -657,7 +657,7 @@ pascals ∷ NonEmpty (NonEmpty ℕ)
 pascals = fix ((⊲) (pure 1) . fmap (NE.zipWith (+) <$> (⋄) (pure 0) <*> flip (⋄) (pure 0)))
 
 -- Factorial numbers (as a non-empty list)
--- http://oeis.org/A000142
+-- https://oeis.org/A000142
 factorials ∷ NonEmpty ℕ
 factorials = fix ((⊲) 1 . NE.zipWith (*) (enumFrom' 1))
 
