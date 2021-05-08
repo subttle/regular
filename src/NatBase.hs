@@ -60,8 +60,8 @@ instance MonadFix NatF where
       a = unfix (f a)
         where
           unfix ∷ NatF a → a
-          unfix (SuccF a) = a
-          unfix ZeroF     = undefined
+          unfix (SuccF a') = a'
+          unfix ZeroF      = undefined
 
 -- case analysis
 nat ∷ a → (a → a) → ℕ → a
