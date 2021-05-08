@@ -102,6 +102,9 @@ test-suite regular-test
                      , base-unicode-symbols
                      , groups
                      , fin
+                     , ordered-containers
+                     , tagged
+                     , universe
   ghc-options:         -threaded
   default-language:    Haskell2010
   default-extensions: UnicodeSyntax

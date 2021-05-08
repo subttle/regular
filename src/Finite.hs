@@ -154,7 +154,7 @@ instance (Finite a, U.Universe a)
        ⇒ U.Universe (OSet a) where
 instance (Finite a)
        ⇒ U.Finite (OSet a) where
-  -- http://oeis.org/A000522
+  -- https://oeis.org/A000522
   cardinality ∷ Tagged (OSet a) ℕ
   cardinality = fmap (\n → sum (fmap (\k → choose' (n, k) * factorial k) [0 .. n])) (retag (U.cardinality ∷ Tagged a ℕ))
 
