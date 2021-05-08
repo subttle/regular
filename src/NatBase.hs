@@ -10,9 +10,10 @@ import           Data.Function (on, (&))
 import           Data.Functor.Contravariant (Contravariant (..), Predicate (..), Op (..))
 import           Data.List.NonEmpty (NonEmpty (..))
 import qualified Data.List.NonEmpty as NE (reverse)
+import           GHC.Real (reduce)
 import           Numeric.Natural (Natural)
 import           Prelude hiding (even, odd)
-import           Common ((⋄), liftA4, ordering, quoteWith)
+import           Common ((‥), (⋄), liftA4, ordering, quoteWith)
 
 -- N.B. this entire file is currently experimental/untested/WIP!
 
@@ -100,7 +101,17 @@ instance Num ℕ where
   negate ∷ ℕ → ℕ
   negate = error "negate"
   (-) ∷ ℕ → ℕ → ℕ
-  (-) = undefined -- FIXME implement
+  (-) = fromIntegral ‥ ((-) `on` toInteger)
+
+instance Real ℕ where
+  toRational ∷ ℕ → Rational
+  toRational = (flip reduce `on` toInteger) (Succ Zero)
+
+instance Integral ℕ where
+  quotRem ∷ ℕ → ℕ → (ℕ, ℕ)
+  quotRem = undefined -- FIXME implement
+  toInteger ∷ ℕ → Integer
+  toInteger = nat 0 succ
 
 instance Semigroup ℕ where
   (<>) ∷ ℕ → ℕ → ℕ
