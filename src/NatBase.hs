@@ -147,4 +147,4 @@ brgc = nat (pure mempty) (liftA2 (⋄) (fmap (False :)) (fmap (True :) . NE.reve
 
 -- c.f. `replicateM`
 replicateA ∷ (Applicative f) ⇒ ℕ → f a → f [a]
-replicateA = nat (const (pure mempty)) (\f → liftA2 (:) <*> f)
+replicateA = nat (const (pure mempty)) ((<*>) (liftA2 (:)))
