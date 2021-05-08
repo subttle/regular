@@ -8,9 +8,10 @@ import           Data.Function (on)
 import           Data.Functor.Contravariant (Predicate (..))
 import           Data.List.NonEmpty (NonEmpty (..))
 import qualified Data.List.NonEmpty as NE (reverse)
+import           GHC.Real (reduce)
 import           Numeric.Natural (Natural)
 import           Prelude hiding (even, odd)
-import           Common ((⋄), (⊲), liftA4, ordering)
+import           Common ((‥), (⋄), (⊲), liftA4, ordering)
 
 
 -- N.B. this entire file is currently experimental/untested/WIP!
@@ -57,9 +58,18 @@ instance Num ℕ¹ where
   signum =              const One
   negate ∷ ℕ¹ → ℕ¹
   negate = error "negate"
-  -- FIXME TODO
-  -- (-) ∷ ℕ¹ → ℕ¹ → ℕ¹
-  -- (-) = undefined
+  (-) ∷ ℕ¹ → ℕ¹ → ℕ¹
+  (-) = fromIntegral ‥ ((-) `on` toInteger)
+
+instance Real ℕ¹ where
+  toRational ∷ ℕ¹ → Rational
+  toRational = (flip reduce `on` toInteger) One
+
+instance Integral ℕ¹ where
+  quotRem ∷ ℕ¹ → ℕ¹ → (ℕ¹, ℕ¹)
+  quotRem = undefined -- FIXME implement
+  toInteger ∷ ℕ¹ → Integer
+  toInteger = nat1 1 succ
 
 instance Semigroup ℕ¹ where
   (<>) ∷ ℕ¹ → ℕ¹ → ℕ¹
