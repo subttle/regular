@@ -341,8 +341,8 @@ replicateTree n a = Node a forest
         lm ∷ ℕ
         lm =                      (n - 1) `div` m
 
--- `replicateM` with parameter of type ℕ (instead of parameter of type ℤ)
--- TODO replicateM' = natf (const (pure [])) ((<*>) (liftA2 (:)) . replicateM' . pred)
+-- `replicateM` with parameter of type ℕ (instead of parameter of type `Int`)
+-- TODO start replacing with `replicateA` where appropriate
 replicateM' ∷ (Applicative m) ⇒ ℕ → m a → m [a]
 replicateM' 0 = const (pure [])
 replicateM' n = (<*>) (liftA2 (:)) (replicateM' (pred n))
