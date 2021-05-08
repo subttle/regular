@@ -144,3 +144,8 @@ positive = Predicate (> 0)
 -- TODO
 brgc ∷ ℕ → NonEmpty [Bool]
 brgc = nat (pure mempty) (liftA2 (⋄) (fmap (False :)) (fmap (True :) . NE.reverse))
+
+-- c.f. `replicateM`
+replicateA ∷ (Applicative m) ⇒ ℕ → m a → m [a]
+replicateA Zero     = const (pure mempty)
+replicateA (Succ n) = (<*>) (liftA2 (:)) (replicateA n)
