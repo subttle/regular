@@ -4,7 +4,7 @@
 module NatBase where
 
 import           Control.Applicative (Alternative (..), Applicative (..))
-import           Control.Selective (Selective (..), selectM)
+import           Control.Selective (Selective (..), selectA)
 import           Control.Monad.Fix (MonadFix (..))
 import           Data.Function (on, (&))
 import           Data.Functor.Contravariant (Contravariant (..), Predicate (..), Op (..))
@@ -46,7 +46,7 @@ instance Alternative NatF where
 
 instance Selective NatF where
   select ∷ NatF (Either a b) → NatF (a → b) → NatF b
-  select = selectM
+  select = selectA
 
 instance Monad NatF where
   (>>=) ∷ NatF a → (a → NatF b) → NatF b
