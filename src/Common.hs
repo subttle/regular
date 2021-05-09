@@ -629,18 +629,29 @@ catalan = 1 ⊲ NE.unfoldr c (pure 1)
         n ∷ ℕ
         n = sum (NE.zipWith (*) ns (NE.reverse ns))
 
--- Rational numbers (as a non-empty list)
+-- ℚ (as a non-empty list)
+-- "Rational numbers"
 -- inspired by:
 -- http://www.cs.ox.ac.uk/people/jeremy.gibbons/publications/rationals.pdf
 -- FIXME untested
 rationals ∷ NonEmpty ℚ
 rationals = fix ((⊲) 1 . (=<<) (\q → pure (1 + q) ⋄ pure (1 / (1 + q))))
 
--- Natural numbers (as a non-empty list)
+-- ℕ (as a non-empty list)
+-- "Natural numbers"
+-- (i.e. {0, 1, 2, 3, 4, 5, ...})
 -- https://oeis.org/A001477
 naturals ∷ NonEmpty ℕ
 -- naturals = NE.iterate (+1) 0
 naturals = fix ((⊲) 0 . fmap (+ 1))
+
+-- ℕ⁺ (as a non-empty list)
+-- "Non-zero Natural numbers"
+-- (i.e. ℕ¹ from src/NatPBase.hs, i.e. ℕ \ {0}, i.e. {1, 2, 3, 4, 5, ...})
+-- https://oeis.org/A000027
+naturalsPlus ∷ NonEmpty ℕ
+-- naturalsPlus = NE.iterate (+1) 1
+naturalsPlus = fix ((⊲) 1 . fmap (+ 1))
 
 powers ∷ ℕ → NonEmpty ℕ
 powers n = fix ((⊲) 1 . fmap (* n))
