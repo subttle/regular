@@ -174,16 +174,16 @@ instance (Bounded a)
   minBound = Nothing
   maxBound ∷ Maybe a
   maxBound = Just maxBound
--- For `Maybe a` types where `a` is enumerable, enumerate as `Nothing : fmap Just [toEnum 0..]`.
-instance (Finite a)
+-- For `Maybe a` types where `a` is enumerable, enumerate as `Nothing : fmap Just asList`.
+instance (Enum a, Bounded a)
        ⇒ Enum (Maybe a) where
   toEnum   ∷ Int     → Maybe a
   toEnum 0 = Nothing
   toEnum n = Just (toEnum (pred n))
   fromEnum ∷ Maybe a → Int
-  fromEnum = maybe 0      (     succ . fromEnum)
+  fromEnum = maybe 0 (succ . fromEnum)
   enumFrom ∷ Maybe a → [Maybe a]
-  enumFrom = maybe asList (fmap Just . enumFrom)
+  enumFrom = maybe (Nothing : fmap Just (boundedEnumFrom minBound)) (fmap Just . boundedEnumFrom)
 instance (Finite a)
        ⇒ Finite (Maybe a) where
   asList ∷ [Maybe a]
