@@ -1243,6 +1243,12 @@ fromRGS (RGS rgs) = equating' (genericIndex rgs . fromEnum')
 disagreements ∷ (Finite a) ⇒ RGS a → RGS a → [ℕ]
 disagreements (RGS rgs₁) (RGS rgs₂) = fmap snd (List.filter ((≠) EQ . fst) (indexed (zipWith compare rgs₁ rgs₂)))
 
+-- TODO may change this definition slightly and also the type signature
+-- TODO testing
+-- Two partitionings are said to be /close/ when they only differ by moving exactly one element to a new block.
+close ∷ (Finite a) ⇒ Equivalence a → Equivalence a → Bool
+close (⮂) (⮀) = (==) (1 ∷ ℕ) (genericLength (disagreements (toRGS (⮂)) (toRGS (⮀))))
+
 -- TODO I think I tested this version in GHCI earlier but still need to add to test suit
 -- TODO a lot to rework/clean up here but this works for now
 -- TODO better name?
