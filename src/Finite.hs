@@ -1581,9 +1581,12 @@ instance (Show a, Finite a)
           top = quoteWith "⦍" "⦐" . (=<<) show
           bot ∷ [a] → String
           bot = quoteWith "⦏" "⦎" . (=<<) show
-      -- FIXME add cycle notation
+      -- show a Comparison as a permutation (in cyclic notation)
       _showc ∷ ∀ a . (Show a, Finite a) ⇒ Comparison a → String
-      _showc = undefined
+      _showc cmp = (=<<) (quoteWith "(" ")" . intercalate " " . toList . fmap show) orbits
+        where
+          orbits ∷ [NonEmpty a]
+          orbits = fromEquivalence (cycles cmp)
       -- show Comparison as a function
       _showf ∷ ∀ a . (Show a, Finite a) ⇒ Comparison a → String
       _showf (Comparison cmp) = unlines (fmap show'' graph)
