@@ -1583,10 +1583,7 @@ instance (Show a, Finite a)
           bot = quoteWith "⦏" "⦎" . (=<<) show
       -- show a Comparison as a permutation (in cyclic notation)
       _showc ∷ ∀ a . (Show a, Finite a) ⇒ Comparison a → String
-      _showc cmp = (=<<) (quoteWith "(" ")" . intercalate " " . toList . fmap show) orbits
-        where
-          orbits ∷ [NonEmpty a]
-          orbits = fromEquivalence (cycles cmp)
+      _showc = (=<<) (quoteWith "(" ")" . unwords . toList . fmap show) . (fromEquivalence . cycles)
       -- show Comparison as a function
       _showf ∷ ∀ a . (Show a, Finite a) ⇒ Comparison a → String
       _showf (Comparison cmp) = unlines (fmap show'' graph)
