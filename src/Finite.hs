@@ -1450,15 +1450,15 @@ trans = Predicate (\(Equivalence (≡)) → all (\(a₁, a₂, a₃) → ((a₁ 
 -- Check that the equivalence relation is lawful
 lawful ∷ (Finite a) ⇒ Predicate (Equivalence a)
 lawful = refl
-      <> sym
-      <> trans
+       ⋄ sym
+       ⋄ trans
 
 -- TODO clean this up, factor for modularity
 -- test if the Comparison is actually a total ordering
 lawfulComparison ∷ (Finite a) ⇒ Predicate (Comparison a)
 lawfulComparison = connexityC
-                <> antisymC
-                <> transC
+                 ⋄ antisymC
+                 ⋄ transC
 
 tolteq ∷ Comparison a → a → a → Bool
 tolteq (Comparison c) a₁ a₂ = a₁ `c` a₂ == LT
